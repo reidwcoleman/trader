@@ -17,7 +17,7 @@
             min-height: 100vh;
         }
 
-        /* Messy white lines background - Layer 1 */
+        /* Messy white lines background - Layer 1 - ALWAYS ON TOP */
         body::before {
             content: '';
             position: fixed;
@@ -26,17 +26,16 @@
             width: 100%;
             height: 100%;
             background-image:
-                linear-gradient(135deg, transparent 0%, transparent 48%, rgba(255,255,255,0.08) 48%, rgba(255,255,255,0.08) 52%, transparent 52%, transparent 100%),
-                linear-gradient(45deg, transparent 0%, transparent 48%, rgba(255,255,255,0.06) 48%, rgba(255,255,255,0.06) 52%, transparent 52%, transparent 100%),
-                linear-gradient(90deg, transparent 0%, transparent 48%, rgba(255,255,255,0.05) 48%, rgba(255,255,255,0.05) 50%, transparent 50%, transparent 100%);
+                linear-gradient(135deg, transparent 0%, transparent 48%, rgba(255,255,255,0.12) 48%, rgba(255,255,255,0.12) 52%, transparent 52%, transparent 100%),
+                linear-gradient(45deg, transparent 0%, transparent 48%, rgba(255,255,255,0.1) 48%, rgba(255,255,255,0.1) 52%, transparent 52%, transparent 100%),
+                linear-gradient(90deg, transparent 0%, transparent 48%, rgba(255,255,255,0.08) 48%, rgba(255,255,255,0.08) 50%, transparent 50%, transparent 100%);
             background-size: 100px 100px, 140px 140px, 70px 70px;
             background-position: 0 0, 50px 50px, 25px 25px;
-            opacity: 0.8;
-            z-index: 0;
+            z-index: 9999;
             pointer-events: none;
         }
 
-        /* Messy white lines background - Layer 2 */
+        /* Messy white lines background - Layer 2 - ALWAYS ON TOP */
         body::after {
             content: '';
             position: fixed;
@@ -49,29 +48,28 @@
                     42deg,
                     transparent,
                     transparent 38px,
-                    rgba(255,255,255,0.05) 38px,
-                    rgba(255,255,255,0.05) 40px
+                    rgba(255,255,255,0.08) 38px,
+                    rgba(255,255,255,0.08) 40px
                 ),
                 repeating-linear-gradient(
                     -48deg,
                     transparent,
                     transparent 28px,
-                    rgba(255,255,255,0.06) 28px,
-                    rgba(255,255,255,0.06) 30px
+                    rgba(255,255,255,0.1) 28px,
+                    rgba(255,255,255,0.1) 30px
                 ),
                 repeating-linear-gradient(
                     88deg,
                     transparent,
                     transparent 55px,
-                    rgba(255,255,255,0.04) 55px,
-                    rgba(255,255,255,0.04) 57px
+                    rgba(255,255,255,0.07) 55px,
+                    rgba(255,255,255,0.07) 57px
                 );
-            opacity: 0.9;
-            z-index: 0;
+            z-index: 9999;
             pointer-events: none;
         }
 
-        /* Ensure content is above background */
+        /* Ensure content is below background lines but still visible */
         #root {
             position: relative;
             z-index: 1;
