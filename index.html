@@ -8,12 +8,13 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
         const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');
@@ -42,6 +43,9 @@
             const [quantity, setQuantity] = useState(1);
             const [searchTerm, setSearchTerm] = useState('');
             const [activeTab, setActiveTab] = useState('market');
+
+            const chartRef = useRef(null);
+            const chartInstance = useRef(null);
 
             const COMMISSION_RATE = 0.03;
             const ALPHA_VANTAGE_KEY = 'KBWH9DJSWKX6UZ53';
@@ -327,6 +331,130 @@
 
                 setQuantity(1);
             };
+
+            // Generate historical price data for chart
+            const generateHistoricalData = (currentPrice, days = 30) => {
+                const data = [];
+                const labels = [];
+                let price = currentPrice;
+
+                // Generate past prices with realistic volatility
+                for (let i = days; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+
+                    // Add some random walk to the price
+                    const change = (Math.random() - 0.5) * (currentPrice * 0.03);
+                    price = Math.max(currentPrice * 0.8, Math.min(currentPrice * 1.2, price + change));
+                    data.push(price.toFixed(2));
+                }
+
+                // Make sure the last point is the current price
+                data[data.length - 1] = currentPrice.toFixed(2);
+
+                return { labels, data };
+            };
+
+            // Chart effect - create/update chart when stock is selected
+            useEffect(() => {
+                if (!selectedStock || !chartRef.current || !stocks.length) return;
+
+                const stock = stocks.find(s => s.symbol === selectedStock);
+                if (!stock) return;
+
+                // Destroy existing chart
+                if (chartInstance.current) {
+                    chartInstance.current.destroy();
+                }
+
+                // Generate historical data
+                const { labels, data } = generateHistoricalData(stock.price);
+
+                // Create new chart
+                const ctx = chartRef.current.getContext('2d');
+                chartInstance.current = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: `${stock.symbol} Price`,
+                            data: data,
+                            borderColor: stock.change >= 0 ? 'rgb(74, 222, 128)' : 'rgb(248, 113, 113)',
+                            backgroundColor: stock.change >= 0 ? 'rgba(74, 222, 128, 0.1)' : 'rgba(248, 113, 113, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            pointHoverBackgroundColor: stock.change >= 0 ? 'rgb(74, 222, 128)' : 'rgb(248, 113, 113)',
+                            pointHoverBorderColor: '#fff',
+                            pointHoverBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: stock.change >= 0 ? 'rgb(74, 222, 128)' : 'rgb(248, 113, 113)',
+                                borderWidth: 1,
+                                callbacks: {
+                                    label: function(context) {
+                                        return '$' + parseFloat(context.parsed.y).toFixed(2);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                grid: {
+                                    display: false,
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: 'rgba(255, 255, 255, 0.6)',
+                                    maxTicksLimit: 6
+                                }
+                            },
+                            y: {
+                                display: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: 'rgba(255, 255, 255, 0.6)',
+                                    callback: function(value) {
+                                        return '$' + value.toFixed(0);
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'nearest',
+                            axis: 'x',
+                            intersect: false
+                        }
+                    }
+                });
+
+                // Cleanup on unmount
+                return () => {
+                    if (chartInstance.current) {
+                        chartInstance.current.destroy();
+                    }
+                };
+            }, [selectedStock, stocks]);
 
             // Plan Selection Screen
             if (view === 'plan-select') {
@@ -631,6 +759,14 @@
                                             }`}>
                                                 {stocks.find(s => s.symbol === selectedStock)?.change >= 0 ? '+' : ''}
                                                 {stocks.find(s => s.symbol === selectedStock)?.change.toFixed(2)}%
+                                            </div>
+                                        </div>
+
+                                        {/* Price Chart */}
+                                        <div className="mb-6 bg-blue-700/20 rounded-xl p-4 border border-blue-600">
+                                            <h3 className="text-sm font-semibold text-blue-200 mb-3">📈 30-Day Price Chart</h3>
+                                            <div className="h-48">
+                                                <canvas ref={chartRef}></canvas>
                                             </div>
                                         </div>
 
