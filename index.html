@@ -560,14 +560,42 @@
             const createCompetition = async (memberName, contributionAmount) => {
                 const code = generateCompetitionCode();
                 const memberId = Date.now().toString();
+                const isPersonalPlan = parseFloat(contributionAmount || 0) === 0;
 
                 try {
-                    // Save competition to Supabase
+                    // Personal plans don't use Supabase - just local state
+                    if (isPersonalPlan) {
+                        const newCompetition = {
+                            code: 'PERSONAL',
+                            totalPool: 0,
+                            startTime: new Date().toISOString(),
+                            members: [{
+                                id: memberId,
+                                name: memberName,
+                                contribution: 0,
+                                portfolio: {
+                                    cash: 100000,
+                                    positions: {},
+                                    history: []
+                                },
+                                joinedAt: new Date().toISOString()
+                            }]
+                        };
+
+                        setCompetition(newCompetition);
+                        setCompetitionCode('PERSONAL');
+                        setCurrentUserId(memberId);
+                        setView('trading');
+                        console.log('✅ Personal plan created successfully');
+                        return;
+                    }
+
+                    // Family plans save to Supabase
                     const { data: compData, error: compError } = await supabase
                         .from('competitions')
                         .insert([{
                             code: code,
-                            total_pool: parseFloat(contributionAmount || 0)
+                            total_pool: parseFloat(contributionAmount)
                         }])
                         .select()
                         .single();
@@ -585,7 +613,7 @@
                             competition_code: code,
                             member_id: memberId,
                             name: memberName,
-                            contribution: parseFloat(contributionAmount || 0),
+                            contribution: parseFloat(contributionAmount),
                             portfolio: {
                                 cash: 100000,
                                 positions: {},
@@ -603,12 +631,12 @@
 
                     const newCompetition = {
                         code,
-                        totalPool: parseFloat(contributionAmount || 0),
+                        totalPool: parseFloat(contributionAmount),
                         startTime: compData.start_time,
                         members: [{
                             id: memberId,
                             name: memberName,
-                            contribution: parseFloat(contributionAmount || 0),
+                            contribution: parseFloat(contributionAmount),
                             portfolio: {
                                 cash: 100000,
                                 positions: {},
@@ -621,8 +649,7 @@
                     setCompetition(newCompetition);
                     setCompetitionCode(code);
                     setCurrentUserId(memberId);
-                    setView('trading');
-
+                    setView('code-display');
                     console.log('✅ Competition created successfully:', code);
                 } catch (error) {
                     console.error('Error creating competition:', error);
@@ -1094,6 +1121,90 @@
                                             Join Pool
                                         </button>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Code Display Screen (after creating competition)
+            if (view === 'code-display') {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-900 p-4 md:p-8 flex items-center justify-center">
+                        <div className="max-w-2xl w-full">
+                            <div className="bg-gradient-to-br from-purple-800 to-indigo-900 rounded-3xl p-8 border-4 border-purple-500 shadow-2xl">
+                                {/* Success Icon */}
+                                <div className="text-center mb-6">
+                                    <div className="inline-block bg-green-500 rounded-full p-6 mb-4">
+                                        <span className="text-7xl">✅</span>
+                                    </div>
+                                    <h1 className="text-4xl font-black text-white mb-2">Competition Created!</h1>
+                                    <p className="text-purple-200 text-lg">Share this code with your family members</p>
+                                </div>
+
+                                {/* Competition Code Display */}
+                                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-6 border-2 border-white/30">
+                                    <div className="text-center">
+                                        <p className="text-purple-200 text-sm font-semibold mb-3">YOUR COMPETITION CODE</p>
+                                        <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl p-6 mb-4">
+                                            <div className="text-6xl font-black text-gray-900 tracking-widest font-mono">
+                                                {competitionCode}
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(competitionCode);
+                                                setCopySuccess(true);
+                                                setTimeout(() => setCopySuccess(false), 2000);
+                                            }}
+                                            className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 mx-auto"
+                                        >
+                                            {copySuccess ? '✓ Copied!' : '📋 Copy Code'}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Instructions */}
+                                <div className="bg-blue-900/50 rounded-xl p-6 mb-6 border border-blue-500">
+                                    <h3 className="text-white font-bold mb-3 text-lg">📱 How to Share:</h3>
+                                    <ol className="text-purple-200 space-y-2 list-decimal list-inside">
+                                        <li>Copy the code above</li>
+                                        <li>Share it with your family members via text, email, or in person</li>
+                                        <li>They click "Join Pool" and enter this code</li>
+                                        <li>Everyone trades with $100,000 virtual cash</li>
+                                        <li>Winner takes the prize pool: <span className="text-green-300 font-bold">${competition?.totalPool || 0}</span></li>
+                                    </ol>
+                                </div>
+
+                                {/* Competition Info */}
+                                <div className="bg-purple-900/50 rounded-xl p-4 mb-6 border border-purple-500">
+                                    <div className="grid grid-cols-2 gap-4 text-center">
+                                        <div>
+                                            <div className="text-purple-300 text-sm">Your Name</div>
+                                            <div className="text-white font-bold text-lg">{userName}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-purple-300 text-sm">Your Entry</div>
+                                            <div className="text-green-300 font-bold text-lg">${contribution}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="grid grid-cols-1 gap-4">
+                                    <button
+                                        onClick={() => setView('trading')}
+                                        className="bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-300 hover:to-emerald-400 text-white py-5 rounded-xl font-black text-xl transition-all duration-300 shadow-lg"
+                                    >
+                                        🚀 Start Trading
+                                    </button>
+                                    <button
+                                        onClick={() => setView('plan-select')}
+                                        className="bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-xl font-bold transition-all duration-300"
+                                    >
+                                        ← Back to Home
+                                    </button>
                                 </div>
                             </div>
                         </div>
