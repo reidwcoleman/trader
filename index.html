@@ -207,6 +207,50 @@
                 }
             }, [watchlist]);
 
+            // Popular stocks database for search
+            const STOCK_DATABASE = [
+                { symbol: 'AAPL', name: 'Apple Inc.' },
+                { symbol: 'GOOGL', name: 'Alphabet Inc.' },
+                { symbol: 'MSFT', name: 'Microsoft Corporation' },
+                { symbol: 'AMZN', name: 'Amazon.com Inc.' },
+                { symbol: 'TSLA', name: 'Tesla Inc.' },
+                { symbol: 'NVDA', name: 'NVIDIA Corporation' },
+                { symbol: 'META', name: 'Meta Platforms Inc.' },
+                { symbol: 'NFLX', name: 'Netflix Inc.' },
+                { symbol: 'AMD', name: 'Advanced Micro Devices' },
+                { symbol: 'DIS', name: 'Walt Disney Company' },
+                { symbol: 'COIN', name: 'Coinbase Global Inc.' },
+                { symbol: 'BA', name: 'Boeing Company' },
+                { symbol: 'BABA', name: 'Alibaba Group' },
+                { symbol: 'NKE', name: 'Nike Inc.' },
+                { symbol: 'INTC', name: 'Intel Corporation' },
+                { symbol: 'V', name: 'Visa Inc.' },
+                { symbol: 'JPM', name: 'JPMorgan Chase' },
+                { symbol: 'WMT', name: 'Walmart Inc.' },
+                { symbol: 'PFE', name: 'Pfizer Inc.' },
+                { symbol: 'KO', name: 'Coca-Cola Company' },
+                { symbol: 'PEP', name: 'PepsiCo Inc.' },
+                { symbol: 'PYPL', name: 'PayPal Holdings' },
+                { symbol: 'ADBE', name: 'Adobe Inc.' },
+                { symbol: 'CRM', name: 'Salesforce Inc.' },
+                { symbol: 'CSCO', name: 'Cisco Systems' },
+                { symbol: 'ORCL', name: 'Oracle Corporation' },
+                { symbol: 'T', name: 'AT&T Inc.' },
+                { symbol: 'VZ', name: 'Verizon Communications' },
+                { symbol: 'GM', name: 'General Motors' },
+                { symbol: 'F', name: 'Ford Motor Company' },
+                { symbol: 'UBER', name: 'Uber Technologies' },
+                { symbol: 'LYFT', name: 'Lyft Inc.' },
+                { symbol: 'SQ', name: 'Block Inc.' },
+                { symbol: 'SHOP', name: 'Shopify Inc.' },
+                { symbol: 'SPOT', name: 'Spotify Technology' },
+                { symbol: 'SNAP', name: 'Snap Inc.' },
+                { symbol: 'TWTR', name: 'Twitter Inc.' },
+                { symbol: 'ZM', name: 'Zoom Video Communications' },
+                { symbol: 'ROKU', name: 'Roku Inc.' },
+                { symbol: 'PINS', name: 'Pinterest Inc.' }
+            ];
+
             const searchStocks = async (query) => {
                 if (!query || query.length < 1) {
                     setSearchResults([]);
@@ -215,41 +259,48 @@
                 }
 
                 setSearching(true);
-                setShowSearchResults(false);
+                setShowSearchResults(true);
+
+                // Simulate slight delay for better UX
+                await new Promise(resolve => setTimeout(resolve, 300));
 
                 try {
-                    // Use Yahoo Finance search API
-                    const response = await fetch(
-                        `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0`
-                    );
-                    const data = await response.json();
+                    const searchTerm = query.toLowerCase();
 
-                    console.log('Search API Response:', data);
+                    // Search in stock database
+                    const results = STOCK_DATABASE
+                        .filter(stock =>
+                            stock.symbol.toLowerCase().includes(searchTerm) ||
+                            stock.name.toLowerCase().includes(searchTerm)
+                        )
+                        .slice(0, 10)
+                        .map(stock => ({
+                            symbol: stock.symbol,
+                            name: stock.name,
+                            type: 'EQUITY',
+                            region: 'US',
+                            currency: 'USD'
+                        }));
 
-                    if (data.quotes && data.quotes.length > 0) {
-                        // Filter for stocks only (not crypto, futures, etc)
-                        const results = data.quotes
-                            .filter(quote => quote.quoteType === 'EQUITY' || quote.quoteType === 'ETF')
-                            .map(quote => ({
-                                symbol: quote.symbol,
-                                name: quote.longname || quote.shortname || quote.symbol,
-                                type: quote.quoteType,
-                                region: quote.exchDisp || 'US',
-                                currency: 'USD'
-                            }));
+                    console.log('Search Results:', results);
 
+                    if (results.length > 0) {
                         setSearchResults(results);
-                        setShowSearchResults(true);
                     } else {
-                        // No results found
-                        setSearchResults([]);
-                        setShowSearchResults(true);
+                        // If no match in database, assume it's a valid symbol and try to fetch it
+                        const upperQuery = query.toUpperCase();
+                        setSearchResults([{
+                            symbol: upperQuery,
+                            name: `${upperQuery} (Enter to load)`,
+                            type: 'EQUITY',
+                            region: 'US',
+                            currency: 'USD'
+                        }]);
                     }
                 } catch (error) {
                     console.error('Error searching stocks:', error);
                     setSearchResults([]);
-                    setShowSearchResults(true);
-                    setError('Search failed. Try again or use popular stocks.');
+                    setError('Search failed. Try typing a stock symbol like AAPL or TSLA.');
                 }
                 setSearching(false);
             };
