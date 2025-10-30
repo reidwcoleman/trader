@@ -152,19 +152,17 @@
         const { useState, useEffect, useRef } = React;
 
         // Initialize Supabase
-        // TODO: Replace with your actual Supabase project URL and anon key from:
-        // https://supabase.com/dashboard/project/YOUR_PROJECT/settings/api
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // e.g., https://abcdefghijklmnop.supabase.co
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const SUPABASE_URL = 'https://qaanvcxzdjekeabrdrqlu.supabase.co';
+        const SUPABASE_ANON_KEY = 'sbp_a644e14bab987209277b3e6747743fc6a311af06';
 
         let supabase = null;
         try {
-            if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && window.supabase) {
+            if (window.supabase) {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 console.log('✅ Supabase initialized successfully');
+                console.log('Project URL:', SUPABASE_URL);
             } else {
-                console.warn('⚠️ Supabase not configured. Family competitions will not work.');
-                console.log('Please update SUPABASE_URL and SUPABASE_ANON_KEY in index.html');
+                console.error('❌ Supabase library not loaded');
             }
         } catch (error) {
             console.error('❌ Error initializing Supabase:', error);
