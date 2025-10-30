@@ -152,12 +152,23 @@
         const { useState, useEffect, useRef } = React;
 
         // Initialize Supabase
-        const SUPABASE_URL = 'https://qaanvcxzdjekeabrdrqlu.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhYW52Y3h6ZGpla2VhYnJkcWx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTUxOTYsImV4cCI6MjA3NzQzMTE5Nn0.ivgT2pQEJm8S0yxLJcuOmSYdKn_tNplI40rp3ho2gRM';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // TODO: Replace with your actual Supabase project URL and anon key from:
+        // https://supabase.com/dashboard/project/YOUR_PROJECT/settings/api
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // e.g., https://abcdefghijklmnop.supabase.co
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
-        // Test Supabase connection
-        console.log('Supabase initialized:', supabase ? '✅' : '❌');
+        let supabase = null;
+        try {
+            if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase initialized successfully');
+            } else {
+                console.warn('⚠️ Supabase not configured. Family competitions will not work.');
+                console.log('Please update SUPABASE_URL and SUPABASE_ANON_KEY in index.html');
+            }
+        } catch (error) {
+            console.error('❌ Error initializing Supabase:', error);
+        }
 
         const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');
@@ -199,7 +210,7 @@
             ];
 
             // Finnhub API for real-time stock data (free tier: 60 calls/minute)
-            const FINNHUB_API_KEY = 'ctbl0tpr01qodqhlrmbgctbl0tpr01qodqhlrmc0';
+            const FINNHUB_API_KEY = 'd3sop19r01qpdd5kkpsgd3sop19r01qpdd5kkpt0';
             const FINNHUB_API_BASE = 'https://finnhub.io/api/v1';
 
             useEffect(() => {
@@ -599,6 +610,11 @@
                     }
 
                     // Family plans save to Supabase
+                    if (!supabase) {
+                        alert('Supabase is not configured. Please update the SUPABASE_URL and SUPABASE_ANON_KEY in index.html.\n\nGet these values from: https://supabase.com/dashboard → Your Project → Settings → API');
+                        return;
+                    }
+
                     console.log('Creating competition with code:', code);
                     const { data: compData, error: compError } = await supabase
                         .from('competitions')
@@ -675,6 +691,11 @@
                 const memberId = Date.now().toString();
 
                 try {
+                    if (!supabase) {
+                        alert('Supabase is not configured. Please update the SUPABASE_URL and SUPABASE_ANON_KEY in index.html.\n\nGet these values from: https://supabase.com/dashboard → Your Project → Settings → API');
+                        return;
+                    }
+
                     // Check if competition exists
                     const { data: compData, error: compError } = await supabase
                         .from('competitions')
