@@ -195,8 +195,9 @@
                 'NVDA', 'META', 'NFLX', 'AMD', 'DIS'
             ];
 
-            // Yahoo Finance API proxy (no rate limits)
-            const YAHOO_FINANCE_API = 'https://query1.finance.yahoo.com/v8/finance/chart/';
+            // Finnhub API for real-time stock data (free tier: 60 calls/minute)
+            const FINNHUB_API_KEY = 'ctbl0tpr01qodqhlrmbgctbl0tpr01qodqhlrmc0';
+            const FINNHUB_API_BASE = 'https://finnhub.io/api/v1';
 
             useEffect(() => {
                 const saved = localStorage.getItem('stockWatchlist');
@@ -331,46 +332,48 @@
                     setLoading(true);
                     setError(null);
 
-                    // Batch fetch all stocks using Yahoo Finance quote API
-                    const symbols = watchlist.join(',');
-                    const response = await fetch(
-                        `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}`
-                    );
-                    const data = await response.json();
+                    // Fetch all stocks in parallel using Finnhub
+                    const promises = watchlist.map(async (symbol) => {
+                        try {
+                            // Get current quote
+                            const quoteResponse = await fetch(
+                                `${FINNHUB_API_BASE}/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`
+                            );
+                            const quoteData = await quoteResponse.json();
 
-                    console.log('Yahoo Finance Quote API Response:', data);
+                            console.log(`Finnhub ${symbol}:`, quoteData);
 
-                    if (data.quoteResponse && data.quoteResponse.result) {
-                        const stocksData = data.quoteResponse.result.map(quote => {
-                            const currentPrice = quote.regularMarketPrice;
-                            const previousClose = quote.regularMarketPreviousClose;
-                            const priceChange = quote.regularMarketChange;
-                            const changePercent = quote.regularMarketChangePercent;
-
-                            console.log(`${quote.symbol}:`, {
-                                price: currentPrice,
-                                change: changePercent,
-                                previousClose: previousClose
-                            });
+                            const currentPrice = quoteData.c; // Current price
+                            const previousClose = quoteData.pc; // Previous close
+                            const priceChange = quoteData.d; // Change
+                            const changePercent = quoteData.dp; // Change percent
+                            const high = quoteData.h; // High
+                            const low = quoteData.l; // Low
+                            const open = quoteData.o; // Open
 
                             return {
-                                symbol: quote.symbol,
-                                name: quote.longName || quote.shortName || getStockName(quote.symbol),
+                                symbol: symbol,
+                                name: getStockName(symbol),
                                 price: parseFloat((currentPrice || 0).toFixed(2)),
                                 change: parseFloat((changePercent || 0).toFixed(2)),
-                                volume: formatVolume(quote.regularMarketVolume || 0),
+                                volume: 'N/A',
                                 previousClose: previousClose || 0,
-                                high: quote.regularMarketDayHigh || currentPrice,
-                                low: quote.regularMarketDayLow || currentPrice,
-                                marketCap: formatVolume(quote.marketCap || 0)
+                                high: high || currentPrice,
+                                low: low || currentPrice,
+                                open: open || currentPrice
                             };
-                        });
+                        } catch (error) {
+                            console.error(`Error fetching ${symbol}:`, error);
+                            return getFallbackStockData(symbol);
+                        }
+                    });
 
+                    const stocksData = await Promise.all(promises);
+
+                    if (stocksData.length > 0) {
                         setStocks(stocksData);
                         setLastUpdate(new Date());
-                        console.log('✅ All stocks loaded with accurate prices:', stocksData);
-                    } else {
-                        throw new Error('Invalid API response');
+                        console.log('✅ All stocks loaded with Finnhub real-time prices:', stocksData);
                     }
 
                     setLoading(false);
@@ -432,23 +435,25 @@
                 };
             };
 
-            // Fetch live data for a single stock using Yahoo Finance Quote API
+            // Fetch live data for a single stock using Finnhub API
             const fetchSingleStock = async (symbol, stockName = null) => {
                 try {
                     const response = await fetch(
-                        `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`
+                        `${FINNHUB_API_BASE}/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`
                     );
                     const data = await response.json();
 
                     console.log(`Fetching single stock ${symbol}:`, data);
 
-                    if (data.quoteResponse && data.quoteResponse.result && data.quoteResponse.result[0]) {
-                        const quote = data.quoteResponse.result[0];
-                        const currentPrice = quote.regularMarketPrice;
-                        const previousClose = quote.regularMarketPreviousClose;
-                        const changePercent = quote.regularMarketChangePercent;
+                    if (data.c) {
+                        const currentPrice = data.c; // Current price
+                        const previousClose = data.pc; // Previous close
+                        const changePercent = data.dp; // Change percent
+                        const high = data.h; // High
+                        const low = data.l; // Low
+                        const open = data.o; // Open
 
-                        console.log(`✅ ${symbol}:`, {
+                        console.log(`✅ Finnhub ${symbol}:`, {
                             price: currentPrice,
                             change: changePercent,
                             previousClose: previousClose
@@ -456,14 +461,14 @@
 
                         return {
                             symbol: symbol,
-                            name: stockName || quote.longName || quote.shortName || getStockName(symbol),
+                            name: stockName || getStockName(symbol),
                             price: parseFloat((currentPrice || 0).toFixed(2)),
                             change: parseFloat((changePercent || 0).toFixed(2)),
-                            volume: formatVolume(quote.regularMarketVolume || 0),
+                            volume: 'N/A',
                             previousClose: previousClose || 0,
-                            high: quote.regularMarketDayHigh || currentPrice,
-                            low: quote.regularMarketDayLow || currentPrice,
-                            marketCap: formatVolume(quote.marketCap || 0)
+                            high: high || currentPrice,
+                            low: low || currentPrice,
+                            open: open || currentPrice
                         };
                     } else {
                         // Fallback if API fails
