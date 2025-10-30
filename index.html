@@ -156,6 +156,9 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhYW52Y3h6ZGpla2VhYnJkcWx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTUxOTYsImV4cCI6MjA3NzQzMTE5Nn0.ivgT2pQEJm8S0yxLJcuOmSYdKn_tNplI40rp3ho2gRM';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Test Supabase connection
+        console.log('Supabase initialized:', supabase ? '✅' : '❌');
+
         const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');
             const [plan, setPlan] = useState(null);
@@ -596,6 +599,7 @@
                     }
 
                     // Family plans save to Supabase
+                    console.log('Creating competition with code:', code);
                     const { data: compData, error: compError } = await supabase
                         .from('competitions')
                         .insert([{
@@ -606,12 +610,15 @@
                         .single();
 
                     if (compError) {
-                        console.error('Error creating competition:', compError);
-                        alert('Failed to create competition. Please try again.');
+                        console.error('Supabase error creating competition:', compError);
+                        alert(`Failed to create competition: ${compError.message}\n\nPlease check browser console for details.`);
                         return;
                     }
 
+                    console.log('Competition created in Supabase:', compData);
+
                     // Save member to Supabase
+                    console.log('Creating member with ID:', memberId);
                     const { data: memberData, error: memberError } = await supabase
                         .from('members')
                         .insert([{
@@ -629,10 +636,12 @@
                         .single();
 
                     if (memberError) {
-                        console.error('Error creating member:', memberError);
-                        alert('Failed to create member. Please try again.');
+                        console.error('Supabase error creating member:', memberError);
+                        alert(`Failed to create member: ${memberError.message}\n\nPlease check browser console for details.`);
                         return;
                     }
+
+                    console.log('Member created in Supabase:', memberData);
 
                     const newCompetition = {
                         code,
