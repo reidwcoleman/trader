@@ -329,25 +329,41 @@
                     const promises = watchlist.map(async (symbol) => {
                         try {
                             const response = await fetch(
-                                `${YAHOO_FINANCE_API}${symbol}?interval=1d&range=1d`
+                                `${YAHOO_FINANCE_API}${symbol}?interval=1d&range=5d`
                             );
                             const data = await response.json();
 
+                            console.log(`Fetching ${symbol}:`, data);
+
                             if (data.chart && data.chart.result && data.chart.result[0]) {
                                 const result = data.chart.result[0];
-                                const quote = result.meta;
-                                const currentPrice = quote.regularMarketPrice;
-                                const previousClose = quote.chartPreviousClose || quote.previousClose;
-                                const change = ((currentPrice - previousClose) / previousClose) * 100;
+                                const meta = result.meta;
+                                const timestamps = result.timestamp;
+                                const quotes = result.indicators.quote[0];
+
+                                // Get the latest available price
+                                const latestClose = quotes.close[quotes.close.length - 1];
+                                const currentPrice = meta.regularMarketPrice || latestClose;
+                                const previousClose = meta.chartPreviousClose || meta.previousClose;
+
+                                // Calculate change percentage
+                                const priceChange = currentPrice - previousClose;
+                                const changePercent = (priceChange / previousClose) * 100;
+
+                                console.log(`${symbol} - Price: $${currentPrice}, Change: ${changePercent.toFixed(2)}%`);
 
                                 return {
                                     symbol: symbol,
                                     name: getStockName(symbol),
-                                    price: currentPrice,
-                                    change: change,
-                                    volume: formatVolume(quote.regularMarketVolume || 0)
+                                    price: parseFloat(currentPrice.toFixed(2)),
+                                    change: parseFloat(changePercent.toFixed(2)),
+                                    volume: formatVolume(meta.regularMarketVolume || 0),
+                                    previousClose: previousClose,
+                                    high: meta.regularMarketDayHigh || latestClose,
+                                    low: meta.regularMarketDayLow || latestClose
                                 };
                             }
+                            console.warn(`No data for ${symbol}, using fallback`);
                             return getFallbackStockData(symbol);
                         } catch (error) {
                             console.error(`Error fetching ${symbol}:`, error);
@@ -360,6 +376,7 @@
                     if (stocksData.length > 0) {
                         setStocks(stocksData);
                         setLastUpdate(new Date());
+                        console.log('All stocks loaded:', stocksData);
                     }
 
                     setLoading(false);
@@ -425,26 +442,41 @@
             const fetchSingleStock = async (symbol, stockName = null) => {
                 try {
                     const response = await fetch(
-                        `${YAHOO_FINANCE_API}${symbol}?interval=1d&range=1d`
+                        `${YAHOO_FINANCE_API}${symbol}?interval=1d&range=5d`
                     );
                     const data = await response.json();
 
+                    console.log(`Fetching single stock ${symbol}:`, data);
+
                     if (data.chart && data.chart.result && data.chart.result[0]) {
                         const result = data.chart.result[0];
-                        const quote = result.meta;
-                        const currentPrice = quote.regularMarketPrice;
-                        const previousClose = quote.chartPreviousClose || quote.previousClose;
-                        const change = ((currentPrice - previousClose) / previousClose) * 100;
+                        const meta = result.meta;
+                        const quotes = result.indicators.quote[0];
+
+                        // Get the latest available price
+                        const latestClose = quotes.close[quotes.close.length - 1];
+                        const currentPrice = meta.regularMarketPrice || latestClose;
+                        const previousClose = meta.chartPreviousClose || meta.previousClose;
+
+                        // Calculate change percentage
+                        const priceChange = currentPrice - previousClose;
+                        const changePercent = (priceChange / previousClose) * 100;
+
+                        console.log(`${symbol} - Price: $${currentPrice}, Change: ${changePercent.toFixed(2)}%`);
 
                         return {
                             symbol: symbol,
                             name: stockName || getStockName(symbol),
-                            price: currentPrice,
-                            change: change,
-                            volume: formatVolume(quote.regularMarketVolume || 0)
+                            price: parseFloat(currentPrice.toFixed(2)),
+                            change: parseFloat(changePercent.toFixed(2)),
+                            volume: formatVolume(meta.regularMarketVolume || 0),
+                            previousClose: previousClose,
+                            high: meta.regularMarketDayHigh || latestClose,
+                            low: meta.regularMarketDayLow || latestClose
                         };
                     } else {
                         // Fallback if API fails
+                        console.warn(`No data for ${symbol}, using fallback`);
                         const fallbackData = getFallbackStockData(symbol);
                         if (stockName) fallbackData.name = stockName;
                         return fallbackData;
