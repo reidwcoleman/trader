@@ -941,27 +941,60 @@
                 setQuantityError('');
             };
 
-            // Generate historical price data for chart
-            const generateHistoricalData = (currentPrice, days = 30) => {
+            // Fetch real historical price data from Finnhub
+            const fetchHistoricalData = async (symbol) => {
+                try {
+                    // Get data for last 30 days
+                    const toDate = Math.floor(Date.now() / 1000);
+                    const fromDate = toDate - (30 * 24 * 60 * 60); // 30 days ago
+
+                    const response = await fetch(
+                        `${FINNHUB_API_BASE}/stock/candle?symbol=${symbol}&resolution=D&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`
+                    );
+                    const data = await response.json();
+
+                    if (data.s === 'ok' && data.c && data.c.length > 0) {
+                        // data.c = closing prices, data.t = timestamps
+                        const labels = data.t.map(timestamp => {
+                            const date = new Date(timestamp * 1000);
+                            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        });
+                        const prices = data.c.map(price => price.toFixed(2));
+
+                        console.log(`✅ Loaded real historical data for ${symbol}:`, {
+                            dataPoints: prices.length,
+                            firstPrice: prices[0],
+                            lastPrice: prices[prices.length - 1]
+                        });
+
+                        return { labels, data: prices };
+                    } else {
+                        console.warn(`No historical data available for ${symbol}, using fallback`);
+                        return null;
+                    }
+                } catch (error) {
+                    console.error(`Error fetching historical data for ${symbol}:`, error);
+                    return null;
+                }
+            };
+
+            // Generate fallback historical data if API fails
+            const generateFallbackHistoricalData = (currentPrice, days = 30) => {
                 const data = [];
                 const labels = [];
                 let price = currentPrice;
 
-                // Generate past prices with realistic volatility
                 for (let i = days; i >= 0; i--) {
                     const date = new Date();
                     date.setDate(date.getDate() - i);
                     labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
 
-                    // Add some random walk to the price
                     const change = (Math.random() - 0.5) * (currentPrice * 0.03);
                     price = Math.max(currentPrice * 0.8, Math.min(currentPrice * 1.2, price + change));
                     data.push(price.toFixed(2));
                 }
 
-                // Make sure the last point is the current price
                 data[data.length - 1] = currentPrice.toFixed(2);
-
                 return { labels, data };
             };
 
@@ -977,12 +1010,21 @@
                     chartInstance.current.destroy();
                 }
 
-                // Generate historical data
-                const { labels, data } = generateHistoricalData(stock.price);
+                // Fetch and render real historical data
+                const loadChart = async () => {
+                    // Try to fetch real data from Finnhub
+                    let historicalData = await fetchHistoricalData(selectedStock);
 
-                // Create new chart
-                const ctx = chartRef.current.getContext('2d');
-                chartInstance.current = new Chart(ctx, {
+                    // Fallback to generated data if API fails
+                    if (!historicalData) {
+                        historicalData = generateFallbackHistoricalData(stock.price);
+                    }
+
+                    const { labels, data } = historicalData;
+
+                    // Create new chart
+                    const ctx = chartRef.current.getContext('2d');
+                    chartInstance.current = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: labels,
@@ -1055,7 +1097,11 @@
                             intersect: false
                         }
                     }
-                });
+                    });
+                };
+
+                // Call async function
+                loadChart();
 
                 // Cleanup on unmount
                 return () => {
