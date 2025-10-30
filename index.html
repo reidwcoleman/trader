@@ -9,6 +9,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* Dark theme with messy white lines background */
         html, body {
@@ -149,6 +150,11 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+
+        // Initialize Supabase
+        const SUPABASE_URL = 'https://9e34dee5-1d75-4e25-a574-2e09e5b85511.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IjllMzRkZWU1LTFkNzUtNGUyNS1hNTc0LTJlMDllNWI4NTUxMSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzQwODUxNjg2LCJleHAiOjIwNTY0Mjc2ODZ9.PJr4MTPX8T-BfzILLGJpZ4tOmN8TQEq0uf9FwKlLpWc';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');
@@ -551,31 +557,168 @@
                 return Math.random().toString(36).substring(2, 8).toUpperCase();
             };
 
-            const createCompetition = (memberName, contributionAmount) => {
+            const createCompetition = async (memberName, contributionAmount) => {
                 const code = generateCompetitionCode();
                 const memberId = Date.now().toString();
 
-                const newCompetition = {
-                    code,
-                    totalPool: parseFloat(contributionAmount || 0),
-                    startTime: new Date().toISOString(),
-                    members: [{
-                        id: memberId,
-                        name: memberName,
-                        contribution: parseFloat(contributionAmount || 0),
-                        portfolio: {
-                            cash: 100000,
-                            positions: {},
-                            history: []
-                        },
-                        joinedAt: new Date().toISOString()
-                    }]
-                };
+                try {
+                    // Save competition to Supabase
+                    const { data: compData, error: compError } = await supabase
+                        .from('competitions')
+                        .insert([{
+                            code: code,
+                            total_pool: parseFloat(contributionAmount || 0)
+                        }])
+                        .select()
+                        .single();
 
-                setCompetition(newCompetition);
-                setCompetitionCode(code);
-                setCurrentUserId(memberId);
-                setView('trading');
+                    if (compError) {
+                        console.error('Error creating competition:', compError);
+                        alert('Failed to create competition. Please try again.');
+                        return;
+                    }
+
+                    // Save member to Supabase
+                    const { data: memberData, error: memberError } = await supabase
+                        .from('members')
+                        .insert([{
+                            competition_code: code,
+                            member_id: memberId,
+                            name: memberName,
+                            contribution: parseFloat(contributionAmount || 0),
+                            portfolio: {
+                                cash: 100000,
+                                positions: {},
+                                history: []
+                            }
+                        }])
+                        .select()
+                        .single();
+
+                    if (memberError) {
+                        console.error('Error creating member:', memberError);
+                        alert('Failed to create member. Please try again.');
+                        return;
+                    }
+
+                    const newCompetition = {
+                        code,
+                        totalPool: parseFloat(contributionAmount || 0),
+                        startTime: compData.start_time,
+                        members: [{
+                            id: memberId,
+                            name: memberName,
+                            contribution: parseFloat(contributionAmount || 0),
+                            portfolio: {
+                                cash: 100000,
+                                positions: {},
+                                history: []
+                            },
+                            joinedAt: memberData.joined_at
+                        }]
+                    };
+
+                    setCompetition(newCompetition);
+                    setCompetitionCode(code);
+                    setCurrentUserId(memberId);
+                    setView('trading');
+
+                    console.log('✅ Competition created successfully:', code);
+                } catch (error) {
+                    console.error('Error creating competition:', error);
+                    alert('Failed to create competition. Please try again.');
+                }
+            };
+
+            const joinCompetition = async (code, memberName, contributionAmount) => {
+                const memberId = Date.now().toString();
+
+                try {
+                    // Check if competition exists
+                    const { data: compData, error: compError } = await supabase
+                        .from('competitions')
+                        .select('*')
+                        .eq('code', code)
+                        .single();
+
+                    if (compError || !compData) {
+                        alert('Competition not found! Please check the code and try again.');
+                        console.error('Competition not found:', compError);
+                        return;
+                    }
+
+                    // Get existing members
+                    const { data: existingMembers, error: membersError } = await supabase
+                        .from('members')
+                        .select('*')
+                        .eq('competition_code', code);
+
+                    if (membersError) {
+                        console.error('Error fetching members:', membersError);
+                        alert('Failed to load competition members. Please try again.');
+                        return;
+                    }
+
+                    // Add new member
+                    const { data: newMemberData, error: newMemberError } = await supabase
+                        .from('members')
+                        .insert([{
+                            competition_code: code,
+                            member_id: memberId,
+                            name: memberName,
+                            contribution: parseFloat(contributionAmount || 0),
+                            portfolio: {
+                                cash: 100000,
+                                positions: {},
+                                history: []
+                            }
+                        }])
+                        .select()
+                        .single();
+
+                    if (newMemberError) {
+                        console.error('Error joining competition:', newMemberError);
+                        alert('Failed to join competition. Please try again.');
+                        return;
+                    }
+
+                    // Update total pool
+                    const newTotalPool = compData.total_pool + parseFloat(contributionAmount || 0);
+                    const { error: updateError } = await supabase
+                        .from('competitions')
+                        .update({ total_pool: newTotalPool })
+                        .eq('code', code);
+
+                    if (updateError) {
+                        console.error('Error updating pool:', updateError);
+                    }
+
+                    // Build competition object with all members
+                    const allMembers = [...existingMembers, newMemberData].map(m => ({
+                        id: m.member_id,
+                        name: m.name,
+                        contribution: m.contribution,
+                        portfolio: m.portfolio,
+                        joinedAt: m.joined_at
+                    }));
+
+                    const joinedCompetition = {
+                        code: code,
+                        totalPool: newTotalPool,
+                        startTime: compData.start_time,
+                        members: allMembers
+                    };
+
+                    setCompetition(joinedCompetition);
+                    setCompetitionCode(code);
+                    setCurrentUserId(memberId);
+                    setView('trading');
+
+                    console.log('✅ Joined competition successfully:', code);
+                } catch (error) {
+                    console.error('Error joining competition:', error);
+                    alert('Failed to join competition. Please try again.');
+                }
             };
 
             // Helper to calculate max shares you can buy
@@ -658,7 +801,7 @@
                 }
             };
 
-            const executeTrade = (type) => {
+            const executeTrade = async (type) => {
                 if (!selectedStock || quantity <= 0) return;
 
                 const stock = stocks.find(s => s.symbol === selectedStock);
@@ -707,12 +850,32 @@
                     }]
                 };
 
+                // Update local state
                 setCompetition(prev => ({
                     ...prev,
                     members: prev.members.map(m =>
                         m.id === currentUserId ? { ...m, portfolio: updatedPortfolio } : m
                     )
                 }));
+
+                // Sync to Supabase for family competitions
+                if (plan === 'family' && competition?.code) {
+                    try {
+                        const { error } = await supabase
+                            .from('members')
+                            .update({ portfolio: updatedPortfolio })
+                            .eq('competition_code', competition.code)
+                            .eq('member_id', currentUserId);
+
+                        if (error) {
+                            console.error('Error syncing trade to Supabase:', error);
+                        } else {
+                            console.log('✅ Trade synced to Supabase');
+                        }
+                    } catch (error) {
+                        console.error('Error syncing trade:', error);
+                    }
+                }
 
                 setQuantity(1);
                 setQuantityError('');
@@ -956,6 +1119,20 @@
                                 </h2>
 
                                 <div className="space-y-6">
+                                    {view === 'join-family' && (
+                                        <div>
+                                            <label className="block text-blue-100 font-semibold mb-2">Competition Code</label>
+                                            <input
+                                                type="text"
+                                                value={joinCode}
+                                                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                                                placeholder="Enter 6-character code"
+                                                maxLength="6"
+                                                className="w-full bg-blue-700/50 border border-blue-500 rounded-xl px-4 py-3 text-white text-2xl font-bold placeholder-blue-300 text-center tracking-widest uppercase"
+                                            />
+                                        </div>
+                                    )}
+
                                     <div>
                                         <label className="block text-blue-100 font-semibold mb-2">Your Name</label>
                                         <input
@@ -986,7 +1163,19 @@
                                                 alert('Please enter your name');
                                                 return;
                                             }
-                                            if (plan === 'personal') {
+
+                                            if (view === 'join-family') {
+                                                // Join existing competition
+                                                if (!joinCode || joinCode.length !== 6) {
+                                                    alert('Please enter a valid 6-character competition code');
+                                                    return;
+                                                }
+                                                if (!contribution || parseFloat(contribution) <= 0) {
+                                                    alert('Please enter a valid contribution amount');
+                                                    return;
+                                                }
+                                                joinCompetition(joinCode, userName, contribution);
+                                            } else if (plan === 'personal') {
                                                 createCompetition(userName, 0);
                                             } else if (!contribution || parseFloat(contribution) <= 0) {
                                                 alert('Please enter a valid contribution amount');
