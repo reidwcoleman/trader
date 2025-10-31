@@ -182,6 +182,8 @@
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         account_code TEXT UNIQUE NOT NULL,
                         user_name TEXT NOT NULL,
+                        user_email TEXT NOT NULL,
+                        passcode TEXT NOT NULL,
                         portfolio TEXT NOT NULL,
                         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -237,15 +239,15 @@
         // SQLite Database Functions
         const SQLiteDB = {
             // Create new personal account
-            createAccount(code, userName, portfolio) {
+            createAccount(code, userName, userEmail, passcode, portfolio) {
                 if (!db) throw new Error('Database not initialized');
 
                 const portfolioJson = JSON.stringify(portfolio);
                 const now = new Date().toISOString();
 
                 db.run(
-                    'INSERT INTO personal_accounts (account_code, user_name, portfolio, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
-                    [code, userName, portfolioJson, now, now]
+                    'INSERT INTO personal_accounts (account_code, user_name, user_email, passcode, portfolio, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [code, userName, userEmail, passcode, portfolioJson, now, now]
                 );
 
                 saveDatabase();
@@ -254,6 +256,8 @@
                 return {
                     account_code: code,
                     user_name: userName,
+                    user_email: userEmail,
+                    passcode: passcode,
                     portfolio: portfolio,
                     created_at: now
                 };
@@ -277,9 +281,37 @@
                     id: row[0],
                     account_code: row[1],
                     user_name: row[2],
-                    portfolio: JSON.parse(row[3]),
-                    created_at: row[4],
-                    updated_at: row[5]
+                    user_email: row[3],
+                    passcode: row[4],
+                    portfolio: JSON.parse(row[5]),
+                    created_at: row[6],
+                    updated_at: row[7]
+                };
+            },
+
+            // Get account by email and passcode (for login)
+            getAccountByEmailAndPasscode(email, passcode) {
+                if (!db) throw new Error('Database not initialized');
+
+                const result = db.exec(
+                    'SELECT * FROM personal_accounts WHERE user_email = ? AND passcode = ?',
+                    [email, passcode]
+                );
+
+                if (result.length === 0 || result[0].values.length === 0) {
+                    return null;
+                }
+
+                const row = result[0].values[0];
+                return {
+                    id: row[0],
+                    account_code: row[1],
+                    user_name: row[2],
+                    user_email: row[3],
+                    passcode: row[4],
+                    portfolio: JSON.parse(row[5]),
+                    created_at: row[6],
+                    updated_at: row[7]
                 };
             },
 
@@ -321,6 +353,9 @@
             const [view, setView] = useState('plan-select');
             const [plan, setPlan] = useState(null);
             const [userName, setUserName] = useState('');
+            const [userEmail, setUserEmail] = useState('');
+            const [userPasscode, setUserPasscode] = useState('');
+            const [generatedPasscode, setGeneratedPasscode] = useState('');
             const [currentUserId, setCurrentUserId] = useState(null);
             const [contribution, setContribution] = useState('');
 
@@ -817,6 +852,11 @@
                 return Math.random().toString(36).substring(2, 8).toUpperCase();
             };
 
+            const generatePasscode = () => {
+                // Generate 6-digit passcode
+                return Math.floor(100000 + Math.random() * 900000).toString();
+            };
+
             const createCompetition = async (memberName, contributionAmount) => {
                 const code = generateCompetitionCode();
                 const memberId = Date.now().toString();
@@ -843,7 +883,9 @@
                             return;
                         }
 
-                        accountData = SQLiteDB.createAccount(code, memberName, initialPortfolio);
+                        const passcode = generatePasscode();
+                        accountData = SQLiteDB.createAccount(code, memberName, userEmail, passcode, initialPortfolio);
+                        setGeneratedPasscode(passcode);
 
                         const newCompetition = {
                             code: code,
@@ -1045,6 +1087,55 @@
                 } catch (error) {
                     console.error('Error joining competition:', error);
                     alert('Failed to join competition. Please try again.');
+                }
+            };
+
+            const signInWithEmailAndPasscode = async (email, passcode) => {
+                try {
+                    console.log('Signing in with email and passcode:', email);
+
+                    // Use SQLite database
+                    if (!dbReady) {
+                        alert('Database is still loading. Please wait a moment and try again.');
+                        return;
+                    }
+
+                    const accountData = SQLiteDB.getAccountByEmailAndPasscode(email, passcode);
+
+                    if (!accountData) {
+                        alert('Invalid email or passcode! Please check your credentials and try again.');
+                        console.error('Account not found for email:', email);
+                        return;
+                    }
+
+                    console.log('✅ Personal account loaded:', accountData);
+
+                    const memberId = Date.now().toString();
+                    const loadedCompetition = {
+                        code: accountData.account_code,
+                        totalPool: 0,
+                        startTime: accountData.created_at,
+                        members: [{
+                            id: memberId,
+                            name: accountData.user_name,
+                            contribution: 0,
+                            portfolio: accountData.portfolio,
+                            joinedAt: accountData.created_at
+                        }]
+                    };
+
+                    setCompetition(loadedCompetition);
+                    setCompetitionCode(accountData.account_code);
+                    setCurrentUserId(memberId);
+                    setUserName(accountData.user_name);
+                    setUserEmail(email);
+                    setPlan('personal');
+                    setView('trading');
+
+                    console.log('✅ Signed in to personal account successfully');
+                } catch (error) {
+                    console.error('Error signing in to personal account:', error);
+                    alert('Failed to sign in. Please try again.');
                 }
             };
 
@@ -1662,36 +1753,71 @@
                                     <p className="text-purple-200 text-lg">{plan === 'personal' ? 'Save this code to sign in from any device' : 'Share this code with your family members'}</p>
                                 </div>
 
-                                {/* Competition Code Display */}
-                                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-6 border-2 border-white/30">
-                                    <div className="text-center">
-                                        <p className="text-purple-200 text-sm font-semibold mb-3">{plan === 'personal' ? 'YOUR ACCOUNT CODE' : 'YOUR COMPETITION CODE'}</p>
-                                        <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl p-6 mb-4">
-                                            <div className="text-6xl font-black text-gray-900 tracking-widest font-mono">
-                                                {competitionCode}
+                                {/* Login Credentials Display */}
+                                {plan === 'personal' ? (
+                                    <div className="space-y-4 mb-6">
+                                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
+                                            <div className="text-center">
+                                                <p className="text-purple-200 text-sm font-semibold mb-2">YOUR EMAIL</p>
+                                                <div className="bg-gradient-to-r from-blue-400 to-cyan-400 rounded-xl p-4">
+                                                    <div className="text-2xl font-bold text-gray-900">
+                                                        {userEmail}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(competitionCode);
-                                                setCopySuccess(true);
-                                                setTimeout(() => setCopySuccess(false), 2000);
-                                            }}
-                                            className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 mx-auto"
-                                        >
-                                            {copySuccess ? '✓ Copied!' : '📋 Copy Code'}
-                                        </button>
+                                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
+                                            <div className="text-center">
+                                                <p className="text-purple-200 text-sm font-semibold mb-2">YOUR PASSCODE</p>
+                                                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl p-6">
+                                                    <div className="text-5xl font-black text-gray-900 tracking-widest font-mono">
+                                                        {generatedPasscode}
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(`Email: ${userEmail}\nPasscode: ${generatedPasscode}`);
+                                                        setCopySuccess(true);
+                                                        setTimeout(() => setCopySuccess(false), 2000);
+                                                    }}
+                                                    className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 mx-auto mt-4"
+                                                >
+                                                    {copySuccess ? '✓ Copied!' : '📋 Copy Login Info'}
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                ) : (
+                                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-6 border-2 border-white/30">
+                                        <div className="text-center">
+                                            <p className="text-purple-200 text-sm font-semibold mb-3">YOUR COMPETITION CODE</p>
+                                            <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl p-6 mb-4">
+                                                <div className="text-6xl font-black text-gray-900 tracking-widest font-mono">
+                                                    {competitionCode}
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(competitionCode);
+                                                    setCopySuccess(true);
+                                                    setTimeout(() => setCopySuccess(false), 2000);
+                                                }}
+                                                className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 mx-auto"
+                                            >
+                                                {copySuccess ? '✓ Copied!' : '📋 Copy Code'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Instructions */}
                                 <div className="bg-blue-900/50 rounded-xl p-6 mb-6 border border-blue-500">
-                                    <h3 className="text-white font-bold mb-3 text-lg">{plan === 'personal' ? '🔐 Important - Save Your Code!' : '📱 How to Share:'}</h3>
+                                    <h3 className="text-white font-bold mb-3 text-lg">{plan === 'personal' ? '🔐 Important - Save Your Login Info!' : '📱 How to Share:'}</h3>
                                     {plan === 'personal' ? (
                                         <ul className="text-purple-200 space-y-2 list-disc list-inside">
-                                            <li>This code is your only way to access your account</li>
-                                            <li>Save it in a safe place (password manager, notes app, etc.)</li>
-                                            <li>Use it to sign in from any device</li>
+                                            <li>Your email and passcode are your only way to access your account</li>
+                                            <li>Save them in a safe place (password manager, notes app, etc.)</li>
+                                            <li>Use them to sign in from any device</li>
                                             <li>Your portfolio and trades are saved to the cloud</li>
                                             <li className="text-green-300 font-semibold">You start with $100,000 virtual cash - Happy trading! 📈</li>
                                         </ul>
@@ -1759,30 +1885,45 @@
                                         <span className="text-6xl">🔐</span>
                                     </div>
                                     <h1 className="text-4xl font-black text-white mb-2">Sign In</h1>
-                                    <p className="text-blue-200">Enter your account code to continue trading</p>
+                                    <p className="text-blue-200">Enter your email and passcode to continue trading</p>
                                 </div>
 
                                 <div className="space-y-6">
                                     <div>
-                                        <label className="block text-cyan-300 font-bold mb-3 text-sm uppercase tracking-wide">Your Account Code</label>
+                                        <label className="block text-cyan-300 font-bold mb-3 text-sm uppercase tracking-wide">Email Address</label>
+                                        <input
+                                            type="email"
+                                            value={userEmail}
+                                            onChange={(e) => setUserEmail(e.target.value)}
+                                            placeholder="your@email.com"
+                                            className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-cyan-300 font-bold mb-3 text-sm uppercase tracking-wide">Passcode</label>
                                         <input
                                             type="text"
-                                            value={joinCode}
-                                            onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                                            placeholder="XXXXXX"
+                                            value={userPasscode}
+                                            onChange={(e) => setUserPasscode(e.target.value)}
+                                            placeholder="123456"
                                             maxLength="6"
-                                            className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-3xl font-black placeholder-blue-300 text-center tracking-widest uppercase focus:border-cyan-400 focus:outline-none transition-all"
+                                            className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-3xl font-black placeholder-blue-300 text-center tracking-widest focus:border-cyan-400 focus:outline-none transition-all"
                                         />
-                                        <p className="text-xs text-blue-300 mt-2 text-center">This is the 6-character code you received when you created your account</p>
+                                        <p className="text-xs text-blue-300 mt-2 text-center">This is the 6-digit passcode you received when you created your account</p>
                                     </div>
 
                                     <button
                                         onClick={() => {
-                                            if (!joinCode || joinCode.length !== 6) {
-                                                alert('Please enter your 6-character account code');
+                                            if (!userEmail || !userEmail.includes('@')) {
+                                                alert('Please enter a valid email address');
                                                 return;
                                             }
-                                            signInToPersonalAccount(joinCode);
+                                            if (!userPasscode || userPasscode.length !== 6) {
+                                                alert('Please enter your 6-digit passcode');
+                                                return;
+                                            }
+                                            signInWithEmailAndPasscode(userEmail, userPasscode);
                                         }}
                                         className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white py-4 rounded-xl font-black text-lg transition-all duration-300 shadow-lg hover:shadow-xl"
                                     >
@@ -1844,6 +1985,20 @@
                                         />
                                     </div>
 
+                                    {plan === 'personal' && (
+                                        <div>
+                                            <label className="block text-blue-100 font-semibold mb-2">Email Address</label>
+                                            <input
+                                                type="email"
+                                                value={userEmail}
+                                                onChange={(e) => setUserEmail(e.target.value)}
+                                                placeholder="your@email.com"
+                                                className="w-full bg-blue-700/50 border border-blue-500 rounded-xl px-4 py-3 text-white placeholder-blue-300"
+                                            />
+                                            <p className="text-xs text-blue-300 mt-2">We'll generate a passcode for you to log back in</p>
+                                        </div>
+                                    )}
+
                                     {plan === 'family' && (
                                         <div>
                                             <label className="block text-blue-100 font-semibold mb-2">Entry Amount ($)</label>
@@ -1876,6 +2031,10 @@
                                                 }
                                                 joinCompetition(joinCode, userName, contribution);
                                             } else if (plan === 'personal') {
+                                                if (!userEmail || !userEmail.includes('@')) {
+                                                    alert('Please enter a valid email address');
+                                                    return;
+                                                }
                                                 createCompetition(userName, 0);
                                             } else if (!contribution || parseFloat(contribution) <= 0) {
                                                 alert('Please enter a valid contribution amount');
