@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         /* Dark theme with messy white lines background */
         html, body {
@@ -700,7 +700,8 @@
                             portfolio: {
                                 cash: 100000,
                                 positions: {},
-                                history: []
+                                history: [],
+                                lastBuyTime: {}
                             },
                             joinedAt: memberData.joined_at
                         }]
@@ -762,7 +763,8 @@
                             portfolio: {
                                 cash: 100000,
                                 positions: {},
-                                history: []
+                                history: [],
+                                lastBuyTime: {}
                             }
                         }])
                         .select()
@@ -904,6 +906,8 @@
 
                 const totalCost = stock.price * quantity;
                 const portfolio = getCurrentPortfolio();
+                const COOLDOWN_MINUTES = 15;
+                const COOLDOWN_MS = COOLDOWN_MINUTES * 60 * 1000;
 
                 if (type === 'buy') {
                     const maxBuy = getMaxBuyQuantity(selectedStock);
@@ -916,10 +920,25 @@
                         return;
                     }
                 } else {
+                    // SELL - Check position
                     const currentPosition = portfolio.positions[selectedStock] || 0;
                     if (quantity > currentPosition) {
                         alert(`Insufficient shares! You only own ${currentPosition} shares of ${selectedStock}`);
                         return;
+                    }
+
+                    // Check 15-minute cooldown
+                    const lastBuyTime = portfolio.lastBuyTime?.[selectedStock];
+                    if (lastBuyTime) {
+                        const timeSinceBuy = Date.now() - new Date(lastBuyTime).getTime();
+                        const minutesSinceBuy = Math.floor(timeSinceBuy / 60000);
+
+                        if (timeSinceBuy < COOLDOWN_MS) {
+                            const minutesRemaining = COOLDOWN_MINUTES - minutesSinceBuy;
+                            const secondsRemaining = Math.ceil((COOLDOWN_MS - timeSinceBuy) / 1000) % 60;
+                            alert(`⏳ Trading Cooldown Active!\n\nYou must wait ${minutesRemaining} minute(s) and ${secondsRemaining} second(s) before selling ${selectedStock}.\n\nThis prevents rapid trading and encourages strategic decisions.`);
+                            return;
+                        }
                     }
                 }
 
@@ -939,7 +958,10 @@
                         price: stock.price,
                         total: totalCost,
                         timestamp: new Date().toISOString()
-                    }]
+                    }],
+                    lastBuyTime: type === 'buy'
+                        ? { ...portfolio.lastBuyTime, [selectedStock]: new Date().toISOString() }
+                        : portfolio.lastBuyTime
                 };
 
                 // Update local state
