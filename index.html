@@ -366,20 +366,17 @@
             const FINNHUB_API_KEY = 'd3sop19r01qpdd5kkpsgd3sop19r01qpdd5kkpt0';
             const FINNHUB_API_BASE = 'https://finnhub.io/api/v1';
 
+            // Load watchlist from portfolio when competition/account changes
             useEffect(() => {
-                const saved = localStorage.getItem('stockWatchlist');
-                if (saved) {
-                    setWatchlist(JSON.parse(saved));
-                } else {
-                    setWatchlist(POPULAR_STOCKS);
+                if (competition?.members) {
+                    const currentMember = competition.members.find(m => m.id === currentUserId);
+                    if (currentMember?.portfolio?.watchlist) {
+                        setWatchlist(currentMember.portfolio.watchlist);
+                    } else {
+                        setWatchlist([]);
+                    }
                 }
-            }, []);
-
-            useEffect(() => {
-                if (watchlist.length > 0) {
-                    localStorage.setItem('stockWatchlist', JSON.stringify(watchlist));
-                }
-            }, [watchlist]);
+            }, [competition, currentUserId]);
 
             // Popular stocks database for search
             const STOCK_DATABASE = [
@@ -692,7 +689,32 @@
                 const stockData = await fetchSingleStock(symbol, stockName);
 
                 // Add to watchlist
-                setWatchlist([...watchlist, symbol]);
+                const newWatchlist = [...watchlist, symbol];
+                setWatchlist(newWatchlist);
+
+                // Update portfolio with new watchlist
+                const portfolio = getCurrentPortfolio();
+                const updatedPortfolio = {
+                    ...portfolio,
+                    watchlist: newWatchlist
+                };
+
+                // Update local state
+                setCompetition(prev => ({
+                    ...prev,
+                    members: prev.members.map(m =>
+                        m.id === currentUserId ? { ...m, portfolio: updatedPortfolio } : m
+                    )
+                }));
+
+                // Sync to SQLite database
+                if (competition?.code && plan === 'personal' && dbReady) {
+                    try {
+                        SQLiteDB.updateAccount(competition.code, updatedPortfolio);
+                    } catch (error) {
+                        console.error('Error syncing watchlist to SQLite:', error);
+                    }
+                }
 
                 // Add to stocks array or update if exists
                 const existingIndex = stocks.findIndex(s => s.symbol === symbol);
@@ -714,8 +736,33 @@
             };
 
             const removeFromWatchlist = (symbol) => {
-                setWatchlist(watchlist.filter(s => s !== symbol));
+                const newWatchlist = watchlist.filter(s => s !== symbol);
+                setWatchlist(newWatchlist);
                 setStocks(stocks.filter(s => s.symbol !== symbol));
+
+                // Update portfolio with new watchlist
+                const portfolio = getCurrentPortfolio();
+                const updatedPortfolio = {
+                    ...portfolio,
+                    watchlist: newWatchlist
+                };
+
+                // Update local state
+                setCompetition(prev => ({
+                    ...prev,
+                    members: prev.members.map(m =>
+                        m.id === currentUserId ? { ...m, portfolio: updatedPortfolio } : m
+                    )
+                }));
+
+                // Sync to SQLite database
+                if (competition?.code && plan === 'personal' && dbReady) {
+                    try {
+                        SQLiteDB.updateAccount(competition.code, updatedPortfolio);
+                    } catch (error) {
+                        console.error('Error syncing watchlist to SQLite:', error);
+                    }
+                }
             };
 
             useEffect(() => {
@@ -741,10 +788,10 @@
 
             const getCurrentPortfolio = () => {
                 if (plan === 'personal') {
-                    return competition?.members[0]?.portfolio || { cash: 100000, positions: {}, history: [], lastBuyTime: {} };
+                    return competition?.members[0]?.portfolio || { cash: 100000, positions: {}, history: [], lastBuyTime: {}, watchlist: [] };
                 }
                 const member = competition?.members.find(m => m.id === currentUserId);
-                return member?.portfolio || { cash: 100000, positions: {}, history: [], lastBuyTime: {} };
+                return member?.portfolio || { cash: 100000, positions: {}, history: [], lastBuyTime: {}, watchlist: [] };
             };
 
             const calculatePortfolioValue = (portfolio) => {
@@ -784,7 +831,8 @@
                             cash: 100000,
                             positions: {},
                             history: [],
-                            lastBuyTime: {}
+                            lastBuyTime: {},
+                            watchlist: []
                         };
 
                         let accountData;
@@ -856,7 +904,8 @@
                                 cash: 100000,
                                 positions: {},
                                 history: [],
-                                lastBuyTime: {}
+                                lastBuyTime: {},
+                                watchlist: []
                             }
                         }])
                         .select()
@@ -882,7 +931,8 @@
                                 cash: 100000,
                                 positions: {},
                                 history: [],
-                                lastBuyTime: {}
+                                lastBuyTime: {},
+                                watchlist: []
                             },
                             joinedAt: memberData.joined_at
                         }]
@@ -945,7 +995,8 @@
                                 cash: 100000,
                                 positions: {},
                                 history: [],
-                                lastBuyTime: {}
+                                lastBuyTime: {},
+                                watchlist: []
                             }
                         }])
                         .select()
