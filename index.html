@@ -151,22 +151,74 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // Initialize Supabase
+        // Initialize Supabase (optional - falls back to localStorage if unavailable)
         const SUPABASE_URL = 'https://qaanvcxzdjekeabrdrqlu.supabase.co';
         const SUPABASE_ANON_KEY = 'sbp_a644e14bab987209277b3e6747743fc6a311af06';
 
         let supabase = null;
+        let useLocalStorage = false;
+
         try {
             if (window.supabase) {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('✅ Supabase initialized successfully');
+                console.log('✅ Supabase initialized successfully - using cloud storage');
                 console.log('Project URL:', SUPABASE_URL);
             } else {
-                console.error('❌ Supabase library not loaded');
+                console.warn('⚠️ Supabase library not loaded - falling back to localStorage');
+                useLocalStorage = true;
             }
         } catch (error) {
             console.error('❌ Error initializing Supabase:', error);
+            console.warn('⚠️ Falling back to localStorage');
+            useLocalStorage = true;
         }
+
+        // LocalStorage Database Functions (fallback when Supabase unavailable)
+        const LocalDB = {
+            // Get all accounts from localStorage
+            getAccounts() {
+                const accounts = localStorage.getItem('tradeWars_accounts');
+                return accounts ? JSON.parse(accounts) : {};
+            },
+
+            // Save accounts to localStorage
+            saveAccounts(accounts) {
+                localStorage.setItem('tradeWars_accounts', JSON.stringify(accounts));
+            },
+
+            // Create new account
+            createAccount(code, userName, portfolio) {
+                const accounts = this.getAccounts();
+                accounts[code] = {
+                    account_code: code,
+                    user_name: userName,
+                    portfolio: portfolio,
+                    created_at: new Date().toISOString()
+                };
+                this.saveAccounts(accounts);
+                console.log('✅ Account saved to localStorage:', code);
+                return accounts[code];
+            },
+
+            // Get account by code
+            getAccount(code) {
+                const accounts = this.getAccounts();
+                return accounts[code] || null;
+            },
+
+            // Update account portfolio
+            updateAccount(code, portfolio) {
+                const accounts = this.getAccounts();
+                if (accounts[code]) {
+                    accounts[code].portfolio = portfolio;
+                    accounts[code].updated_at = new Date().toISOString();
+                    this.saveAccounts(accounts);
+                    console.log('✅ Account updated in localStorage:', code);
+                    return true;
+                }
+                return false;
+            }
+        };
 
         const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');
@@ -626,38 +678,43 @@
                 const isPersonalPlan = parseFloat(contributionAmount || 0) === 0;
 
                 try {
-                    // Personal plans now also use Supabase for cloud storage
+                    // Personal plans use Supabase or localStorage fallback
                     if (isPersonalPlan) {
-                        if (!supabase) {
-                            alert('Database connection required. Please check your internet connection and try again.');
-                            return;
-                        }
-
                         console.log('Creating personal account with code:', code);
 
-                        // Save personal account to Supabase
-                        const { data: accountData, error: accountError } = await supabase
-                            .from('personal_accounts')
-                            .insert([{
-                                account_code: code,
-                                user_name: memberName,
-                                portfolio: {
-                                    cash: 100000,
-                                    positions: {},
-                                    history: [],
-                                    lastBuyTime: {}
-                                }
-                            }])
-                            .select()
-                            .single();
+                        const initialPortfolio = {
+                            cash: 100000,
+                            positions: {},
+                            history: [],
+                            lastBuyTime: {}
+                        };
 
-                        if (accountError) {
-                            console.error('Supabase error creating personal account:', accountError);
-                            alert(`Failed to create account: ${accountError.message}\n\nPlease check browser console for details.`);
-                            return;
+                        let accountData;
+
+                        // Try Supabase first, fall back to localStorage
+                        if (supabase && !useLocalStorage) {
+                            try {
+                                const { data, error } = await supabase
+                                    .from('personal_accounts')
+                                    .insert([{
+                                        account_code: code,
+                                        user_name: memberName,
+                                        portfolio: initialPortfolio
+                                    }])
+                                    .select()
+                                    .single();
+
+                                if (error) throw error;
+                                accountData = data;
+                                console.log('✅ Personal account created in Supabase:', accountData);
+                            } catch (err) {
+                                console.warn('⚠️ Supabase failed, using localStorage:', err);
+                                accountData = LocalDB.createAccount(code, memberName, initialPortfolio);
+                            }
+                        } else {
+                            // Use localStorage directly
+                            accountData = LocalDB.createAccount(code, memberName, initialPortfolio);
                         }
-
-                        console.log('Personal account created in Supabase:', accountData);
 
                         const newCompetition = {
                             code: code,
@@ -667,12 +724,7 @@
                                 id: memberId,
                                 name: memberName,
                                 contribution: 0,
-                                portfolio: {
-                                    cash: 100000,
-                                    positions: {},
-                                    history: [],
-                                    lastBuyTime: {}
-                                },
+                                portfolio: initialPortfolio,
                                 joinedAt: accountData.created_at
                             }]
                         };
@@ -866,27 +918,38 @@
 
             const signInToPersonalAccount = async (accountCode) => {
                 try {
-                    if (!supabase) {
-                        alert('Database connection required. Please check your internet connection and try again.');
-                        return;
-                    }
-
                     console.log('Signing in to personal account:', accountCode);
 
-                    // Load account from Supabase
-                    const { data: accountData, error: accountError } = await supabase
-                        .from('personal_accounts')
-                        .select('*')
-                        .eq('account_code', accountCode)
-                        .single();
+                    let accountData = null;
 
-                    if (accountError || !accountData) {
+                    // Try Supabase first, fall back to localStorage
+                    if (supabase && !useLocalStorage) {
+                        try {
+                            const { data, error } = await supabase
+                                .from('personal_accounts')
+                                .select('*')
+                                .eq('account_code', accountCode)
+                                .single();
+
+                            if (error) throw error;
+                            accountData = data;
+                            console.log('✅ Personal account loaded from Supabase:', accountData);
+                        } catch (err) {
+                            console.warn('⚠️ Supabase failed, checking localStorage:', err);
+                            accountData = LocalDB.getAccount(accountCode);
+                        }
+                    } else {
+                        // Use localStorage directly
+                        accountData = LocalDB.getAccount(accountCode);
+                    }
+
+                    if (!accountData) {
                         alert('Account not found! Please check your account code and try again.');
-                        console.error('Account not found:', accountError);
+                        console.error('Account not found for code:', accountCode);
                         return;
                     }
 
-                    console.log('Personal account loaded:', accountData);
+                    console.log('✅ Personal account loaded:', accountData);
 
                     const memberId = Date.now().toString();
                     const loadedCompetition = {
@@ -1093,37 +1156,46 @@
                     )
                 }));
 
-                // Sync to Supabase for both personal and family plans
+                // Sync to database (Supabase or localStorage)
                 if (competition?.code) {
                     try {
                         if (plan === 'personal') {
-                            // Sync personal account
-                            const { error } = await supabase
-                                .from('personal_accounts')
-                                .update({ portfolio: updatedPortfolio })
-                                .eq('account_code', competition.code);
+                            // Sync personal account - try Supabase, fall back to localStorage
+                            if (supabase && !useLocalStorage) {
+                                try {
+                                    const { error } = await supabase
+                                        .from('personal_accounts')
+                                        .update({ portfolio: updatedPortfolio })
+                                        .eq('account_code', competition.code);
 
-                            if (error) {
-                                console.error('Error syncing personal account to Supabase:', error);
+                                    if (error) throw error;
+                                    console.log('✅ Personal account synced to Supabase');
+                                } catch (err) {
+                                    console.warn('⚠️ Supabase sync failed, using localStorage:', err);
+                                    LocalDB.updateAccount(competition.code, updatedPortfolio);
+                                }
                             } else {
-                                console.log('✅ Personal account synced to Supabase');
+                                // Use localStorage directly
+                                LocalDB.updateAccount(competition.code, updatedPortfolio);
                             }
                         } else if (plan === 'family-public' || plan === 'family-private') {
-                            // Sync family competition member
-                            const { error } = await supabase
-                                .from('members')
-                                .update({ portfolio: updatedPortfolio })
-                                .eq('competition_code', competition.code)
-                                .eq('member_id', currentUserId);
+                            // Sync family competition member (requires Supabase)
+                            if (supabase) {
+                                const { error } = await supabase
+                                    .from('members')
+                                    .update({ portfolio: updatedPortfolio })
+                                    .eq('competition_code', competition.code)
+                                    .eq('member_id', currentUserId);
 
-                            if (error) {
-                                console.error('Error syncing trade to Supabase:', error);
-                            } else {
-                                console.log('✅ Trade synced to Supabase');
+                                if (error) {
+                                    console.error('Error syncing trade to Supabase:', error);
+                                } else {
+                                    console.log('✅ Trade synced to Supabase');
+                                }
                             }
                         }
                     } catch (error) {
-                        console.error('Error syncing to Supabase:', error);
+                        console.error('Error syncing:', error);
                     }
                 }
 
