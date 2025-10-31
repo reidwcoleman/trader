@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <style>
         /* Dark theme with messy white lines background */
         html, body {
@@ -151,74 +151,171 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // Initialize Supabase (optional - falls back to localStorage if unavailable)
-        const SUPABASE_URL = 'https://qaanvcxzdjekeabrdrqlu.supabase.co';
-        const SUPABASE_ANON_KEY = 'sbp_a644e14bab987209277b3e6747743fc6a311af06';
+        // Initialize SQLite Database
+        let db = null;
+        let dbReady = false;
 
-        let supabase = null;
-        let useLocalStorage = false;
+        // Initialize SQL.js and create/load database
+        async function initDatabase() {
+            try {
+                console.log('🗄️ Initializing SQLite database...');
 
-        try {
-            if (window.supabase) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('✅ Supabase initialized successfully - using cloud storage');
-                console.log('Project URL:', SUPABASE_URL);
-            } else {
-                console.warn('⚠️ Supabase library not loaded - falling back to localStorage');
-                useLocalStorage = true;
+                // Load sql.js with WASM
+                const SQL = await initSqlJs({
+                    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+                });
+
+                // Try to load existing database from localStorage
+                const savedDb = localStorage.getItem('tradeWars_sqlite_db');
+                if (savedDb) {
+                    const uint8Array = new Uint8Array(JSON.parse(savedDb));
+                    db = new SQL.Database(uint8Array);
+                    console.log('✅ Loaded existing SQLite database from localStorage');
+                } else {
+                    db = new SQL.Database();
+                    console.log('✅ Created new SQLite database');
+                }
+
+                // Create tables if they don't exist
+                db.run(`
+                    CREATE TABLE IF NOT EXISTS personal_accounts (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        account_code TEXT UNIQUE NOT NULL,
+                        user_name TEXT NOT NULL,
+                        portfolio TEXT NOT NULL,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                `);
+
+                db.run(`
+                    CREATE TABLE IF NOT EXISTS competitions (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        code TEXT UNIQUE NOT NULL,
+                        total_pool REAL DEFAULT 0,
+                        start_time TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                `);
+
+                db.run(`
+                    CREATE TABLE IF NOT EXISTS members (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        competition_code TEXT NOT NULL,
+                        member_id TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        contribution REAL DEFAULT 0,
+                        portfolio TEXT NOT NULL,
+                        joined_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        UNIQUE(competition_code, member_id)
+                    )
+                `);
+
+                // Save database to localStorage
+                saveDatabase();
+
+                dbReady = true;
+                console.log('✅ SQLite database initialized successfully');
+            } catch (error) {
+                console.error('❌ Error initializing SQLite:', error);
+                dbReady = false;
             }
-        } catch (error) {
-            console.error('❌ Error initializing Supabase:', error);
-            console.warn('⚠️ Falling back to localStorage');
-            useLocalStorage = true;
         }
 
-        // LocalStorage Database Functions (fallback when Supabase unavailable)
-        const LocalDB = {
-            // Get all accounts from localStorage
-            getAccounts() {
-                const accounts = localStorage.getItem('tradeWars_accounts');
-                return accounts ? JSON.parse(accounts) : {};
-            },
+        // Save database to localStorage
+        function saveDatabase() {
+            if (!db) return;
+            try {
+                const data = db.export();
+                const buffer = Array.from(data);
+                localStorage.setItem('tradeWars_sqlite_db', JSON.stringify(buffer));
+                console.log('💾 Database saved to localStorage');
+            } catch (error) {
+                console.error('Error saving database:', error);
+            }
+        }
 
-            // Save accounts to localStorage
-            saveAccounts(accounts) {
-                localStorage.setItem('tradeWars_accounts', JSON.stringify(accounts));
-            },
-
-            // Create new account
+        // SQLite Database Functions
+        const SQLiteDB = {
+            // Create new personal account
             createAccount(code, userName, portfolio) {
-                const accounts = this.getAccounts();
-                accounts[code] = {
+                if (!db) throw new Error('Database not initialized');
+
+                const portfolioJson = JSON.stringify(portfolio);
+                const now = new Date().toISOString();
+
+                db.run(
+                    'INSERT INTO personal_accounts (account_code, user_name, portfolio, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
+                    [code, userName, portfolioJson, now, now]
+                );
+
+                saveDatabase();
+                console.log('✅ Account saved to SQLite:', code);
+
+                return {
                     account_code: code,
                     user_name: userName,
                     portfolio: portfolio,
-                    created_at: new Date().toISOString()
+                    created_at: now
                 };
-                this.saveAccounts(accounts);
-                console.log('✅ Account saved to localStorage:', code);
-                return accounts[code];
             },
 
             // Get account by code
             getAccount(code) {
-                const accounts = this.getAccounts();
-                return accounts[code] || null;
+                if (!db) throw new Error('Database not initialized');
+
+                const result = db.exec(
+                    'SELECT * FROM personal_accounts WHERE account_code = ?',
+                    [code]
+                );
+
+                if (result.length === 0 || result[0].values.length === 0) {
+                    return null;
+                }
+
+                const row = result[0].values[0];
+                return {
+                    id: row[0],
+                    account_code: row[1],
+                    user_name: row[2],
+                    portfolio: JSON.parse(row[3]),
+                    created_at: row[4],
+                    updated_at: row[5]
+                };
             },
 
             // Update account portfolio
             updateAccount(code, portfolio) {
-                const accounts = this.getAccounts();
-                if (accounts[code]) {
-                    accounts[code].portfolio = portfolio;
-                    accounts[code].updated_at = new Date().toISOString();
-                    this.saveAccounts(accounts);
-                    console.log('✅ Account updated in localStorage:', code);
-                    return true;
-                }
-                return false;
+                if (!db) throw new Error('Database not initialized');
+
+                const portfolioJson = JSON.stringify(portfolio);
+                const now = new Date().toISOString();
+
+                db.run(
+                    'UPDATE personal_accounts SET portfolio = ?, updated_at = ? WHERE account_code = ?',
+                    [portfolioJson, now, code]
+                );
+
+                saveDatabase();
+                console.log('✅ Account updated in SQLite:', code);
+                return true;
+            },
+
+            // Get all accounts (for debugging)
+            getAllAccounts() {
+                if (!db) return [];
+
+                const result = db.exec('SELECT account_code, user_name FROM personal_accounts');
+                if (result.length === 0) return [];
+
+                return result[0].values.map(row => ({
+                    account_code: row[0],
+                    user_name: row[1]
+                }));
             }
         };
+
+        // Initialize database on load
+        initDatabase();
 
         const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');
@@ -691,30 +788,13 @@
 
                         let accountData;
 
-                        // Try Supabase first, fall back to localStorage
-                        if (supabase && !useLocalStorage) {
-                            try {
-                                const { data, error } = await supabase
-                                    .from('personal_accounts')
-                                    .insert([{
-                                        account_code: code,
-                                        user_name: memberName,
-                                        portfolio: initialPortfolio
-                                    }])
-                                    .select()
-                                    .single();
-
-                                if (error) throw error;
-                                accountData = data;
-                                console.log('✅ Personal account created in Supabase:', accountData);
-                            } catch (err) {
-                                console.warn('⚠️ Supabase failed, using localStorage:', err);
-                                accountData = LocalDB.createAccount(code, memberName, initialPortfolio);
-                            }
-                        } else {
-                            // Use localStorage directly
-                            accountData = LocalDB.createAccount(code, memberName, initialPortfolio);
+                        // Use SQLite database (always available)
+                        if (!dbReady) {
+                            alert('Database is still loading. Please wait a moment and try again.');
+                            return;
                         }
+
+                        accountData = SQLiteDB.createAccount(code, memberName, initialPortfolio);
 
                         const newCompetition = {
                             code: code,
@@ -922,26 +1002,13 @@
 
                     let accountData = null;
 
-                    // Try Supabase first, fall back to localStorage
-                    if (supabase && !useLocalStorage) {
-                        try {
-                            const { data, error } = await supabase
-                                .from('personal_accounts')
-                                .select('*')
-                                .eq('account_code', accountCode)
-                                .single();
-
-                            if (error) throw error;
-                            accountData = data;
-                            console.log('✅ Personal account loaded from Supabase:', accountData);
-                        } catch (err) {
-                            console.warn('⚠️ Supabase failed, checking localStorage:', err);
-                            accountData = LocalDB.getAccount(accountCode);
-                        }
-                    } else {
-                        // Use localStorage directly
-                        accountData = LocalDB.getAccount(accountCode);
+                    // Use SQLite database
+                    if (!dbReady) {
+                        alert('Database is still loading. Please wait a moment and try again.');
+                        return;
                     }
+
+                    accountData = SQLiteDB.getAccount(accountCode);
 
                     if (!accountData) {
                         alert('Account not found! Please check your account code and try again.');
@@ -1156,46 +1223,12 @@
                     )
                 }));
 
-                // Sync to database (Supabase or localStorage)
-                if (competition?.code) {
+                // Sync to SQLite database
+                if (competition?.code && plan === 'personal' && dbReady) {
                     try {
-                        if (plan === 'personal') {
-                            // Sync personal account - try Supabase, fall back to localStorage
-                            if (supabase && !useLocalStorage) {
-                                try {
-                                    const { error } = await supabase
-                                        .from('personal_accounts')
-                                        .update({ portfolio: updatedPortfolio })
-                                        .eq('account_code', competition.code);
-
-                                    if (error) throw error;
-                                    console.log('✅ Personal account synced to Supabase');
-                                } catch (err) {
-                                    console.warn('⚠️ Supabase sync failed, using localStorage:', err);
-                                    LocalDB.updateAccount(competition.code, updatedPortfolio);
-                                }
-                            } else {
-                                // Use localStorage directly
-                                LocalDB.updateAccount(competition.code, updatedPortfolio);
-                            }
-                        } else if (plan === 'family-public' || plan === 'family-private') {
-                            // Sync family competition member (requires Supabase)
-                            if (supabase) {
-                                const { error } = await supabase
-                                    .from('members')
-                                    .update({ portfolio: updatedPortfolio })
-                                    .eq('competition_code', competition.code)
-                                    .eq('member_id', currentUserId);
-
-                                if (error) {
-                                    console.error('Error syncing trade to Supabase:', error);
-                                } else {
-                                    console.log('✅ Trade synced to Supabase');
-                                }
-                            }
-                        }
+                        SQLiteDB.updateAccount(competition.code, updatedPortfolio);
                     } catch (error) {
-                        console.error('Error syncing:', error);
+                        console.error('Error syncing to SQLite:', error);
                     }
                 }
 
