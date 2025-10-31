@@ -350,13 +350,22 @@
                 }
 
                 const row = result[0].values[0];
+                const portfolioData = row[5];
+                let portfolio;
+                try {
+                    portfolio = typeof portfolioData === 'string' ? JSON.parse(portfolioData) : portfolioData;
+                } catch (e) {
+                    console.error('Error parsing portfolio data:', e);
+                    portfolio = { cash: 100000, stocks: {} };
+                }
+
                 return {
                     id: row[0],
                     account_code: row[1],
                     user_name: row[2],
                     user_email: row[3],
                     passcode: row[4],
-                    portfolio: JSON.parse(row[5]),
+                    portfolio: portfolio,
                     created_at: row[6],
                     updated_at: row[7]
                 };
