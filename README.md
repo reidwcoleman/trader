@@ -11,15 +11,45 @@ A browser-based stock trading simulator with personal accounts, family competiti
 - **Real-time Data**: Live stock prices powered by Finnhub API
 - **Virtual Trading**: Start with $100,000 virtual cash
 
+## 🌐 Live Demo
+
+**Visit the live app:** Coming soon after deployment!
+
 ## Getting Started
 
-### 1. Open the App
+### Option 1: Deploy to Vercel (Recommended - FREE!)
+
+Deploy your own automated free website in 3 minutes:
+
+1. **Fork this repo** to your GitHub account
+
+2. **Sign up for Vercel** at [vercel.com](https://vercel.com) (free forever)
+
+3. **Import your GitHub repo** in Vercel
+   - Click "New Project"
+   - Select your forked `trader` repo
+   - Vercel auto-detects the configuration
+
+4. **Add Environment Variables** (for password reset emails):
+   - In Vercel dashboard → Settings → Environment Variables
+   - Add these variables:
+     - `EMAIL_USER`: Your Gmail address
+     - `EMAIL_PASSWORD`: Your Gmail [App Password](https://support.google.com/accounts/answer/185833)
+     - `STRIPE_SECRET_KEY`: (Optional) For family competitions
+     - `STRIPE_PRICE_ID`: (Optional) For family competitions
+
+5. **Deploy!**
+   - Click "Deploy"
+   - Your site will be live at `https://your-app.vercel.app`
+   - Auto-deploys on every git push! 🚀
+
+### Option 2: Run Locally
 
 Simply open `index.html` in your web browser. The app runs entirely in the browser using SQL.js (SQLite compiled to WebAssembly).
 
-### 2. Set Up Password Reset (Optional)
+### Option 3: Local Development with Email Server
 
-To enable password reset functionality, you need to run the email server:
+To enable password reset functionality locally, you need to run the email server:
 
 #### Step 1: Configure Email Settings
 
@@ -75,6 +105,8 @@ The server will run on `http://localhost:3001`
 
 - **Frontend**: Pure HTML/CSS/JavaScript with React (via Babel standalone)
 - **Database**: SQL.js (SQLite in the browser)
+- **Hosting**: Vercel (serverless deployment)
+- **API**: Vercel Serverless Functions
 - **Cloud Sync**: Supabase for global leaderboard
 - **Stock Data**: Finnhub API
 - **Payments**: Stripe
@@ -85,7 +117,11 @@ The server will run on `http://localhost:3001`
 ```
 trader/
 ├── index.html          # Main app file (includes all React code)
-├── server.js           # Email server for password reset
+├── server.js           # Email server for local development
+├── api/                # Vercel serverless functions
+│   ├── send-password-reset.js  # Password reset API
+│   └── health.js       # Health check endpoint
+├── vercel.json         # Vercel deployment configuration
 ├── .env.example        # Example environment variables
 ├── .env                # Your email credentials (git-ignored)
 ├── package.json        # Node.js dependencies
