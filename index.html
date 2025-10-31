@@ -379,6 +379,9 @@
             const [generatedPasscode, setGeneratedPasscode] = useState('');
             const [currentUserId, setCurrentUserId] = useState(null);
             const [contribution, setContribution] = useState('');
+            const [resetEmail, setResetEmail] = useState('');
+            const [showPasswordReset, setShowPasswordReset] = useState(false);
+            const [accountMode, setAccountMode] = useState('create'); // 'create' or 'login'
 
             const [competitionCode, setCompetitionCode] = useState('');
             const [joinCode, setJoinCode] = useState('');
@@ -402,6 +405,7 @@
             const [activeTab, setActiveTab] = useState('market');
             const [quantityError, setQuantityError] = useState('');
             const [mainTab, setMainTab] = useState('portfolio');
+            const [chartPeriod, setChartPeriod] = useState('1M');
 
             const chartRef = useRef(null);
             const chartInstance = useRef(null);
@@ -1401,14 +1405,40 @@
             };
 
             // Fetch real historical price data from Finnhub
-            const fetchHistoricalData = async (symbol) => {
+            const fetchHistoricalData = async (symbol, period = '1M') => {
                 try {
-                    // Get data for last 30 days
                     const toDate = Math.floor(Date.now() / 1000);
-                    const fromDate = toDate - (30 * 24 * 60 * 60); // 30 days ago
+                    let fromDate, resolution;
+
+                    // Calculate date range and resolution based on period
+                    switch (period) {
+                        case '1D':
+                            fromDate = toDate - (24 * 60 * 60); // 1 day
+                            resolution = '5'; // 5-minute intervals
+                            break;
+                        case '1W':
+                            fromDate = toDate - (7 * 24 * 60 * 60); // 7 days
+                            resolution = '60'; // 1-hour intervals
+                            break;
+                        case '1M':
+                            fromDate = toDate - (30 * 24 * 60 * 60); // 30 days
+                            resolution = 'D'; // Daily
+                            break;
+                        case '3M':
+                            fromDate = toDate - (90 * 24 * 60 * 60); // 90 days
+                            resolution = 'D'; // Daily
+                            break;
+                        case 'ALL':
+                            fromDate = toDate - (365 * 24 * 60 * 60); // 1 year
+                            resolution = 'D'; // Daily
+                            break;
+                        default:
+                            fromDate = toDate - (30 * 24 * 60 * 60);
+                            resolution = 'D';
+                    }
 
                     const response = await fetch(
-                        `${FINNHUB_API_BASE}/stock/candle?symbol=${symbol}&resolution=D&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`
+                        `${FINNHUB_API_BASE}/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`
                     );
                     const data = await response.json();
 
@@ -1416,11 +1446,17 @@
                         // data.c = closing prices, data.t = timestamps
                         const labels = data.t.map(timestamp => {
                             const date = new Date(timestamp * 1000);
-                            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            if (period === '1D') {
+                                return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                            } else if (period === '1W') {
+                                return date.toLocaleDateString('en-US', { weekday: 'short', hour: 'numeric' });
+                            } else {
+                                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            }
                         });
                         const prices = data.c.map(price => price.toFixed(2));
 
-                        console.log(`✅ Loaded real historical data for ${symbol}:`, {
+                        console.log(`✅ Loaded real historical data for ${symbol} (${period}):`, {
                             dataPoints: prices.length,
                             firstPrice: prices[0],
                             lastPrice: prices[prices.length - 1]
@@ -1472,7 +1508,7 @@
                 // Fetch and render real historical data
                 const loadChart = async () => {
                     // Try to fetch real data from Finnhub
-                    let historicalData = await fetchHistoricalData(selectedStock);
+                    let historicalData = await fetchHistoricalData(selectedStock, chartPeriod);
 
                     // Fallback to generated data if API fails
                     if (!historicalData) {
@@ -1568,7 +1604,7 @@
                         chartInstance.current.destroy();
                     }
                 };
-            }, [selectedStock, stocks]);
+            }, [selectedStock, stocks, chartPeriod]);
 
             // Plan Selection Screen
             if (view === 'plan-select') {
@@ -1744,14 +1780,18 @@
                                 </div>
                             </div>
 
-                            {/* Sign In to Existing Account */}
+                            {/* Sign In to Existing Personal Account */}
                             <div className="mt-6 max-w-md mx-auto text-center">
-                                <p className="text-blue-200 mb-3">Already have an account?</p>
+                                <p className="text-blue-200 mb-3">Already have a personal account?</p>
                                 <button
-                                    onClick={() => setView('signin')}
+                                    onClick={() => {
+                                        setPlan('personal');
+                                        setAccountMode('login');
+                                        setView('setup-family');
+                                    }}
                                     className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 shadow-lg"
                                 >
-                                    🔐 Sign In to Your Account
+                                    🔐 Sign In to Personal Account
                                 </button>
                             </div>
                         </div>
@@ -1888,80 +1928,6 @@
                 );
             }
 
-            // Sign In Screen
-            if (view === 'signin') {
-                return (
-                    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-900 p-4 md:p-8 flex items-center justify-center">
-                        <div className="max-w-md w-full">
-                            <button
-                                onClick={() => setView('plan-select')}
-                                className="mb-6 text-cyan-300 hover:text-cyan-200 font-semibold"
-                            >
-                                ← Back to Plans
-                            </button>
-
-                            <div className="bg-gradient-to-br from-blue-800 to-blue-900 rounded-3xl p-8 border-2 border-cyan-500 shadow-2xl">
-                                <div className="text-center mb-8">
-                                    <div className="inline-block bg-cyan-500/20 rounded-full p-4 mb-4">
-                                        <span className="text-6xl">🔐</span>
-                                    </div>
-                                    <h1 className="text-4xl font-black text-white mb-2">Sign In</h1>
-                                    <p className="text-blue-200">Enter your email and passcode to continue trading</p>
-                                </div>
-
-                                <div className="space-y-6">
-                                    <div>
-                                        <label className="block text-cyan-300 font-bold mb-3 text-sm uppercase tracking-wide">Email Address</label>
-                                        <input
-                                            type="email"
-                                            value={userEmail}
-                                            onChange={(e) => setUserEmail(e.target.value)}
-                                            placeholder="your@email.com"
-                                            className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-cyan-300 font-bold mb-3 text-sm uppercase tracking-wide">Passcode</label>
-                                        <input
-                                            type="text"
-                                            value={userPasscode}
-                                            onChange={(e) => setUserPasscode(e.target.value)}
-                                            placeholder="123456"
-                                            maxLength="6"
-                                            className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-3xl font-black placeholder-blue-300 text-center tracking-widest focus:border-cyan-400 focus:outline-none transition-all"
-                                        />
-                                        <p className="text-xs text-blue-300 mt-2 text-center">This is the 6-digit passcode you received when you created your account</p>
-                                    </div>
-
-                                    <button
-                                        onClick={() => {
-                                            if (!userEmail || !userEmail.includes('@')) {
-                                                alert('Please enter a valid email address');
-                                                return;
-                                            }
-                                            if (!userPasscode || userPasscode.length !== 6) {
-                                                alert('Please enter your 6-digit passcode');
-                                                return;
-                                            }
-                                            signInWithEmailAndPasscode(userEmail, userPasscode);
-                                        }}
-                                        className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white py-4 rounded-xl font-black text-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-                                    >
-                                        🚀 Sign In
-                                    </button>
-                                </div>
-
-                                <div className="mt-6 p-4 bg-blue-900/50 border border-blue-600 rounded-xl">
-                                    <p className="text-xs text-blue-200 text-center">
-                                        💡 <span className="font-semibold">Tip:</span> Your account code works for both personal and family accounts. Make sure to save it somewhere safe!
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
 
             // Setup/Join screens
             if (view === 'setup-family' || view === 'join-family') {
@@ -2648,7 +2614,24 @@
 
                                         {/* Price Chart */}
                                         <div className="mb-6 bg-blue-700/20 rounded-xl p-4 border border-blue-600">
-                                            <h3 className="text-sm font-semibold text-blue-200 mb-3">📈 30-Day Price Chart</h3>
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h3 className="text-sm font-semibold text-blue-200">📈 Price Chart</h3>
+                                                <div className="flex gap-1 bg-blue-900/50 rounded-lg p-1">
+                                                    {['1D', '1W', '1M', '3M', 'ALL'].map(period => (
+                                                        <button
+                                                            key={period}
+                                                            onClick={() => setChartPeriod(period)}
+                                                            className={`px-3 py-1 rounded font-bold text-xs transition-all ${
+                                                                chartPeriod === period
+                                                                    ? 'bg-cyan-500 text-white shadow-lg'
+                                                                    : 'text-blue-300 hover:text-white hover:bg-blue-700'
+                                                            }`}
+                                                        >
+                                                            {period}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
                                             <div className="h-48">
                                                 <canvas ref={chartRef}></canvas>
                                             </div>
