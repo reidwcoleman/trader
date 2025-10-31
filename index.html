@@ -3136,3 +3136,38 @@
     </script>
 </body>
 </html>
+// server.js
+import express from 'express';
+import { WebSocketServer } from 'ws';
+import http from 'http';
+
+const FINNHUB_TOKEN = process.env.FINNHUB_TOKEN; // required
+const PORT = process.env.PORT || 8787;
+
+if (!FINNHUB_TOKEN) {
+  console.error('Missing FINNHUB_TOKEN');
+  process.exit(1);
+}
+
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server, path: '/ws' });
+
+wss.on('connection', (client) => {
+  const upstream = new WebSocket(`wss://ws.finnhub.io?token=${FINNHUB_TOKEN}`);
+
+  client.on('message', (raw) => {
+    try {
+      const msg = JSON.parse(raw.toString());
+      if (msg.type === 'subscribe' && msg.symbol) upstream.send(JSON.stringify({ type: 'subscribe', symbol: msg.symbol }));
+      else if (msg.type === 'unsubscribe' && msg.symbol) upstream.send(JSON.stringify({ type: 'unsubscribe', symbol: msg.symbol }));
+    } catch {}
+  });
+
+  upstream.on('message', (data) => client.send(data));
+  upstream.on('close', () => client.close());
+  upstream.on('error', () => client.close());
+  client.on('close', () => upstream.close());
+});
+
+server.listen(PORT, () => console.log(`WS proxy on :${PORT}`));
