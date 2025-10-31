@@ -202,6 +202,11 @@
 
             const COMMISSION_RATE = 0.03;
 
+            // Stripe Payment Links - REPLACE THESE WITH YOUR ACTUAL STRIPE LINKS
+            // Follow STRIPE_SETUP_GUIDE.md to create your payment links
+            const STRIPE_FAMILY_PUBLIC_LINK = 'https://buy.stripe.com/test_REPLACE_WITH_YOUR_LINK';
+            const STRIPE_FAMILY_PRIVATE_LINK = 'https://buy.stripe.com/test_REPLACE_WITH_YOUR_LINK';
+
             const POPULAR_STOCKS = [
                 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA',
                 'NVDA', 'META', 'NFLX', 'AMD', 'DIS'
@@ -686,11 +691,12 @@
                         return;
                     }
 
-                    console.log('Creating competition with code:', code);
+                    console.log('Creating competition with code:', code, 'plan:', plan);
                     const { data: compData, error: compError } = await supabase
                         .from('competitions')
                         .insert([{
                             code: code,
+                            plan_type: plan, // Save 'family-public' or 'family-private'
                             total_pool: parseFloat(contributionAmount)
                         }])
                         .select()
@@ -848,9 +854,10 @@
                     setCompetition(joinedCompetition);
                     setCompetitionCode(code);
                     setCurrentUserId(memberId);
+                    setPlan(compData.plan_type || 'family-public'); // Set plan type from competition
                     setView('trading');
 
-                    console.log('✅ Joined competition successfully:', code);
+                    console.log('✅ Joined competition successfully:', code, 'plan:', compData.plan_type);
                 } catch (error) {
                     console.error('Error joining competition:', error);
                     alert('Failed to join competition. Please try again.');
@@ -1003,14 +1010,18 @@
                 const COOLDOWN_MINUTES = 15;
                 const COOLDOWN_MS = COOLDOWN_MINUTES * 60 * 1000;
 
+                // Calculate trading fee based on plan
+                let tradingFee = 0;
+                if (plan === 'family-public') {
+                    tradingFee = totalCost * 0.01; // 1% fee
+                } else if (plan === 'family-private') {
+                    tradingFee = 0.05; // $0.05 flat fee
+                }
+
                 if (type === 'buy') {
-                    const maxBuy = getMaxBuyQuantity(selectedStock);
-                    if (quantity > maxBuy) {
-                        alert(`Insufficient funds! You can only buy ${maxBuy} shares with $${portfolio.cash.toFixed(2)}`);
-                        return;
-                    }
-                    if (totalCost > portfolio.cash) {
-                        alert('Insufficient funds!');
+                    const totalWithFee = totalCost + tradingFee;
+                    if (totalWithFee > portfolio.cash) {
+                        alert(`Insufficient funds!\n\nCost: $${totalCost.toFixed(2)}\nFee: $${tradingFee.toFixed(2)}\nTotal: $${totalWithFee.toFixed(2)}\n\nYou only have $${portfolio.cash.toFixed(2)} available.`);
                         return;
                     }
                 } else {
@@ -1036,9 +1047,24 @@
                     }
                 }
 
+                // Show fee notification for family plans
+                if (tradingFee > 0) {
+                    const proceed = confirm(
+                        `💰 Trading Fee Notice\n\n` +
+                        `${type === 'buy' ? 'Buying' : 'Selling'} ${quantity} shares of ${selectedStock}\n` +
+                        `Trade Value: $${totalCost.toFixed(2)}\n` +
+                        `Trading Fee: $${tradingFee.toFixed(2)} ${plan === 'family-public' ? '(1%)' : '(flat)'}\n` +
+                        `Total ${type === 'buy' ? 'Cost' : 'Net Proceeds'}: $${(type === 'buy' ? totalCost + tradingFee : totalCost - tradingFee).toFixed(2)}\n\n` +
+                        `Continue with trade?`
+                    );
+                    if (!proceed) return;
+                }
+
                 const updatedPortfolio = {
                     ...portfolio,
-                    cash: type === 'buy' ? portfolio.cash - totalCost : portfolio.cash + totalCost,
+                    cash: type === 'buy'
+                        ? portfolio.cash - totalCost - tradingFee
+                        : portfolio.cash + totalCost - tradingFee,
                     positions: {
                         ...portfolio.positions,
                         [selectedStock]: type === 'buy'
@@ -1051,6 +1077,7 @@
                         quantity,
                         price: stock.price,
                         total: totalCost,
+                        fee: tradingFee,
                         timestamp: new Date().toISOString()
                     }],
                     lastBuyTime: type === 'buy'
@@ -1081,7 +1108,7 @@
                             } else {
                                 console.log('✅ Personal account synced to Supabase');
                             }
-                        } else if (plan === 'family') {
+                        } else if (plan === 'family-public' || plan === 'family-private') {
                             // Sync family competition member
                             const { error } = await supabase
                                 .from('members')
@@ -1289,9 +1316,9 @@
                                     TradeWars
                                 </h1>
                                 <p className="text-xl text-blue-100">Master the markets. Compete with family. Win real money.</p>
-                                <div className="mt-4 inline-flex items-center gap-2 bg-purple-900/50 border border-purple-500 rounded-xl px-6 py-3">
-                                    <span className="text-purple-200 font-semibold">Powered by</span>
-                                    <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">Shop Pay</span>
+                                <div className="mt-4 inline-flex items-center gap-2 bg-indigo-900/50 border border-indigo-500 rounded-xl px-6 py-3">
+                                    <span className="text-indigo-200 font-semibold">Powered by</span>
+                                    <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">Stripe</span>
                                 </div>
                             </div>
 
@@ -1360,12 +1387,16 @@
                                     <div className="grid grid-cols-2 gap-2">
                                         <button
                                             onClick={() => {
-                                                setPlan('family-public');
-                                                setView('setup-family');
+                                                // Redirect to Stripe payment for Family Public plan
+                                                if (STRIPE_FAMILY_PUBLIC_LINK.includes('REPLACE_WITH_YOUR_LINK')) {
+                                                    alert('⚠️ Stripe payment link not configured yet!\n\nPlease follow the instructions in STRIPE_SETUP_GUIDE.md to set up your Stripe payment links.');
+                                                    return;
+                                                }
+                                                window.location.href = STRIPE_FAMILY_PUBLIC_LINK;
                                             }}
                                             className="bg-gradient-to-r from-green-400 to-emerald-500 text-white py-3 rounded-xl font-bold text-sm hover:from-green-300 hover:to-emerald-400 transition-all duration-300"
                                         >
-                                            Create
+                                            💳 Pay & Create
                                         </button>
                                         <button
                                             onClick={() => {
@@ -1374,7 +1405,7 @@
                                             }}
                                             className="bg-green-700 text-white py-3 rounded-xl font-bold text-sm hover:bg-green-600 transition-all duration-300"
                                         >
-                                            Join
+                                            Join Pool
                                         </button>
                                     </div>
                                 </div>
@@ -1409,12 +1440,16 @@
                                     <div className="grid grid-cols-2 gap-2">
                                         <button
                                             onClick={() => {
-                                                setPlan('family-private');
-                                                setView('setup-family');
+                                                // Redirect to Stripe payment for Family Private plan
+                                                if (STRIPE_FAMILY_PRIVATE_LINK.includes('REPLACE_WITH_YOUR_LINK')) {
+                                                    alert('⚠️ Stripe payment link not configured yet!\n\nPlease follow the instructions in STRIPE_SETUP_GUIDE.md to set up your Stripe payment links.');
+                                                    return;
+                                                }
+                                                window.location.href = STRIPE_FAMILY_PRIVATE_LINK;
                                             }}
                                             className="bg-gradient-to-r from-purple-400 to-pink-500 text-white py-3 rounded-xl font-bold text-sm hover:from-purple-300 hover:to-pink-400 transition-all duration-300"
                                         >
-                                            Create
+                                            💳 Pay & Create
                                         </button>
                                         <button
                                             onClick={() => {
@@ -1423,19 +1458,19 @@
                                             }}
                                             className="bg-purple-700 text-white py-3 rounded-xl font-bold text-sm hover:bg-purple-600 transition-all duration-300"
                                         >
-                                            Join
+                                            Join Pool
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Shop Pay Integration Notice */}
-                            <div className="mt-8 max-w-2xl mx-auto bg-gradient-to-r from-purple-900/50 to-pink-900/50 border border-purple-500 rounded-2xl p-6">
+                            {/* Stripe Integration Notice */}
+                            <div className="mt-8 max-w-2xl mx-auto bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border border-indigo-500 rounded-2xl p-6">
                                 <div className="flex items-center gap-4">
-                                    <div className="text-5xl">🛡️</div>
+                                    <div className="text-5xl">💳</div>
                                     <div>
-                                        <h3 className="text-white font-bold text-lg mb-1">Secure Payments with Shop Pay</h3>
-                                        <p className="text-purple-200 text-sm">All Family plan payments are processed securely through Shop Pay. Fast, secure, and trusted by millions.</p>
+                                        <h3 className="text-white font-bold text-lg mb-1">Secure Payments with Stripe</h3>
+                                        <p className="text-purple-200 text-sm">All Family plan payments are processed securely through Stripe. Trusted by millions of businesses worldwide with bank-level security.</p>
                                     </div>
                                 </div>
                             </div>

@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS competitions;
 CREATE TABLE competitions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   code TEXT UNIQUE NOT NULL,
+  plan_type TEXT NOT NULL DEFAULT 'family-public', -- 'family-public' or 'family-private'
   total_pool DECIMAL DEFAULT 0,
   start_time TIMESTAMPTZ DEFAULT NOW(),
   created_at TIMESTAMPTZ DEFAULT NOW()
