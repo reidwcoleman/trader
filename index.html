@@ -190,6 +190,27 @@
                     )
                 `);
 
+                // Migration: Add user_email and passcode columns if they don't exist
+                try {
+                    // Check if columns exist by trying to query them
+                    const checkColumns = db.exec('PRAGMA table_info(personal_accounts)');
+                    if (checkColumns.length > 0) {
+                        const columns = checkColumns[0].values.map(row => row[1]); // column names are at index 1
+
+                        if (!columns.includes('user_email')) {
+                            console.log('📝 Adding user_email column to existing database...');
+                            db.run('ALTER TABLE personal_accounts ADD COLUMN user_email TEXT DEFAULT ""');
+                        }
+
+                        if (!columns.includes('passcode')) {
+                            console.log('📝 Adding passcode column to existing database...');
+                            db.run('ALTER TABLE personal_accounts ADD COLUMN passcode TEXT DEFAULT ""');
+                        }
+                    }
+                } catch (migrationError) {
+                    console.warn('Migration check skipped:', migrationError);
+                }
+
                 db.run(`
                     CREATE TABLE IF NOT EXISTS competitions (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
