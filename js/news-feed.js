@@ -58,13 +58,52 @@ async function fetchMarketNews(apiKey) {
 
         const data = await response.json();
 
-        // Filter to ensure all news is trading/finance related
+        // Comprehensive filter to ensure ALL news is trading/finance related
         const tradingKeywords = [
-            'stock', 'market', 'trading', 'shares', 'wall street', 'nasdaq', 'dow', 'sp500', 's&p',
-            'investor', 'investment', 'equity', 'portfolio', 'earnings', 'revenue', 'profit',
-            'financial', 'economy', 'fed', 'federal reserve', 'interest rate', 'inflation',
-            'bullish', 'bearish', 'rally', 'surge', 'plunge', 'analyst', 'upgrade', 'downgrade',
-            'ipo', 'merger', 'acquisition', 'dividend', 'buyback', 'ceo', 'quarterly'
+            // Market basics
+            'stock', 'stocks', 'market', 'markets', 'trading', 'trade', 'shares', 'share', 'equity', 'equities',
+            'wall street', 'nasdaq', 'dow', 'dow jones', 's&p', 's&p 500', 'sp500', 'nyse', 'index', 'indices',
+
+            // Investors & trading
+            'investor', 'investors', 'investment', 'investments', 'portfolio', 'portfolios', 'asset', 'assets',
+            'trader', 'traders', 'fund', 'funds', 'hedge fund', 'mutual fund', 'etf', 'broker', 'brokerage',
+
+            // Financial metrics
+            'earnings', 'revenue', 'profit', 'profits', 'loss', 'losses', 'eps', 'p/e', 'valuation',
+            'quarterly', 'quarter', 'q1', 'q2', 'q3', 'q4', 'annual', 'fiscal', 'guidance',
+
+            // Market movements
+            'bullish', 'bearish', 'rally', 'rallies', 'surge', 'surged', 'soar', 'soared', 'jump', 'jumped',
+            'plunge', 'plunged', 'drop', 'dropped', 'fall', 'fell', 'decline', 'declined', 'crash', 'correction',
+            'gain', 'gains', 'rise', 'rose', 'climb', 'climbed', 'spike', 'spiked', 'tumble', 'tumbled',
+
+            // Analysis & ratings
+            'analyst', 'analysts', 'upgrade', 'upgraded', 'downgrade', 'downgraded', 'rating', 'ratings',
+            'price target', 'target price', 'forecast', 'outlook', 'guidance', 'estimate', 'estimates',
+
+            // Corporate actions
+            'ipo', 'merger', 'mergers', 'acquisition', 'acquisitions', 'm&a', 'buyout', 'takeover',
+            'dividend', 'dividends', 'buyback', 'share buyback', 'split', 'stock split',
+
+            // Executive & company
+            'ceo', 'cfo', 'executive', 'management', 'board', 'chairman', 'earnings call',
+            'sec', 'filing', '10-k', '10-q', '8-k', 'insider', 'institutional',
+
+            // Economic indicators
+            'fed', 'federal reserve', 'interest rate', 'inflation', 'gdp', 'unemployment',
+            'treasury', 'yield', 'bond', 'bonds', 'monetary', 'fiscal', 'powell',
+
+            // Sectors & industries
+            'tech', 'technology', 'semiconductor', 'software', 'hardware', 'fintech',
+            'healthcare', 'pharma', 'biotech', 'energy', 'oil', 'gas', 'renewable',
+            'finance', 'financial', 'bank', 'banking', 'retail', 'consumer', 'industrial',
+
+            // Crypto (relevant for trading)
+            'bitcoin', 'crypto', 'cryptocurrency', 'blockchain', 'coinbase',
+
+            // Trading terms
+            'options', 'calls', 'puts', 'futures', 'short', 'long', 'volatility', 'vix',
+            'bull market', 'bear market', 'volume', 'liquidity', 'bid', 'ask', 'spread'
         ];
 
         const tradingNews = (data || []).filter(article => {
