@@ -138,7 +138,7 @@ const SQLiteDB = {
         );
 
         saveDatabase();
-        console.log('✅ Account saved to SQLite:', code);
+        console.log('✅ Account saved to SQLite:', code, '| Has password:', !!passwordHash);
 
         return {
             account_code: code,

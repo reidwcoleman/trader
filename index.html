@@ -2165,6 +2165,7 @@
 
                                                     // Hash password before creating account
                                                     const passwordHash = await window.PasswordHash.hash(userPassword);
+                                                    console.log('🔐 Creating account with password hash');
                                                     createCompetition(userName, 0, passwordHash);
                                                 }}
                                                 className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300"
@@ -2218,14 +2219,19 @@
                                                     try {
                                                         // Get account by email
                                                         const account = SQLiteDB.getAccountByEmail(userEmail);
+                                                        console.log('🔍 Account lookup for:', userEmail, account ? 'Found' : 'Not found');
+
                                                         if (!account) {
                                                             alert('Invalid email or password');
                                                             return;
                                                         }
 
+                                                        console.log('🔐 Account has password_hash:', !!account.password_hash);
+
                                                         // Verify password
                                                         if (account.password_hash) {
                                                             const isValid = await window.PasswordHash.verify(userPassword, account.password_hash);
+                                                            console.log('✅ Password verification result:', isValid);
                                                             if (!isValid) {
                                                                 alert('Invalid email or password');
                                                                 return;
