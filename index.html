@@ -1253,11 +1253,23 @@
                         <div className="max-w-7xl mx-auto">
                             <div className="text-center mb-12 pt-8">
                                 <div className="flex items-center justify-center mb-6">
-                                    <div className="bg-gradient-to-r from-cyan-400 to-blue-400 p-4 rounded-2xl shadow-2xl">
-                                        <span className="text-6xl">📈</span>
+                                    <div className="relative bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-2 rounded-3xl shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 hover:scale-105">
+                                        <div className="bg-gradient-to-br from-slate-900 to-blue-950 rounded-2xl p-4 border-2 border-cyan-400/30">
+                                            <img
+                                                src="finclash.png"
+                                                alt="FinClash Logo"
+                                                className="w-32 h-32 md:w-40 md:h-40 object-contain drop-shadow-2xl"
+                                                onError={(e) => {
+                                                    // Fallback to emoji if image not found
+                                                    e.target.style.display = 'none';
+                                                    e.target.nextElementSibling.style.display = 'block';
+                                                }}
+                                            />
+                                            <span className="text-7xl hidden">📈</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <h1 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300 mb-4">
+                                <h1 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300 mb-4 drop-shadow-lg">
                                     FinClash
                                 </h1>
                                 <p className="text-xl text-blue-100">Master the markets. Compete with family. Win real money.</p>
