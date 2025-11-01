@@ -215,6 +215,7 @@
 
             try {
                 // Create checkout session
+                console.log('Calling API:', '/api/create-checkout-session');
                 const response = await fetch('/api/create-checkout-session', {
                     method: 'POST',
                     headers: {
@@ -223,7 +224,9 @@
                     body: JSON.stringify({ email })
                 });
 
+                console.log('Response status:', response.status);
                 const data = await response.json();
+                console.log('Response data:', data);
 
                 if (!data.success) {
                     throw new Error(data.message || 'Failed to create checkout session');
