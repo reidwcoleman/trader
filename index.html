@@ -1300,66 +1300,93 @@
             // Fetch real historical price data from Finnhub
             const fetchHistoricalData = async (symbol, period = '1M') => {
                 try {
-                    const toDate = Math.floor(Date.now() / 1000);
-                    let fromDate, resolution;
+                    // Calculate date range based on period
+                    const toDate = new Date();
+                    let fromDate;
+                    let range, interval;
 
-                    // Calculate date range and resolution based on period
                     switch (period) {
                         case '1D':
-                            fromDate = toDate - (24 * 60 * 60); // 1 day
-                            resolution = '5'; // 5-minute intervals
+                            fromDate = new Date(toDate.getTime() - (2 * 24 * 60 * 60 * 1000)); // 2 days for intraday
+                            range = '1d';
+                            interval = '5m';
                             break;
                         case '1W':
-                            fromDate = toDate - (7 * 24 * 60 * 60); // 7 days
-                            resolution = '60'; // 1-hour intervals
+                            fromDate = new Date(toDate.getTime() - (7 * 24 * 60 * 60 * 1000));
+                            range = '5d';
+                            interval = '15m';
                             break;
                         case '1M':
-                            fromDate = toDate - (30 * 24 * 60 * 60); // 30 days
-                            resolution = 'D'; // Daily
+                            fromDate = new Date(toDate.getTime() - (30 * 24 * 60 * 60 * 1000));
+                            range = '1mo';
+                            interval = '1d';
                             break;
                         case '3M':
-                            fromDate = toDate - (90 * 24 * 60 * 60); // 90 days
-                            resolution = 'D'; // Daily
+                            fromDate = new Date(toDate.getTime() - (90 * 24 * 60 * 60 * 1000));
+                            range = '3mo';
+                            interval = '1d';
                             break;
                         case 'ALL':
-                            fromDate = toDate - (365 * 24 * 60 * 60); // 1 year
-                            resolution = 'D'; // Daily
+                            fromDate = new Date(toDate.getTime() - (365 * 24 * 60 * 60 * 1000));
+                            range = '1y';
+                            interval = '1d';
                             break;
                         default:
-                            fromDate = toDate - (30 * 24 * 60 * 60);
-                            resolution = 'D';
+                            fromDate = new Date(toDate.getTime() - (30 * 24 * 60 * 60 * 1000));
+                            range = '1mo';
+                            interval = '1d';
                     }
 
-                    const response = await fetch(
-                        `${FINNHUB_API_BASE}/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`
-                    );
+                    // Use Yahoo Finance API via proxy (no API key required)
+                    const period1 = Math.floor(fromDate.getTime() / 1000);
+                    const period2 = Math.floor(toDate.getTime() / 1000);
+
+                    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=${interval}&includePrePost=false`;
+
+                    console.log(`📊 Fetching Yahoo Finance data for ${symbol} (${period})...`);
+
+                    const response = await fetch(url);
                     const data = await response.json();
 
-                    if (data.s === 'ok' && data.c && data.c.length > 0) {
-                        // data.c = closing prices, data.t = timestamps
-                        const labels = data.t.map(timestamp => {
-                            const date = new Date(timestamp * 1000);
-                            if (period === '1D') {
-                                return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-                            } else if (period === '1W') {
-                                return date.toLocaleDateString('en-US', { weekday: 'short', hour: 'numeric' });
-                            } else {
-                                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    if (data.chart && data.chart.result && data.chart.result[0]) {
+                        const result = data.chart.result[0];
+                        const timestamps = result.timestamp;
+                        const prices = result.indicators.quote[0].close;
+
+                        if (timestamps && prices && timestamps.length > 0) {
+                            const labels = timestamps.map(timestamp => {
+                                const date = new Date(timestamp * 1000);
+                                if (period === '1D') {
+                                    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                                } else if (period === '1W') {
+                                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric' });
+                                } else {
+                                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                }
+                            });
+
+                            // Filter out null prices and format
+                            const validData = [];
+                            const validLabels = [];
+                            for (let i = 0; i < prices.length; i++) {
+                                if (prices[i] !== null && prices[i] !== undefined) {
+                                    validData.push(prices[i].toFixed(2));
+                                    validLabels.push(labels[i]);
+                                }
                             }
-                        });
-                        const prices = data.c.map(price => price.toFixed(2));
 
-                        console.log(`✅ Loaded real historical data for ${symbol} (${period}):`, {
-                            dataPoints: prices.length,
-                            firstPrice: prices[0],
-                            lastPrice: prices[prices.length - 1]
-                        });
+                            console.log(`✅ Loaded Yahoo Finance data for ${symbol} (${period}):`, {
+                                dataPoints: validData.length,
+                                firstPrice: validData[0],
+                                lastPrice: validData[validData.length - 1]
+                            });
 
-                        return { labels, data: prices };
-                    } else {
-                        console.warn(`No historical data available for ${symbol}, using fallback`);
-                        return null;
+                            return { labels: validLabels, data: validData };
+                        }
                     }
+
+                    console.warn(`No historical data available for ${symbol} from Yahoo Finance, using fallback`);
+                    return null;
                 } catch (error) {
                     console.error(`Error fetching historical data for ${symbol}:`, error);
                     return null;
