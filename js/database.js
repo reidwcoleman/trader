@@ -82,6 +82,17 @@ async function initDatabase() {
             )
         `);
 
+        db.run(`
+            CREATE TABLE IF NOT EXISTS reset_codes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_email TEXT NOT NULL,
+                code_hash TEXT NOT NULL,
+                expires_at TEXT NOT NULL,
+                attempts INTEGER DEFAULT 0,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
         // Save database to localStorage
         saveDatabase();
 
