@@ -554,7 +554,7 @@
                 return Math.floor(100000 + Math.random() * 900000).toString();
             };
 
-            const createCompetition = async (memberName, contributionAmount) => {
+            const createCompetition = async (memberName, contributionAmount, passwordHash = null) => {
                 const code = generateCompetitionCode();
                 const memberId = Date.now().toString();
                 const isPersonalPlan = parseFloat(contributionAmount || 0) === 0;
@@ -581,7 +581,7 @@
                         }
 
                         const passcode = generatePasscode();
-                        accountData = SQLiteDB.createAccount(code, memberName, userEmail, passcode, initialPortfolio);
+                        accountData = SQLiteDB.createAccount(code, memberName, userEmail, passcode, initialPortfolio, passwordHash);
                         setGeneratedPasscode(passcode);
 
                         const newCompetition = {
@@ -2084,11 +2084,57 @@
                                                     placeholder="your@email.com"
                                                     className="w-full bg-blue-700/50 border border-blue-500 rounded-xl px-4 py-3 text-white placeholder-blue-300"
                                                 />
-                                                <p className="text-xs text-blue-300 mt-2">We'll generate a secure 6-digit passcode for you</p>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-blue-100 font-semibold mb-2">Password</label>
+                                                <input
+                                                    type="password"
+                                                    value={userPassword}
+                                                    onChange={(e) => {
+                                                        setUserPassword(e.target.value);
+                                                        if (window.PasswordStrength) {
+                                                            setPasswordStrength(window.PasswordStrength.check(e.target.value));
+                                                        }
+                                                    }}
+                                                    placeholder="Create a strong password"
+                                                    className="w-full bg-blue-700/50 border border-blue-500 rounded-xl px-4 py-3 text-white placeholder-blue-300"
+                                                />
+                                                {passwordStrength && userPassword && (
+                                                    <div className="mt-3">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <span className="text-xs text-blue-200 font-semibold">Password Strength:</span>
+                                                            <span className={`text-xs font-bold ${
+                                                                passwordStrength.color === 'red' ? 'text-red-400' :
+                                                                passwordStrength.color === 'orange' ? 'text-orange-400' :
+                                                                passwordStrength.color === 'yellow' ? 'text-yellow-400' :
+                                                                'text-green-400'
+                                                            }`}>
+                                                                {passwordStrength.strength}
+                                                            </span>
+                                                        </div>
+                                                        <div className="w-full bg-blue-900/50 rounded-full h-2 mb-2">
+                                                            <div
+                                                                className={`h-2 rounded-full transition-all duration-300 ${
+                                                                    passwordStrength.color === 'red' ? 'bg-red-500' :
+                                                                    passwordStrength.color === 'orange' ? 'bg-orange-500' :
+                                                                    passwordStrength.color === 'yellow' ? 'bg-yellow-500' :
+                                                                    'bg-green-500'
+                                                                }`}
+                                                                style={{ width: `${passwordStrength.score}%` }}
+                                                            ></div>
+                                                        </div>
+                                                        <ul className="text-xs text-blue-300 space-y-1">
+                                                            {passwordStrength.feedback.map((item, idx) => (
+                                                                <li key={idx}>• {item}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <button
-                                                onClick={() => {
+                                                onClick={async () => {
                                                     if (!userName) {
                                                         alert('Please enter your name');
                                                         return;
@@ -2097,7 +2143,21 @@
                                                         alert('Please enter a valid email address');
                                                         return;
                                                     }
-                                                    createCompetition(userName, 0);
+                                                    if (!userPassword) {
+                                                        alert('Please create a password');
+                                                        return;
+                                                    }
+
+                                                    // Validate password strength
+                                                    const validation = window.PasswordStrength.validate(userPassword);
+                                                    if (!validation.isValid) {
+                                                        alert('Password requirements:\n' + validation.errors.join('\n'));
+                                                        return;
+                                                    }
+
+                                                    // Hash password before creating account
+                                                    const passwordHash = await window.PasswordHash.hash(userPassword);
+                                                    createCompetition(userName, 0, passwordHash);
                                                 }}
                                                 className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300"
                                             >
@@ -2126,29 +2186,72 @@
                                             </div>
 
                                             <div>
-                                                <label className="block text-cyan-300 font-bold mb-3 text-sm uppercase tracking-wide">Passcode</label>
+                                                <label className="block text-cyan-300 font-bold mb-3 text-sm uppercase tracking-wide">Password</label>
                                                 <input
-                                                    type="text"
-                                                    value={userPasscode}
-                                                    onChange={(e) => setUserPasscode(e.target.value)}
-                                                    placeholder="123456"
-                                                    maxLength="6"
-                                                    className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-3xl font-black placeholder-blue-300 text-center tracking-widest focus:border-cyan-400 focus:outline-none transition-all"
+                                                    type="password"
+                                                    value={userPassword}
+                                                    onChange={(e) => setUserPassword(e.target.value)}
+                                                    placeholder="Enter your password"
+                                                    className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
                                                 />
-                                                <p className="text-xs text-blue-300 mt-2 text-center">Enter your 6-digit passcode</p>
                                             </div>
 
                                             <button
-                                                onClick={() => {
+                                                onClick={async () => {
                                                     if (!userEmail || !userEmail.includes('@')) {
                                                         alert('Please enter a valid email address');
                                                         return;
                                                     }
-                                                    if (!userPasscode || userPasscode.length !== 6) {
-                                                        alert('Please enter your 6-digit passcode');
+                                                    if (!userPassword) {
+                                                        alert('Please enter your password');
                                                         return;
                                                     }
-                                                    signInWithEmailAndPasscode(userEmail, userPasscode);
+
+                                                    try {
+                                                        // Get account by email
+                                                        const account = SQLiteDB.getAccountByEmail(userEmail);
+                                                        if (!account) {
+                                                            alert('Invalid email or password');
+                                                            return;
+                                                        }
+
+                                                        // Verify password
+                                                        if (account.password_hash) {
+                                                            const isValid = await window.PasswordHash.verify(userPassword, account.password_hash);
+                                                            if (!isValid) {
+                                                                alert('Invalid email or password');
+                                                                return;
+                                                            }
+                                                        } else {
+                                                            alert('This account was created without a password. Please use password reset to set one.');
+                                                            return;
+                                                        }
+
+                                                        // Sign in
+                                                        const code = account.account_code;
+                                                        const newCompetition = {
+                                                            code: code,
+                                                            totalPool: 0,
+                                                            startTime: account.created_at,
+                                                            members: [{
+                                                                id: Date.now().toString(),
+                                                                name: account.user_name,
+                                                                contribution: 0,
+                                                                portfolio: account.portfolio,
+                                                                joinedAt: account.created_at
+                                                            }]
+                                                        };
+
+                                                        setCompetition(newCompetition);
+                                                        setCompetitionCode(code);
+                                                        setCurrentUserId(newCompetition.members[0].id);
+                                                        setUserName(account.user_name);
+                                                        setView('app');
+                                                        console.log('✅ Signed in successfully');
+                                                    } catch (error) {
+                                                        console.error('Sign in error:', error);
+                                                        alert('Failed to sign in. Please try again.');
+                                                    }
                                                 }}
                                                 className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white py-4 rounded-xl font-black text-lg transition-all duration-300 shadow-lg hover:shadow-xl"
                                             >
@@ -2160,7 +2263,7 @@
                                                     onClick={() => setShowPasswordReset(true)}
                                                     className="text-cyan-300 hover:text-cyan-200 font-semibold text-sm underline"
                                                 >
-                                                    Forgot your passcode?
+                                                    Forgot your password?
                                                 </button>
                                             </div>
                                         </div>

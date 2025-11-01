@@ -34,13 +34,14 @@ async function initDatabase() {
                 user_name TEXT NOT NULL,
                 user_email TEXT NOT NULL,
                 passcode TEXT NOT NULL,
+                password_hash TEXT,
                 portfolio TEXT NOT NULL,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                 updated_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
         `);
 
-        // Migration: Add user_email and passcode columns if they don't exist
+        // Migration: Add user_email, passcode, and password_hash columns if they don't exist
         try {
             const checkColumns = db.exec('PRAGMA table_info(personal_accounts)');
             if (checkColumns.length > 0) {
@@ -54,6 +55,11 @@ async function initDatabase() {
                 if (!columns.includes('passcode')) {
                     console.log('📝 Adding passcode column to existing database...');
                     db.run('ALTER TABLE personal_accounts ADD COLUMN passcode TEXT DEFAULT ""');
+                }
+
+                if (!columns.includes('password_hash')) {
+                    console.log('📝 Adding password_hash column to existing database...');
+                    db.run('ALTER TABLE personal_accounts ADD COLUMN password_hash TEXT');
                 }
             }
         } catch (migrationError) {
@@ -120,15 +126,15 @@ function saveDatabase() {
 // SQLite Database Functions
 const SQLiteDB = {
     // Create new personal account
-    createAccount(code, userName, userEmail, passcode, portfolio) {
+    createAccount(code, userName, userEmail, passcode, portfolio, passwordHash = null) {
         if (!db) throw new Error('Database not initialized');
 
         const portfolioJson = JSON.stringify(portfolio);
         const now = new Date().toISOString();
 
         db.run(
-            'INSERT INTO personal_accounts (account_code, user_name, user_email, passcode, portfolio, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [code, userName, userEmail, passcode, portfolioJson, now, now]
+            'INSERT INTO personal_accounts (account_code, user_name, user_email, passcode, password_hash, portfolio, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [code, userName, userEmail, passcode, passwordHash, portfolioJson, now, now]
         );
 
         saveDatabase();
@@ -139,6 +145,7 @@ const SQLiteDB = {
             user_name: userName,
             user_email: userEmail,
             passcode: passcode,
+            password_hash: passwordHash,
             portfolio: portfolio,
             created_at: now
         };
@@ -164,9 +171,10 @@ const SQLiteDB = {
             user_name: row[2],
             user_email: row[3],
             passcode: row[4],
-            portfolio: JSON.parse(row[5]),
-            created_at: row[6],
-            updated_at: row[7]
+            password_hash: row[5],
+            portfolio: JSON.parse(row[6]),
+            created_at: row[7],
+            updated_at: row[8]
         };
     },
 
@@ -190,13 +198,14 @@ const SQLiteDB = {
             user_name: row[2],
             user_email: row[3],
             passcode: row[4],
-            portfolio: JSON.parse(row[5]),
-            created_at: row[6],
-            updated_at: row[7]
+            password_hash: row[5],
+            portfolio: JSON.parse(row[6]),
+            created_at: row[7],
+            updated_at: row[8]
         };
     },
 
-    // Get account by email only (for password reset)
+    // Get account by email (for password login)
     getAccountByEmail(email) {
         if (!db) throw new Error('Database not initialized');
 
@@ -210,34 +219,16 @@ const SQLiteDB = {
         }
 
         const row = result[0].values[0];
-        const portfolioData = row[5];
-        let portfolio;
-        try {
-            // Handle various portfolio data formats
-            if (typeof portfolioData === 'string') {
-                // Remove any BOM or whitespace
-                const cleanData = portfolioData.trim().replace(/^\uFEFF/, '');
-                portfolio = cleanData ? JSON.parse(cleanData) : { cash: 100000, stocks: {} };
-            } else if (portfolioData && typeof portfolioData === 'object') {
-                portfolio = portfolioData;
-            } else {
-                portfolio = { cash: 100000, stocks: {} };
-            }
-        } catch (e) {
-            console.error('Error parsing portfolio data:', e);
-            console.error('Raw portfolio data:', portfolioData);
-            portfolio = { cash: 100000, stocks: {} };
-        }
-
         return {
             id: row[0],
             account_code: row[1],
             user_name: row[2],
             user_email: row[3],
             passcode: row[4],
-            portfolio: portfolio,
-            created_at: row[6],
-            updated_at: row[7]
+            password_hash: row[5],
+            portfolio: JSON.parse(row[6]),
+            created_at: row[7],
+            updated_at: row[8]
         };
     },
 
