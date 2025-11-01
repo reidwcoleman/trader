@@ -259,5 +259,81 @@ const SQLiteDB = {
             account_code: row[0],
             user_name: row[1]
         }));
+    },
+
+    // Reset code functions
+    createResetCode(email, codeHash, expiresAt) {
+        if (!db) throw new Error('Database not initialized');
+
+        // Clean up old codes for this email
+        db.run('DELETE FROM reset_codes WHERE user_email = ? AND expires_at < ?',
+            [email, new Date().toISOString()]);
+
+        // Limit active codes per user to 3
+        const countResult = db.exec('SELECT COUNT(*) as count FROM reset_codes WHERE user_email = ?', [email]);
+        const count = countResult[0]?.values[0]?.[0] || 0;
+        if (count >= 3) {
+            db.run('DELETE FROM reset_codes WHERE user_email = ?', [email]);
+        }
+
+        const now = new Date().toISOString();
+        db.run(
+            'INSERT INTO reset_codes (user_email, code_hash, expires_at, attempts, created_at) VALUES (?, ?, ?, 0, ?)',
+            [email, codeHash, expiresAt, now]
+        );
+
+        saveDatabase();
+        console.log('✅ Reset code created for:', email);
+    },
+
+    getResetCode(email) {
+        if (!db) throw new Error('Database not initialized');
+
+        const result = db.exec(
+            'SELECT * FROM reset_codes WHERE user_email = ? ORDER BY created_at DESC LIMIT 1',
+            [email]
+        );
+
+        if (result.length === 0 || result[0].values.length === 0) {
+            return null;
+        }
+
+        const row = result[0].values[0];
+        return {
+            id: row[0],
+            user_email: row[1],
+            code_hash: row[2],
+            expires_at: row[3],
+            attempts: row[4],
+            created_at: row[5]
+        };
+    },
+
+    incrementResetAttempts(id) {
+        if (!db) throw new Error('Database not initialized');
+
+        db.run('UPDATE reset_codes SET attempts = attempts + 1 WHERE id = ?', [id]);
+        saveDatabase();
+    },
+
+    deleteResetCode(id) {
+        if (!db) throw new Error('Database not initialized');
+
+        db.run('DELETE FROM reset_codes WHERE id = ?', [id]);
+        saveDatabase();
+    },
+
+    updatePasscode(email, newPasscode) {
+        if (!db) throw new Error('Database not initialized');
+
+        const now = new Date().toISOString();
+        db.run(
+            'UPDATE personal_accounts SET passcode = ?, updated_at = ? WHERE user_email = ?',
+            [newPasscode, now, email]
+        );
+
+        saveDatabase();
+        console.log('✅ Passcode updated for:', email);
+        return true;
     }
 };

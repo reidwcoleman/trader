@@ -20,6 +20,7 @@
     <!-- External JavaScript modules -->
     <script src="js/config.js"></script>
     <script src="js/database.js"></script>
+    <script src="js/crypto-utils.js"></script>
 
     <!-- Initialize database on page load -->
     <script>
@@ -44,6 +45,9 @@
             const [currentUserId, setCurrentUserId] = useState(null);
             const [contribution, setContribution] = useState('');
             const [resetEmail, setResetEmail] = useState('');
+            const [resetCode, setResetCode] = useState('');
+            const [newPasscode, setNewPasscode] = useState('');
+            const [resetStep, setResetStep] = useState(1); // 1: enter email, 2: enter code + new passcode
             const [showPasswordReset, setShowPasswordReset] = useState(false);
             const [accountMode, setAccountMode] = useState('create'); // 'create' or 'login'
 
