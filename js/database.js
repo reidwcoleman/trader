@@ -123,6 +123,24 @@ function saveDatabase() {
     }
 }
 
+// Helper function to safely extract row data by column name
+function extractRowData(result) {
+    if (result.length === 0 || result[0].values.length === 0) {
+        return null;
+    }
+
+    const columns = result[0].columns;
+    const row = result[0].values[0];
+
+    // Create a map of column name to value
+    const data = {};
+    columns.forEach((col, index) => {
+        data[col] = row[index];
+    });
+
+    return data;
+}
+
 // SQLite Database Functions
 const SQLiteDB = {
     // Create new personal account
@@ -160,21 +178,30 @@ const SQLiteDB = {
             [code]
         );
 
-        if (result.length === 0 || result[0].values.length === 0) {
-            return null;
+        const data = extractRowData(result);
+        if (!data) return null;
+
+        // Parse portfolio with error handling
+        let portfolio;
+        try {
+            portfolio = typeof data.portfolio === 'string'
+                ? JSON.parse(data.portfolio)
+                : data.portfolio;
+        } catch (e) {
+            console.error('Error parsing portfolio for account:', code, e);
+            portfolio = { cash: 100000, positions: {}, history: [], lastBuyTime: {}, watchlist: [] };
         }
 
-        const row = result[0].values[0];
         return {
-            id: row[0],
-            account_code: row[1],
-            user_name: row[2],
-            user_email: row[3],
-            passcode: row[4],
-            password_hash: row[5],
-            portfolio: JSON.parse(row[6]),
-            created_at: row[7],
-            updated_at: row[8]
+            id: data.id,
+            account_code: data.account_code,
+            user_name: data.user_name,
+            user_email: data.user_email,
+            passcode: data.passcode,
+            password_hash: data.password_hash,
+            portfolio: portfolio,
+            created_at: data.created_at,
+            updated_at: data.updated_at
         };
     },
 
@@ -187,21 +214,30 @@ const SQLiteDB = {
             [email, passcode]
         );
 
-        if (result.length === 0 || result[0].values.length === 0) {
-            return null;
+        const data = extractRowData(result);
+        if (!data) return null;
+
+        // Parse portfolio with error handling
+        let portfolio;
+        try {
+            portfolio = typeof data.portfolio === 'string'
+                ? JSON.parse(data.portfolio)
+                : data.portfolio;
+        } catch (e) {
+            console.error('Error parsing portfolio for email:', email, e);
+            portfolio = { cash: 100000, positions: {}, history: [], lastBuyTime: {}, watchlist: [] };
         }
 
-        const row = result[0].values[0];
         return {
-            id: row[0],
-            account_code: row[1],
-            user_name: row[2],
-            user_email: row[3],
-            passcode: row[4],
-            password_hash: row[5],
-            portfolio: JSON.parse(row[6]),
-            created_at: row[7],
-            updated_at: row[8]
+            id: data.id,
+            account_code: data.account_code,
+            user_name: data.user_name,
+            user_email: data.user_email,
+            passcode: data.passcode,
+            password_hash: data.password_hash,
+            portfolio: portfolio,
+            created_at: data.created_at,
+            updated_at: data.updated_at
         };
     },
 
@@ -214,16 +250,13 @@ const SQLiteDB = {
             [email]
         );
 
-        if (result.length === 0 || result[0].values.length === 0) {
-            return null;
-        }
-
-        const row = result[0].values[0];
+        const data = extractRowData(result);
+        if (!data) return null;
 
         // Parse portfolio with error handling
         let portfolio;
         try {
-            const portfolioData = row[6];
+            const portfolioData = data.portfolio;
             if (typeof portfolioData === 'string') {
                 portfolio = JSON.parse(portfolioData);
             } else if (portfolioData && typeof portfolioData === 'object') {
@@ -237,15 +270,15 @@ const SQLiteDB = {
         }
 
         return {
-            id: row[0],
-            account_code: row[1],
-            user_name: row[2],
-            user_email: row[3],
-            passcode: row[4],
-            password_hash: row[5],
+            id: data.id,
+            account_code: data.account_code,
+            user_name: data.user_name,
+            user_email: data.user_email,
+            passcode: data.passcode,
+            password_hash: data.password_hash,
             portfolio: portfolio,
-            created_at: row[7],
-            updated_at: row[8]
+            created_at: data.created_at,
+            updated_at: data.updated_at
         };
     },
 
