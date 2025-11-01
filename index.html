@@ -1645,30 +1645,6 @@
                                 </button>
 
                                 <div className="bg-gradient-to-br from-blue-800 to-blue-900 rounded-3xl p-8 border border-blue-600">
-                                    {/* Tabs */}
-                                    <div className="flex gap-2 mb-8">
-                                        <button
-                                            onClick={() => { setAccountMode('create'); setShowPasswordReset(false); }}
-                                            className={`flex-1 py-4 rounded-xl font-bold text-lg transition-all duration-300 ${
-                                                accountMode === 'create'
-                                                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-xl'
-                                                    : 'bg-blue-700/50 text-blue-300 hover:text-white hover:bg-blue-700'
-                                            }`}
-                                        >
-                                            ✨ Create Account
-                                        </button>
-                                        <button
-                                            onClick={() => { setAccountMode('login'); setShowPasswordReset(false); }}
-                                            className={`flex-1 py-4 rounded-xl font-bold text-lg transition-all duration-300 ${
-                                                accountMode === 'login'
-                                                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-xl'
-                                                    : 'bg-blue-700/50 text-blue-300 hover:text-white hover:bg-blue-700'
-                                            }`}
-                                        >
-                                            🔐 Login
-                                        </button>
-                                    </div>
-
                                     {/* Create Account Form */}
                                     {accountMode === 'create' && (
                                         <div className="space-y-6">
