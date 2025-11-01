@@ -82,6 +82,8 @@
             const [stockNews, setStockNews] = useState([]);
             const [loadingNews, setLoadingNews] = useState(false);
             const [tradeType, setTradeType] = useState('long'); // 'long' or 'short'
+            const [marketNews, setMarketNews] = useState([]);
+            const [loadingMarketNews, setLoadingMarketNews] = useState(false);
 
             const chartRef = useRef(null);
             const chartInstance = useRef(null);
@@ -1063,6 +1065,19 @@
                 setLoadingNews(false);
             };
 
+            // Load general market news
+            const loadMarketNews = async () => {
+                setLoadingMarketNews(true);
+                try {
+                    const news = await window.newsFeed.fetchMarketNews(FINNHUB_API_KEY);
+                    setMarketNews(news);
+                } catch (error) {
+                    console.error('Error loading market news:', error);
+                    setMarketNews([]);
+                }
+                setLoadingMarketNews(false);
+            };
+
             const executeTrade = async (type) => {
                 if (!selectedStock || quantity <= 0) return;
 
@@ -1385,6 +1400,11 @@
                     loadStockNews();
                 }
             }, [selectedStock]);
+
+            // Load market news on mount
+            useEffect(() => {
+                loadMarketNews();
+            }, []);
 
             // Plan Selection Screen
             if (view === 'plan-select') {
@@ -2234,6 +2254,16 @@
                                     }`}
                                 >
                                     ⭐ Watchlist
+                                </button>
+                                <button
+                                    onClick={() => setMainTab('news')}
+                                    className={`flex-1 py-4 rounded-xl font-black text-lg transition-all duration-300 ${
+                                        mainTab === 'news'
+                                            ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-xl'
+                                            : 'text-blue-300 hover:text-white hover:bg-blue-700/50'
+                                    }`}
+                                >
+                                    📰 News
                                 </button>
                             </div>
                         </div>
@@ -3229,6 +3259,135 @@
                                             ))}
                                         </div>
                                     )}
+                                </div>
+                            </>
+                        )}
+
+                        {/* News View */}
+                        {mainTab === 'news' && (
+                            <>
+                                <div className="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 rounded-2xl p-6 border-2 border-indigo-500 mb-6 shadow-xl">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h2 className="text-2xl font-black text-white flex items-center gap-2">
+                                            📰 Market News
+                                            <span className="ml-2 px-3 py-1 bg-green-500/20 text-green-300 border border-green-500 rounded-full text-xs font-bold animate-pulse">
+                                                ● LIVE
+                                            </span>
+                                        </h2>
+                                        <button
+                                            onClick={loadMarketNews}
+                                            disabled={loadingMarketNews}
+                                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                                        >
+                                            {loadingMarketNews ? '⏳ Loading...' : '🔄 Refresh News'}
+                                        </button>
+                                    </div>
+
+                                    {loadingMarketNews ? (
+                                        <div className="text-center py-16">
+                                            <div className="inline-block animate-spin text-6xl mb-4">⏳</div>
+                                            <div className="text-indigo-200 text-lg font-semibold">Loading latest market news...</div>
+                                        </div>
+                                    ) : marketNews.length === 0 ? (
+                                        <div className="text-center py-16 bg-indigo-700/20 rounded-xl border-2 border-dashed border-indigo-600">
+                                            <div className="text-8xl mb-4 opacity-50">📰</div>
+                                            <h3 className="text-2xl font-bold text-white mb-3">No News Available</h3>
+                                            <p className="text-indigo-200 text-lg mb-6">Click refresh to load the latest market news</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {marketNews.map((article, idx) => (
+                                                <a
+                                                    key={idx}
+                                                    href={article.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="block bg-indigo-800/30 hover:bg-indigo-800/50 rounded-xl p-5 transition-all border border-indigo-600/50 hover:border-indigo-500 shadow-lg hover:shadow-xl hover:scale-[1.01] cursor-pointer"
+                                                >
+                                                    <div className="flex gap-4">
+                                                        {article.image && (
+                                                            <img
+                                                                src={article.image}
+                                                                alt=""
+                                                                className="w-32 h-32 rounded-lg object-cover flex-shrink-0 border-2 border-indigo-600/30"
+                                                                onError={(e) => e.target.style.display = 'none'}
+                                                            />
+                                                        )}
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center gap-2 mb-3 flex-wrap">
+                                                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                                                    article.sentiment === 'positive' ? 'bg-green-500/20 text-green-300 border border-green-500' :
+                                                                    article.sentiment === 'negative' ? 'bg-red-500/20 text-red-300 border border-red-500' :
+                                                                    'bg-gray-500/20 text-gray-300 border border-gray-500'
+                                                                }`}>
+                                                                    {article.sentiment === 'positive' ? '📈 Bullish' :
+                                                                     article.sentiment === 'negative' ? '📉 Bearish' :
+                                                                     '➖ Neutral'}
+                                                                </span>
+                                                                <span className="text-xs text-indigo-400 font-semibold">
+                                                                    {window.newsFeed.formatNewsDate(article.datetime)}
+                                                                </span>
+                                                                {article.category && (
+                                                                    <span className="text-xs text-indigo-300 bg-indigo-700/50 px-2 py-1 rounded-full">
+                                                                        {article.category}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <h4 className="text-white font-bold text-lg mb-2 line-clamp-2 hover:text-indigo-200 transition-colors">
+                                                                {article.headline}
+                                                            </h4>
+                                                            <p className="text-sm text-indigo-200 line-clamp-3 mb-3 leading-relaxed">
+                                                                {article.summary}
+                                                            </p>
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="text-xs text-indigo-400 font-semibold flex items-center gap-1">
+                                                                    <span>📡</span>
+                                                                    <span>{article.source}</span>
+                                                                </div>
+                                                                <div className="text-xs text-indigo-300 font-bold flex items-center gap-1">
+                                                                    <span>Read full article</span>
+                                                                    <span>→</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Market Overview */}
+                                <div className="bg-gradient-to-br from-blue-800/40 to-indigo-900/40 rounded-2xl p-6 border-2 border-blue-500 shadow-xl">
+                                    <h3 className="text-xl font-black text-white mb-4 flex items-center gap-2">
+                                        📊 Market Overview
+                                    </h3>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                                        {topStocks.slice(0, 6).map(stock => (
+                                            <div
+                                                key={stock.symbol}
+                                                onClick={() => {
+                                                    addToWatchlist(stock.symbol);
+                                                    setMainTab('trading');
+                                                }}
+                                                className="bg-blue-900/40 rounded-lg p-4 border border-blue-400/30 hover:border-blue-400 transition-all cursor-pointer hover:scale-105 shadow-lg"
+                                            >
+                                                <div className="font-bold text-white text-sm mb-1">{stock.symbol}</div>
+                                                <div className="text-xl font-black text-white">${stock.price.toFixed(2)}</div>
+                                                <div className={`text-xs font-bold mt-1 ${stock.change >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                                                    {stock.change >= 0 ? '↗' : '↘'} {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="mt-4 text-center">
+                                        <button
+                                            onClick={() => setMainTab('trading')}
+                                            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold text-sm transition-all"
+                                        >
+                                            🚀 Go to Trading
+                                        </button>
+                                    </div>
                                 </div>
                             </>
                         )}
