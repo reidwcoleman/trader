@@ -19,11 +19,5 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ],
-  "env": {
-    "EMAIL_USER": "@email_user",
-    "EMAIL_PASSWORD": "@email_password",
-    "STRIPE_SECRET_KEY": "@stripe_secret_key",
-    "STRIPE_PRICE_ID": "@stripe_price_id"
-  }
+  ]
 }
