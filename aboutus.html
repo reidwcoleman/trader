@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FinClash — About Cameron</title>
+
+  <!-- Optional: if your site sets this, we'll pick it up -->
+  <!-- <meta name="theme-color" content="#1A73E8"> -->
+
+  <style>
+    /* Defaults (will be auto-overridden by your site's theme below) */
+    :root{
+      --bg:#0E0E0E;       /* page background */
+      --ink:#EAEAEA;      /* primary text */
+      --muted:#A8B3BF;    /* secondary text */
+      --brand:#1A73E8;    /* primary brand */
+      --accent:#00FF88;   /* secondary accent */
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+      line-height: 1.5;
+    }
+
+    /* ===== About Section ===== */
+    .about-section{
+      position: relative;
+      background:
+        radial-gradient(1200px 600px at 75% -10%, color-mix(in oklab, var(--brand) 15%, transparent), transparent 60%),
+        radial-gradient(1000px 500px at 10% -20%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 60%),
+        var(--bg);
+      padding: clamp(3rem, 5vw, 6rem) 1rem;
+      overflow: hidden;
+    }
+    .about-wrap{
+      max-width: 900px;
+      margin: 0 auto;
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 10px 40px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.04);
+      border-radius: 20px;
+      padding: clamp(1.5rem, 3vw, 2.5rem);
+      backdrop-filter: blur(6px);
+    }
+    .about-badge{
+      display:inline-block;
+      font-size:.75rem;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      background: color-mix(in oklab, var(--brand) 15%, transparent);
+      color: color-mix(in oklab, var(--brand) 85%, white);
+      border:1px solid color-mix(in oklab, var(--brand) 35%, transparent);
+      border-radius: 999px;
+      padding:.4rem .7rem;
+      font-weight: 700;
+    }
+    .about-title{
+      margin:.8rem 0 1rem;
+      font-size: clamp(1.8rem, 2.8vw, 2.4rem);
+      line-height:1.15;
+      color: var(--ink);
+    }
+    .about-text{
+      color: var(--muted);
+      font-size: clamp(1rem, 1.3vw, 1.05rem);
+      line-height:1.75;
+      margin: 1rem 0;
+    }
+    .about-cta{
+      display:flex;
+      gap:.8rem;
+      flex-wrap:wrap;
+      margin-top:1.2rem;
+    }
+    .btn{ 
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:.8rem 1.1rem; border-radius:14px; text-decoration:none; font-weight:600;
+      transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      user-select: none;
+    }
+    .btn-primary{
+      color:#041424;
+      background: linear-gradient(90deg, var(--accent), color-mix(in oklab, var(--accent) 70%, white));
+      box-shadow: 0 8px 24px color-mix(in oklab, var(--accent) 25%, transparent);
+    }
+    .btn-primary:hover{ transform: translateY(-2px); box-shadow:0 12px 30px color-mix(in oklab, var(--accent) 35%, transparent); }
+    .btn-ghost{
+      color: color-mix(in oklab, var(--brand) 70%, white);
+      border:1px solid rgba(255,255,255,.15);
+      background: rgba(255,255,255,.04);
+    }
+    .btn-ghost:hover{ transform: translateY(-2px); border-color: rgba(255,255,255,.3); }
+
+    #leaderboards { scroll-margin-top: 80px; }
+
+    @media (max-width: 480px){
+      .about-wrap { padding: 1.25rem; }
+      .about-cta { gap: .6rem; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== FinClash About Section (Founder) ===== -->
+  <section id="about" class="about-section">
+    <div class="about-wrap">
+      <div class="about-badge">Founder Story</div>
+      <h2 class="about-title">About Cameron</h2>
+
+      <p class="about-text">
+        I’m Cameron, the founder of <strong>FinClash</strong>. I’ve been obsessed with markets from a young age—studying price action, earnings catalysts, and risk management while running a real portfolio and documenting what works. I noticed friends wanted to learn investing without blowing up accounts, so me and Reid built FinClash: a game where you draft tickers like a fantasy team, compete on performance, and level up your skills with clear entries, stops, and targets.
+      </p>
+      <p class="about-text">
+        My vision is simple: make market education <em>interactive, competitive, and honest</em>—with data-driven tools, challenge formats, and weekly leaderboards that reward discipline over luck. Whether you’re a beginner or a stat-obsessed grinder, FinClash gives you reps, feedback, and a community that pushes you to get better.
+      </p>
+
+      <div class="about-cta">
+        <a class="btn btn-primary" href="mailto:contact@finclash.com" aria-label="Email Cameron at FinClash">
+          Email Me
+        </a>
+        <a class="btn btn-ghost" href="#leaderboards">See Leaderboards</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- (Optional) Example target for "See Leaderboards" -->
+  <section id="leaderboards" style="height:200px"></section>
+
+  <script>
+    (function autoThemeAboutSection(){
+      const root = document.documentElement;
+      const cs = getComputedStyle(root);
+
+      // Helper to trim CSS var result
+      const getVar = (name) => cs.getPropertyValue(name).trim();
+
+      // Try 1: use existing site CSS variables if present
+      let brand  = getVar('--brand');
+      let accent = getVar('--accent');
+      let bg     = getVar('--bg');
+      let ink    = getVar('--ink');
+      let muted  = getVar('--muted');
+
+      // Try 2: theme-color meta
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
+      const themeColor = themeMeta?.getAttribute('content')?.trim();
+
+      // Try 3: infer from body and links
+      const bodyCS = getComputedStyle(document.body);
+      const bodyBg = bodyCS.backgroundColor;
+      const bodyColor = bodyCS.color;
+      const link = document.querySelector('a');
+      const linkCS = link ? getComputedStyle(link) : null;
+      const linkColor = linkCS ? linkCS.color : null;
+
+      // Basic heuristics only if vars missing
+      if (!bg || bg === '') bg = bodyBg || '#0E0E0E';
+      if (!ink || ink === '') ink = bodyColor || '#EAEAEA';
+      if (!brand || brand === '') brand = themeColor || linkColor || '#1A73E8';
+      if (!accent || accent === '') {
+        // If brand exists, create a simple accent variant by rotating hue a bit
+        accent = '#00FF88';
+      }
+      if (!muted || muted === '') muted = 'color-mix(in oklab, ' + ink + ' 65%, transparent)';
+
+      // Apply to :root so our section picks it up
+      const setVar = (k, v) => root.style.setProperty(k, v);
+      setVar('--bg', bg);
+      setVar('--ink', ink);
+      setVar('--brand', brand);
+      setVar('--accent', accent);
+      setVar('--muted', muted);
+
+      // If the host page is light, make the card border a touch darker
+      // (very lightweight contrast adjustment)
+      try {
+        const [r,g,b] = (bg.match(/\d+/g) || []).map(Number);
+        if (r+g+b > 600) {
+          document.querySelector('.about-wrap')?.style.setProperty('border-color','rgba(0,0,0,.08)');
+          document.querySelector('.about-wrap')?.style.setProperty('box-shadow','0 10px 40px rgba(0,0,0,.08)');
+        }
+      } catch(e){}
+    })();
+  </script>
+</body>
+</html>
