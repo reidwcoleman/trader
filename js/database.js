@@ -219,6 +219,23 @@ const SQLiteDB = {
         }
 
         const row = result[0].values[0];
+
+        // Parse portfolio with error handling
+        let portfolio;
+        try {
+            const portfolioData = row[6];
+            if (typeof portfolioData === 'string') {
+                portfolio = JSON.parse(portfolioData);
+            } else if (portfolioData && typeof portfolioData === 'object') {
+                portfolio = portfolioData;
+            } else {
+                portfolio = { cash: 100000, positions: {}, history: [], lastBuyTime: {}, watchlist: [] };
+            }
+        } catch (e) {
+            console.error('Error parsing portfolio for email:', email, e);
+            portfolio = { cash: 100000, positions: {}, history: [], lastBuyTime: {}, watchlist: [] };
+        }
+
         return {
             id: row[0],
             account_code: row[1],
@@ -226,7 +243,7 @@ const SQLiteDB = {
             user_email: row[3],
             passcode: row[4],
             password_hash: row[5],
-            portfolio: JSON.parse(row[6]),
+            portfolio: portfolio,
             created_at: row[7],
             updated_at: row[8]
         };
