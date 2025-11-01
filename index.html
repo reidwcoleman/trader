@@ -10,400 +10,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
-    <style>
-        /* Dark theme with messy white lines background */
-        html, body {
-            background: #1a1a1a !important;
-            position: relative;
-            min-height: 100vh;
-        }
 
-        /* Messy white lines background - Layer 1 - ALWAYS ON TOP */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image:
-                linear-gradient(135deg, transparent 0%, transparent 48%, rgba(255,255,255,0.12) 48%, rgba(255,255,255,0.12) 52%, transparent 52%, transparent 100%),
-                linear-gradient(45deg, transparent 0%, transparent 48%, rgba(255,255,255,0.1) 48%, rgba(255,255,255,0.1) 52%, transparent 52%, transparent 100%),
-                linear-gradient(90deg, transparent 0%, transparent 48%, rgba(255,255,255,0.08) 48%, rgba(255,255,255,0.08) 50%, transparent 50%, transparent 100%);
-            background-size: 100px 100px, 140px 140px, 70px 70px;
-            background-position: 0 0, 50px 50px, 25px 25px;
-            z-index: 9999;
-            pointer-events: none;
-        }
-
-        /* Messy white lines background - Layer 2 - ALWAYS ON TOP */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image:
-                repeating-linear-gradient(
-                    42deg,
-                    transparent,
-                    transparent 38px,
-                    rgba(255,255,255,0.08) 38px,
-                    rgba(255,255,255,0.08) 40px
-                ),
-                repeating-linear-gradient(
-                    -48deg,
-                    transparent,
-                    transparent 28px,
-                    rgba(255,255,255,0.1) 28px,
-                    rgba(255,255,255,0.1) 30px
-                ),
-                repeating-linear-gradient(
-                    88deg,
-                    transparent,
-                    transparent 55px,
-                    rgba(255,255,255,0.07) 55px,
-                    rgba(255,255,255,0.07) 57px
-                );
-            z-index: 9999;
-            pointer-events: none;
-        }
-
-        /* Ensure content is below background lines but still visible */
-        #root {
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Override Tailwind colors for dark theme */
-        .bg-gradient-to-br.from-blue-900 {
-            background: linear-gradient(to bottom right, #1e293b 0%, #0f172a 100%) !important;
-        }
-
-        .bg-gradient-to-r.from-blue-800 {
-            background: linear-gradient(to right, #1e3a5f 0%, #1a2332 100%) !important;
-        }
-
-        .bg-blue-800, .from-blue-800 {
-            background-color: #1e3a5f !important;
-        }
-
-        .bg-blue-900, .to-blue-900 {
-            background-color: #1a2332 !important;
-        }
-
-        .bg-blue-700 {
-            background-color: #2d4a6f !important;
-        }
-
-        .border-blue-600 {
-            border-color: #3d5a80 !important;
-        }
-
-        .border-blue-500 {
-            border-color: #4a6fa5 !important;
-        }
-
-        .text-blue-100 {
-            color: #d4e4ff !important;
-        }
-
-        .text-blue-200 {
-            color: #b8d4ff !important;
-        }
-
-        .text-blue-300 {
-            color: #9cc4ff !important;
-        }
-
-        .placeholder-blue-300::placeholder {
-            color: #9cc4ff !important;
-        }
-
-        /* Card backgrounds with subtle patterns */
-        .bg-gradient-to-br.from-blue-800.to-blue-900 {
-            background: linear-gradient(to bottom right, #1e3a5f 0%, #1a2332 100%) !important;
-            position: relative;
-        }
-
-        /* Add subtle texture to cards */
-        .bg-gradient-to-br.from-blue-800.to-blue-900::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                repeating-linear-gradient(
-                    45deg,
-                    transparent,
-                    transparent 10px,
-                    rgba(255,255,255,0.01) 10px,
-                    rgba(255,255,255,0.01) 11px
-                );
-            border-radius: inherit;
-            pointer-events: none;
-        }
-    </style>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <div id="root"></div>
 
+    <!-- External JavaScript modules -->
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+
+    <!-- Initialize database on page load -->
+    <script>
+        // Initialize database when page loads
+        initDatabase();
+    </script>
+
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // Initialize SQLite Database
-        let db = null;
-        let dbReady = false;
-
-        // Initialize SQL.js and create/load database
-        async function initDatabase() {
-            try {
-                console.log('🗄️ Initializing SQLite database...');
-
-                // Load sql.js with WASM
-                const SQL = await initSqlJs({
-                    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
-                });
-
-                // Try to load existing database from localStorage
-                const savedDb = localStorage.getItem('tradeWars_sqlite_db');
-                if (savedDb) {
-                    const uint8Array = new Uint8Array(JSON.parse(savedDb));
-                    db = new SQL.Database(uint8Array);
-                    console.log('✅ Loaded existing SQLite database from localStorage');
-                } else {
-                    db = new SQL.Database();
-                    console.log('✅ Created new SQLite database');
-                }
-
-                // Create tables if they don't exist
-                db.run(`
-                    CREATE TABLE IF NOT EXISTS personal_accounts (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        account_code TEXT UNIQUE NOT NULL,
-                        user_name TEXT NOT NULL,
-                        user_email TEXT NOT NULL,
-                        passcode TEXT NOT NULL,
-                        portfolio TEXT NOT NULL,
-                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-                    )
-                `);
-
-                // Migration: Add user_email and passcode columns if they don't exist
-                try {
-                    // Check if columns exist by trying to query them
-                    const checkColumns = db.exec('PRAGMA table_info(personal_accounts)');
-                    if (checkColumns.length > 0) {
-                        const columns = checkColumns[0].values.map(row => row[1]); // column names are at index 1
-
-                        if (!columns.includes('user_email')) {
-                            console.log('📝 Adding user_email column to existing database...');
-                            db.run('ALTER TABLE personal_accounts ADD COLUMN user_email TEXT DEFAULT ""');
-                        }
-
-                        if (!columns.includes('passcode')) {
-                            console.log('📝 Adding passcode column to existing database...');
-                            db.run('ALTER TABLE personal_accounts ADD COLUMN passcode TEXT DEFAULT ""');
-                        }
-                    }
-                } catch (migrationError) {
-                    console.warn('Migration check skipped:', migrationError);
-                }
-
-                db.run(`
-                    CREATE TABLE IF NOT EXISTS competitions (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        code TEXT UNIQUE NOT NULL,
-                        total_pool REAL DEFAULT 0,
-                        start_time TEXT DEFAULT CURRENT_TIMESTAMP
-                    )
-                `);
-
-                db.run(`
-                    CREATE TABLE IF NOT EXISTS members (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        competition_code TEXT NOT NULL,
-                        member_id TEXT NOT NULL,
-                        name TEXT NOT NULL,
-                        contribution REAL DEFAULT 0,
-                        portfolio TEXT NOT NULL,
-                        joined_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                        UNIQUE(competition_code, member_id)
-                    )
-                `);
-
-                // Save database to localStorage
-                saveDatabase();
-
-                dbReady = true;
-                console.log('✅ SQLite database initialized successfully');
-            } catch (error) {
-                console.error('❌ Error initializing SQLite:', error);
-                dbReady = false;
-            }
-        }
-
-        // Save database to localStorage
-        function saveDatabase() {
-            if (!db) return;
-            try {
-                const data = db.export();
-                const buffer = Array.from(data);
-                localStorage.setItem('tradeWars_sqlite_db', JSON.stringify(buffer));
-                console.log('💾 Database saved to localStorage');
-            } catch (error) {
-                console.error('Error saving database:', error);
-            }
-        }
-
-        // SQLite Database Functions
-        const SQLiteDB = {
-            // Create new personal account
-            createAccount(code, userName, userEmail, passcode, portfolio) {
-                if (!db) throw new Error('Database not initialized');
-
-                const portfolioJson = JSON.stringify(portfolio);
-                const now = new Date().toISOString();
-
-                db.run(
-                    'INSERT INTO personal_accounts (account_code, user_name, user_email, passcode, portfolio, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [code, userName, userEmail, passcode, portfolioJson, now, now]
-                );
-
-                saveDatabase();
-                console.log('✅ Account saved to SQLite:', code);
-
-                return {
-                    account_code: code,
-                    user_name: userName,
-                    user_email: userEmail,
-                    passcode: passcode,
-                    portfolio: portfolio,
-                    created_at: now
-                };
-            },
-
-            // Get account by code
-            getAccount(code) {
-                if (!db) throw new Error('Database not initialized');
-
-                const result = db.exec(
-                    'SELECT * FROM personal_accounts WHERE account_code = ?',
-                    [code]
-                );
-
-                if (result.length === 0 || result[0].values.length === 0) {
-                    return null;
-                }
-
-                const row = result[0].values[0];
-                return {
-                    id: row[0],
-                    account_code: row[1],
-                    user_name: row[2],
-                    user_email: row[3],
-                    passcode: row[4],
-                    portfolio: JSON.parse(row[5]),
-                    created_at: row[6],
-                    updated_at: row[7]
-                };
-            },
-
-            // Get account by email and passcode (for login)
-            getAccountByEmailAndPasscode(email, passcode) {
-                if (!db) throw new Error('Database not initialized');
-
-                const result = db.exec(
-                    'SELECT * FROM personal_accounts WHERE user_email = ? AND passcode = ?',
-                    [email, passcode]
-                );
-
-                if (result.length === 0 || result[0].values.length === 0) {
-                    return null;
-                }
-
-                const row = result[0].values[0];
-                return {
-                    id: row[0],
-                    account_code: row[1],
-                    user_name: row[2],
-                    user_email: row[3],
-                    passcode: row[4],
-                    portfolio: JSON.parse(row[5]),
-                    created_at: row[6],
-                    updated_at: row[7]
-                };
-            },
-
-            // Get account by email only (for password reset)
-            getAccountByEmail(email) {
-                if (!db) throw new Error('Database not initialized');
-
-                const result = db.exec(
-                    'SELECT * FROM personal_accounts WHERE user_email = ?',
-                    [email]
-                );
-
-                if (result.length === 0 || result[0].values.length === 0) {
-                    return null;
-                }
-
-                const row = result[0].values[0];
-                const portfolioData = row[5];
-                let portfolio;
-                try {
-                    portfolio = typeof portfolioData === 'string' ? JSON.parse(portfolioData) : portfolioData;
-                } catch (e) {
-                    console.error('Error parsing portfolio data:', e);
-                    portfolio = { cash: 100000, stocks: {} };
-                }
-
-                return {
-                    id: row[0],
-                    account_code: row[1],
-                    user_name: row[2],
-                    user_email: row[3],
-                    passcode: row[4],
-                    portfolio: portfolio,
-                    created_at: row[6],
-                    updated_at: row[7]
-                };
-            },
-
-            // Update account portfolio
-            updateAccount(code, portfolio) {
-                if (!db) throw new Error('Database not initialized');
-
-                const portfolioJson = JSON.stringify(portfolio);
-                const now = new Date().toISOString();
-
-                db.run(
-                    'UPDATE personal_accounts SET portfolio = ?, updated_at = ? WHERE account_code = ?',
-                    [portfolioJson, now, code]
-                );
-
-                saveDatabase();
-                console.log('✅ Account updated in SQLite:', code);
-                return true;
-            },
-
-            // Get all accounts (for debugging)
-            getAllAccounts() {
-                if (!db) return [];
-
-                const result = db.exec('SELECT account_code, user_name FROM personal_accounts');
-                if (result.length === 0) return [];
-
-                return result[0].values.map(row => ({
-                    account_code: row[0],
-                    user_name: row[1]
-                }));
-            }
-        };
-
-        // Initialize database on load
-        initDatabase();
+        // Database and config are loaded from external JS files
+        // Available: db, dbReady, SQLiteDB, initDatabase(), saveDatabase()
+        // Available: FINNHUB_API_KEY, FINNHUB_API_BASE, STOCK_DATABASE, etc.
 
         const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');
@@ -446,27 +75,11 @@
             const chartRef = useRef(null);
             const chartInstance = useRef(null);
 
-            const COMMISSION_RATE = 0.03;
-
-            // Stripe Payment Links - REPLACE THESE WITH YOUR ACTUAL STRIPE LINKS
-            // Follow STRIPE_SETUP_GUIDE.md to create your payment links
-            const STRIPE_FAMILY_PUBLIC_LINK = 'https://buy.stripe.com/test_REPLACE_WITH_YOUR_LINK';
-            const STRIPE_FAMILY_PRIVATE_LINK = 'https://buy.stripe.com/test_REPLACE_WITH_YOUR_LINK';
-
-            const POPULAR_STOCKS = [
-                'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA',
-                'NVDA', 'META', 'NFLX', 'AMD', 'DIS'
-            ];
-
-            const TOP_12_STOCKS = [
-                'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA',
-                'NVDA', 'META', 'NFLX', 'AMD', 'COIN',
-                'JPM', 'V'
-            ];
-
-            // Finnhub API for real-time stock data (free tier: 60 calls/minute)
-            const FINNHUB_API_KEY = 'd3sop19r01qpdd5kkpsgd3sop19r01qpdd5kkpt0';
-            const FINNHUB_API_BASE = 'https://finnhub.io/api/v1';
+            // Constants are now loaded from config.js:
+            // COMMISSION_RATE, COOLDOWN_MINUTES, COOLDOWN_MS
+            // STRIPE_FAMILY_PUBLIC_LINK, STRIPE_FAMILY_PRIVATE_LINK
+            // POPULAR_STOCKS, TOP_12_STOCKS
+            // FINNHUB_API_KEY, FINNHUB_API_BASE, STOCK_DATABASE, FALLBACK_STOCK_DATA
 
             // Load watchlist from portfolio when competition/account changes
             useEffect(() => {
@@ -479,50 +92,6 @@
                     }
                 }
             }, [competition, currentUserId]);
-
-            // Popular stocks database for search
-            const STOCK_DATABASE = [
-                { symbol: 'AAPL', name: 'Apple Inc.' },
-                { symbol: 'GOOGL', name: 'Alphabet Inc.' },
-                { symbol: 'MSFT', name: 'Microsoft Corporation' },
-                { symbol: 'AMZN', name: 'Amazon.com Inc.' },
-                { symbol: 'TSLA', name: 'Tesla Inc.' },
-                { symbol: 'NVDA', name: 'NVIDIA Corporation' },
-                { symbol: 'META', name: 'Meta Platforms Inc.' },
-                { symbol: 'NFLX', name: 'Netflix Inc.' },
-                { symbol: 'AMD', name: 'Advanced Micro Devices' },
-                { symbol: 'DIS', name: 'Walt Disney Company' },
-                { symbol: 'COIN', name: 'Coinbase Global Inc.' },
-                { symbol: 'BA', name: 'Boeing Company' },
-                { symbol: 'BABA', name: 'Alibaba Group' },
-                { symbol: 'NKE', name: 'Nike Inc.' },
-                { symbol: 'INTC', name: 'Intel Corporation' },
-                { symbol: 'V', name: 'Visa Inc.' },
-                { symbol: 'JPM', name: 'JPMorgan Chase' },
-                { symbol: 'WMT', name: 'Walmart Inc.' },
-                { symbol: 'PFE', name: 'Pfizer Inc.' },
-                { symbol: 'KO', name: 'Coca-Cola Company' },
-                { symbol: 'PEP', name: 'PepsiCo Inc.' },
-                { symbol: 'PYPL', name: 'PayPal Holdings' },
-                { symbol: 'ADBE', name: 'Adobe Inc.' },
-                { symbol: 'CRM', name: 'Salesforce Inc.' },
-                { symbol: 'CSCO', name: 'Cisco Systems' },
-                { symbol: 'ORCL', name: 'Oracle Corporation' },
-                { symbol: 'T', name: 'AT&T Inc.' },
-                { symbol: 'VZ', name: 'Verizon Communications' },
-                { symbol: 'GM', name: 'General Motors' },
-                { symbol: 'F', name: 'Ford Motor Company' },
-                { symbol: 'UBER', name: 'Uber Technologies' },
-                { symbol: 'LYFT', name: 'Lyft Inc.' },
-                { symbol: 'SQ', name: 'Block Inc.' },
-                { symbol: 'SHOP', name: 'Shopify Inc.' },
-                { symbol: 'SPOT', name: 'Spotify Technology' },
-                { symbol: 'SNAP', name: 'Snap Inc.' },
-                { symbol: 'TWTR', name: 'Twitter Inc.' },
-                { symbol: 'ZM', name: 'Zoom Video Communications' },
-                { symbol: 'ROKU', name: 'Roku Inc.' },
-                { symbol: 'PINS', name: 'Pinterest Inc.' }
-            ];
 
             const searchStocks = async (query) => {
                 if (!query || query.length < 1) {
@@ -701,24 +270,12 @@
             };
 
             const getFallbackStockData = (symbol) => {
-                const fallbackData = {
-                    'AAPL': { price: 178.50, change: 1.2 },
-                    'GOOGL': { price: 142.30, change: -0.8 },
-                    'MSFT': { price: 378.90, change: 0.9 },
-                    'AMZN': { price: 145.60, change: 1.5 },
-                    'TSLA': { price: 242.80, change: -2.3 },
-                    'NVDA': { price: 495.20, change: 3.2 },
-                    'META': { price: 325.40, change: 0.7 },
-                    'NFLX': { price: 445.30, change: -1.1 },
-                    'AMD': { price: 143.20, change: 2.1 },
-                    'DIS': { price: 91.30, change: -0.5 }
-                };
-
+                // Use FALLBACK_STOCK_DATA from config.js
                 return {
                     symbol,
                     name: getStockName(symbol),
-                    price: fallbackData[symbol]?.price || Math.random() * 200 + 50,
-                    change: fallbackData[symbol]?.change || (Math.random() - 0.5) * 10,
+                    price: FALLBACK_STOCK_DATA[symbol]?.price || Math.random() * 200 + 50,
+                    change: FALLBACK_STOCK_DATA[symbol]?.change || (Math.random() - 0.5) * 10,
                     volume: '10.5M'
                 };
             };
