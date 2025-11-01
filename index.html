@@ -2272,12 +2272,24 @@
                                                 🚀 Sign In
                                             </button>
 
-                                            <div className="text-center">
+                                            <div className="text-center space-y-2">
                                                 <button
                                                     onClick={() => setShowPasswordReset(true)}
                                                     className="text-cyan-300 hover:text-cyan-200 font-semibold text-sm underline"
                                                 >
                                                     Forgot your password?
+                                                </button>
+                                                <div className="text-blue-400 text-sm">or</div>
+                                                <button
+                                                    onClick={() => {
+                                                        const code = prompt('Enter your account code:');
+                                                        if (code) {
+                                                            signInToPersonalAccount(code);
+                                                        }
+                                                    }}
+                                                    className="text-cyan-300 hover:text-cyan-200 font-semibold text-sm underline"
+                                                >
+                                                    Sign in with account code
                                                 </button>
                                             </div>
                                         </div>
