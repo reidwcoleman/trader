@@ -1294,15 +1294,28 @@
                                         <li>✅ No fees whatsoever</li>
                                     </ul>
 
-                                    <button
-                                        onClick={() => {
-                                            setPlan('personal');
-                                            setView('setup-family');
-                                        }}
-                                        className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white py-3 rounded-xl font-bold hover:from-cyan-300 hover:to-blue-400 transition-all duration-300"
-                                    >
-                                        Start Free
-                                    </button>
+                                    <div className="space-y-3">
+                                        <button
+                                            onClick={() => {
+                                                setPlan('personal');
+                                                setAccountMode('create');
+                                                setView('setup-family');
+                                            }}
+                                            className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white py-3 rounded-xl font-bold hover:from-cyan-300 hover:to-blue-400 transition-all duration-300"
+                                        >
+                                            ✨ Create Account
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setPlan('personal');
+                                                setAccountMode('login');
+                                                setView('setup-family');
+                                            }}
+                                            className="w-full bg-blue-700 hover:bg-blue-600 text-white py-3 rounded-xl font-bold transition-all duration-300"
+                                        >
+                                            🔐 Sign In
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Family Public Plan - 1% Fee */}
@@ -1421,21 +1434,6 @@
                                         <p className="text-purple-200 text-sm">All Family plan payments are processed securely through Stripe. Trusted by millions of businesses worldwide with bank-level security.</p>
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Sign In to Existing Personal Account */}
-                            <div className="mt-6 max-w-md mx-auto text-center">
-                                <p className="text-blue-200 mb-3">Already have a personal account?</p>
-                                <button
-                                    onClick={() => {
-                                        setPlan('personal');
-                                        setAccountMode('login');
-                                        setView('setup-family');
-                                    }}
-                                    className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 shadow-lg"
-                                >
-                                    🔐 Sign In to Personal Account
-                                </button>
                             </div>
 
                             {/* Live Stock Ticker - At the bottom */}
