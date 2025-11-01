@@ -1,5 +1,4 @@
-require('dotenv').config();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe');
 
 exports.handler = async (event, context) => {
   // Add CORS headers for preflight requests
@@ -16,22 +15,31 @@ exports.handler = async (event, context) => {
   }
 
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: JSON.stringify({ success: false, message: 'Method Not Allowed' }) };
+    return { 
+      statusCode: 405, 
+      headers: { 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ success: false, message: 'Method Not Allowed' }) 
+    };
   }
 
   try {
     // Check if Stripe is configured
     if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_PRICE_ID) {
       console.error('Missing Stripe configuration');
+      console.error('STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? 'Set' : 'NOT SET');
+      console.error('STRIPE_PRICE_ID:', process.env.STRIPE_PRICE_ID ? 'Set' : 'NOT SET');
       return {
         statusCode: 500,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({ 
           success: false, 
-          message: 'Stripe is not configured. Please set STRIPE_SECRET_KEY and STRIPE_PRICE_ID environment variables.' 
+          message: 'Stripe is not configured. Please set STRIPE_SECRET_KEY and STRIPE_PRICE_ID environment variables in Netlify.' 
         })
       };
     }
+
+    // Initialize Stripe with the secret key
+    const stripeClient = stripe(process.env.STRIPE_SECRET_KEY);
 
     const { email, userId } = JSON.parse(event.body);
 
@@ -43,11 +51,15 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const origin = event.headers.origin || event.headers.referer?.replace(/\/$/, '') || event.headers.host || 'https://reidwcoleman.github.io/trader';
+    // Get the origin from the request
+    const protocol = event.headers['x-forwarded-proto'] || 'https';
+    const host = event.headers.host;
+    const origin = `${protocol}://${host}`;
 
     console.log('Creating Stripe session for:', email);
+    console.log('Origin:', origin);
     
-    const session = await stripe.checkout.sessions.create({
+    const session = await stripeClient.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
       mode: 'payment',
@@ -58,7 +70,7 @@ exports.handler = async (event, context) => {
       metadata: { email, userId: userId || '', accessType: 'family' }
     });
 
-    console.log('Stripe session created:', session.id);
+    console.log('Stripe session created successfully:', session.id);
 
     return {
       statusCode: 200,
