@@ -1508,9 +1508,19 @@
                 }
             }, [selectedStock]);
 
-            // Load market news on mount
+            // Load market news on mount and auto-refresh every 5 minutes
             useEffect(() => {
+                // Load immediately on mount
                 loadMarketNews();
+
+                // Set up auto-refresh every 5 minutes (300000 ms)
+                const newsRefreshInterval = setInterval(() => {
+                    loadMarketNews();
+                    console.log('📰 Auto-refreshing market news...');
+                }, 300000); // 5 minutes
+
+                // Cleanup interval on unmount
+                return () => clearInterval(newsRefreshInterval);
             }, []);
 
             // Plan Selection Screen

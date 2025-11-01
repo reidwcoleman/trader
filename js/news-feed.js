@@ -4,7 +4,8 @@
 async function fetchStockNews(symbol, apiKey) {
     try {
         const toDate = new Date().toISOString().split('T')[0];
-        const fromDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        // Fetch news from last 30 days to ensure we get at least 3 articles
+        const fromDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
         const response = await fetch(
             `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${fromDate}&to=${toDate}&token=${apiKey}`
@@ -17,8 +18,8 @@ async function fetchStockNews(symbol, apiKey) {
 
         const data = await response.json();
 
-        // Format and limit to top 10 articles
-        return (data || []).slice(0, 10).map(article => ({
+        // Format and return at least 3 articles, up to 20 for good coverage
+        const articles = (data || []).slice(0, 20).map(article => ({
             id: article.id,
             headline: article.headline,
             summary: article.summary,
@@ -29,15 +30,23 @@ async function fetchStockNews(symbol, apiKey) {
             symbol: symbol,
             sentiment: analyzeSentiment(article.headline + ' ' + article.summary)
         }));
+
+        // Log warning if less than 3 articles found
+        if (articles.length < 3) {
+            console.warn(`⚠️ Only ${articles.length} news articles found for ${symbol}`);
+        }
+
+        return articles;
     } catch (error) {
         console.error(`Error fetching news for ${symbol}:`, error);
         return [];
     }
 }
 
-// Fetch general market news
+// Fetch general market news (trading and financial news)
 async function fetchMarketNews(apiKey) {
     try {
+        // Fetch general financial/market news
         const response = await fetch(
             `https://finnhub.io/api/v1/news?category=general&token=${apiKey}`
         );
@@ -49,7 +58,22 @@ async function fetchMarketNews(apiKey) {
 
         const data = await response.json();
 
-        return (data || []).slice(0, 20).map(article => ({
+        // Filter to ensure all news is trading/finance related
+        const tradingKeywords = [
+            'stock', 'market', 'trading', 'shares', 'wall street', 'nasdaq', 'dow', 'sp500', 's&p',
+            'investor', 'investment', 'equity', 'portfolio', 'earnings', 'revenue', 'profit',
+            'financial', 'economy', 'fed', 'federal reserve', 'interest rate', 'inflation',
+            'bullish', 'bearish', 'rally', 'surge', 'plunge', 'analyst', 'upgrade', 'downgrade',
+            'ipo', 'merger', 'acquisition', 'dividend', 'buyback', 'ceo', 'quarterly'
+        ];
+
+        const tradingNews = (data || []).filter(article => {
+            const text = (article.headline + ' ' + article.summary).toLowerCase();
+            return tradingKeywords.some(keyword => text.includes(keyword));
+        });
+
+        // Return up to 30 trading-related articles for comprehensive coverage
+        return tradingNews.slice(0, 30).map(article => ({
             id: article.id,
             headline: article.headline,
             summary: article.summary,
