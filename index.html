@@ -21,6 +21,9 @@
     <script src="js/config.js"></script>
     <script src="js/database.js"></script>
     <script src="js/crypto-utils.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/news-feed.js"></script>
+    <script src="js/short-selling.js"></script>
 
     <!-- Initialize database on page load -->
     <script>
@@ -76,9 +79,14 @@
             const [chartPeriod, setChartPeriod] = useState('1M');
             const [topStocks, setTopStocks] = useState([]);
             const [isRealChartData, setIsRealChartData] = useState(false);
+            const [stockNews, setStockNews] = useState([]);
+            const [loadingNews, setLoadingNews] = useState(false);
+            const [tradeType, setTradeType] = useState('long'); // 'long' or 'short'
 
             const chartRef = useRef(null);
             const chartInstance = useRef(null);
+            const performanceChartRef = useRef(null);
+            const performanceChartInstance = useRef(null);
 
             // Constants are now loaded from config.js:
             // COMMISSION_RATE, COOLDOWN_MINUTES, COOLDOWN_MS
@@ -451,11 +459,21 @@
             }, [selectedStock]);
 
             const getCurrentPortfolio = () => {
+                const defaultPortfolio = {
+                    cash: 100000,
+                    positions: {},
+                    shortPositions: {},
+                    history: [],
+                    lastBuyTime: {},
+                    watchlist: [],
+                    performanceHistory: [] // Track daily portfolio values for analytics
+                };
+
                 if (plan === 'personal') {
-                    return competition?.members[0]?.portfolio || { cash: 100000, positions: {}, history: [], lastBuyTime: {}, watchlist: [] };
+                    return competition?.members[0]?.portfolio || defaultPortfolio;
                 }
                 const member = competition?.members.find(m => m.id === currentUserId);
-                return member?.portfolio || { cash: 100000, positions: {}, history: [], lastBuyTime: {}, watchlist: [] };
+                return member?.portfolio || defaultPortfolio;
             };
 
             const calculatePortfolioValue = (portfolio) => {
