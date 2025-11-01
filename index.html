@@ -84,6 +84,7 @@
             const [tradeType, setTradeType] = useState('long'); // 'long' or 'short'
             const [marketNews, setMarketNews] = useState([]);
             const [loadingMarketNews, setLoadingMarketNews] = useState(false);
+            const [lastNewsUpdate, setLastNewsUpdate] = useState(null);
             const [aiAnalysis, setAiAnalysis] = useState(null);
             const [loadingAnalysis, setLoadingAnalysis] = useState(false);
             const [analysisExpanded, setAnalysisExpanded] = useState(true);
@@ -1074,6 +1075,7 @@
                 try {
                     const news = await window.newsFeed.fetchMarketNews(FINNHUB_API_KEY);
                     setMarketNews(news);
+                    setLastNewsUpdate(new Date()); // Track when news was updated
                 } catch (error) {
                     console.error('Error loading market news:', error);
                     setMarketNews([]);
@@ -1508,16 +1510,16 @@
                 }
             }, [selectedStock]);
 
-            // Load market news on mount and auto-refresh every 5 minutes
+            // Load market news on mount and auto-refresh every 2 minutes for truly LIVE updates
             useEffect(() => {
                 // Load immediately on mount
                 loadMarketNews();
 
-                // Set up auto-refresh every 5 minutes (300000 ms)
+                // Set up auto-refresh every 2 minutes (120000 ms) for live updates
                 const newsRefreshInterval = setInterval(() => {
+                    console.log('📰 Auto-refreshing market news (LIVE MODE)...');
                     loadMarketNews();
-                    console.log('📰 Auto-refreshing market news...');
-                }, 300000); // 5 minutes
+                }, 120000); // 2 minutes for truly live updates
 
                 // Cleanup interval on unmount
                 return () => clearInterval(newsRefreshInterval);
