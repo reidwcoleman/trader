@@ -10,15 +10,29 @@ module.exports = async (req, res) => {
         'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
     );
 
-    // Handle OPTIONS request
+    // Handle OPTIONS request for CORS preflight
     if (req.method === 'OPTIONS') {
         res.status(200).end();
         return;
     }
 
+    // Log for debugging
+    console.log('Password reset API called:', {
+        method: req.method,
+        hasBody: !!req.body,
+        email: req.body?.email,
+        hasPasscode: !!req.body?.passcode,
+        envConfigured: !!process.env.EMAIL_USER
+    });
+
     // Only allow POST
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+        console.error('Invalid method:', req.method);
+        return res.status(405).json({
+            error: 'Method not allowed',
+            method: req.method,
+            expectedMethod: 'POST'
+        });
     }
 
     const { email, passcode } = req.body;

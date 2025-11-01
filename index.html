@@ -1812,11 +1812,13 @@
                                                             setShowPasswordReset(false);
                                                             setResetEmail('');
                                                         } else {
-                                                            alert('❌ Failed to send email. Make sure the email server is running:\n\n1. Open terminal in the trader folder\n2. Run: npm start\n3. Try password reset again');
+                                                            const errorData = await response.json().catch(() => ({}));
+                                                            console.error('API Error:', errorData);
+                                                            alert(`❌ Failed to send email (${response.status}).\n\nYour passcode is: ${account.passcode}\n\n(Save this somewhere safe!)\n\nIf you're the admin, check Vercel logs for details.`);
                                                         }
                                                     } catch (error) {
                                                         console.error('Error sending reset email:', error);
-                                                        alert('❌ Email server not running!\n\nTo enable password reset:\n1. Open terminal in the trader folder\n2. Run: npm start\n3. Try again\n\nYour passcode is: ' + account.passcode + '\n\n(Save this somewhere safe!)');
+                                                        alert(`❌ Could not reach email server!\n\nYour passcode is: ${account.passcode}\n\n(Save this somewhere safe!)\n\nError: ${error.message}`);
                                                     }
                                                 }}
                                                 className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-gray-900 py-4 rounded-xl font-black text-lg transition-all duration-300 shadow-lg hover:shadow-xl"
