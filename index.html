@@ -2777,9 +2777,17 @@
                         )}
 
                         {/* Main Content */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className={`grid grid-cols-1 gap-6 ${
+                            Object.entries(portfolio.positions).filter(([_, qty]) => qty > 0).length > 0
+                                ? 'lg:grid-cols-3'
+                                : 'lg:grid-cols-1'
+                        }`}>
                             {/* Market View */}
-                            <div className="lg:col-span-2 bg-gradient-to-br from-blue-800 to-blue-900 rounded-2xl p-6 border border-blue-600">
+                            <div className={`bg-gradient-to-br from-blue-800 to-blue-900 rounded-2xl p-6 border border-blue-600 ${
+                                Object.entries(portfolio.positions).filter(([_, qty]) => qty > 0).length > 0
+                                    ? 'lg:col-span-2'
+                                    : 'col-span-1'
+                            }`}>
                                 <h2 className="text-2xl font-bold text-white mb-4">🔍 Stock Search</h2>
 
                                 <div className="relative mb-6">
@@ -3433,7 +3441,8 @@
                             )}
                             </div>
 
-                            {/* Portfolio Holdings - Right Column */}
+                            {/* Portfolio Holdings - Right Column - Only show when there are holdings */}
+                            {Object.entries(portfolio.positions).filter(([_, qty]) => qty > 0).length > 0 && (
                             <div className="space-y-6">
                                 {/* Portfolio Positions */}
                                 <div className="bg-gradient-to-br from-blue-800 to-blue-900 rounded-2xl p-6 border-2 border-blue-500">
@@ -3530,6 +3539,7 @@
                                     </div>
                                 </div>
                             </div>
+                            )}
                         </div>
                             </>
                         )}
