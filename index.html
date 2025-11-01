@@ -1935,6 +1935,17 @@
                                     <div className="space-y-4 mb-6">
                                         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
                                             <div className="text-center">
+                                                <p className="text-purple-200 text-sm font-semibold mb-2">YOUR ACCOUNT CODE</p>
+                                                <div className="bg-gradient-to-r from-green-400 to-emerald-400 rounded-xl p-4">
+                                                    <div className="text-3xl font-black text-gray-900 tracking-widest font-mono">
+                                                        {competitionCode}
+                                                    </div>
+                                                </div>
+                                                <p className="text-purple-200 text-xs mt-2">Use this code to sign in quickly</p>
+                                            </div>
+                                        </div>
+                                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
+                                            <div className="text-center">
                                                 <p className="text-purple-200 text-sm font-semibold mb-2">YOUR EMAIL</p>
                                                 <div className="bg-gradient-to-r from-blue-400 to-cyan-400 rounded-xl p-4">
                                                     <div className="text-2xl font-bold text-gray-900">
@@ -1951,18 +1962,19 @@
                                                         {generatedPasscode}
                                                     </div>
                                                 </div>
-                                                <button
-                                                    onClick={() => {
-                                                        navigator.clipboard.writeText(`Email: ${userEmail}\nPasscode: ${generatedPasscode}`);
-                                                        setCopySuccess(true);
-                                                        setTimeout(() => setCopySuccess(false), 2000);
-                                                    }}
-                                                    className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 mx-auto mt-4"
-                                                >
-                                                    {copySuccess ? '✓ Copied!' : '📋 Copy Login Info'}
-                                                </button>
+                                                <p className="text-purple-200 text-xs mt-2">Legacy 6-digit code (optional)</p>
                                             </div>
                                         </div>
+                                        <button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(`Account Code: ${competitionCode}\nEmail: ${userEmail}\nPasscode: ${generatedPasscode}`);
+                                                setCopySuccess(true);
+                                                setTimeout(() => setCopySuccess(false), 2000);
+                                            }}
+                                            className="w-full bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2"
+                                        >
+                                            {copySuccess ? '✓ Copied!' : '📋 Copy All Login Info'}
+                                        </button>
                                     </div>
                                 ) : (
                                     <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-6 border-2 border-white/30">
@@ -1992,10 +2004,11 @@
                                     <h3 className="text-white font-bold mb-3 text-lg">{plan === 'personal' ? '🔐 Important - Save Your Login Info!' : '📱 How to Share:'}</h3>
                                     {plan === 'personal' ? (
                                         <ul className="text-purple-200 space-y-2 list-disc list-inside">
-                                            <li>Your email and passcode are your only way to access your account</li>
-                                            <li>Save them in a safe place (password manager, notes app, etc.)</li>
-                                            <li>Use them to sign in from any device</li>
-                                            <li>Your portfolio and trades are saved to the cloud</li>
+                                            <li><strong>Account Code:</strong> Quick sign-in option (easiest method)</li>
+                                            <li><strong>Email + Password:</strong> Secure login with your password</li>
+                                            <li><strong>Passcode:</strong> Legacy 6-digit backup code</li>
+                                            <li>Save these credentials in a safe place</li>
+                                            <li>Your portfolio and trades are saved automatically</li>
                                             <li className="text-green-300 font-semibold">You start with $100,000 virtual cash - Happy trading! 📈</li>
                                         </ul>
                                     ) : (
