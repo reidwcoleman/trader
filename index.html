@@ -2141,10 +2141,8 @@
 
                                                     // Send email with passcode
                                                     try {
-                                                        // Determine API URL based on how the page is loaded
-                                                        const apiUrl = window.location.protocol === 'file:'
-                                                            ? 'http://localhost:3001/api/send-password-reset'
-                                                            : '/api/send-password-reset';
+                                                        // Try to send email via API
+                                                        const apiUrl = 'http://localhost:3001/api/send-password-reset';
 
                                                         const response = await fetch(apiUrl, {
                                                             method: 'POST',
@@ -2157,6 +2155,11 @@
 
                                                         if (response.ok) {
                                                             alert('✅ Your passcode has been sent to your email!');
+                                                            setShowPasswordReset(false);
+                                                            setResetEmail('');
+                                                        } else if (response.status === 405) {
+                                                            // Server not running or CORS issue - show passcode directly
+                                                            alert(`📧 Email server not available.\n\nYour passcode is: ${account.passcode}\n\n(Save this somewhere safe!)`);
                                                             setShowPasswordReset(false);
                                                             setResetEmail('');
                                                         } else {

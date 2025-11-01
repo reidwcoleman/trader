@@ -213,9 +213,19 @@ const SQLiteDB = {
         const portfolioData = row[5];
         let portfolio;
         try {
-            portfolio = typeof portfolioData === 'string' ? JSON.parse(portfolioData) : portfolioData;
+            // Handle various portfolio data formats
+            if (typeof portfolioData === 'string') {
+                // Remove any BOM or whitespace
+                const cleanData = portfolioData.trim().replace(/^\uFEFF/, '');
+                portfolio = cleanData ? JSON.parse(cleanData) : { cash: 100000, stocks: {} };
+            } else if (portfolioData && typeof portfolioData === 'object') {
+                portfolio = portfolioData;
+            } else {
+                portfolio = { cash: 100000, stocks: {} };
+            }
         } catch (e) {
             console.error('Error parsing portfolio data:', e);
+            console.error('Raw portfolio data:', portfolioData);
             portfolio = { cash: 100000, stocks: {} };
         }
 
