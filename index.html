@@ -980,7 +980,7 @@
             };
 
             // Execute short sell
-            const executeShortSell = () => {
+            const executeShortSell = async () => {
                 if (!selectedStock || quantity <= 0) return;
 
                 const stock = stocks.find(s => s.symbol === selectedStock);
@@ -1012,12 +1012,20 @@
                     )
                 }));
 
-                // Sync to database
-                if (competition?.code && plan === 'personal' && dbReady) {
+                // Sync to backend server for personal accounts
+                if (plan === 'personal' && userEmail) {
                     try {
-                        SQLiteDB.updateAccount(competition.code, updatedPortfolio);
+                        await fetch('http://localhost:3001/api/accounts/update-portfolio', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                email: userEmail,
+                                portfolio: updatedPortfolio
+                            })
+                        });
+                        console.log('✅ Portfolio synced to backend');
                     } catch (error) {
-                        console.error('Error syncing to SQLite:', error);
+                        console.error('Error syncing portfolio to backend:', error);
                     }
                 }
 
@@ -1027,7 +1035,7 @@
             };
 
             // Execute cover short
-            const executeCoverShort = () => {
+            const executeCoverShort = async () => {
                 if (!selectedStock || quantity <= 0) return;
 
                 const stock = stocks.find(s => s.symbol === selectedStock);
@@ -1057,12 +1065,20 @@
                     )
                 }));
 
-                // Sync to database
-                if (competition?.code && plan === 'personal' && dbReady) {
+                // Sync to backend server for personal accounts
+                if (plan === 'personal' && userEmail) {
                     try {
-                        SQLiteDB.updateAccount(competition.code, updatedPortfolio);
+                        await fetch('http://localhost:3001/api/accounts/update-portfolio', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                email: userEmail,
+                                portfolio: updatedPortfolio
+                            })
+                        });
+                        console.log('✅ Portfolio synced to backend');
                     } catch (error) {
-                        console.error('Error syncing to SQLite:', error);
+                        console.error('Error syncing portfolio to backend:', error);
                     }
                 }
 
@@ -1418,12 +1434,20 @@
                     )
                 }));
 
-                // Sync to SQLite database
-                if (competition?.code && plan === 'personal' && dbReady) {
+                // Sync to backend server for personal accounts
+                if (plan === 'personal' && userEmail) {
                     try {
-                        SQLiteDB.updateAccount(competition.code, updatedPortfolio);
+                        await fetch('http://localhost:3001/api/accounts/update-portfolio', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                email: userEmail,
+                                portfolio: updatedPortfolio
+                            })
+                        });
+                        console.log('✅ Portfolio synced to backend');
                     } catch (error) {
-                        console.error('Error syncing to SQLite:', error);
+                        console.error('Error syncing portfolio to backend:', error);
                     }
                 }
 
@@ -2385,7 +2409,7 @@
 
                                             <button
                                                 onClick={async () => {
-                                                    if (!userName) {
+                                                    if (!userName || userName.trim().length === 0) {
                                                         alert('Please enter your name');
                                                         return;
                                                     }
@@ -2393,17 +2417,25 @@
                                                         alert('Please enter a valid email address');
                                                         return;
                                                     }
-                                                    if (!userPassword) {
-                                                        alert('Please create a password');
+                                                    if (!userPassword || userPassword.length < 6) {
+                                                        alert('Password must be at least 6 characters long');
                                                         return;
                                                     }
 
-                                                    // Send password directly to backend
-                                                    createCompetition(userName, 0, userPassword);
+                                                    setLoading(true);
+                                                    try {
+                                                        await createCompetition(userName.trim(), 0, userPassword);
+                                                    } catch (error) {
+                                                        console.error('Account creation error:', error);
+                                                        alert('Failed to create account. Please try again.');
+                                                    } finally {
+                                                        setLoading(false);
+                                                    }
                                                 }}
-                                                className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl"
+                                                disabled={loading}
+                                                className={`w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
-                                                ✨ Create Account & Start Trading
+                                                {loading ? '⏳ Creating Account...' : '✨ Create Account & Start Trading'}
                                             </button>
                                         </div>
                                     )}
@@ -2449,13 +2481,14 @@
                                                         return;
                                                     }
 
+                                                    setLoading(true);
                                                     try {
                                                         // Login via backend server
                                                         const response = await fetch('http://localhost:3001/api/accounts/login', {
                                                             method: 'POST',
                                                             headers: { 'Content-Type': 'application/json' },
                                                             body: JSON.stringify({
-                                                                email: userEmail,
+                                                                email: userEmail.trim().toLowerCase(),
                                                                 password: userPassword
                                                             })
                                                         });
@@ -2493,12 +2526,15 @@
                                                         console.log('✅ Signed in successfully');
                                                     } catch (error) {
                                                         console.error('Sign in error:', error);
-                                                        alert('Failed to sign in. Please check that the server is running.');
+                                                        alert('Failed to sign in. Please check that the server is running (npm start).');
+                                                    } finally {
+                                                        setLoading(false);
                                                     }
                                                 }}
-                                                className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-4 rounded-xl font-black text-lg transition-all duration-300 shadow-xl hover:shadow-2xl"
+                                                disabled={loading}
+                                                className={`w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-4 rounded-xl font-black text-lg transition-all duration-300 shadow-xl hover:shadow-2xl ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
-                                                🚀 Sign In
+                                                {loading ? '⏳ Signing In...' : '🚀 Sign In'}
                                             </button>
                                         </div>
                                     )}
