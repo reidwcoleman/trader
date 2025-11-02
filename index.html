@@ -2004,8 +2004,7 @@
                                     <h3 className="text-white font-bold mb-3 text-lg">{plan === 'personal' ? '🔐 Important - Save Your Login Info!' : '📱 How to Share:'}</h3>
                                     {plan === 'personal' ? (
                                         <ul className="text-purple-200 space-y-2 list-disc list-inside">
-                                            <li><strong>Account Code:</strong> Quick sign-in option (easiest method)</li>
-                                            <li><strong>Email + Password:</strong> Secure login with your password</li>
+                                            <li><strong>Email + Account Code:</strong> Sign in with your email and account code</li>
                                             <li><strong>Passcode:</strong> Legacy 6-digit backup code</li>
                                             <li>Save these credentials in a safe place</li>
                                             <li>Your portfolio and trades are saved automatically</li>
@@ -2107,53 +2106,6 @@
                                                 />
                                             </div>
 
-                                            <div>
-                                                <label className="block text-blue-100 font-semibold mb-2">Password</label>
-                                                <input
-                                                    type="password"
-                                                    value={userPassword}
-                                                    onChange={(e) => {
-                                                        setUserPassword(e.target.value);
-                                                        if (window.PasswordStrength) {
-                                                            setPasswordStrength(window.PasswordStrength.check(e.target.value));
-                                                        }
-                                                    }}
-                                                    placeholder="Create a strong password"
-                                                    className="w-full bg-blue-700/50 border border-blue-500 rounded-xl px-4 py-3 text-white placeholder-blue-300"
-                                                />
-                                                {passwordStrength && userPassword && (
-                                                    <div className="mt-3">
-                                                        <div className="flex items-center justify-between mb-2">
-                                                            <span className="text-xs text-blue-200 font-semibold">Password Strength:</span>
-                                                            <span className={`text-xs font-bold ${
-                                                                passwordStrength.color === 'red' ? 'text-red-400' :
-                                                                passwordStrength.color === 'orange' ? 'text-orange-400' :
-                                                                passwordStrength.color === 'yellow' ? 'text-yellow-400' :
-                                                                'text-green-400'
-                                                            }`}>
-                                                                {passwordStrength.strength}
-                                                            </span>
-                                                        </div>
-                                                        <div className="w-full bg-blue-900/50 rounded-full h-2 mb-2">
-                                                            <div
-                                                                className={`h-2 rounded-full transition-all duration-300 ${
-                                                                    passwordStrength.color === 'red' ? 'bg-red-500' :
-                                                                    passwordStrength.color === 'orange' ? 'bg-orange-500' :
-                                                                    passwordStrength.color === 'yellow' ? 'bg-yellow-500' :
-                                                                    'bg-green-500'
-                                                                }`}
-                                                                style={{ width: `${passwordStrength.score}%` }}
-                                                            ></div>
-                                                        </div>
-                                                        <ul className="text-xs text-blue-300 space-y-1">
-                                                            {passwordStrength.feedback.map((item, idx) => (
-                                                                <li key={idx}>• {item}</li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
-                                            </div>
-
                                             <button
                                                 onClick={async () => {
                                                     if (!userName) {
@@ -2164,22 +2116,8 @@
                                                         alert('Please enter a valid email address');
                                                         return;
                                                     }
-                                                    if (!userPassword) {
-                                                        alert('Please create a password');
-                                                        return;
-                                                    }
 
-                                                    // Validate password strength
-                                                    const validation = window.PasswordStrength.validate(userPassword);
-                                                    if (!validation.isValid) {
-                                                        alert('Password requirements:\n' + validation.errors.join('\n'));
-                                                        return;
-                                                    }
-
-                                                    // Hash password before creating account
-                                                    const passwordHash = await window.PasswordHash.hash(userPassword);
-                                                    console.log('🔐 Creating account with password hash');
-                                                    createCompetition(userName, 0, passwordHash);
+                                                    createCompetition(userName, 0);
                                                 }}
                                                 className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300"
                                             >
@@ -2189,11 +2127,11 @@
                                     )}
 
                                     {/* Login Form */}
-                                    {accountMode === 'login' && !showPasswordReset && (
+                                    {accountMode === 'login' && (
                                         <div className="space-y-6">
                                             <div className="text-center mb-6">
                                                 <h2 className="text-3xl font-bold text-white mb-2">Welcome Back!</h2>
-                                                <p className="text-blue-200">Sign in to continue trading</p>
+                                                <p className="text-blue-200">Sign in with your email and account code</p>
                                             </div>
 
                                             <div>
@@ -2208,12 +2146,12 @@
                                             </div>
 
                                             <div>
-                                                <label className="block text-cyan-300 font-bold mb-3 text-sm uppercase tracking-wide">Password</label>
+                                                <label className="block text-cyan-300 font-bold mb-3 text-sm uppercase tracking-wide">Account Code</label>
                                                 <input
-                                                    type="password"
-                                                    value={userPassword}
-                                                    onChange={(e) => setUserPassword(e.target.value)}
-                                                    placeholder="Enter your password"
+                                                    type="text"
+                                                    value={userPasscode}
+                                                    onChange={(e) => setUserPasscode(e.target.value)}
+                                                    placeholder="Enter your account code"
                                                     className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
                                                 />
                                             </div>
@@ -2224,8 +2162,8 @@
                                                         alert('Please enter a valid email address');
                                                         return;
                                                     }
-                                                    if (!userPassword) {
-                                                        alert('Please enter your password');
+                                                    if (!userPasscode) {
+                                                        alert('Please enter your account code');
                                                         return;
                                                     }
 
@@ -2235,22 +2173,13 @@
                                                         console.log('🔍 Account lookup for:', userEmail, account ? 'Found' : 'Not found');
 
                                                         if (!account) {
-                                                            alert('Invalid email or password');
+                                                            alert('Invalid email or account code');
                                                             return;
                                                         }
 
-                                                        console.log('🔐 Account has password_hash:', !!account.password_hash);
-
-                                                        // Verify password
-                                                        if (account.password_hash) {
-                                                            const isValid = await window.PasswordHash.verify(userPassword, account.password_hash);
-                                                            console.log('✅ Password verification result:', isValid);
-                                                            if (!isValid) {
-                                                                alert('Invalid email or password');
-                                                                return;
-                                                            }
-                                                        } else {
-                                                            alert('This account was created without a password. Please use password reset to set one.');
+                                                        // Verify account code
+                                                        if (account.account_code !== userPasscode) {
+                                                            alert('Invalid email or account code');
                                                             return;
                                                         }
 
@@ -2274,6 +2203,7 @@
                                                         setCurrentUserId(newCompetition.members[0].id);
                                                         setUserName(account.user_name);
                                                         setView('app');
+                                                        setUserPasscode('');
                                                         console.log('✅ Signed in successfully');
                                                     } catch (error) {
                                                         console.error('Sign in error:', error);
@@ -2284,117 +2214,9 @@
                                             >
                                                 🚀 Sign In
                                             </button>
-
-                                            <div className="text-center space-y-2">
-                                                <button
-                                                    onClick={() => setShowPasswordReset(true)}
-                                                    className="text-cyan-300 hover:text-cyan-200 font-semibold text-sm underline"
-                                                >
-                                                    Forgot your password?
-                                                </button>
-                                                <div className="text-blue-400 text-sm">or</div>
-                                                <button
-                                                    onClick={() => {
-                                                        const code = prompt('Enter your account code:');
-                                                        if (code) {
-                                                            signInToPersonalAccount(code);
-                                                        }
-                                                    }}
-                                                    className="text-cyan-300 hover:text-cyan-200 font-semibold text-sm underline"
-                                                >
-                                                    Sign in with account code
-                                                </button>
-                                            </div>
                                         </div>
                                     )}
 
-                                    {/* Password Reset Form */}
-                                    {accountMode === 'login' && showPasswordReset && (
-                                        <div className="space-y-6">
-                                            <div className="text-center mb-6">
-                                                <div className="inline-block bg-yellow-500/20 rounded-full p-4 mb-4">
-                                                    <span className="text-5xl">🔑</span>
-                                                </div>
-                                                <h2 className="text-3xl font-bold text-white mb-2">Reset Passcode</h2>
-                                                <p className="text-blue-200">We'll send your passcode to your email</p>
-                                            </div>
-
-                                            <div>
-                                                <label className="block text-cyan-300 font-bold mb-3 text-sm uppercase tracking-wide">Email Address</label>
-                                                <input
-                                                    type="email"
-                                                    value={resetEmail}
-                                                    onChange={(e) => setResetEmail(e.target.value)}
-                                                    placeholder="your@email.com"
-                                                    className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
-                                                />
-                                            </div>
-
-                                            <button
-                                                onClick={async () => {
-                                                    if (!resetEmail || !resetEmail.includes('@')) {
-                                                        alert('Please enter a valid email address');
-                                                        return;
-                                                    }
-
-                                                    // Get account by email
-                                                    const account = SQLiteDB.getAccountByEmail(resetEmail);
-                                                    if (!account) {
-                                                        alert('No account found with that email address');
-                                                        return;
-                                                    }
-
-                                                    // Send email with passcode
-                                                    try {
-                                                        // Try to send email via API
-                                                        const apiUrl = 'http://localhost:3001/api/send-password-reset';
-
-                                                        const response = await fetch(apiUrl, {
-                                                            method: 'POST',
-                                                            headers: { 'Content-Type': 'application/json' },
-                                                            body: JSON.stringify({
-                                                                email: resetEmail,
-                                                                passcode: account.passcode
-                                                            })
-                                                        });
-
-                                                        if (response.ok) {
-                                                            alert('✅ Your passcode has been sent to your email!');
-                                                            setShowPasswordReset(false);
-                                                            setResetEmail('');
-                                                        } else if (response.status === 405) {
-                                                            // Server not running or CORS issue - show passcode directly
-                                                            alert(`📧 Email server not available.\n\nYour passcode is: ${account.passcode}\n\n(Save this somewhere safe!)`);
-                                                            setShowPasswordReset(false);
-                                                            setResetEmail('');
-                                                        } else {
-                                                            const errorData = await response.json().catch(() => ({}));
-                                                            console.error('API Error:', errorData);
-                                                            alert(`❌ Failed to send email (${response.status}).\n\nYour passcode is: ${account.passcode}\n\n(Save this somewhere safe!)\n\nIf you're the admin, check Vercel logs for details.`);
-                                                        }
-                                                    } catch (error) {
-                                                        console.error('Error sending reset email:', error);
-                                                        alert(`❌ Could not reach email server!\n\nYour passcode is: ${account.passcode}\n\n(Save this somewhere safe!)\n\nError: ${error.message}`);
-                                                    }
-                                                }}
-                                                className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-gray-900 py-4 rounded-xl font-black text-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-                                            >
-                                                📧 Send Passcode to Email
-                                            </button>
-
-                                            <div className="text-center">
-                                                <button
-                                                    onClick={() => {
-                                                        setShowPasswordReset(false);
-                                                        setResetEmail('');
-                                                    }}
-                                                    className="text-cyan-300 hover:text-cyan-200 font-semibold text-sm underline"
-                                                >
-                                                    ← Back to Login
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </div>
