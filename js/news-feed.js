@@ -4,8 +4,8 @@
 async function fetchStockNews(symbol, apiKey) {
     try {
         const toDate = new Date().toISOString().split('T')[0];
-        // Fetch news from last 30 days to ensure we get at least 3 articles
-        const fromDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        // Fetch news from last 60 days for better coverage
+        const fromDate = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
         const response = await fetch(
             `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${fromDate}&to=${toDate}&token=${apiKey}`
@@ -18,8 +18,26 @@ async function fetchStockNews(symbol, apiKey) {
 
         const data = await response.json();
 
-        // Format and return at least 3 articles, up to 20 for good coverage
-        const articles = (data || []).slice(0, 20).map(article => ({
+        // Filter for quality and relevance
+        const relevantNews = (data || []).filter(article => {
+            // Must have headline and summary
+            if (!article.headline || !article.summary) return false;
+
+            // Filter out very old articles (older than 60 days)
+            const articleDate = new Date(article.datetime * 1000);
+            const daysSincePublished = (Date.now() - articleDate.getTime()) / (1000 * 60 * 60 * 24);
+            if (daysSincePublished > 60) return false;
+
+            // Must mention the stock symbol or company name
+            const text = (article.headline + ' ' + article.summary).toUpperCase();
+            return text.includes(symbol.toUpperCase());
+        });
+
+        // Sort by date (most recent first)
+        relevantNews.sort((a, b) => b.datetime - a.datetime);
+
+        // Format and return top 25 articles for comprehensive coverage
+        const articles = relevantNews.slice(0, 25).map(article => ({
             id: article.id,
             headline: article.headline,
             summary: article.summary,
@@ -28,19 +46,27 @@ async function fetchStockNews(symbol, apiKey) {
             image: article.image,
             datetime: article.datetime,
             symbol: symbol,
-            sentiment: analyzeSentiment(article.headline + ' ' + article.summary)
+            sentiment: analyzeSentiment(article.headline + ' ' + article.summary),
+            relevance: calculateRelevance(article, symbol)
         }));
 
-        // Log warning if less than 3 articles found
-        if (articles.length < 3) {
-            console.warn(`⚠️ Only ${articles.length} news articles found for ${symbol}`);
-        }
-
+        console.log(`✅ Loaded ${articles.length} relevant news articles for ${symbol}`);
         return articles;
     } catch (error) {
         console.error(`Error fetching news for ${symbol}:`, error);
         return [];
     }
+}
+
+// Calculate article relevance score
+function calculateRelevance(article, symbol) {
+    const text = (article.headline + ' ' + article.summary).toUpperCase();
+    const symbolMentions = (text.match(new RegExp(symbol.toUpperCase(), 'g')) || []).length;
+
+    // Headline mentions are more important
+    const headlineMention = article.headline.toUpperCase().includes(symbol.toUpperCase()) ? 2 : 0;
+
+    return Math.min(10, symbolMentions + headlineMention);
 }
 
 // Fetch general market news (trading and financial news)
@@ -129,37 +155,64 @@ async function fetchMarketNews(apiKey) {
     }
 }
 
-// Simple sentiment analysis (positive/negative/neutral)
+// Enhanced sentiment analysis with scoring (positive/negative/neutral)
 function analyzeSentiment(text) {
     if (!text) return 'neutral';
 
     const lowerText = text.toLowerCase();
 
+    // Expanded and weighted sentiment words
+    const strongPositive = [
+        'soar', 'surge', 'skyrocket', 'explode', 'breakout', 'breakthrough', 'record high',
+        'massive gain', 'strong buy', 'outperform', 'beat expectations', 'exceptional'
+    ];
+
     const positiveWords = [
-        'surge', 'soar', 'rally', 'gain', 'profit', 'growth', 'rise', 'jump',
-        'climb', 'advance', 'beat', 'exceed', 'strong', 'bullish', 'success',
-        'upgrade', 'record', 'high', 'up', 'positive', 'win', 'boom', 'breakthrough'
+        'rally', 'gain', 'gains', 'profit', 'profits', 'growth', 'rise', 'rises', 'rising', 'jump', 'jumped',
+        'climb', 'climbs', 'advance', 'beat', 'beats', 'exceed', 'exceeds', 'strong', 'bullish', 'success',
+        'upgrade', 'upgraded', 'high', 'higher', 'up', 'positive', 'win', 'wins', 'boom', 'boost',
+        'improve', 'improves', 'better', 'recovery', 'recover', 'momentum', 'opportunity',
+        'outperform', 'outperformed', 'expand', 'expansion', 'innovative', 'promising'
+    ];
+
+    const strongNegative = [
+        'crash', 'plunge', 'collapse', 'tank', 'catastrophic', 'disaster', 'plummet',
+        'massive loss', 'strong sell', 'underperform', 'miss badly', 'devastating'
     ];
 
     const negativeWords = [
-        'plunge', 'drop', 'fall', 'loss', 'decline', 'crash', 'tank', 'tumble',
-        'sink', 'slide', 'miss', 'weak', 'bearish', 'fail', 'downgrade',
-        'low', 'down', 'negative', 'concern', 'risk', 'warning', 'cut', 'slash'
+        'drop', 'drops', 'fall', 'falls', 'falling', 'loss', 'losses', 'decline', 'declines', 'tumble',
+        'sink', 'sinks', 'slide', 'slides', 'miss', 'misses', 'weak', 'weaker', 'bearish', 'fail', 'fails',
+        'downgrade', 'downgraded', 'low', 'lower', 'down', 'negative', 'concern', 'concerns', 'worried',
+        'risk', 'risks', 'warning', 'warns', 'cut', 'cuts', 'slash', 'slashed', 'disappoint',
+        'disappointing', 'struggle', 'struggles', 'hurt', 'damage', 'threat', 'volatile', 'volatility'
     ];
 
-    let positiveCount = 0;
-    let negativeCount = 0;
+    let sentimentScore = 0;
 
+    // Strong indicators count more
+    strongPositive.forEach(phrase => {
+        if (lowerText.includes(phrase)) sentimentScore += 3;
+    });
+
+    strongNegative.forEach(phrase => {
+        if (lowerText.includes(phrase)) sentimentScore -= 3;
+    });
+
+    // Regular words
     positiveWords.forEach(word => {
-        if (lowerText.includes(word)) positiveCount++;
+        if (lowerText.includes(word)) sentimentScore += 1;
     });
 
     negativeWords.forEach(word => {
-        if (lowerText.includes(word)) negativeCount++;
+        if (lowerText.includes(word)) sentimentScore -= 1;
     });
 
-    if (positiveCount > negativeCount) return 'positive';
-    if (negativeCount > positiveCount) return 'negative';
+    // Return sentiment based on score
+    if (sentimentScore >= 3) return 'positive';
+    if (sentimentScore <= -3) return 'negative';
+    if (sentimentScore > 0) return 'positive';
+    if (sentimentScore < 0) return 'negative';
     return 'neutral';
 }
 
