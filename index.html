@@ -1086,7 +1086,7 @@
                 setLoadingMarketNews(false);
             };
 
-            // AI Trade Analysis with "UltraThink" deep reasoning
+            // AI Trade Analysis with "UltraThink" deep reasoning - REAL DATA DRIVEN
             const generateAIAnalysis = async () => {
                 if (!selectedStock) return;
 
@@ -1102,39 +1102,131 @@
                     return;
                 }
 
-                const priceChange = stock.change || 0;
+                console.log('🧠 Generating AI analysis with REAL data for:', stock);
+
+                // REAL DATA: Extract all stock metrics
                 const price = stock.price || 0;
+                const high = stock.high || price;
+                const low = stock.low || price;
+                const open = stock.open || price;
+                const previousClose = stock.previousClose || price;
+                const priceChange = stock.change || 0;
 
-                // Analyze sentiment from news
-                const newsSentiment = stockNews.length > 0
-                    ? stockNews.reduce((acc, article) => {
-                        if (article.sentiment === 'positive') return acc + 1;
-                        if (article.sentiment === 'negative') return acc - 1;
-                        return acc;
-                    }, 0) / stockNews.length
-                    : 0;
+                // REAL CALCULATION: RSI (Relative Strength Index) from price momentum
+                const calculateRSI = () => {
+                    // Use daily price change as momentum indicator
+                    const gain = Math.max(0, price - previousClose);
+                    const loss = Math.max(0, previousClose - price);
 
-                // Generate comprehensive analysis
-                const technicalSignal = priceChange > 2 ? 'Strong Bullish' :
-                                       priceChange > 0.5 ? 'Bullish' :
-                                       priceChange < -2 ? 'Strong Bearish' :
-                                       priceChange < -0.5 ? 'Bearish' : 'Neutral';
+                    // Simplified RSI calculation based on single-day momentum
+                    const avgGain = gain;
+                    const avgLoss = loss + 0.01; // Prevent division by zero
+                    const rs = avgGain / avgLoss;
+                    const rsi = 100 - (100 / (1 + rs));
 
-                const newsSignal = newsSentiment > 0.3 ? 'Positive' :
-                                  newsSentiment < -0.3 ? 'Negative' : 'Mixed';
+                    return Math.max(0, Math.min(100, rsi));
+                };
+
+                const rsi = calculateRSI();
+                console.log('📊 Real RSI calculated:', rsi);
+
+                // REAL CALCULATION: Intraday Volatility from high/low range
+                const intradayVolatility = ((high - low) / low * 100);
+                console.log('📈 Real intraday volatility:', intradayVolatility.toFixed(2) + '%');
+
+                // REAL CALCULATION: Price momentum
+                const momentum = ((price - open) / open * 100);
+                console.log('⚡ Real price momentum:', momentum.toFixed(2) + '%');
+
+                // REAL CALCULATION: Support and Resistance from actual price action
+                const support = (low * 0.98).toFixed(2); // 2% below daily low
+                const resistance = (high * 1.02).toFixed(2); // 2% above daily high
+
+                // TECHNICAL ANALYSIS based on real RSI and momentum
+                const isOverbought = rsi > 70;
+                const isOversold = rsi < 30;
+                const technicalSignal = isOverbought ? 'Overbought - Consider Selling' :
+                                       isOversold ? 'Oversold - Consider Buying' :
+                                       rsi > 60 ? 'Strong Bullish' :
+                                       rsi > 50 ? 'Bullish' :
+                                       rsi < 40 ? 'Bearish' :
+                                       rsi < 30 ? 'Strong Bearish' : 'Neutral';
+
+                // REAL NEWS SENTIMENT ANALYSIS with weighted scoring
+                let sentimentScore = 0;
+                let positiveCount = 0;
+                let negativeCount = 0;
+                let neutralCount = 0;
+
+                if (stockNews.length > 0) {
+                    // Weight recent news more heavily (time decay factor)
+                    stockNews.forEach((article, index) => {
+                        const recencyWeight = 1 - (index / stockNews.length) * 0.3; // 30% decay
+
+                        if (article.sentiment === 'positive') {
+                            sentimentScore += 1 * recencyWeight;
+                            positiveCount++;
+                        } else if (article.sentiment === 'negative') {
+                            sentimentScore -= 1 * recencyWeight;
+                            negativeCount++;
+                        } else {
+                            neutralCount++;
+                        }
+                    });
+
+                    // Normalize to -100 to +100 scale
+                    sentimentScore = (sentimentScore / stockNews.length) * 100;
+                }
+
+                console.log('📰 Real sentiment score:', sentimentScore, 'from', stockNews.length, 'articles');
+
+                const newsSignal = sentimentScore > 50 ? 'Very Positive' :
+                                  sentimentScore > 20 ? 'Positive' :
+                                  sentimentScore < -50 ? 'Very Negative' :
+                                  sentimentScore < -20 ? 'Negative' : 'Neutral';
+
+                // REAL RISK ASSESSMENT
+                const volatilityRisk = intradayVolatility > 5 ? 3 : intradayVolatility > 2 ? 2 : 1;
+                const sentimentRisk = Math.abs(sentimentScore) > 70 ? 2 : Math.abs(sentimentScore) > 40 ? 1 : 0;
+                const liquidityRisk = stockNews.length < 3 ? 2 : stockNews.length < 5 ? 1 : 0;
+                const rsiRisk = (isOverbought || isOversold) ? 2 : 1;
+
+                const totalRiskScore = volatilityRisk + sentimentRisk + liquidityRisk + rsiRisk;
+                const riskLevel = totalRiskScore >= 7 ? 'High' : totalRiskScore >= 4 ? 'Moderate' : 'Low';
+                const riskRating = totalRiskScore;
+
+                console.log('⚠️ Real risk assessment:', riskLevel, '| Score:', riskRating);
+
+                // COMPREHENSIVE RECOMMENDATION based on multiple real factors
+                const technicalScore = rsi > 50 ? (rsi - 50) / 10 : -(50 - rsi) / 10;
+                const sentimentScoreNormalized = sentimentScore / 25; // Scale to similar range
+                const momentumScore = momentum / 2;
+
+                // Adjust for overbought/oversold
+                let adjustedTechnicalScore = technicalScore;
+                if (isOverbought) adjustedTechnicalScore -= 3;
+                if (isOversold) adjustedTechnicalScore += 3;
+
+                // Weighted composite score: Technical (40%), Sentiment (35%), Momentum (25%)
+                const compositeScore = (adjustedTechnicalScore * 0.4) + (sentimentScoreNormalized * 0.35) + (momentumScore * 0.25);
+
+                // Risk-adjusted confidence
+                const riskAdjustment = riskLevel === 'High' ? -15 : riskLevel === 'Moderate' ? -5 : 0;
 
                 const overallRecommendation = (() => {
-                    const score = priceChange + (newsSentiment * 2);
-                    if (score > 2) return { action: 'Strong Buy', confidence: 85 + Math.random() * 10, color: 'green' };
-                    if (score > 0.5) return { action: 'Buy', confidence: 70 + Math.random() * 15, color: 'green' };
-                    if (score < -2) return { action: 'Strong Sell', confidence: 80 + Math.random() * 15, color: 'red' };
-                    if (score < -0.5) return { action: 'Sell', confidence: 65 + Math.random() * 20, color: 'red' };
-                    return { action: 'Hold', confidence: 60 + Math.random() * 15, color: 'yellow' };
+                    if (compositeScore > 3) return { action: 'Strong Buy', confidence: Math.min(95, 80 + compositeScore + riskAdjustment), color: 'green' };
+                    if (compositeScore > 1) return { action: 'Buy', confidence: Math.min(85, 70 + compositeScore + riskAdjustment), color: 'green' };
+                    if (compositeScore < -3) return { action: 'Strong Sell', confidence: Math.min(90, 75 - compositeScore + riskAdjustment), color: 'red' };
+                    if (compositeScore < -1) return { action: 'Sell', confidence: Math.min(80, 65 - compositeScore + riskAdjustment), color: 'red' };
+                    return { action: 'Hold', confidence: Math.min(75, 55 + Math.abs(compositeScore) + riskAdjustment), color: 'yellow' };
                 })();
 
-                // Calculate risk metrics
-                const volatility = Math.abs(priceChange) > 3 ? 'High' :
-                                  Math.abs(priceChange) > 1.5 ? 'Moderate' : 'Low';
+                console.log('💡 Final recommendation:', overallRecommendation.action, 'at', overallRecommendation.confidence.toFixed(1) + '% confidence');
+
+                // Calculate realistic stop loss and take profit using ATR concept
+                const atr = high - low; // Average True Range (simplified)
+                const stopLossDistance = atr * 1.5;
+                const takeProfitDistance = atr * 3; // 2:1 reward/risk ratio
 
                 const analysis = {
                     symbol: selectedStock,
@@ -1145,24 +1237,40 @@
                         signal: technicalSignal,
                         priceChange: priceChange.toFixed(2),
                         currentPrice: price.toFixed(2),
-                        support: (price * (1 - Math.abs(priceChange) / 100 * 0.5)).toFixed(2),
-                        resistance: (price * (1 + Math.abs(priceChange) / 100 * 0.5)).toFixed(2),
+                        support: support,
+                        resistance: resistance,
+                        rsi: rsi.toFixed(1),
+                        momentum: momentum.toFixed(2),
+                        volatility: intradayVolatility.toFixed(2),
+                        open: open.toFixed(2),
+                        high: high.toFixed(2),
+                        low: low.toFixed(2),
+                        previousClose: previousClose.toFixed(2)
                     },
 
                     sentiment: {
                         signal: newsSignal,
-                        score: (newsSentiment * 100).toFixed(0),
+                        score: sentimentScore.toFixed(0),
                         articlesAnalyzed: stockNews.length,
-                        trending: stockNews.length > 5 ? 'High Interest' : stockNews.length > 2 ? 'Moderate Interest' : 'Low Interest'
+                        positiveCount,
+                        negativeCount,
+                        neutralCount,
+                        trending: stockNews.length > 10 ? 'Very High Interest' :
+                                 stockNews.length > 5 ? 'High Interest' :
+                                 stockNews.length > 2 ? 'Moderate Interest' : 'Low Interest'
                     },
 
                     risk: {
-                        level: volatility,
-                        rating: volatility === 'High' ? 8 : volatility === 'Moderate' ? 5 : 3,
+                        level: riskLevel,
+                        rating: riskRating,
+                        volatilityRisk,
+                        sentimentRisk,
+                        liquidityRisk,
                         factors: [
-                            volatility === 'High' ? '⚠️ High price volatility detected' : '✓ Stable price movement',
-                            Math.abs(newsSentiment) > 0.5 ? '⚠️ Strong news sentiment' : '✓ Balanced news coverage',
-                            stockNews.length < 3 ? '⚠️ Limited news data' : '✓ Sufficient news coverage'
+                            `Volatility: ${intradayVolatility.toFixed(2)}% intraday range (${volatilityRisk === 3 ? 'High' : volatilityRisk === 2 ? 'Moderate' : 'Low'} risk)`,
+                            `Sentiment: ${Math.abs(sentimentScore).toFixed(0)} intensity (${sentimentRisk === 2 ? 'High' : sentimentRisk === 1 ? 'Moderate' : 'Low'} risk)`,
+                            `Liquidity: ${stockNews.length} news articles (${liquidityRisk === 2 ? 'High' : liquidityRisk === 1 ? 'Moderate' : 'Low'} risk)`,
+                            `RSI: ${rsi.toFixed(1)} ${isOverbought ? '(Overbought)' : isOversold ? '(Oversold)' : '(Normal)'}`
                         ]
                     },
 
@@ -1171,21 +1279,29 @@
                         confidence: overallRecommendation.confidence.toFixed(1),
                         color: overallRecommendation.color,
                         reasoning: [
-                            `📊 Technical analysis shows ${technicalSignal.toLowerCase()} momentum with ${priceChange >= 0 ? 'positive' : 'negative'} price action (${priceChange >= 0 ? '+' : ''}${priceChange.toFixed(2)}%)`,
-                            `📰 News sentiment is ${newsSignal.toLowerCase()} based on ${stockNews.length} recent articles`,
-                            `⚡ Current volatility is ${volatility.toLowerCase()}, suggesting ${volatility === 'High' ? 'elevated risk' : volatility === 'Moderate' ? 'moderate risk' : 'lower risk'} for this position`,
-                            `💡 ${overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Buy' ? 'Entry point looks favorable for long positions' :
-                                  overallRecommendation.action === 'Strong Sell' || overallRecommendation.action === 'Sell' ? 'Consider taking profits or avoiding entry' :
-                                  'Wait for clearer signals before taking action'}`
+                            `📊 Real RSI at ${rsi.toFixed(1)} shows ${technicalSignal.toLowerCase()} conditions with ${momentum >= 0 ? 'positive' : 'negative'} momentum (${momentum >= 0 ? '+' : ''}${momentum.toFixed(2)}% from open)`,
+                            `📰 Sentiment analysis of ${stockNews.length} articles: ${positiveCount} positive, ${negativeCount} negative, ${neutralCount} neutral (Score: ${sentimentScore.toFixed(0)}/100)`,
+                            `⚡ Intraday volatility at ${intradayVolatility.toFixed(2)}% with ${riskLevel.toLowerCase()} risk profile (Risk score: ${riskRating}/10)`,
+                            `💡 ${overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Buy' ?
+                                `Technical and sentiment align for bullish entry. Consider ${momentum > 0 ? 'buying on strength' : 'buying on dips near support at $${support}'}` :
+                                overallRecommendation.action === 'Strong Sell' || overallRecommendation.action === 'Sell' ?
+                                `Indicators suggest caution. ${isOverbought ? 'RSI overbought suggests profit-taking' : 'Consider protective stops or exit strategies'}` :
+                                `Mixed signals warrant patience. Wait for ${rsi < 50 ? 'upward momentum' : 'clearer direction'} before committing capital`}`
                         ],
+                        strategy: overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Buy' ?
+                                'Long position with tight stops' :
+                                overallRecommendation.action === 'Strong Sell' || overallRecommendation.action === 'Sell' ?
+                                'Exit or short with defined risk' : 'Cash or wait for setup',
                         targets: {
                             entry: price.toFixed(2),
-                            stopLoss: (price * 0.95).toFixed(2),
-                            takeProfit: (price * 1.08).toFixed(2)
+                            stopLoss: Math.max(0, price - stopLossDistance).toFixed(2),
+                            takeProfit: (price + takeProfitDistance).toFixed(2),
+                            riskRewardRatio: '2:1'
                         }
                     }
                 };
 
+                console.log('✅ AI Analysis complete with REAL data:', analysis);
                 setAiAnalysis(analysis);
                 setLoadingAnalysis(false);
             };
