@@ -2,9 +2,6 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const session = require('express-session');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const nodemailer = require('nodemailer');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const bcrypt = require('bcrypt');
@@ -73,71 +70,8 @@ function writeAccounts(accounts) {
 }
 
 // Middleware
-app.use(cors({
-    origin: 'http://localhost:3000', // Update with your frontend URL
-    credentials: true
-}));
+app.use(cors());
 app.use(express.json());
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'ultrathink-secret-key-change-in-production',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Passport serialize/deserialize
-passport.serializeUser((user, done) => {
-    done(null, user.email);
-});
-
-passport.deserializeUser((email, done) => {
-    const accounts = readAccounts();
-    const user = accounts.find(acc => acc.email === email);
-    done(null, user);
-});
-
-// Google OAuth Strategy
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback'
-},
-async (accessToken, refreshToken, profile, done) => {
-    try {
-        const accounts = readAccounts();
-        const email = profile.emails[0].value;
-        let account = accounts.find(acc => acc.email.toLowerCase() === email.toLowerCase());
-
-        if (!account) {
-            // Create new account for Google user
-            const accountCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-            account = {
-                email: email.toLowerCase().trim(),
-                userName: profile.displayName || email.split('@')[0],
-                googleId: profile.id,
-                accountCode: accountCode,
-                portfolio: {
-                    cash: 100000,
-                    positions: {},
-                    history: [],
-                    lastBuyTime: {},
-                    watchlist: []
-                },
-                createdAt: new Date().toISOString()
-            };
-            accounts.push(account);
-            writeAccounts(accounts);
-            console.log('✅ Created new Google account:', email);
-        }
-
-        return done(null, account);
-    } catch (error) {
-        console.error('Google OAuth error:', error);
-        return done(error, null);
-    }
-}));
 
 // Email transporter configuration
 const transporter = nodemailer.createTransport({
@@ -502,47 +436,6 @@ app.post('/api/accounts/update-portfolio', async (req, res) => {
     }
 });
 
-// Google OAuth routes
-app.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
-);
-
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
-    (req, res) => {
-        // Successful authentication, redirect to frontend with account data
-        res.redirect(`http://localhost:3000/?googleAuth=success&email=${req.user.email}&accountCode=${req.user.accountCode}`);
-    }
-);
-
-// Get current user endpoint
-app.get('/api/auth/user', (req, res) => {
-    if (req.isAuthenticated()) {
-        res.json({
-            success: true,
-            user: {
-                email: req.user.email,
-                userName: req.user.userName,
-                accountCode: req.user.accountCode,
-                portfolio: req.user.portfolio,
-                createdAt: req.user.createdAt
-            }
-        });
-    } else {
-        res.status(401).json({ success: false, message: 'Not authenticated' });
-    }
-});
-
-// Logout endpoint
-app.post('/api/auth/logout', (req, res) => {
-    req.logout((err) => {
-        if (err) {
-            return res.status(500).json({ error: 'Logout failed' });
-        }
-        res.json({ success: true, message: 'Logged out successfully' });
-    });
-});
-
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
@@ -552,5 +445,4 @@ app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`📧 Email service configured: ${process.env.EMAIL_USER || 'Not configured'}`);
     console.log(`💳 Stripe configured: ${!!process.env.STRIPE_SECRET_KEY}`);
-    console.log(`🔐 Google OAuth configured: ${!!process.env.GOOGLE_CLIENT_ID}`);
 });
