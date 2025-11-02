@@ -405,6 +405,9 @@ app.post('/api/accounts/update-portfolio', async (req, res) => {
     try {
         const { email, portfolio } = req.body;
 
+        console.log('📊 Portfolio update request for:', email);
+        console.log('📊 Portfolio data:', JSON.stringify(portfolio, null, 2));
+
         if (!email || !isValidEmail(email)) {
             return res.status(400).json({ error: 'Valid email is required' });
         }
@@ -413,6 +416,7 @@ app.post('/api/accounts/update-portfolio', async (req, res) => {
         const account = accounts.find(acc => acc.email.toLowerCase() === email.toLowerCase());
 
         if (!account) {
+            console.error('❌ Account not found:', email);
             return res.status(404).json({ error: 'Account not found' });
         }
 
@@ -420,6 +424,7 @@ app.post('/api/accounts/update-portfolio', async (req, res) => {
         account.updatedAt = new Date().toISOString();
 
         writeAccounts(accounts);
+        console.log('✅ Portfolio updated successfully for:', email);
 
         res.json({
             success: true,
