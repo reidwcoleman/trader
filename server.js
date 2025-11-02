@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -11,8 +12,9 @@ const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// User data file
+// User data files
 const usersFile = path.join(__dirname, 'family-users.json');
+const accountsFile = path.join(__dirname, 'accounts.json');
 
 // Helper functions
 function readUsers() {
@@ -43,6 +45,28 @@ function generateUserId() {
 
 function isValidEmail(email) {
     return email && email.includes('@');
+}
+
+function readAccounts() {
+    try {
+        if (fs.existsSync(accountsFile)) {
+            return JSON.parse(fs.readFileSync(accountsFile, 'utf8'));
+        }
+        return [];
+    } catch (error) {
+        console.error('Error reading accounts:', error);
+        return [];
+    }
+}
+
+function writeAccounts(accounts) {
+    try {
+        fs.writeFileSync(accountsFile, JSON.stringify(accounts, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Error writing accounts:', error);
+        return false;
+    }
 }
 
 // Middleware
@@ -264,6 +288,140 @@ app.get('/api/family-access/:email', (req, res) => {
             success: false,
             message: 'An error occurred while checking access'
         });
+    }
+});
+
+// Create account endpoint
+app.post('/api/accounts/create', async (req, res) => {
+    try {
+        const { email, userName, password, accountCode } = req.body;
+
+        if (!email || !isValidEmail(email)) {
+            return res.status(400).json({ error: 'Valid email is required' });
+        }
+
+        if (!userName) {
+            return res.status(400).json({ error: 'User name is required' });
+        }
+
+        if (!password) {
+            return res.status(400).json({ error: 'Password is required' });
+        }
+
+        if (!accountCode) {
+            return res.status(400).json({ error: 'Account code is required' });
+        }
+
+        const accounts = readAccounts();
+
+        // Check if email already exists
+        const existingAccount = accounts.find(acc => acc.email.toLowerCase() === email.toLowerCase());
+        if (existingAccount) {
+            return res.status(400).json({ error: 'An account with this email already exists' });
+        }
+
+        // Hash the password
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        // Create new account
+        const newAccount = {
+            email: email.toLowerCase().trim(),
+            userName: userName,
+            passwordHash: passwordHash,
+            accountCode: accountCode,
+            portfolio: { cash: 100000, stocks: [] },
+            createdAt: new Date().toISOString()
+        };
+
+        accounts.push(newAccount);
+        writeAccounts(accounts);
+
+        res.json({
+            success: true,
+            account: {
+                email: newAccount.email,
+                userName: newAccount.userName,
+                accountCode: newAccount.accountCode
+            }
+        });
+    } catch (error) {
+        console.error('Account creation error:', error);
+        res.status(500).json({ error: 'Failed to create account' });
+    }
+});
+
+// Login endpoint
+app.post('/api/accounts/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !isValidEmail(email)) {
+            return res.status(400).json({ error: 'Valid email is required' });
+        }
+
+        if (!password) {
+            return res.status(400).json({ error: 'Password is required' });
+        }
+
+        const accounts = readAccounts();
+        const account = accounts.find(acc => acc.email.toLowerCase() === email.toLowerCase());
+
+        if (!account) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
+
+        // Verify password
+        const isValid = await bcrypt.compare(password, account.passwordHash);
+
+        if (!isValid) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
+
+        // Return account data
+        res.json({
+            success: true,
+            account: {
+                email: account.email,
+                userName: account.userName,
+                accountCode: account.accountCode,
+                portfolio: account.portfolio,
+                createdAt: account.createdAt
+            }
+        });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Failed to login' });
+    }
+});
+
+// Update portfolio endpoint
+app.post('/api/accounts/update-portfolio', async (req, res) => {
+    try {
+        const { email, portfolio } = req.body;
+
+        if (!email || !isValidEmail(email)) {
+            return res.status(400).json({ error: 'Valid email is required' });
+        }
+
+        const accounts = readAccounts();
+        const account = accounts.find(acc => acc.email.toLowerCase() === email.toLowerCase());
+
+        if (!account) {
+            return res.status(404).json({ error: 'Account not found' });
+        }
+
+        account.portfolio = portfolio;
+        account.updatedAt = new Date().toISOString();
+
+        writeAccounts(accounts);
+
+        res.json({
+            success: true,
+            message: 'Portfolio updated successfully'
+        });
+    } catch (error) {
+        console.error('Portfolio update error:', error);
+        res.status(500).json({ error: 'Failed to update portfolio' });
     }
 });
 

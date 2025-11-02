@@ -555,15 +555,15 @@
                 return Math.floor(100000 + Math.random() * 900000).toString();
             };
 
-            const createCompetition = async (memberName, contributionAmount, passwordHash = null) => {
+            const createCompetition = async (memberName, contributionAmount, password = null) => {
                 const code = generateCompetitionCode();
                 const memberId = Date.now().toString();
                 const isPersonalPlan = parseFloat(contributionAmount || 0) === 0;
 
                 try {
-                    // Personal plans use Supabase or localStorage fallback
+                    // Personal plans use backend server
                     if (isPersonalPlan) {
-                        console.log('Creating personal account with code:', code);
+                        console.log('Creating personal account with backend server');
 
                         const initialPortfolio = {
                             cash: 100000,
@@ -573,28 +573,40 @@
                             watchlist: []
                         };
 
-                        let accountData;
+                        const passcode = generatePasscode();
 
-                        // Use SQLite database (always available)
-                        if (!dbReady) {
-                            alert('Database is still loading. Please wait a moment and try again.');
+                        // Create account on backend server
+                        const response = await fetch('http://localhost:3001/api/accounts/create', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                email: userEmail,
+                                userName: memberName,
+                                password: password,
+                                accountCode: code,
+                                portfolio: initialPortfolio
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                            alert(data.error || 'Failed to create account');
                             return;
                         }
 
-                        const passcode = generatePasscode();
-                        accountData = SQLiteDB.createAccount(code, memberName, userEmail, passcode, initialPortfolio, passwordHash);
                         setGeneratedPasscode(passcode);
 
                         const newCompetition = {
                             code: code,
                             totalPool: 0,
-                            startTime: accountData.created_at,
+                            startTime: new Date().toISOString(),
                             members: [{
                                 id: memberId,
                                 name: memberName,
                                 contribution: 0,
                                 portfolio: initialPortfolio,
-                                joinedAt: accountData.created_at
+                                joinedAt: new Date().toISOString()
                             }]
                         };
 
@@ -2267,9 +2279,8 @@
                                                         return;
                                                     }
 
-                                                    // Hash password before creating account
-                                                    const passwordHash = await window.PasswordHash.hash(userPassword);
-                                                    createCompetition(userName, 0, passwordHash);
+                                                    // Send password directly to backend
+                                                    createCompetition(userName, 0, userPassword);
                                                 }}
                                                 className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300"
                                             >
@@ -2320,53 +2331,50 @@
                                                     }
 
                                                     try {
-                                                        // Get account by email
-                                                        const account = SQLiteDB.getAccountByEmail(userEmail);
-                                                        console.log('🔍 Account lookup for:', userEmail, account ? 'Found' : 'Not found');
+                                                        // Login via backend server
+                                                        const response = await fetch('http://localhost:3001/api/accounts/login', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({
+                                                                email: userEmail,
+                                                                password: userPassword
+                                                            })
+                                                        });
 
-                                                        if (!account) {
-                                                            alert('Invalid email or password');
+                                                        const data = await response.json();
+
+                                                        if (!response.ok) {
+                                                            alert(data.error || 'Invalid email or password');
                                                             return;
                                                         }
 
-                                                        // Verify password
-                                                        if (account.password_hash) {
-                                                            const isValid = await window.PasswordHash.verify(userPassword, account.password_hash);
-                                                            console.log('✅ Password verification result:', isValid);
-                                                            if (!isValid) {
-                                                                alert('Invalid email or password');
-                                                                return;
-                                                            }
-                                                        } else {
-                                                            alert('This account does not have a password set. Please contact support.');
-                                                            return;
-                                                        }
-
-                                                        // Sign in
-                                                        const code = account.account_code;
+                                                        // Sign in with account data from backend
+                                                        const account = data.account;
+                                                        const code = account.accountCode;
                                                         const newCompetition = {
                                                             code: code,
                                                             totalPool: 0,
-                                                            startTime: account.created_at,
+                                                            startTime: account.createdAt,
                                                             members: [{
                                                                 id: Date.now().toString(),
-                                                                name: account.user_name,
+                                                                name: account.userName,
                                                                 contribution: 0,
                                                                 portfolio: account.portfolio,
-                                                                joinedAt: account.created_at
+                                                                joinedAt: account.createdAt
                                                             }]
                                                         };
 
                                                         setCompetition(newCompetition);
                                                         setCompetitionCode(code);
                                                         setCurrentUserId(newCompetition.members[0].id);
-                                                        setUserName(account.user_name);
+                                                        setUserName(account.userName);
+                                                        setUserEmail(account.email);
                                                         setView('app');
                                                         setUserPassword('');
                                                         console.log('✅ Signed in successfully');
                                                     } catch (error) {
                                                         console.error('Sign in error:', error);
-                                                        alert('Failed to sign in. Please try again.');
+                                                        alert('Failed to sign in. Please check that the server is running.');
                                                     }
                                                 }}
                                                 className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white py-4 rounded-xl font-black text-lg transition-all duration-300 shadow-lg hover:shadow-xl"
