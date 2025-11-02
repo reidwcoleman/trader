@@ -1593,40 +1593,46 @@
                 setQuantityError('');
             };
 
-            // Try alternative API (Polygon.io free tier - no key required for delayed data)
-            const fetchFromPolygonIO = async (symbol, period) => {
+            // Try Yahoo Finance through CORS proxy
+            const fetchThroughProxy = async (symbol, period, interval, period1, period2) => {
                 try {
-                    // Polygon.io provides free delayed data without API key
-                    const days = period === '1D' ? 2 : period === '1W' ? 7 : period === '1M' ? 30 : period === '3M' ? 90 : 365;
-                    const toDate = new Date();
-                    const fromDate = new Date(toDate.getTime() - (days * 24 * 60 * 60 * 1000));
+                    // Try multiple CORS proxies in order
+                    const proxies = [
+                        'https://corsproxy.io/?',
+                        'https://api.allorigins.win/raw?url=',
+                        'https://cors-anywhere.herokuapp.com/'
+                    ];
 
-                    const from = fromDate.toISOString().split('T')[0];
-                    const to = toDate.toISOString().split('T')[0];
+                    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=${interval}&includePrePost=false`;
 
-                    // Use public aggregates endpoint (delayed data, no key needed)
-                    const url = `https://api.polygon.io/v2/aggs/ticker/${symbol}/range/1/day/${from}/${to}?adjusted=true&sort=asc&limit=120`;
+                    for (let i = 0; i < proxies.length; i++) {
+                        try {
+                            console.log(`📊 Trying CORS proxy ${i + 1}/${proxies.length} for ${symbol}...`);
+                            const proxyUrl = proxies[i] + encodeURIComponent(yahooUrl);
 
-                    console.log(`📊 Trying Polygon.io for ${symbol}...`);
+                            const response = await fetch(proxyUrl, {
+                                method: 'GET',
+                                headers: { 'Accept': 'application/json' }
+                            });
 
-                    const response = await fetch(url);
-                    const data = await response.json();
+                            if (!response.ok) continue;
 
-                    if (data.results && data.results.length > 0) {
-                        const labels = data.results.map(bar => {
-                            const date = new Date(bar.t);
-                            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                        });
-                        const prices = data.results.map(bar => bar.c.toFixed(2));
+                            const data = await response.json();
 
-                        console.log(`✅ Polygon.io data loaded for ${symbol}:`, prices.length, 'points');
-                        return { labels, data: prices };
+                            if (data.chart && data.chart.result && data.chart.result[0]) {
+                                console.log(`✅ Proxy ${i + 1} succeeded for ${symbol}`);
+                                return data;
+                            }
+                        } catch (proxyError) {
+                            console.warn(`Proxy ${i + 1} failed:`, proxyError.message);
+                            continue;
+                        }
                     }
 
-                    console.warn(`Polygon.io: No data for ${symbol}`);
+                    console.warn(`All CORS proxies failed for ${symbol}`);
                     return null;
                 } catch (error) {
-                    console.error('Polygon.io error:', error.message);
+                    console.error('CORS proxy error:', error.message);
                     return null;
                 }
             };
@@ -1671,68 +1677,115 @@
                             interval = '1d';
                     }
 
-                    // TRY 1: Yahoo Finance API (no API key required)
+                    // Calculate timestamps for Yahoo Finance
                     const period1 = Math.floor(fromDate.getTime() / 1000);
                     const period2 = Math.floor(toDate.getTime() / 1000);
 
-                    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=${interval}&includePrePost=false`;
+                    // TRY 1: Yahoo Finance API (no API key required)
+                    try {
 
-                    console.log(`📊 [1/2] Trying Yahoo Finance for ${symbol} (${period})...`);
+                        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=${interval}&includePrePost=false`;
 
-                    const response = await fetch(url, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
+                        console.log(`📊 [1/2] Trying Yahoo Finance for ${symbol} (${period})...`);
 
-                    if (!response.ok) {
-                        console.warn(`Yahoo Finance failed: ${response.status} ${response.statusText}`);
-                        // Try alternative API
-                        console.log(`📊 [2/2] Yahoo Finance blocked, trying Polygon.io...`);
-                        return await fetchFromPolygonIO(symbol, period);
-                    }
-
-                    const data = await response.json();
-
-                    if (data.chart && data.chart.result && data.chart.result[0]) {
-                        const result = data.chart.result[0];
-                        const timestamps = result.timestamp;
-                        const prices = result.indicators.quote[0].close;
-
-                        if (timestamps && prices && timestamps.length > 0) {
-                            const labels = timestamps.map(timestamp => {
-                                const date = new Date(timestamp * 1000);
-                                if (period === '1D') {
-                                    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-                                } else if (period === '1W') {
-                                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric' });
-                                } else {
-                                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                                }
-                            });
-
-                            // Filter out null prices and format
-                            const validData = [];
-                            const validLabels = [];
-                            for (let i = 0; i < prices.length; i++) {
-                                if (prices[i] !== null && prices[i] !== undefined) {
-                                    validData.push(prices[i].toFixed(2));
-                                    validLabels.push(labels[i]);
-                                }
+                        const response = await fetch(url, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
                             }
+                        });
 
-                            console.log(`✅ Loaded Yahoo Finance data for ${symbol} (${period}):`, {
-                                dataPoints: validData.length,
-                                firstPrice: validData[0],
-                                lastPrice: validData[validData.length - 1]
-                            });
+                        if (!response.ok) {
+                            console.warn(`Yahoo Finance failed: ${response.status} ${response.statusText}`);
+                            throw new Error(`HTTP ${response.status}`);
+                        }
 
-                            return { labels: validLabels, data: validData };
+                        const data = await response.json();
+
+                        if (data.chart && data.chart.result && data.chart.result[0]) {
+                            const result = data.chart.result[0];
+                            const timestamps = result.timestamp;
+                            const prices = result.indicators.quote[0].close;
+
+                            if (timestamps && prices && timestamps.length > 0) {
+                                const labels = timestamps.map(timestamp => {
+                                    const date = new Date(timestamp * 1000);
+                                    if (period === '1D') {
+                                        return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                                    } else if (period === '1W') {
+                                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric' });
+                                    } else {
+                                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                    }
+                                });
+
+                                // Filter out null prices and format
+                                const validData = [];
+                                const validLabels = [];
+                                for (let i = 0; i < prices.length; i++) {
+                                    if (prices[i] !== null && prices[i] !== undefined) {
+                                        validData.push(prices[i].toFixed(2));
+                                        validLabels.push(labels[i]);
+                                    }
+                                }
+
+                                console.log(`✅ Loaded Yahoo Finance data for ${symbol} (${period}):`, {
+                                    dataPoints: validData.length,
+                                    firstPrice: validData[0],
+                                    lastPrice: validData[validData.length - 1]
+                                });
+
+                                return { labels: validLabels, data: validData };
+                            }
+                        }
+
+                        console.warn(`No historical data available for ${symbol} from Yahoo Finance`);
+                    } catch (yahooError) {
+                        // Yahoo Finance failed (CORS, network, or HTTP error)
+                        console.warn(`Yahoo Finance blocked: ${yahooError.message}`);
+                        console.log(`📊 [2/2] Trying CORS proxy for ${symbol} (${period})...`);
+
+                        // Try CORS proxy as fallback
+                        const proxyData = await fetchThroughProxy(symbol, period, interval, period1, period2);
+                        if (proxyData && proxyData.chart && proxyData.chart.result && proxyData.chart.result[0]) {
+                            const result = proxyData.chart.result[0];
+                            const timestamps = result.timestamp;
+                            const prices = result.indicators.quote[0].close;
+
+                            if (timestamps && prices && timestamps.length > 0) {
+                                const labels = timestamps.map(timestamp => {
+                                    const date = new Date(timestamp * 1000);
+                                    if (period === '1D') {
+                                        return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                                    } else if (period === '1W') {
+                                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric' });
+                                    } else {
+                                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                    }
+                                });
+
+                                const validData = [];
+                                const validLabels = [];
+                                for (let i = 0; i < prices.length; i++) {
+                                    if (prices[i] !== null && prices[i] !== undefined) {
+                                        validData.push(prices[i].toFixed(2));
+                                        validLabels.push(labels[i]);
+                                    }
+                                }
+
+                                console.log(`✅ Loaded data via CORS proxy for ${symbol} (${period}):`, {
+                                    dataPoints: validData.length,
+                                    firstPrice: validData[0],
+                                    lastPrice: validData[validData.length - 1]
+                                });
+
+                                return { labels: validLabels, data: validData };
+                            }
                         }
                     }
 
-                    console.warn(`No historical data available for ${symbol} from Yahoo Finance, using fallback`);
+                    // Both direct access and proxy failed, return null to trigger simulated data
+                    console.warn(`All methods failed for ${symbol}, will use simulated data`);
                     return null;
                 } catch (error) {
                     console.error(`❌ Error fetching historical data for ${symbol}:`, error);
