@@ -1,0 +1,16 @@
+[
+  {
+    "email": "reidwcoleman@gmail.com",
+    "userName": "e",
+    "passwordHash": "$2b$10$OmaIBC/9gI57J93DsslOk.DqhiSzPhnl5swiKj5jZB143pqsBuFTu",
+    "accountCode": "I0UPX4",
+    "portfolio": {
+      "cash": 100000,
+      "positions": {},
+      "history": [],
+      "lastBuyTime": {},
+      "watchlist": []
+    },
+    "createdAt": "2025-11-02T17:59:30.202Z"
+  }
+]

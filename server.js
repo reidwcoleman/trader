@@ -329,7 +329,13 @@ app.post('/api/accounts/create', async (req, res) => {
             userName: userName,
             passwordHash: passwordHash,
             accountCode: accountCode,
-            portfolio: { cash: 100000, stocks: [] },
+            portfolio: {
+                cash: 100000,
+                positions: {},
+                history: [],
+                lastBuyTime: {},
+                watchlist: []
+            },
             createdAt: new Date().toISOString()
         };
 
