@@ -568,3 +568,673 @@ body::after {
     background-size: 200% 200%;
     animation: rotate-gradient 3s ease infinite;
 }
+
+/* ====================================
+   TOAST NOTIFICATION SYSTEM
+   ==================================== */
+
+/* Toast slide in from right */
+@keyframes toastSlideIn {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Toast slide out to right */
+@keyframes toastSlideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+/* Progress bar animation */
+@keyframes progressBar {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+    max-width: 400px;
+}
+
+.toast {
+    pointer-events: all;
+    background: linear-gradient(135deg, #1e3a5f 0%, #1a2332 100%);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 0, 0, 0.3);
+    animation: toastSlideIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    min-width: 320px;
+    max-width: 400px;
+}
+
+.toast.closing {
+    animation: toastSlideOut 0.3s ease-in forwards;
+}
+
+.toast-success {
+    border-left: 4px solid #22c55e;
+}
+
+.toast-error {
+    border-left: 4px solid #ef4444;
+}
+
+.toast-info {
+    border-left: 4px solid #3b82f6;
+}
+
+.toast-warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.toast-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.toast-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.toast-message {
+    flex: 1;
+    color: #e5e7eb;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+.toast-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    line-height: 1;
+    transition: color 0.2s ease;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-close:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.3);
+    animation: progressBar linear;
+    transform-origin: left;
+}
+
+.toast-success .toast-progress {
+    background: #22c55e;
+}
+
+.toast-error .toast-progress {
+    background: #ef4444;
+}
+
+.toast-info .toast-progress {
+    background: #3b82f6;
+}
+
+.toast-warning .toast-progress {
+    background: #f59e0b;
+}
+
+@media (max-width: 640px) {
+    .toast-container {
+        top: 0.5rem;
+        right: 0.5rem;
+        left: 0.5rem;
+        max-width: none;
+    }
+
+    .toast {
+        min-width: auto;
+        max-width: none;
+    }
+}
+
+/* ====================================
+   ENHANCED FORM VALIDATION STYLES
+   ==================================== */
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-success {
+    border-color: #22c55e !important;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1) !important;
+}
+
+.input-error {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    animation: shake 0.5s ease-in-out;
+}
+
+.input-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.25rem;
+    pointer-events: none;
+}
+
+.input-icon-success {
+    color: #22c55e;
+}
+
+.input-icon-error {
+    color: #ef4444;
+}
+
+.input-helper {
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+.input-helper-error {
+    color: #ef4444;
+}
+
+.input-helper-success {
+    color: #22c55e;
+}
+
+.input-helper-info {
+    color: #9ca3af;
+}
+
+/* ====================================
+   KEYBOARD SHORTCUT INDICATORS
+   ==================================== */
+
+.kbd {
+    display: inline-block;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    color: #e5e7eb;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.tooltip {
+    position: relative;
+}
+
+.tooltip-content {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 1000;
+}
+
+.tooltip:hover .tooltip-content {
+    opacity: 1;
+}
+
+/* ====================================
+   ACCESSIBILITY ENHANCEMENTS
+   ==================================== */
+
+/* Visible focus rings for keyboard navigation */
+*:focus-visible {
+    outline: 2px solid #22d3ee;
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #22d3ee;
+    outline-offset: 2px;
+}
+
+/* Skip to content link */
+.skip-to-content {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    background: #1e3a5f;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    z-index: 100000;
+    border-radius: 0 0 0.5rem 0;
+}
+
+.skip-to-content:focus {
+    top: 0;
+}
+
+/* Screen reader only text */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ====================================
+   DATA PERSISTENCE INDICATORS
+   ==================================== */
+
+.save-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #9ca3af;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.save-indicator-saving {
+    color: #3b82f6;
+}
+
+.save-indicator-saved {
+    color: #22c55e;
+}
+
+.save-indicator-error {
+    color: #ef4444;
+}
+
+.save-indicator-offline {
+    color: #f59e0b;
+}
+
+.save-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* ====================================
+   ENHANCED EMPTY STATES
+   ==================================== */
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #e5e7eb;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-description {
+    font-size: 1rem;
+    color: #9ca3af;
+    margin-bottom: 1.5rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.empty-state-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.empty-state-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+}
+
+/* ====================================
+   ENHANCED LOADING SPINNER
+   ==================================== */
+
+.loading-spinner {
+    display: inline-block;
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #22d3ee;
+    border-right-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.loading-spinner-sm {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-width: 2px;
+}
+
+.loading-spinner-lg {
+    width: 4rem;
+    height: 4rem;
+    border-width: 5px;
+}
+
+/* ====================================
+   MOBILE RESPONSIVE IMPROVEMENTS
+   ==================================== */
+
+@media (max-width: 768px) {
+    /* Touch-friendly button sizes */
+    button,
+    .btn,
+    a.btn {
+        min-height: 44px;
+        padding: 0.75rem 1.25rem;
+    }
+
+    /* Better spacing on mobile */
+    .p-8 {
+        padding: 1rem !important;
+    }
+
+    .p-6 {
+        padding: 0.75rem !important;
+    }
+
+    /* Smaller text on mobile but readable */
+    .text-4xl {
+        font-size: 2rem !important;
+    }
+
+    .text-3xl {
+        font-size: 1.75rem !important;
+    }
+
+    .text-2xl {
+        font-size: 1.5rem !important;
+    }
+
+    /* Better input sizing */
+    input,
+    select,
+    textarea {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+        min-height: 44px;
+    }
+
+    /* Stack cards better */
+    .grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+}
+
+/* ====================================
+   ENHANCED TRANSITIONS
+   ==================================== */
+
+/* Fast interactions */
+.transition-fast {
+    transition: all 0.15s ease;
+}
+
+/* Normal interactions */
+.transition-normal {
+    transition: all 0.3s ease;
+}
+
+/* Slow/emphasis */
+.transition-slow {
+    transition: all 0.5s ease;
+}
+
+/* Smooth easing */
+.transition-smooth {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Bounce easing */
+.transition-bounce {
+    transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Modal transitions */
+.modal-enter {
+    animation: scaleIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.modal-exit {
+    animation: scaleIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) reverse;
+}
+
+/* Page transitions */
+.page-enter {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.page-exit {
+    animation: fadeIn 0.3s ease-out reverse;
+}
+
+/* ====================================
+   NUMBER FORMATTING AND DATA DISPLAY
+   ==================================== */
+
+.positive-change {
+    color: #22c55e;
+}
+
+.negative-change {
+    color: #ef4444;
+}
+
+.neutral-change {
+    color: #9ca3af;
+}
+
+.currency {
+    font-feature-settings: 'tnum';
+    font-variant-numeric: tabular-nums;
+}
+
+/* ====================================
+   ENHANCED TYPOGRAPHY
+   ==================================== */
+
+.font-heading {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+}
+
+.font-body {
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+.font-label {
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+}
+
+/* ====================================
+   IMPROVED CONTRAST FOR ACCESSIBILITY
+   ==================================== */
+
+.text-high-contrast {
+    color: #f9fafb;
+}
+
+.text-medium-contrast {
+    color: #e5e7eb;
+}
+
+.text-low-contrast {
+    color: #9ca3af;
+}
+
+/* ====================================
+   CARD ENHANCEMENTS
+   ==================================== */
+
+.card-interactive {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.card-interactive:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.card-interactive:active {
+    transform: translateY(-2px);
+}
+
+/* ====================================
+   BADGE AND TAG STYLES
+   ==================================== */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-success {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.badge-error {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.badge-warning {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.badge-info {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+/* ====================================
+   ENHANCED SCROLLBAR
+   ==================================== */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+}

@@ -93,6 +93,13 @@
             const [loadingAnalysis, setLoadingAnalysis] = useState(false);
             const [analysisExpanded, setAnalysisExpanded] = useState(true);
 
+            // Toast notification system
+            const [toasts, setToasts] = useState([]);
+
+            // Save indicator state
+            const [saveStatus, setSaveStatus] = useState('saved'); // 'saving', 'saved', 'error', 'offline'
+            const [lastSaved, setLastSaved] = useState(null);
+
             const chartRef = useRef(null);
             const chartInstance = useRef(null);
             const performanceChartRef = useRef(null);
@@ -204,6 +211,69 @@
                 }, 500);
                 return () => clearTimeout(timer);
             }, [searchQuery]);
+
+            // Toast notification system
+            const showToast = (message, type = 'info', duration = 5000) => {
+                const id = Date.now() + Math.random();
+                const newToast = { id, message, type, duration };
+                setToasts(prev => [...prev, newToast]);
+
+                // Auto-dismiss after duration
+                if (duration > 0) {
+                    setTimeout(() => {
+                        dismissToast(id);
+                    }, duration);
+                }
+            };
+
+            const dismissToast = (id) => {
+                setToasts(prev => prev.map(toast =>
+                    toast.id === id ? { ...toast, closing: true } : toast
+                ));
+
+                // Remove from DOM after animation
+                setTimeout(() => {
+                    setToasts(prev => prev.filter(toast => toast.id !== id));
+                }, 300);
+            };
+
+            // Keyboard shortcuts
+            useEffect(() => {
+                const handleKeyPress = (e) => {
+                    // Focus search with /
+                    if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+                        e.preventDefault();
+                        document.querySelector('input[type="text"]')?.focus();
+                    }
+
+                    // Close modals with Escape
+                    if (e.key === 'Escape') {
+                        setShowSearchResults(false);
+                        setQuantityError('');
+                    }
+
+                    // Quick buy with Ctrl/Cmd + B
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'b' && selectedStock) {
+                        e.preventDefault();
+                        // Trigger buy if on trading screen
+                        if (view === 'trading') {
+                            setTradeType('long');
+                        }
+                    }
+
+                    // Quick sell with Ctrl/Cmd + S
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's' && selectedStock) {
+                        e.preventDefault();
+                        // Trigger sell if on trading screen
+                        if (view === 'trading') {
+                            setTradeType('short');
+                        }
+                    }
+                };
+
+                window.addEventListener('keydown', handleKeyPress);
+                return () => window.removeEventListener('keydown', handleKeyPress);
+            }, [view, selectedStock]);
 
             const fetchStockData = async () => {
                 if (watchlist.length === 0) return;
@@ -411,6 +481,9 @@
                 // Select the stock
                 setSelectedStock(symbol);
 
+                // Show success toast
+                showToast(`⭐ Added ${symbol} to watchlist`, 'success');
+
                 // Clear search
                 setSearchQuery('');
                 setShowSearchResults(false);
@@ -421,6 +494,9 @@
                 const newWatchlist = watchlist.filter(s => s !== symbol);
                 setWatchlist(newWatchlist);
                 setStocks(stocks.filter(s => s.symbol !== symbol));
+
+                // Show info toast
+                showToast(`Removed ${symbol} from watchlist`, 'info');
 
                 // Update portfolio with new watchlist
                 const portfolio = getCurrentPortfolio();
@@ -1397,7 +1473,7 @@
 
                 const stock = stocks.find(s => s.symbol === selectedStock);
                 if (!stock) {
-                    alert('Stock data not available. Please add to watchlist and refresh.');
+                    showToast('Stock data not available. Please add to watchlist and refresh.', 'error');
                     return;
                 }
 
@@ -1417,14 +1493,14 @@
                 if (type === 'buy') {
                     const totalWithFee = totalCost + tradingFee;
                     if (totalWithFee > portfolio.cash) {
-                        alert(`Insufficient funds!\n\nCost: $${totalCost.toFixed(2)}\nFee: $${tradingFee.toFixed(2)}\nTotal: $${totalWithFee.toFixed(2)}\n\nYou only have $${portfolio.cash.toFixed(2)} available.`);
+                        showToast(`Insufficient funds! Total: $${totalWithFee.toFixed(2)} - You have $${portfolio.cash.toFixed(2)} available.`, 'error');
                         return;
                     }
                 } else {
                     // SELL - Check position
                     const currentPosition = portfolio.positions[selectedStock] || 0;
                     if (quantity > currentPosition) {
-                        alert(`Insufficient shares! You only own ${currentPosition} shares of ${selectedStock}`);
+                        showToast(`Insufficient shares! You only own ${currentPosition} shares of ${selectedStock}`, 'error');
                         return;
                     }
 
@@ -1437,7 +1513,7 @@
                         if (timeSinceBuy < COOLDOWN_MS) {
                             const minutesRemaining = COOLDOWN_MINUTES - minutesSinceBuy;
                             const secondsRemaining = Math.ceil((COOLDOWN_MS - timeSinceBuy) / 1000) % 60;
-                            alert(`⏳ Trading Cooldown Active!\n\nYou must wait ${minutesRemaining} minute(s) and ${secondsRemaining} second(s) before selling ${selectedStock}.\n\nThis prevents rapid trading and encourages strategic decisions.`);
+                            showToast(`⏳ Trading Cooldown! Wait ${minutesRemaining}m ${secondsRemaining}s before selling ${selectedStock}`, 'warning', 8000);
                             return;
                         }
                     }
@@ -1505,6 +1581,15 @@
                         console.error('Error syncing portfolio to backend:', error);
                     }
                 }
+
+                // Show success toast
+                const tradeIcon = type === 'buy' ? '✅' : '💰';
+                const tradeAction = type === 'buy' ? 'Bought' : 'Sold';
+                showToast(`${tradeIcon} ${tradeAction} ${quantity} shares of ${selectedStock} at $${stock.price.toFixed(2)}`, 'success');
+
+                // Set save status
+                setSaveStatus('saved');
+                setLastSaved(new Date());
 
                 setQuantity(1);
                 setQuantityError('');
@@ -2807,8 +2892,52 @@
             );
 
             return (
+                <>
+                    {/* Toast Notification Container */}
+                    <div className="toast-container">
+                        {toasts.map(toast => {
+                            const icons = {
+                                success: '✅',
+                                error: '❌',
+                                warning: '⚠️',
+                                info: 'ℹ️'
+                            };
+                            return (
+                                <div
+                                    key={toast.id}
+                                    className={`toast toast-${toast.type} ${toast.closing ? 'closing' : ''}`}
+                                    role="alert"
+                                    aria-live="polite"
+                                >
+                                    <div className="toast-content">
+                                        <span className="toast-icon">{icons[toast.type]}</span>
+                                        <span className="toast-message">{toast.message}</span>
+                                    </div>
+                                    <button
+                                        className="toast-close"
+                                        onClick={() => dismissToast(toast.id)}
+                                        aria-label="Close notification"
+                                    >
+                                        ×
+                                    </button>
+                                    {toast.duration > 0 && (
+                                        <div
+                                            className="toast-progress"
+                                            style={{ animationDuration: `${toast.duration}ms` }}
+                                        />
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Skip to main content for accessibility */}
+                    <a href="#main-content" className="skip-to-content">
+                        Skip to main content
+                    </a>
+
                 <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-900 p-4">
-                    <div className="max-w-7xl mx-auto">
+                    <div id="main-content" className="max-w-7xl mx-auto">
                         {/* Navigation Bar */}
                         <div className="mb-4 flex gap-3">
                             <button
@@ -4530,6 +4659,7 @@
                         )}
                     </div>
                 </div>
+                </>
             );
         };
 
