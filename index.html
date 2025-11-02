@@ -2729,7 +2729,7 @@
                                         <div className="absolute inset-0 bg-gradient-to-r from-blue-400/40 via-cyan-400/40 to-blue-500/40 rounded-2xl blur-lg opacity-60 group-hover:opacity-80 transition duration-300"></div>
                                         <div className="relative bg-gradient-to-br from-blue-600/20 via-indigo-700/20 to-blue-800/20 backdrop-blur-sm p-2 rounded-2xl border border-blue-400/30 shadow-xl">
                                             <img
-                                                src="finclash.png"
+                                                src="8c5470b9-7f6a-49f6-b4d9-d9128261158f.jpg"
                                                 alt="FinClash Logo"
                                                 className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
                                                 onError={(e) => {
@@ -3985,6 +3985,189 @@
                         {/* Portfolio View */}
                         {mainTab === 'portfolio' && (
                             <>
+                        {/* Daily Summary - UltraThink */}
+                        <div className="bg-gradient-to-br from-purple-900/60 via-indigo-900/60 to-blue-900/60 backdrop-blur-xl rounded-2xl p-8 border-2 border-purple-500/50 mb-6 shadow-2xl">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-cyan-300 flex items-center gap-3">
+                                    ⚡ Daily Summary
+                                    <span className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full font-bold">TODAY</span>
+                                </h2>
+                                <div className="text-sm text-purple-200">
+                                    {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {/* Today's Performance */}
+                                <div className="bg-blue-950/50 backdrop-blur-sm rounded-xl p-6 border-2 border-cyan-500/30">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="text-2xl">📊</span>
+                                        <h3 className="text-sm font-bold text-cyan-300 uppercase tracking-wide">Portfolio Change</h3>
+                                    </div>
+                                    {(() => {
+                                        // Calculate daily portfolio change (simulated as today's overall gain/loss)
+                                        const positionsWithStocks = Object.entries(portfolio.positions)
+                                            .filter(([_, qty]) => qty > 0)
+                                            .map(([symbol, qty]) => {
+                                                const stock = stocks.find(s => s.symbol === symbol);
+                                                return stock ? { symbol, qty, stock } : null;
+                                            })
+                                            .filter(Boolean);
+
+                                        const totalDayChange = positionsWithStocks.reduce((sum, item) => {
+                                            const positionValue = item.stock.price * item.qty;
+                                            const dayChange = (item.stock.change / 100) * positionValue;
+                                            return sum + dayChange;
+                                        }, 0);
+
+                                        const dayChangePercent = portfolioValue > 0 ? (totalDayChange / portfolioValue) * 100 : 0;
+                                        const isPositive = totalDayChange >= 0;
+
+                                        return (
+                                            <>
+                                                <div className={`text-4xl font-black mb-2 ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                                                    {isPositive ? '+' : ''}{totalDayChange >= 0 ? '$' : '-$'}{Math.abs(totalDayChange).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </div>
+                                                <div className={`text-2xl font-bold ${isPositive ? 'text-green-300' : 'text-red-300'}`}>
+                                                    {isPositive ? '+' : ''}{dayChangePercent.toFixed(2)}%
+                                                </div>
+                                                <div className="mt-3 flex items-center gap-2">
+                                                    <span className={`text-3xl ${isPositive ? 'animate-bounce' : ''}`}>
+                                                        {isPositive ? '📈' : '📉'}
+                                                    </span>
+                                                    <span className="text-xs text-blue-300 font-semibold">
+                                                        {isPositive ? 'Winning Day!' : 'Down Today'}
+                                                    </span>
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
+                                </div>
+
+                                {/* Best Performer */}
+                                <div className="bg-blue-950/50 backdrop-blur-sm rounded-xl p-6 border-2 border-green-500/30">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="text-2xl">🏆</span>
+                                        <h3 className="text-sm font-bold text-green-300 uppercase tracking-wide">Top Gainer</h3>
+                                    </div>
+                                    {(() => {
+                                        const positionsWithStocks = Object.entries(portfolio.positions)
+                                            .filter(([_, qty]) => qty > 0)
+                                            .map(([symbol, qty]) => {
+                                                const stock = stocks.find(s => s.symbol === symbol);
+                                                return stock ? { symbol, stock, qty } : null;
+                                            })
+                                            .filter(Boolean);
+
+                                        if (positionsWithStocks.length === 0) {
+                                            return <div className="text-gray-400">No positions</div>;
+                                        }
+
+                                        const bestPerformer = positionsWithStocks.reduce((best, current) =>
+                                            current.stock.change > best.stock.change ? current : best
+                                        );
+
+                                        const gainAmount = (bestPerformer.stock.change / 100) * (bestPerformer.stock.price * bestPerformer.qty);
+
+                                        return (
+                                            <>
+                                                <div className="text-3xl font-black text-white mb-1">{bestPerformer.symbol}</div>
+                                                <div className="text-2xl font-bold text-green-400">
+                                                    +{bestPerformer.stock.change.toFixed(2)}%
+                                                </div>
+                                                <div className="text-sm text-green-300 mt-2">
+                                                    +${gainAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gain
+                                                </div>
+                                                <div className="mt-3 text-xs text-blue-300">
+                                                    {bestPerformer.qty} shares @ ${bestPerformer.stock.price.toFixed(2)}
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
+                                </div>
+
+                                {/* Worst Performer */}
+                                <div className="bg-blue-950/50 backdrop-blur-sm rounded-xl p-6 border-2 border-red-500/30">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="text-2xl">⚠️</span>
+                                        <h3 className="text-sm font-bold text-red-300 uppercase tracking-wide">Top Loser</h3>
+                                    </div>
+                                    {(() => {
+                                        const positionsWithStocks = Object.entries(portfolio.positions)
+                                            .filter(([_, qty]) => qty > 0)
+                                            .map(([symbol, qty]) => {
+                                                const stock = stocks.find(s => s.symbol === symbol);
+                                                return stock ? { symbol, stock, qty } : null;
+                                            })
+                                            .filter(Boolean);
+
+                                        if (positionsWithStocks.length === 0) {
+                                            return <div className="text-gray-400">No positions</div>;
+                                        }
+
+                                        const worstPerformer = positionsWithStocks.reduce((worst, current) =>
+                                            current.stock.change < worst.stock.change ? current : worst
+                                        );
+
+                                        const lossAmount = (worstPerformer.stock.change / 100) * (worstPerformer.stock.price * worstPerformer.qty);
+
+                                        return (
+                                            <>
+                                                <div className="text-3xl font-black text-white mb-1">{worstPerformer.symbol}</div>
+                                                <div className="text-2xl font-bold text-red-400">
+                                                    {worstPerformer.stock.change.toFixed(2)}%
+                                                </div>
+                                                <div className="text-sm text-red-300 mt-2">
+                                                    ${lossAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} loss
+                                                </div>
+                                                <div className="mt-3 text-xs text-blue-300">
+                                                    {worstPerformer.qty} shares @ ${worstPerformer.stock.price.toFixed(2)}
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
+                                </div>
+                            </div>
+
+                            {/* Additional Stats Row */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                                {(() => {
+                                    const positionsWithStocks = Object.entries(portfolio.positions)
+                                        .filter(([_, qty]) => qty > 0)
+                                        .map(([symbol, qty]) => {
+                                            const stock = stocks.find(s => s.symbol === symbol);
+                                            return stock ? { symbol, stock, qty } : null;
+                                        })
+                                        .filter(Boolean);
+
+                                    const gainers = positionsWithStocks.filter(item => item.stock.change > 0).length;
+                                    const losers = positionsWithStocks.filter(item => item.stock.change < 0).length;
+                                    const unchanged = positionsWithStocks.filter(item => item.stock.change === 0).length;
+
+                                    return (
+                                        <>
+                                            <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                                                <div className="text-green-300 text-sm font-bold mb-1">Gainers</div>
+                                                <div className="text-2xl font-black text-green-400">{gainers}</div>
+                                            </div>
+                                            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                                                <div className="text-red-300 text-sm font-bold mb-1">Losers</div>
+                                                <div className="text-2xl font-black text-red-400">{losers}</div>
+                                            </div>
+                                            <div className="bg-gray-900/20 border border-gray-500/30 rounded-lg p-4">
+                                                <div className="text-gray-300 text-sm font-bold mb-1">Unchanged</div>
+                                                <div className="text-2xl font-black text-gray-400">{unchanged}</div>
+                                            </div>
+                                            <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4">
+                                                <div className="text-purple-300 text-sm font-bold mb-1">Total Stocks</div>
+                                                <div className="text-2xl font-black text-purple-400">{positionsWithStocks.length}</div>
+                                            </div>
+                                        </>
+                                    );
+                                })()}
+                            </div>
+                        </div>
+
                         {/* Portfolio Breakdown */}
                         <div className="bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-blue-500/50 mb-6 shadow-2xl">
                             <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-6 flex items-center gap-2">
