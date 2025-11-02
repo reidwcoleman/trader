@@ -1146,12 +1146,19 @@
                 // REAL CALCULATION: RSI (Relative Strength Index) from price momentum
                 const calculateRSI = () => {
                     // Use daily price change as momentum indicator
-                    const gain = Math.max(0, price - previousClose);
-                    const loss = Math.max(0, previousClose - price);
+                    const priceChangeAmount = price - previousClose;
+                    const gain = Math.max(0, priceChangeAmount);
+                    const loss = Math.max(0, -priceChangeAmount);
+
+                    // If no change, return neutral RSI of 50
+                    if (gain === 0 && loss === 0) {
+                        return 50;
+                    }
 
                     // Simplified RSI calculation based on single-day momentum
-                    const avgGain = gain;
-                    const avgLoss = loss + 0.01; // Prevent division by zero
+                    // Normalize by price for percentage-based calculation
+                    const avgGain = (gain / previousClose) * 100;
+                    const avgLoss = (loss / previousClose) * 100 + 0.01; // Prevent division by zero
                     const rs = avgGain / avgLoss;
                     const rsi = 100 - (100 / (1 + rs));
 
@@ -1159,7 +1166,7 @@
                 };
 
                 const rsi = calculateRSI();
-                console.log('📊 Real RSI calculated:', rsi);
+                console.log('📊 Real RSI calculated:', rsi.toFixed(1));
 
                 // REAL CALCULATION: Intraday Volatility from high/low range
                 const intradayVolatility = ((high - low) / low * 100);
