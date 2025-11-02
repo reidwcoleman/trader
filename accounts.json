@@ -5,12 +5,27 @@
     "passwordHash": "$2b$10$OmaIBC/9gI57J93DsslOk.DqhiSzPhnl5swiKj5jZB143pqsBuFTu",
     "accountCode": "I0UPX4",
     "portfolio": {
-      "cash": 100000,
-      "positions": {},
-      "history": [],
-      "lastBuyTime": {},
+      "cash": 6.1600000000034925,
+      "positions": {
+        "APLE": 8936
+      },
+      "history": [
+        {
+          "type": "buy",
+          "symbol": "APLE",
+          "quantity": 8936,
+          "price": 11.19,
+          "total": 99993.84,
+          "fee": 0,
+          "timestamp": "2025-11-02T19:41:11.449Z"
+        }
+      ],
+      "lastBuyTime": {
+        "APLE": "2025-11-02T19:41:11.449Z"
+      },
       "watchlist": []
     },
-    "createdAt": "2025-11-02T17:59:30.202Z"
+    "createdAt": "2025-11-02T17:59:30.202Z",
+    "updatedAt": "2025-11-02T19:41:11.517Z"
   }
 ]
