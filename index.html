@@ -1501,9 +1501,20 @@
 
                     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=${interval}&includePrePost=false`;
 
-                    console.log(`📊 Fetching Yahoo Finance data for ${symbol} (${period})...`);
+                    console.log(`📊 Fetching Yahoo Finance data for ${symbol} (${period})...`, url);
 
-                    const response = await fetch(url);
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        console.error(`Yahoo Finance API error: ${response.status} ${response.statusText}`);
+                        return null;
+                    }
+
                     const data = await response.json();
 
                     if (data.chart && data.chart.result && data.chart.result[0]) {
@@ -1546,7 +1557,12 @@
                     console.warn(`No historical data available for ${symbol} from Yahoo Finance, using fallback`);
                     return null;
                 } catch (error) {
-                    console.error(`Error fetching historical data for ${symbol}:`, error);
+                    console.error(`❌ Error fetching historical data for ${symbol}:`, error);
+                    console.error('Error details:', {
+                        message: error.message,
+                        type: error.name,
+                        stack: error.stack?.split('\n')[0]
+                    });
                     return null;
                 }
             };
@@ -1585,15 +1601,19 @@
 
                 // Fetch and render real historical data
                 const loadChart = async () => {
-                    // Try to fetch real data from Finnhub
+                    console.log(`🔄 Loading chart for ${selectedStock} (${chartPeriod})...`);
+
+                    // Try to fetch real data from Yahoo Finance
                     let historicalData = await fetchHistoricalData(selectedStock, chartPeriod);
 
                     // Fallback to generated data if API fails
                     if (!historicalData) {
-                        console.warn(`⚠️ Using simulated data for ${selectedStock} - real data unavailable`);
+                        console.warn(`⚠️ Yahoo Finance unavailable - using simulated data for ${selectedStock}`);
+                        console.warn('This could be due to CORS restrictions or API rate limiting');
                         historicalData = generateFallbackHistoricalData(stock.price);
                         setIsRealChartData(false);
                     } else {
+                        console.log(`✅ Real chart data loaded successfully for ${selectedStock}`);
                         setIsRealChartData(true);
                     }
 
@@ -1734,16 +1754,16 @@
                         <div className="max-w-7xl mx-auto">
                             {/* Hero Section with Navy Blue Theme */}
                             <div className="text-center mb-16 pt-8">
-                                {/* Enhanced Logo */}
+                                {/* Enhanced Logo with Premium Animations */}
                                 <div className="flex items-center justify-center mb-8">
-                                    <div className="relative group">
-                                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition duration-300 animate-pulse"></div>
-                                        <div className="relative bg-gradient-to-br from-blue-500 via-indigo-600 to-blue-700 p-3 rounded-3xl shadow-2xl">
-                                            <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-2xl p-6 border-2 border-blue-400/40">
+                                    <div className="relative group animate-float">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition duration-300 animate-pulse-glow"></div>
+                                        <div className="relative bg-gradient-to-br from-blue-500 via-indigo-600 to-blue-700 p-3 rounded-3xl shadow-2xl rotating-border">
+                                            <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-2xl p-6 border-2 border-blue-400/40 gpu-accelerated">
                                                 <img
                                                     src="finclash.png"
                                                     alt="FinClash Logo"
-                                                    className="w-36 h-36 md:w-48 md:h-48 object-contain drop-shadow-2xl filter brightness-110"
+                                                    className="w-36 h-36 md:w-48 md:h-48 object-contain drop-shadow-2xl filter brightness-110 group-hover:scale-110 transition-transform duration-500"
                                                     onError={(e) => {
                                                         e.target.style.display = 'none';
                                                         e.target.nextElementSibling.style.display = 'block';
@@ -1800,7 +1820,7 @@
 
                             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                                 {/* Personal Plan - FREE */}
-                                <div className="group relative bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 border-2 border-blue-500/50 hover:border-cyan-400 hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-500 hover:scale-105">
+                                <div className="group relative bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 border-2 border-blue-500/50 hover:border-cyan-400 hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-500 hover:-translate-y-2 hover-glow will-change-transform gpu-accelerated animate-fade-in">
                                     {/* Glow Effect */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-3xl opacity-0 group-hover:opacity-100 transition duration-500"></div>
 
@@ -1856,7 +1876,7 @@
                                                     setAccountMode('create');
                                                     setView('setup-family');
                                                 }}
-                                                className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-4 rounded-xl font-black text-lg shadow-xl hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 transform hover:scale-105"
+                                                className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-4 rounded-xl font-black text-lg shadow-xl hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 transform hover:scale-105 active-press hover-glow will-change-transform"
                                             >
                                                 ✨ Create Free Account
                                             </button>
@@ -1866,7 +1886,7 @@
                                                     setAccountMode('login');
                                                     setView('setup-family');
                                                 }}
-                                                className="w-full bg-blue-800/60 hover:bg-blue-700/80 backdrop-blur-sm border-2 border-blue-500/50 hover:border-blue-400 text-white py-4 rounded-xl font-black text-lg transition-all duration-300"
+                                                className="w-full bg-blue-800/60 hover:bg-blue-700/80 backdrop-blur-sm border-2 border-blue-500/50 hover:border-blue-400 text-white py-4 rounded-xl font-black text-lg transition-all duration-300 hover:scale-105 active-press"
                                             >
                                                 🔐 Sign In
                                             </button>
@@ -1875,12 +1895,12 @@
                                 </div>
 
                                 {/* Family Public Plan - 1% Fee */}
-                                <div className="group relative bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 border-2 border-blue-500/50 hover:border-green-400 hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-500 hover:scale-105">
+                                <div className="group relative bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 border-2 border-blue-500/50 hover:border-green-400 hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-500 hover:-translate-y-2 hover-glow-green will-change-transform gpu-accelerated animate-fade-in stagger-1">
                                     {/* Glow Effect */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-3xl opacity-0 group-hover:opacity-100 transition duration-500"></div>
 
                                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                                        <span className="bg-green-500 text-white text-xs font-black px-4 py-1 rounded-full">POPULAR</span>
+                                        <span className="bg-green-500 text-white text-xs font-black px-4 py-1 rounded-full animate-pulse-glow-green shadow-xl">POPULAR</span>
                                     </div>
 
                                     <div className="relative z-10">
@@ -1938,7 +1958,7 @@
                                                     }
                                                     window.location.href = STRIPE_FAMILY_PUBLIC_LINK;
                                                 }}
-                                                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white py-4 rounded-xl font-black text-lg shadow-xl hover:shadow-2xl hover:shadow-green-500/50 transition-all duration-300 transform hover:scale-105"
+                                                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white py-4 rounded-xl font-black text-lg shadow-xl hover:shadow-2xl hover:shadow-green-500/50 transition-all duration-300 transform hover:scale-105 active-press hover-glow-green will-change-transform"
                                             >
                                                 💳 Pay & Create Pool
                                             </button>
@@ -1947,7 +1967,7 @@
                                                     setPlan('family-public');
                                                     setView('join-family');
                                                 }}
-                                                className="w-full bg-blue-800/60 hover:bg-blue-700/80 backdrop-blur-sm border-2 border-blue-500/50 hover:border-green-400 text-white py-4 rounded-xl font-black text-lg transition-all duration-300"
+                                                className="w-full bg-blue-800/60 hover:bg-blue-700/80 backdrop-blur-sm border-2 border-blue-500/50 hover:border-green-400 text-white py-4 rounded-xl font-black text-lg transition-all duration-300 hover:scale-105 active-press"
                                             >
                                                 🏆 Join Pool
                                             </button>
@@ -1956,12 +1976,12 @@
                                 </div>
 
                                 {/* Family Private Plan - $0.05 Fee */}
-                                <div className="group relative bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 border-2 border-blue-500/50 hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 hover:scale-105">
+                                <div className="group relative bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 border-2 border-blue-500/50 hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 hover:-translate-y-2 will-change-transform gpu-accelerated animate-fade-in stagger-2">
                                     {/* Glow Effect */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-600/10 rounded-3xl opacity-0 group-hover:opacity-100 transition duration-500"></div>
 
                                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                                        <span className="bg-purple-500 text-white text-xs font-black px-4 py-1 rounded-full">PREMIUM</span>
+                                        <span className="rotating-border-premium text-white text-xs font-black px-4 py-1 rounded-full shadow-xl">PREMIUM</span>
                                     </div>
 
                                     <div className="relative z-10">
@@ -2019,7 +2039,7 @@
                                                     }
                                                     window.location.href = STRIPE_FAMILY_PRIVATE_LINK;
                                                 }}
-                                                className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white py-4 rounded-xl font-black text-lg shadow-xl hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105"
+                                                className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white py-4 rounded-xl font-black text-lg shadow-xl hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 active-press hover-glow-amber will-change-transform"
                                             >
                                                 💳 Pay & Create Pool
                                             </button>
@@ -2028,7 +2048,7 @@
                                                     setPlan('family-private');
                                                     setView('join-family');
                                                 }}
-                                                className="w-full bg-blue-800/60 hover:bg-blue-700/80 backdrop-blur-sm border-2 border-blue-500/50 hover:border-purple-400 text-white py-4 rounded-xl font-black text-lg transition-all duration-300"
+                                                className="w-full bg-blue-800/60 hover:bg-blue-700/80 backdrop-blur-sm border-2 border-blue-500/50 hover:border-purple-400 text-white py-4 rounded-xl font-black text-lg transition-all duration-300 hover:scale-105 active-press"
                                             >
                                                 👑 Join Pool
                                             </button>
@@ -2970,8 +2990,8 @@
                             </div>
                             <div className="space-y-3">
                                 {Object.entries(portfolio.positions).filter(([_, qty]) => qty > 0).length === 0 ? (
-                                    <div className="text-center py-12 bg-blue-700/20 rounded-xl border-2 border-dashed border-blue-600">
-                                        <div className="text-6xl mb-3 opacity-50">📊</div>
+                                    <div className="text-center py-12 bg-blue-700/20 rounded-xl border-2 border-dashed border-blue-600 animate-fade-in">
+                                        <div className="text-6xl mb-3 opacity-50 animate-bounce">📊</div>
                                         <div className="text-blue-200 font-semibold">No positions yet</div>
                                         <div className="text-sm text-blue-400 mt-2">Buy your first stock to get started!</div>
                                     </div>
@@ -3000,21 +3020,21 @@
                                             return (
                                                 <div
                                                     key={symbol}
-                                                    className={`transition-all duration-200 bg-gradient-to-r ${
+                                                    className={`transition-all duration-300 bg-gradient-to-r ${
                                                         isPositive
-                                                            ? 'from-green-900/30 to-emerald-900/30 border-2 border-green-500/50'
-                                                            : 'from-red-900/30 to-pink-900/30 border-2 border-red-500/50'
-                                                    } rounded-xl p-4 shadow-lg`}
+                                                            ? 'from-green-900/30 to-emerald-900/30 border-2 border-green-500/50 hover-glow-green'
+                                                            : 'from-red-900/30 to-pink-900/30 border-2 border-red-500/50 hover-glow-red'
+                                                    } rounded-xl p-4 shadow-lg hover:-translate-y-1 hover:shadow-2xl will-change-transform gpu-accelerated animate-fade-in`}
                                                 >
                                                     <div className="flex justify-between items-start mb-3">
                                                         <div>
                                                             <div className="font-black text-white text-xl">{symbol}</div>
                                                             <div className="text-sm text-gray-300 font-semibold">{qty} shares</div>
                                                         </div>
-                                                        <div className={`px-3 py-1 rounded-full font-bold text-sm ${
+                                                        <div className={`px-3 py-1 rounded-full font-bold text-sm transition-all ${
                                                             isPositive
-                                                                ? 'bg-green-500/20 text-green-300 border border-green-500'
-                                                                : 'bg-red-500/20 text-red-300 border border-red-500'
+                                                                ? 'bg-green-500/20 text-green-300 border border-green-500 animate-pulse-glow-green'
+                                                                : 'bg-red-500/20 text-red-300 border border-red-500 animate-pulse-glow-red'
                                                         }`}>
                                                             {isPositive ? '↗' : '↘'} {isPositive ? '+' : ''}{gainLossPercent.toFixed(2)}%
                                                         </div>
@@ -3147,11 +3167,11 @@
                                         placeholder="Search stocks (e.g., AAPL, TSLA, NVDA)..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
+                                        className="w-full bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all focus:shadow-lg focus:shadow-cyan-500/30 focus:scale-[1.02]"
                                     />
                                     {searching && (
                                         <div className="absolute right-4 top-4">
-                                            <div className="text-cyan-300 animate-pulse">🔍</div>
+                                            <div className="text-cyan-300 animate-spin">🔍</div>
                                         </div>
                                     )}
                                 </div>
@@ -3185,7 +3205,7 @@
                                                             setShowSearchResults(false);
                                                             setSearching(false);
                                                         }}
-                                                        className="p-4 border-b border-blue-700 last:border-b-0 hover:bg-blue-700 cursor-pointer transition-all"
+                                                        className="p-4 border-b border-blue-700 last:border-b-0 hover:bg-blue-700 cursor-pointer transition-all hover:scale-[1.02] hover-glow active-press"
                                                     >
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex-1">
@@ -3697,7 +3717,7 @@
                                             <div className="flex gap-3 mb-3">
                                                 <button
                                                     onClick={() => handleQuantityChange(quantity - 1)}
-                                                    className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white w-14 h-14 rounded-xl font-bold text-2xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                                                    className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white w-14 h-14 rounded-xl font-bold text-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110 active-press hover-glow"
                                                 >
                                                     −
                                                 </button>
@@ -3706,11 +3726,11 @@
                                                     min="1"
                                                     value={quantity}
                                                     onChange={(e) => handleQuantityChange(e.target.value)}
-                                                    className="flex-1 bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-3 text-white text-center text-2xl font-black focus:border-cyan-400 focus:outline-none transition-all"
+                                                    className="flex-1 bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-3 text-white text-center text-2xl font-black focus:border-cyan-400 focus:outline-none transition-all focus:shadow-lg focus:shadow-cyan-500/30"
                                                 />
                                                 <button
                                                     onClick={() => handleQuantityChange(quantity + 1)}
-                                                    className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white w-14 h-14 rounded-xl font-bold text-2xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                                                    className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white w-14 h-14 rounded-xl font-bold text-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110 active-press hover-glow"
                                                 >
                                                     +
                                                 </button>
@@ -3720,13 +3740,13 @@
                                             <div className="flex gap-2 mb-3">
                                                 <button
                                                     onClick={buyMax}
-                                                    className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white py-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg hover:shadow-xl"
+                                                    className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white py-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active-press hover-glow-green"
                                                 >
                                                     💰 Buy Max ({getMaxBuyQuantity(selectedStock)})
                                                 </button>
                                                 <button
                                                     onClick={sellMax}
-                                                    className="flex-1 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white py-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg hover:shadow-xl"
+                                                    className="flex-1 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white py-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active-press hover-glow-red"
                                                 >
                                                     📊 Sell Max ({getCurrentPosition(selectedStock)})
                                                 </button>
@@ -3734,7 +3754,7 @@
 
                                             {/* Error message */}
                                             {quantityError && (
-                                                <div className="bg-red-900/40 border-2 border-red-500 rounded-xl p-4 text-red-200 text-sm font-semibold animate-pulse">
+                                                <div className="bg-red-900/40 border-2 border-red-500 rounded-xl p-4 text-red-200 text-sm font-semibold animate-shake animate-pulse-glow-red">
                                                     ⚠️ {quantityError}
                                                 </div>
                                             )}
@@ -3758,7 +3778,7 @@
                                                         executeShortSell();
                                                     }
                                                 }}
-                                                className="group relative bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white py-5 rounded-xl font-black text-xl shadow-2xl hover:shadow-green-500/50 transition-all duration-300 hover:scale-105"
+                                                className="group relative bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white py-5 rounded-xl font-black text-xl shadow-2xl hover:shadow-green-500/50 transition-all duration-300 hover:scale-105 active-press hover-glow-green will-change-transform gpu-accelerated"
                                             >
                                                 <span className="flex items-center justify-center gap-2">
                                                     <span className="text-2xl group-hover:animate-bounce">{tradeType === 'long' ? '🚀' : '📉'}</span>
@@ -3774,7 +3794,7 @@
                                                         executeTrade('sell');
                                                     }
                                                 }}
-                                                className="group relative bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-400 hover:to-pink-500 text-white py-5 rounded-xl font-black text-xl shadow-2xl hover:shadow-red-500/50 transition-all duration-300 hover:scale-105"
+                                                className="group relative bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-400 hover:to-pink-500 text-white py-5 rounded-xl font-black text-xl shadow-2xl hover:shadow-red-500/50 transition-all duration-300 hover:scale-105 active-press hover-glow-red will-change-transform gpu-accelerated"
                                             >
                                                 <span className="flex items-center justify-center gap-2">
                                                     <span className="text-2xl group-hover:animate-bounce">💸</span>
@@ -3839,35 +3859,35 @@
                                             <div className="text-purple-200">Loading stocks...</div>
                                         </div>
                                     ) : watchlist.length === 0 ? (
-                                        <div className="text-center py-16 bg-blue-900/30 rounded-xl border-2 border-dashed border-blue-500/50">
-                                            <div className="text-8xl mb-4 opacity-50">⭐</div>
+                                        <div className="text-center py-16 bg-blue-900/30 rounded-xl border-2 border-dashed border-blue-500/50 animate-fade-in">
+                                            <div className="text-8xl mb-4 opacity-50 animate-bounce">⭐</div>
                                             <h3 className="text-2xl font-bold text-white mb-3">No Stocks in Watchlist</h3>
                                             <p className="text-blue-200 text-lg mb-6">Add stocks to your watchlist to track them here</p>
-                                            <div className="inline-flex items-center gap-2 bg-blue-500/20 border-2 border-blue-500/50 rounded-xl px-6 py-3 text-blue-300 font-semibold">
+                                            <div className="inline-flex items-center gap-2 bg-blue-500/20 border-2 border-blue-500/50 rounded-xl px-6 py-3 text-blue-300 font-semibold animate-pulse hover:scale-105 transition-transform">
                                                 <span>💡</span>
                                                 <span>Go to Trading tab to search and add stocks</span>
                                             </div>
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            {filteredStocks.map(stock => (
+                                            {filteredStocks.map((stock, index) => (
                                                 <div
                                                     key={stock.symbol}
                                                     onClick={() => {
                                                         setSelectedStock(stock.symbol);
                                                         setMainTab('trading');
                                                     }}
-                                                    className="p-6 rounded-xl cursor-pointer transition-all bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl border-2 border-blue-500/50 hover:border-cyan-400 hover:scale-105 shadow-xl hover:shadow-2xl"
+                                                    className={`p-6 rounded-xl cursor-pointer transition-all bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl border-2 border-blue-500/50 hover:border-cyan-400 hover:-translate-y-2 shadow-xl hover:shadow-2xl hover-glow will-change-transform gpu-accelerated animate-fade-in stagger-${Math.min(index + 1, 6)}`}
                                                 >
                                                     <div className="flex justify-between items-start mb-4">
                                                         <div>
                                                             <div className="font-bold text-2xl text-white">{stock.symbol}</div>
                                                             <div className="text-sm text-blue-200 mt-1">{stock.name}</div>
                                                         </div>
-                                                        <div className={`px-3 py-1 rounded-full font-bold text-sm ${
+                                                        <div className={`px-3 py-1 rounded-full font-bold text-sm transition-all ${
                                                             stock.change >= 0
-                                                                ? 'bg-green-500/20 text-green-300 border border-green-500'
-                                                                : 'bg-red-500/20 text-red-300 border border-red-500'
+                                                                ? 'bg-green-500/20 text-green-300 border border-green-500 animate-pulse-glow-green'
+                                                                : 'bg-red-500/20 text-red-300 border border-red-500 animate-pulse-glow-red'
                                                         }`}>
                                                             {stock.change >= 0 ? '↗' : '↘'} {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
                                                         </div>
@@ -3877,7 +3897,7 @@
                                                         <div className="font-bold text-3xl text-white">${stock.price.toFixed(2)}</div>
                                                     </div>
                                                     <div className="mt-4 text-center">
-                                                        <button className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-2 rounded-lg font-bold text-sm transition-all shadow-lg hover:shadow-xl">
+                                                        <button className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-2 rounded-lg font-bold text-sm transition-all shadow-lg hover:shadow-xl hover:scale-105 active-press hover-glow">
                                                             📊 Trade This Stock
                                                         </button>
                                                     </div>
@@ -3910,7 +3930,7 @@
                                         <button
                                             onClick={loadMarketNews}
                                             disabled={loadingMarketNews}
-                                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-5 py-2 rounded-lg font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl"
+                                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-5 py-2 rounded-lg font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl hover:scale-105 active-press hover-glow"
                                         >
                                             {loadingMarketNews ? '⏳ Loading...' : '🔄 Refresh News'}
                                         </button>
@@ -3922,8 +3942,8 @@
                                             <div className="text-blue-200 text-lg font-semibold">Loading latest market news...</div>
                                         </div>
                                     ) : marketNews.length === 0 ? (
-                                        <div className="text-center py-16 bg-blue-900/30 rounded-xl border-2 border-dashed border-blue-500/50">
-                                            <div className="text-8xl mb-4 opacity-50">📰</div>
+                                        <div className="text-center py-16 bg-blue-900/30 rounded-xl border-2 border-dashed border-blue-500/50 animate-fade-in">
+                                            <div className="text-8xl mb-4 opacity-50 animate-bounce">📰</div>
                                             <h3 className="text-2xl font-bold text-white mb-3">No News Available</h3>
                                             <p className="text-blue-200 text-lg mb-6">Click refresh to load the latest market news</p>
                                         </div>
@@ -3935,22 +3955,22 @@
                                                     href={article.url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="block bg-blue-900/40 hover:bg-blue-900/60 backdrop-blur-sm rounded-xl p-5 transition-all border-2 border-blue-500/50 hover:border-cyan-400 shadow-xl hover:shadow-2xl hover:scale-[1.01] cursor-pointer"
+                                                    className={`block bg-blue-900/40 hover:bg-blue-900/60 backdrop-blur-sm rounded-xl p-5 transition-all border-2 border-blue-500/50 hover:border-cyan-400 shadow-xl hover:shadow-2xl hover:-translate-y-1 cursor-pointer hover-glow will-change-transform gpu-accelerated animate-fade-in stagger-${Math.min(idx + 1, 6)}`}
                                                 >
                                                     <div className="flex gap-4">
                                                         {article.image && (
                                                             <img
                                                                 src={article.image}
                                                                 alt=""
-                                                                className="w-32 h-32 rounded-lg object-cover flex-shrink-0 border-2 border-blue-600/30"
+                                                                className="w-32 h-32 rounded-lg object-cover flex-shrink-0 border-2 border-blue-600/30 hover:scale-105 transition-transform duration-300"
                                                                 onError={(e) => e.target.style.display = 'none'}
                                                             />
                                                         )}
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-2 mb-3 flex-wrap">
-                                                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                                                    article.sentiment === 'positive' ? 'bg-green-500/20 text-green-300 border border-green-500' :
-                                                                    article.sentiment === 'negative' ? 'bg-red-500/20 text-red-300 border border-red-500' :
+                                                                <span className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                                                                    article.sentiment === 'positive' ? 'bg-green-500/20 text-green-300 border border-green-500 animate-pulse-glow-green' :
+                                                                    article.sentiment === 'negative' ? 'bg-red-500/20 text-red-300 border border-red-500 animate-pulse-glow-red' :
                                                                     'bg-gray-500/20 text-gray-300 border border-gray-500'
                                                                 }`}>
                                                                     {article.sentiment === 'positive' ? '📈 Bullish' :
@@ -3996,18 +4016,18 @@
                                         📊 Market Overview
                                     </h3>
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                                        {topStocks.slice(0, 6).map(stock => (
+                                        {topStocks.slice(0, 6).map((stock, index) => (
                                             <div
                                                 key={stock.symbol}
                                                 onClick={() => {
                                                     addToWatchlist(stock.symbol);
                                                     setMainTab('trading');
                                                 }}
-                                                className="bg-blue-900/40 rounded-lg p-4 border border-blue-400/30 hover:border-blue-400 transition-all cursor-pointer hover:scale-105 shadow-lg"
+                                                className={`bg-blue-900/40 rounded-lg p-4 border border-blue-400/30 hover:border-blue-400 transition-all cursor-pointer hover:-translate-y-1 shadow-lg hover:shadow-2xl hover-glow will-change-transform gpu-accelerated animate-fade-in stagger-${Math.min(index + 1, 6)}`}
                                             >
                                                 <div className="font-bold text-white text-sm mb-1">{stock.symbol}</div>
                                                 <div className="text-xl font-black text-white">${stock.price.toFixed(2)}</div>
-                                                <div className={`text-xs font-bold mt-1 ${stock.change >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                                                <div className={`text-xs font-bold mt-1 transition-all ${stock.change >= 0 ? 'text-green-300 animate-pulse-glow-green' : 'text-red-300 animate-pulse-glow-red'}`}>
                                                     {stock.change >= 0 ? '↗' : '↘'} {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
                                                 </div>
                                             </div>
@@ -4016,7 +4036,7 @@
                                     <div className="mt-4 text-center">
                                         <button
                                             onClick={() => setMainTab('trading')}
-                                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-lg hover:shadow-xl"
+                                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-lg hover:shadow-xl hover:scale-105 active-press hover-glow"
                                         >
                                             🚀 Go to Trading
                                         </button>
@@ -4148,7 +4168,7 @@
                                                 <button
                                                     onClick={generateAIAnalysis}
                                                     disabled={loadingAnalysis}
-                                                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-4 rounded-xl font-black text-xl transition-all shadow-2xl hover:shadow-purple-500/50 disabled:opacity-50 flex items-center justify-center gap-3"
+                                                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-4 rounded-xl font-black text-xl transition-all shadow-2xl hover:shadow-purple-500/50 disabled:opacity-50 flex items-center justify-center gap-3 hover:scale-105 active-press hover-glow-amber will-change-transform gpu-accelerated"
                                                 >
                                                     {loadingAnalysis ? (
                                                         <>
@@ -4157,7 +4177,7 @@
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <span className="text-2xl">🔮</span>
+                                                            <span className="text-2xl animate-pulse">🔮</span>
                                                             <span>Generate AI Analysis</span>
                                                         </>
                                                     )}
@@ -4166,24 +4186,24 @@
 
                                             {/* AI Analysis Results */}
                                             {loadingAnalysis && (
-                                                <div className="bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-2xl p-12 border-2 border-blue-500/50 shadow-2xl">
+                                                <div className="bg-gradient-to-br from-purple-900/60 to-indigo-950/60 backdrop-blur-xl rounded-2xl p-12 border-2 border-purple-500/50 shadow-2xl animate-pulse-glow-amber animate-scale-in">
                                                     <div className="text-center space-y-6">
-                                                        <div className="inline-block">
-                                                            <div className="w-24 h-24 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div>
+                                                        <div className="inline-block animate-bounce">
+                                                            <div className="w-24 h-24 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
                                                         </div>
                                                         <div className="space-y-3">
-                                                            <p className="text-blue-200 font-bold text-xl animate-pulse">🧠 Initializing neural networks...</p>
-                                                            <p className="text-blue-300 animate-pulse delay-100">📊 Analyzing technical indicators...</p>
-                                                            <p className="text-blue-300 animate-pulse delay-200">📰 Processing news sentiment...</p>
-                                                            <p className="text-blue-300 animate-pulse delay-300">⚡ Calculating risk factors...</p>
-                                                            <p className="text-blue-300 animate-pulse delay-400">🎯 Generating trade recommendations...</p>
+                                                            <p className="text-purple-200 font-bold text-xl animate-pulse">🧠 Initializing neural networks...</p>
+                                                            <p className="text-purple-300 animate-pulse">📊 Analyzing technical indicators...</p>
+                                                            <p className="text-purple-300 animate-pulse">📰 Processing news sentiment...</p>
+                                                            <p className="text-purple-300 animate-pulse">⚡ Calculating risk factors...</p>
+                                                            <p className="text-purple-300 animate-pulse">🎯 Generating trade recommendations...</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             )}
 
                                             {!loadingAnalysis && aiAnalysis && (
-                                                <div className="space-y-6">
+                                                <div className="space-y-6 animate-fade-in">
                                                     {/* Timestamp */}
                                                     <div className="text-center text-sm text-purple-300">
                                                         Analysis generated: {aiAnalysis.timestamp}
@@ -4191,15 +4211,15 @@
 
                                                     {/* Main Recommendation */}
                                                     <div className={`bg-gradient-to-br ${
-                                                        aiAnalysis.recommendation.color === 'green' ? 'from-green-900/40 to-emerald-900/40 border-green-500' :
-                                                        aiAnalysis.recommendation.color === 'red' ? 'from-red-900/40 to-rose-900/40 border-red-500' :
-                                                        'from-yellow-900/40 to-amber-900/40 border-yellow-500'
-                                                    } border-2 rounded-2xl p-8 shadow-2xl`}>
+                                                        aiAnalysis.recommendation.color === 'green' ? 'from-green-900/40 to-emerald-900/40 border-green-500 hover-glow-green' :
+                                                        aiAnalysis.recommendation.color === 'red' ? 'from-red-900/40 to-rose-900/40 border-red-500 hover-glow-red' :
+                                                        'from-yellow-900/40 to-amber-900/40 border-yellow-500 hover-glow-amber'
+                                                    } border-2 rounded-2xl p-8 shadow-2xl transition-all hover:-translate-y-1 will-change-transform gpu-accelerated animate-scale-in`}>
                                                         <div className="text-center mb-6">
                                                             <div className={`inline-block px-6 py-3 rounded-full font-black text-2xl mb-3 ${
-                                                                aiAnalysis.recommendation.color === 'green' ? 'bg-green-500 text-white' :
-                                                                aiAnalysis.recommendation.color === 'red' ? 'bg-red-500 text-white' :
-                                                                'bg-yellow-500 text-gray-900'
+                                                                aiAnalysis.recommendation.color === 'green' ? 'bg-green-500 text-white animate-pulse-glow-green' :
+                                                                aiAnalysis.recommendation.color === 'red' ? 'bg-red-500 text-white animate-pulse-glow-red' :
+                                                                'bg-yellow-500 text-gray-900 animate-pulse-glow-amber'
                                                             }`}>
                                                                 {aiAnalysis.recommendation.action}
                                                             </div>
