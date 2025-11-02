@@ -123,6 +123,51 @@
                 }
             }, [competition, currentUserId]);
 
+            // Auto-fetch stock data for portfolio positions
+            useEffect(() => {
+                const fetchPositionStocks = async () => {
+                    const portfolio = getCurrentPortfolio();
+                    if (!portfolio?.positions) return;
+
+                    const positionSymbols = Object.keys(portfolio.positions).filter(symbol => {
+                        const qty = portfolio.positions[symbol];
+                        return qty && qty > 0;
+                    });
+
+                    if (positionSymbols.length === 0) return;
+
+                    // Fetch data for each position symbol
+                    for (const symbol of positionSymbols) {
+                        // Check if stock data already exists
+                        const existingStock = stocks.find(s => s.symbol === symbol);
+                        if (!existingStock) {
+                            try {
+                                const response = await fetch(
+                                    `${FINNHUB_API_BASE}/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`
+                                );
+                                const data = await response.json();
+
+                                if (data.c) {
+                                    setStocks(prev => [...prev, {
+                                        symbol,
+                                        price: data.c,
+                                        change: data.dp || 0,
+                                        high: data.h,
+                                        low: data.l,
+                                        open: data.o,
+                                        previousClose: data.pc
+                                    }]);
+                                }
+                            } catch (error) {
+                                console.error(`Error fetching ${symbol}:`, error);
+                            }
+                        }
+                    }
+                };
+
+                fetchPositionStocks();
+            }, [competition, currentUserId]);
+
             const searchStocks = async (query) => {
                 if (!query || query.length < 1) {
                     setSearchResults([]);
