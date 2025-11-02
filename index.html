@@ -10,6 +10,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 
     <!-- External CSS -->
     <link rel="stylesheet" href="css/styles.css">
@@ -93,6 +94,18 @@
             const [loadingAnalysis, setLoadingAnalysis] = useState(false);
             const [analysisExpanded, setAnalysisExpanded] = useState(true);
 
+            // Trade analysis system
+            const [showTradeAnalysis, setShowTradeAnalysis] = useState(false);
+            const [tradeAnalysisData, setTradeAnalysisData] = useState(null);
+            const [showDailySummary, setShowDailySummary] = useState(false);
+            const [dailySummaryData, setDailySummaryData] = useState(null);
+
+            // Chat room state
+            const [chatMessages, setChatMessages] = useState([]);
+            const [chatInput, setChatInput] = useState('');
+            const [socket, setSocket] = useState(null);
+            const chatContainerRef = useRef(null);
+
             // Toast notification system
             const [toasts, setToasts] = useState([]);
 
@@ -122,6 +135,32 @@
                     }
                 }
             }, [competition, currentUserId]);
+
+            // Initialize Socket.io connection for chat
+            useEffect(() => {
+                const newSocket = io('http://localhost:3001');
+                setSocket(newSocket);
+
+                // Listen for chat history
+                newSocket.on('chat_history', (messages) => {
+                    setChatMessages(messages);
+                });
+
+                // Listen for new messages
+                newSocket.on('chat_message', (message) => {
+                    setChatMessages(prev => [...prev, message]);
+                    // Auto-scroll to bottom
+                    setTimeout(() => {
+                        if (chatContainerRef.current) {
+                            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+                        }
+                    }, 100);
+                });
+
+                return () => {
+                    newSocket.close();
+                };
+            }, []);
 
             // Auto-fetch stock data for portfolio positions
             useEffect(() => {
@@ -465,6 +504,27 @@
                     const fallbackData = getFallbackStockData(symbol);
                     if (stockName) fallbackData.name = stockName;
                     return fallbackData;
+                }
+            };
+
+            // Chat functions
+            const sendChatMessage = () => {
+                if (!chatInput.trim() || !socket) return;
+
+                const message = {
+                    userName: userName || 'Guest',
+                    message: chatInput.trim(),
+                    timestamp: new Date().toISOString()
+                };
+
+                socket.emit('chat_message', message);
+                setChatInput('');
+            };
+
+            const handleChatKeyPress = (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendChatMessage();
                 }
             };
 
@@ -1593,6 +1653,302 @@
                 setQuantityError('');
             };
 
+            // AI Trade Analysis Functions
+            const calculateOptimalSellPrice = (stock, buyTimestamp, sellTimestamp) => {
+                // In a real implementation, this would check historical data
+                // For simulation, we'll estimate based on current stock data
+                const currentPrice = stock.price;
+                const priceVolatility = Math.abs(stock.change) / 100;
+
+                // Simulate peak price during hold period (could be higher or lower)
+                const peakMultiplier = 1 + (Math.random() * priceVolatility * 2);
+                return currentPrice * peakMultiplier;
+            };
+
+            const calculateOverallGrade = (profitPercent, missedProfitPercent, holdDurationHours) => {
+                let score = 0;
+
+                // Profit/Loss scoring (50 points)
+                if (profitPercent > 10) score += 50;
+                else if (profitPercent > 5) score += 40;
+                else if (profitPercent > 2) score += 30;
+                else if (profitPercent > 0) score += 20;
+                else if (profitPercent > -5) score += 10;
+                else score += 0;
+
+                // Timing scoring (30 points)
+                if (missedProfitPercent < 2) score += 30;
+                else if (missedProfitPercent < 5) score += 20;
+                else if (missedProfitPercent < 10) score += 10;
+                else score += 0;
+
+                // Hold duration scoring (20 points)
+                if (holdDurationHours >= 2) score += 20;
+                else if (holdDurationHours >= 1) score += 15;
+                else if (holdDurationHours >= 0.5) score += 10;
+                else score += 5;
+
+                // Convert to letter grade
+                if (score >= 90) return { grade: 'A+', color: '#10b981' };
+                if (score >= 85) return { grade: 'A', color: '#10b981' };
+                if (score >= 80) return { grade: 'A-', color: '#10b981' };
+                if (score >= 75) return { grade: 'B+', color: '#22c55e' };
+                if (score >= 70) return { grade: 'B', color: '#84cc16' };
+                if (score >= 65) return { grade: 'B-', color: '#eab308' };
+                if (score >= 60) return { grade: 'C+', color: '#f59e0b' };
+                if (score >= 55) return { grade: 'C', color: '#f59e0b' };
+                if (score >= 50) return { grade: 'C-', color: '#ef4444' };
+                if (score >= 40) return { grade: 'D', color: '#dc2626' };
+                return { grade: 'F', color: '#991b1b' };
+            };
+
+            const generateTradeAnalysis = (stock, buyPrice, sellPrice, shares, buyTimestamp) => {
+                const sellTimestamp = Date.now();
+                const profitLoss = (sellPrice - buyPrice) * shares;
+                const profitPercent = ((sellPrice - buyPrice) / buyPrice) * 100;
+                const holdDuration = sellTimestamp - buyTimestamp;
+                const holdDurationHours = holdDuration / (1000 * 60 * 60);
+                const holdDurationMinutes = Math.floor(holdDuration / (1000 * 60));
+
+                // Calculate optimal sell price (highest price during hold period)
+                const optimalPrice = calculateOptimalSellPrice(stock, buyTimestamp, sellTimestamp);
+                const missedProfit = (optimalPrice - sellPrice) * shares;
+                const missedProfitPercent = ((optimalPrice - sellPrice) / sellPrice) * 100;
+
+                // Determine timing quality
+                let timingFeedback, timingGrade, timingColor;
+                if (missedProfit < 0) {
+                    timingFeedback = `Perfect timing! Stock dropped ${Math.abs(missedProfitPercent).toFixed(1)}% after you sold.`;
+                    timingGrade = "A+";
+                    timingColor = "#10b981";
+                } else if (missedProfitPercent < 2) {
+                    timingFeedback = "Excellent timing! You captured nearly all available gains.";
+                    timingGrade = "A";
+                    timingColor = "#10b981";
+                } else if (missedProfitPercent < 5) {
+                    timingFeedback = `Good timing! You left only ${missedProfitPercent.toFixed(1)}% on the table.`;
+                    timingGrade = "B";
+                    timingColor = "#22c55e";
+                } else if (missedProfitPercent < 10) {
+                    timingFeedback = `Decent timing, but you missed ${missedProfitPercent.toFixed(1)}% more gains.`;
+                    timingGrade = "C";
+                    timingColor = "#eab308";
+                } else {
+                    timingFeedback = `You sold too early! You could have made $${Math.abs(missedProfit).toFixed(2)} more (${missedProfitPercent.toFixed(1)}%).`;
+                    timingGrade = "D";
+                    timingColor = "#ef4444";
+                }
+
+                // Generate actionable insights
+                const insights = [];
+
+                if (profitPercent > 10) {
+                    insights.push({
+                        icon: "✅",
+                        text: "Excellent profit! You're showing strong stock picking skills.",
+                        type: "success"
+                    });
+                } else if (profitPercent > 5) {
+                    insights.push({
+                        icon: "👍",
+                        text: "Solid profit! Keep up the good work.",
+                        type: "success"
+                    });
+                } else if (profitPercent > 0) {
+                    insights.push({
+                        icon: "✓",
+                        text: "Profitable trade, but aim for higher returns.",
+                        type: "neutral"
+                    });
+                }
+
+                if (holdDurationHours < 0.5) {
+                    insights.push({
+                        icon: "⚠️",
+                        text: `Very short hold (${holdDurationMinutes}min). Consider holding longer for bigger gains.`,
+                        type: "warning"
+                    });
+                } else if (holdDurationHours < 1) {
+                    insights.push({
+                        icon: "⏱️",
+                        text: "Quick trade. Make sure you're not overtrading.",
+                        type: "neutral"
+                    });
+                }
+
+                if (profitPercent < -5) {
+                    insights.push({
+                        icon: "🛡️",
+                        text: "Consider using stop-losses at -5% to protect your capital.",
+                        type: "warning"
+                    });
+                } else if (profitPercent < -2) {
+                    insights.push({
+                        icon: "📉",
+                        text: "Small loss. Review why the trade didn't work out.",
+                        type: "warning"
+                    });
+                }
+
+                if (missedProfitPercent > 10) {
+                    insights.push({
+                        icon: "💡",
+                        text: "You're selling winning positions too early. Be more patient!",
+                        type: "tip"
+                    });
+                }
+
+                if (profitPercent > 0 && missedProfitPercent < 5) {
+                    insights.push({
+                        icon: "🎯",
+                        text: "Great exit! You timed this sale very well.",
+                        type: "success"
+                    });
+                }
+
+                // Calculate overall grade
+                const gradeInfo = calculateOverallGrade(profitPercent, Math.abs(missedProfitPercent), holdDurationHours);
+
+                return {
+                    stock: stock.symbol,
+                    stockName: stock.name || getStockName(stock.symbol),
+                    buyPrice: buyPrice.toFixed(2),
+                    sellPrice: sellPrice.toFixed(2),
+                    shares,
+                    profitLoss: profitLoss.toFixed(2),
+                    profitPercent: profitPercent.toFixed(2),
+                    holdDuration,
+                    holdDurationFormatted: holdDurationHours >= 1
+                        ? `${holdDurationHours.toFixed(1)} hours`
+                        : `${holdDurationMinutes} minutes`,
+                    optimalPrice: optimalPrice.toFixed(2),
+                    missedProfit: missedProfit.toFixed(2),
+                    missedProfitPercent: missedProfitPercent.toFixed(2),
+                    timingFeedback,
+                    timingGrade,
+                    timingColor,
+                    insights,
+                    overallGrade: gradeInfo.grade,
+                    overallGradeColor: gradeInfo.color,
+                    timestamp: sellTimestamp
+                };
+            };
+
+            const generateDailySummary = () => {
+                const portfolio = getCurrentPortfolio();
+                if (!portfolio.history || portfolio.history.length === 0) {
+                    return null;
+                }
+
+                // Get today's trades
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todayTrades = portfolio.history.filter(trade => {
+                    const tradeDate = new Date(trade.timestamp);
+                    tradeDate.setHours(0, 0, 0, 0);
+                    return tradeDate.getTime() === today.getTime();
+                });
+
+                if (todayTrades.length === 0) {
+                    return null;
+                }
+
+                // Calculate statistics
+                const sellTrades = todayTrades.filter(t => t.type === 'sell');
+                const buyTrades = todayTrades.filter(t => t.type === 'buy');
+
+                let totalProfitLoss = 0;
+                let profitableTrades = 0;
+                let bestTrade = null;
+                let worstTrade = null;
+
+                sellTrades.forEach(sell => {
+                    // Find corresponding buy
+                    const buys = portfolio.history.filter(h =>
+                        h.type === 'buy' &&
+                        h.symbol === sell.symbol &&
+                        new Date(h.timestamp) < new Date(sell.timestamp)
+                    );
+
+                    if (buys.length > 0) {
+                        const avgBuyPrice = buys.reduce((sum, b) => sum + b.price, 0) / buys.length;
+                        const profitLoss = (sell.price - avgBuyPrice) * sell.quantity;
+                        totalProfitLoss += profitLoss;
+
+                        if (profitLoss > 0) profitableTrades++;
+
+                        if (!bestTrade || profitLoss > bestTrade.profit) {
+                            bestTrade = { symbol: sell.symbol, profit: profitLoss };
+                        }
+                        if (!worstTrade || profitLoss < worstTrade.profit) {
+                            worstTrade = { symbol: sell.symbol, profit: profitLoss };
+                        }
+                    }
+                });
+
+                const winRate = sellTrades.length > 0 ? (profitableTrades / sellTrades.length) * 100 : 0;
+
+                // Generate AI commentary
+                const commentary = [];
+
+                if (winRate >= 70) {
+                    commentary.push("Outstanding day! You're trading with confidence and precision.");
+                } else if (winRate >= 50) {
+                    commentary.push("Good day overall. More wins than losses.");
+                } else if (sellTrades.length > 0) {
+                    commentary.push("Challenging day. Review your trades and adjust your strategy.");
+                }
+
+                if (todayTrades.length > 20) {
+                    commentary.push("⚠️ You're overtrading! Too many trades can lead to emotional decisions and higher fees.");
+                } else if (todayTrades.length > 10) {
+                    commentary.push("High activity today. Make sure each trade has a clear reason.");
+                }
+
+                if (bestTrade && bestTrade.profit > 0) {
+                    commentary.push(`Your best trade was ${bestTrade.symbol} with +$${bestTrade.profit.toFixed(2)} profit!`);
+                }
+
+                // Behavioral insights
+                const insights = [];
+
+                if (winRate < 50 && sellTrades.length >= 3) {
+                    insights.push({
+                        icon: "📊",
+                        text: "Your win rate is below 50%. Focus on quality over quantity.",
+                        type: "warning"
+                    });
+                }
+
+                if (totalProfitLoss > 0) {
+                    insights.push({
+                        icon: "💰",
+                        text: `You made $${totalProfitLoss.toFixed(2)} today. Great work!`,
+                        type: "success"
+                    });
+                } else if (totalProfitLoss < 0) {
+                    insights.push({
+                        icon: "📉",
+                        text: `You lost $${Math.abs(totalProfitLoss).toFixed(2)} today. Tomorrow is a new day.`,
+                        type: "warning"
+                    });
+                }
+
+                return {
+                    date: today.toLocaleDateString(),
+                    totalTrades: todayTrades.length,
+                    buyTrades: buyTrades.length,
+                    sellTrades: sellTrades.length,
+                    winRate: winRate.toFixed(1),
+                    totalProfitLoss: totalProfitLoss.toFixed(2),
+                    profitableTrades,
+                    bestTrade,
+                    worstTrade,
+                    commentary,
+                    insights
+                };
+            };
+
             // Try Yahoo Finance through CORS proxy
             const fetchThroughProxy = async (symbol, period, interval, period1, period2) => {
                 try {
@@ -1647,14 +2003,15 @@
 
                     switch (period) {
                         case '1D':
-                            fromDate = new Date(toDate.getTime() - (2 * 24 * 60 * 60 * 1000)); // 2 days for intraday
-                            range = '1d';
-                            interval = '5m';
+                            // Use 5 days lookback with hourly intervals for better reliability
+                            fromDate = new Date(toDate.getTime() - (5 * 24 * 60 * 60 * 1000));
+                            range = '5d';
+                            interval = '1h'; // Hourly is more reliable than 5m through proxies
                             break;
                         case '1W':
                             fromDate = new Date(toDate.getTime() - (7 * 24 * 60 * 60 * 1000));
                             range = '5d';
-                            interval = '15m';
+                            interval = '1h'; // Use hourly for better proxy compatibility
                             break;
                         case '1M':
                             fromDate = new Date(toDate.getTime() - (30 * 24 * 60 * 60 * 1000));
@@ -1722,10 +2079,33 @@
                                 // Filter out null prices and format
                                 const validData = [];
                                 const validLabels = [];
+                                const validTimestamps = [];
                                 for (let i = 0; i < prices.length; i++) {
                                     if (prices[i] !== null && prices[i] !== undefined) {
                                         validData.push(prices[i].toFixed(2));
                                         validLabels.push(labels[i]);
+                                        validTimestamps.push(timestamps[i]);
+                                    }
+                                }
+
+                                // For 1D, filter to show only last 24 hours of data
+                                if (period === '1D') {
+                                    const oneDayAgo = Date.now() / 1000 - (24 * 60 * 60);
+                                    const filtered = validTimestamps.map((ts, idx) => ({ ts, label: validLabels[idx], price: validData[idx] }))
+                                        .filter(item => item.ts >= oneDayAgo);
+
+                                    if (filtered.length > 0) {
+                                        console.log(`✅ Loaded Yahoo Finance data for ${symbol} (${period}):`, {
+                                            dataPoints: filtered.length,
+                                            firstPrice: filtered[0].price,
+                                            lastPrice: filtered[filtered.length - 1].price,
+                                            timeRange: `${filtered[0].label} to ${filtered[filtered.length - 1].label}`
+                                        });
+
+                                        return {
+                                            labels: filtered.map(item => item.label),
+                                            data: filtered.map(item => item.price)
+                                        };
                                     }
                                 }
 
@@ -1766,10 +2146,33 @@
 
                                 const validData = [];
                                 const validLabels = [];
+                                const validTimestamps = [];
                                 for (let i = 0; i < prices.length; i++) {
                                     if (prices[i] !== null && prices[i] !== undefined) {
                                         validData.push(prices[i].toFixed(2));
                                         validLabels.push(labels[i]);
+                                        validTimestamps.push(timestamps[i]);
+                                    }
+                                }
+
+                                // For 1D, filter to show only last 24 hours of data
+                                if (period === '1D') {
+                                    const oneDayAgo = Date.now() / 1000 - (24 * 60 * 60);
+                                    const filtered = validTimestamps.map((ts, idx) => ({ ts, label: validLabels[idx], price: validData[idx] }))
+                                        .filter(item => item.ts >= oneDayAgo);
+
+                                    if (filtered.length > 0) {
+                                        console.log(`✅ Loaded data via CORS proxy for ${symbol} (${period}):`, {
+                                            dataPoints: filtered.length,
+                                            firstPrice: filtered[0].price,
+                                            lastPrice: filtered[filtered.length - 1].price,
+                                            timeRange: `${filtered[0].label} to ${filtered[filtered.length - 1].label}`
+                                        });
+
+                                        return {
+                                            labels: filtered.map(item => item.label),
+                                            data: filtered.map(item => item.price)
+                                        };
                                     }
                                 }
 
@@ -3038,6 +3441,16 @@
                                     }`}
                                 >
                                     🧠 AI Analysis
+                                </button>
+                                <button
+                                    onClick={() => setMainTab('chat')}
+                                    className={`flex-1 py-4 rounded-xl font-black text-lg transition-all duration-300 ${
+                                        mainTab === 'chat'
+                                            ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-xl'
+                                            : 'text-blue-300 hover:text-white hover:bg-blue-700/50'
+                                    }`}
+                                >
+                                    💬 Chat Room
                                 </button>
                             </div>
                         </div>
@@ -4657,6 +5070,94 @@
                                             <p className="text-xl text-purple-200">Use the search bar above to find and analyze any stock with AI-powered insights</p>
                                         </div>
                                     )}
+                                </div>
+                            </>
+                        )}
+
+                        {/* Chat Room View */}
+                        {mainTab === 'chat' && (
+                            <>
+                                <div className="bg-gradient-to-br from-green-900/60 via-teal-900/60 to-blue-900/60 rounded-2xl p-8 border-2 border-green-500/50 shadow-2xl">
+                                    <div className="text-center mb-8">
+                                        <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-green-500 to-teal-500 rounded-full mb-6 shadow-2xl">
+                                            <span className="text-5xl">💬</span>
+                                        </div>
+                                        <h2 className="text-4xl font-black text-white mb-3 flex items-center justify-center gap-3">
+                                            Trading Chat Room
+                                            <span className="text-sm bg-gradient-to-r from-green-500 to-teal-500 text-white px-3 py-1 rounded-full font-bold animate-pulse">LIVE</span>
+                                        </h2>
+                                        <p className="text-xl text-green-200">Connect with traders in real-time</p>
+                                    </div>
+
+                                    {/* Chat Messages Container */}
+                                    <div className="bg-blue-950/50 rounded-2xl border-2 border-green-500/30 overflow-hidden mb-6">
+                                        <div
+                                            ref={chatContainerRef}
+                                            className="h-[500px] overflow-y-auto p-6 space-y-4"
+                                            style={{ scrollBehavior: 'smooth' }}
+                                        >
+                                            {chatMessages.length === 0 ? (
+                                                <div className="text-center py-20">
+                                                    <div className="text-6xl mb-4 opacity-50">💬</div>
+                                                    <p className="text-xl text-green-200">No messages yet. Start the conversation!</p>
+                                                </div>
+                                            ) : (
+                                                chatMessages.map((msg) => (
+                                                    <div
+                                                        key={msg.id}
+                                                        className={`${
+                                                            msg.userName === userName
+                                                                ? 'bg-gradient-to-r from-green-600/40 to-teal-600/40 border-green-500/50'
+                                                                : 'bg-blue-900/40 border-blue-500/30'
+                                                        } rounded-xl p-4 border-2 backdrop-blur-sm`}
+                                                    >
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            <span className="text-2xl">👤</span>
+                                                            <span className="font-black text-white">{msg.userName}</span>
+                                                            <span className="text-xs text-gray-400 ml-auto">
+                                                                {new Date(msg.timestamp).toLocaleTimeString()}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-white text-lg break-words">{msg.message}</p>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Chat Input */}
+                                    <div className="bg-blue-950/50 rounded-2xl border-2 border-green-500/30 p-4">
+                                        <div className="flex gap-3">
+                                            <input
+                                                type="text"
+                                                placeholder="Type your message..."
+                                                value={chatInput}
+                                                onChange={(e) => setChatInput(e.target.value)}
+                                                onKeyPress={handleChatKeyPress}
+                                                className="flex-1 bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-6 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
+                                                maxLength={500}
+                                            />
+                                            <button
+                                                onClick={sendChatMessage}
+                                                disabled={!chatInput.trim() || !socket}
+                                                className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-400 hover:to-teal-400 disabled:from-gray-600 disabled:to-gray-700 text-white px-8 py-4 rounded-xl font-black text-lg transition-all shadow-lg hover:shadow-xl hover:scale-105 active-press disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                Send 📤
+                                            </button>
+                                        </div>
+                                        <div className="mt-3 flex items-center justify-between text-sm">
+                                            <span className="text-green-300">
+                                                {socket ? '🟢 Connected' : '🔴 Disconnected'}
+                                            </span>
+                                            <span className="text-gray-400">
+                                                {chatInput.length}/500 characters
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-6 text-center text-sm text-green-200 bg-green-900/20 rounded-xl p-4 border border-green-500/20">
+                                        💡 <strong>Tip:</strong> Press Enter to send messages quickly. All messages are stored and synced in real-time.
+                                    </div>
                                 </div>
                             </>
                         )}

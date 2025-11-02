@@ -10,11 +10,21 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require('socket.io');
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 const PORT = process.env.PORT || 3001;
 
 // User data files
 const usersFile = path.join(__dirname, 'family-users.json');
 const accountsFile = path.join(__dirname, 'accounts.json');
+const chatMessagesFile = path.join(__dirname, 'chat-messages.json');
 
 // Helper functions
 function readUsers() {
@@ -65,6 +75,28 @@ function writeAccounts(accounts) {
         return true;
     } catch (error) {
         console.error('Error writing accounts:', error);
+        return false;
+    }
+}
+
+function readChatMessages() {
+    try {
+        if (fs.existsSync(chatMessagesFile)) {
+            return JSON.parse(fs.readFileSync(chatMessagesFile, 'utf8'));
+        }
+        return [];
+    } catch (error) {
+        console.error('Error reading chat messages:', error);
+        return [];
+    }
+}
+
+function writeChatMessages(messages) {
+    try {
+        fs.writeFileSync(chatMessagesFile, JSON.stringify(messages, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Error writing chat messages:', error);
         return false;
     }
 }
@@ -441,8 +473,66 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
 });
 
-app.listen(PORT, () => {
+// Get chat history endpoint
+app.get('/api/chat/history', (req, res) => {
+    try {
+        const messages = readChatMessages();
+        // Return last 100 messages
+        res.json({ success: true, messages: messages.slice(-100) });
+    } catch (error) {
+        console.error('Chat history error:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch chat history' });
+    }
+});
+
+// Socket.io chat handlers
+io.on('connection', (socket) => {
+    console.log('💬 User connected to chat:', socket.id);
+
+    // Send recent chat history to new user
+    const messages = readChatMessages();
+    socket.emit('chat_history', messages.slice(-100));
+
+    // Handle new chat messages
+    socket.on('chat_message', (data) => {
+        const { userName, message, timestamp } = data;
+
+        if (!userName || !message) {
+            return;
+        }
+
+        const chatMessage = {
+            id: crypto.randomBytes(16).toString('hex'),
+            userName: userName,
+            message: message.substring(0, 500), // Limit message length
+            timestamp: timestamp || new Date().toISOString()
+        };
+
+        // Save message to file
+        const messages = readChatMessages();
+        messages.push(chatMessage);
+
+        // Keep only last 1000 messages
+        if (messages.length > 1000) {
+            messages.splice(0, messages.length - 1000);
+        }
+
+        writeChatMessages(messages);
+
+        // Broadcast to all connected clients
+        io.emit('chat_message', chatMessage);
+
+        console.log(`💬 ${userName}: ${message.substring(0, 50)}${message.length > 50 ? '...' : ''}`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('👋 User disconnected from chat:', socket.id);
+    });
+});
+
+server.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`📧 Email service configured: ${process.env.EMAIL_USER || 'Not configured'}`);
     console.log(`💳 Stripe configured: ${!!process.env.STRIPE_SECRET_KEY}`);
+    console.log(`💬 Chat server ready`);
 });

@@ -27,5 +27,19 @@
     },
     "createdAt": "2025-11-02T17:59:30.202Z",
     "updatedAt": "2025-11-02T19:41:11.517Z"
+  },
+  {
+    "email": "finclash101@gmail.com",
+    "userName": "fin",
+    "passwordHash": "$2b$10$3INXWY1u9XdjFOMm9mjjxOcaBDZWHyR4dp5CIqmiwHbXqZim3hoqe",
+    "accountCode": "2D7HTR",
+    "portfolio": {
+      "cash": 100000,
+      "positions": {},
+      "history": [],
+      "lastBuyTime": {},
+      "watchlist": []
+    },
+    "createdAt": "2025-11-02T21:03:29.385Z"
   }
 ]
