@@ -2818,31 +2818,22 @@
                         <div className="max-w-7xl mx-auto">
                             {/* Hero Section with Navy Blue Theme */}
                             <div className="text-center mb-16 pt-8">
-                                {/* Enhanced Logo with Premium Styling */}
-                                <div className="flex items-center justify-center mb-8">
-                                    <div className="relative group">
-                                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400/40 via-cyan-400/40 to-blue-500/40 rounded-2xl blur-lg opacity-60 group-hover:opacity-80 transition duration-300"></div>
-                                        <div className="relative bg-gradient-to-br from-blue-600/20 via-indigo-700/20 to-blue-800/20 backdrop-blur-sm p-2 rounded-2xl border border-blue-400/30 shadow-xl">
-                                            <img
-                                                src="8c5470b9-7f6a-49f6-b4d9-d9128261158f.jpg"
-                                                alt="FinClash Logo"
-                                                className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
-                                                onError={(e) => {
-                                                    e.target.style.display = 'none';
-                                                    e.target.nextElementSibling.style.display = 'block';
-                                                }}
-                                            />
-                                            <span className="text-4xl hidden">📈</span>
-                                        </div>
-                                    </div>
+                                {/* Main Title with Logo */}
+                                <div className="flex items-center justify-center mb-6">
+                                    <img
+                                        src="8c5470b9-7f6a-49f6-b4d9-d9128261158f.jpg"
+                                        alt="FinClash Logo"
+                                        className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-lg mr-4"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                        }}
+                                    />
+                                    <h1 className="text-7xl md:text-8xl font-black relative inline-block">
+                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-300 to-blue-400 drop-shadow-2xl">
+                                            FinClash
+                                        </span>
+                                    </h1>
                                 </div>
-
-                                {/* Main Title */}
-                                <h1 className="text-7xl md:text-8xl font-black mb-6 relative inline-block">
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-300 to-blue-400 drop-shadow-2xl">
-                                        FinClash
-                                    </span>
-                                </h1>
 
                                 {/* UltraThink AI Badge */}
                                 <div className="flex justify-center mb-6">
