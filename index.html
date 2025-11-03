@@ -754,44 +754,65 @@
                 return isNaN(totalValue) ? 100000 : totalValue;
             };
 
-            // Fetch top 12 stocks with live prices
+            // Fetch real market movers - top gainers and losers
             const fetchTopStocks = async () => {
                 try {
-                    const stockPromises = TOP_12_STOCKS.map(async (symbol) => {
+                    console.log('🔄 Fetching market movers from all stocks...');
+
+                    // Fetch all stocks from database to find real movers
+                    const stockPromises = STOCK_DATABASE.map(async (stockInfo) => {
                         try {
                             const response = await fetch(
-                                `${FINNHUB_API_BASE}/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`
+                                `${FINNHUB_API_BASE}/quote?symbol=${stockInfo.symbol}&token=${FINNHUB_API_KEY}`
                             );
                             const data = await response.json();
 
-                            if (data.c) {
+                            if (data.c && data.dp !== undefined) {
                                 return {
-                                    symbol,
+                                    symbol: stockInfo.symbol,
+                                    name: stockInfo.name,
                                     price: data.c,
                                     change: data.dp || 0,
                                     high: data.h,
-                                    low: data.l
+                                    low: data.l,
+                                    open: data.o,
+                                    previousClose: data.pc
                                 };
                             }
                             return null;
                         } catch (error) {
-                            console.error(`Error fetching ${symbol}:`, error);
+                            console.error(`Error fetching ${stockInfo.symbol}:`, error);
                             return null;
                         }
                     });
 
                     const results = await Promise.all(stockPromises);
-                    const validStocks = results.filter(stock => stock !== null);
-                    setTopStocks(validStocks);
+                    const validStocks = results.filter(stock => stock !== null && stock.change !== 0);
+
+                    // Sort by change percentage
+                    const sortedStocks = validStocks.sort((a, b) => b.change - a.change);
+
+                    // Get top 6 gainers and top 6 losers
+                    const topGainers = sortedStocks.slice(0, 6);
+                    const topLosers = sortedStocks.slice(-6).reverse();
+
+                    // Combine them: gainers first, then losers
+                    const marketMovers = [...topGainers, ...topLosers];
+
+                    console.log(`✅ Market Movers: ${topGainers.length} gainers, ${topLosers.length} losers`);
+                    console.log('Top Gainer:', topGainers[0]?.symbol, topGainers[0]?.change.toFixed(2) + '%');
+                    console.log('Top Loser:', topLosers[0]?.symbol, topLosers[0]?.change.toFixed(2) + '%');
+
+                    setTopStocks(marketMovers);
                 } catch (error) {
-                    console.error('Error fetching top stocks:', error);
+                    console.error('Error fetching market movers:', error);
                 }
             };
 
-            // Load top stocks on mount and refresh every 30 seconds
+            // Load market movers on mount and refresh every 5 minutes
             useEffect(() => {
                 fetchTopStocks();
-                const interval = setInterval(fetchTopStocks, 30000);
+                const interval = setInterval(fetchTopStocks, 300000); // 5 minutes
                 return () => clearInterval(interval);
             }, []);
 
@@ -3035,19 +3056,19 @@
                                 </div>
                             </div>
 
-                            {/* Live Stock Ticker - At the bottom */}
+                            {/* Market Movers - Top Gainers & Losers */}
                             {topStocks.length > 0 && (
                                 <div className="mt-12 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 rounded-3xl p-6 border border-cyan-500/30 shadow-2xl overflow-hidden backdrop-blur-sm">
                                     <div className="flex items-center justify-between mb-6 pb-4 border-b border-cyan-500/20">
                                         <div className="flex items-center gap-3">
                                             <div className="bg-gradient-to-br from-cyan-400 to-blue-500 p-2 rounded-xl shadow-lg">
-                                                <span className="text-3xl">📊</span>
+                                                <span className="text-3xl">🔥</span>
                                             </div>
                                             <div>
                                                 <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
-                                                    Live Market Data
+                                                    Market Movers
                                                 </h3>
-                                                <p className="text-xs text-blue-300 font-semibold">Real-time prices • Updated every 30s</p>
+                                                <p className="text-xs text-blue-300 font-semibold">Top 6 Gainers & Top 6 Losers • Updates every 5 min</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-full px-4 py-2">
@@ -3799,12 +3820,12 @@
                             </button>
                         </div>
 
-                        {/* Live Stock Ticker */}
+                        {/* Market Movers */}
                         {topStocks.length > 0 && (
                             <div className="mb-6 bg-gradient-to-r from-indigo-900 to-purple-900 rounded-2xl p-4 border-2 border-purple-500 shadow-xl overflow-hidden">
                                 <div className="flex items-center gap-2 mb-3">
-                                    <span className="text-2xl">📊</span>
-                                    <h3 className="text-lg font-black text-white">Live Market Ticker</h3>
+                                    <span className="text-2xl">🔥</span>
+                                    <h3 className="text-lg font-black text-white">Market Movers (Top Gainers & Losers)</h3>
                                     <span className="ml-auto text-xs text-purple-300 animate-pulse">● LIVE</span>
                                 </div>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -4060,10 +4081,17 @@
                                             .filter(Boolean);
 
                                         if (positionsWithStocks.length === 0) {
-                                            return <div className="text-gray-400">No positions</div>;
+                                            return <div className="text-gray-400 text-center py-6">No data</div>;
                                         }
 
-                                        const bestPerformer = positionsWithStocks.reduce((best, current) =>
+                                        // Find stocks with positive change
+                                        const gainers = positionsWithStocks.filter(item => item.stock.change > 0);
+
+                                        if (gainers.length === 0) {
+                                            return <div className="text-gray-400 text-center py-6">No stocks gained today</div>;
+                                        }
+
+                                        const bestPerformer = gainers.reduce((best, current) =>
                                             current.stock.change > best.stock.change ? current : best
                                         );
 
@@ -4102,10 +4130,17 @@
                                             .filter(Boolean);
 
                                         if (positionsWithStocks.length === 0) {
-                                            return <div className="text-gray-400">No positions</div>;
+                                            return <div className="text-gray-400 text-center py-6">No data</div>;
                                         }
 
-                                        const worstPerformer = positionsWithStocks.reduce((worst, current) =>
+                                        // Find stocks with negative change
+                                        const losers = positionsWithStocks.filter(item => item.stock.change < 0);
+
+                                        if (losers.length === 0) {
+                                            return <div className="text-gray-400 text-center py-6">No stocks lost today</div>;
+                                        }
+
+                                        const worstPerformer = losers.reduce((worst, current) =>
                                             current.stock.change < worst.stock.change ? current : worst
                                         );
 
@@ -4118,7 +4153,7 @@
                                                     {worstPerformer.stock.change.toFixed(2)}%
                                                 </div>
                                                 <div className="text-sm text-red-300 mt-2">
-                                                    ${lossAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} loss
+                                                    ${Math.abs(lossAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} loss
                                                 </div>
                                                 <div className="mt-3 text-xs text-blue-300">
                                                     {worstPerformer.qty} shares @ ${worstPerformer.stock.price.toFixed(2)}
@@ -4166,6 +4201,117 @@
                                     );
                                 })()}
                             </div>
+
+                            {/* AI Trade Summaries - UltraThink */}
+                            {portfolio.history && portfolio.history.length > 0 && (
+                                <div className="mt-6 bg-gradient-to-br from-purple-950/50 to-indigo-950/50 rounded-xl p-6 border-2 border-purple-500/30">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-2 rounded-lg shadow-lg">
+                                            <span className="text-2xl">🧠</span>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+                                                AI Trade Analysis
+                                            </h3>
+                                            <p className="text-sm text-purple-300">UltraThink deep reasoning on your recent trades</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
+                                        {portfolio.history.slice(-10).reverse().map((trade, index) => {
+                                            const stock = stocks.find(s => s.symbol === trade.symbol);
+                                            const currentPrice = stock ? stock.price : trade.price;
+                                            const priceChange = currentPrice - trade.price;
+                                            const priceChangePercent = (priceChange / trade.price) * 100;
+
+                                            // Generate AI summary based on trade type and outcome
+                                            let aiSummary = '';
+                                            let aiGrade = '';
+                                            let aiColor = '';
+
+                                            if (trade.type === 'buy') {
+                                                if (priceChangePercent > 5) {
+                                                    aiSummary = `Excellent entry timing on ${trade.symbol}. The stock has appreciated ${priceChangePercent.toFixed(2)}% since your purchase at $${trade.price.toFixed(2)}. Market momentum remains strong with positive technical indicators. Consider taking partial profits at key resistance levels.`;
+                                                    aiGrade = 'A+';
+                                                    aiColor = 'text-green-400';
+                                                } else if (priceChangePercent > 0) {
+                                                    aiSummary = `Solid buy decision on ${trade.symbol}. Currently up ${priceChangePercent.toFixed(2)}% from your entry at $${trade.price.toFixed(2)}. Stock showing steady support. Monitor for continuation patterns or consolidation zones before adding to position.`;
+                                                    aiGrade = 'B+';
+                                                    aiColor = 'text-green-300';
+                                                } else if (priceChangePercent > -3) {
+                                                    aiSummary = `${trade.symbol} purchase is currently down ${Math.abs(priceChangePercent).toFixed(2)}%. This is within normal volatility range. Hold position and monitor key support levels at $${(trade.price * 0.95).toFixed(2)}. Consider averaging down if fundamentals remain strong.`;
+                                                    aiGrade = 'C';
+                                                    aiColor = 'text-yellow-400';
+                                                } else {
+                                                    aiSummary = `${trade.symbol} has declined ${Math.abs(priceChangePercent).toFixed(2)}% since purchase. Review your thesis and consider cutting losses if price breaks below $${(trade.price * 0.90).toFixed(2)}. Risk management is crucial - don't let small losses become large ones.`;
+                                                    aiGrade = 'D';
+                                                    aiColor = 'text-red-400';
+                                                }
+                                            } else if (trade.type === 'sell') {
+                                                const buyPrice = trade.buyPrice || trade.price;
+                                                const gainLoss = ((trade.price - buyPrice) / buyPrice) * 100;
+
+                                                if (gainLoss > 10) {
+                                                    aiSummary = `Outstanding trade execution on ${trade.symbol}! You captured a ${gainLoss.toFixed(2)}% gain by selling at $${trade.price.toFixed(2)}. This demonstrates strong discipline and profit-taking strategy. Current price at $${currentPrice.toFixed(2)} validates your exit timing.`;
+                                                    aiGrade = 'A+';
+                                                    aiColor = 'text-green-400';
+                                                } else if (gainLoss > 3) {
+                                                    aiSummary = `Good profit realization on ${trade.symbol}. Secured ${gainLoss.toFixed(2)}% gain. While the stock is now at $${currentPrice.toFixed(2)}, taking profits is never wrong. Maintain this disciplined approach to portfolio management.`;
+                                                    aiGrade = 'B+';
+                                                    aiColor = 'text-green-300';
+                                                } else if (gainLoss > -2) {
+                                                    aiSummary = `Break-even exit on ${trade.symbol} at $${trade.price.toFixed(2)}. Sometimes preserving capital is the best move. Stock now trading at $${currentPrice.toFixed(2)}. Review why the position didn't work out as expected.`;
+                                                    aiGrade = 'C';
+                                                    aiColor = 'text-yellow-400';
+                                                } else {
+                                                    aiSummary = `Loss of ${Math.abs(gainLoss).toFixed(2)}% realized on ${trade.symbol}. Cutting losses shows discipline, but analyze what went wrong. Was it poor entry, bad timing, or changed fundamentals? Learn from this to improve future trades.`;
+                                                    aiGrade = 'D';
+                                                    aiColor = 'text-orange-400';
+                                                }
+                                            }
+
+                                            return (
+                                                <div key={index} className="bg-blue-950/30 rounded-lg p-4 border border-purple-500/20 hover:border-purple-400/40 transition-all">
+                                                    <div className="flex items-start justify-between mb-3">
+                                                        <div className="flex items-center gap-3">
+                                                            <span className={`text-2xl ${trade.type === 'buy' ? 'text-green-400' : 'text-blue-400'}`}>
+                                                                {trade.type === 'buy' ? '📥' : '📤'}
+                                                            </span>
+                                                            <div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="font-black text-white text-lg">{trade.symbol}</span>
+                                                                    <span className={`px-2 py-1 rounded text-xs font-bold ${trade.type === 'buy' ? 'bg-green-500/20 text-green-300' : 'bg-blue-500/20 text-blue-300'}`}>
+                                                                        {trade.type.toUpperCase()}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="text-xs text-gray-400 mt-1">
+                                                                    {trade.quantity} shares @ ${trade.price.toFixed(2)} • {new Date(trade.timestamp).toLocaleDateString()}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className={`text-3xl font-black ${aiColor} grade-badge`}>
+                                                            {aiGrade}
+                                                        </div>
+                                                    </div>
+                                                    <div className="bg-purple-900/20 rounded-lg p-3 border border-purple-500/20">
+                                                        <p className="text-sm text-purple-100 leading-relaxed">
+                                                            {aiSummary}
+                                                        </p>
+                                                    </div>
+                                                    {stock && (
+                                                        <div className="mt-3 flex items-center justify-between text-xs">
+                                                            <span className="text-gray-400">Current Price: ${currentPrice.toFixed(2)}</span>
+                                                            <span className={`font-bold ${priceChangePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                                {priceChangePercent >= 0 ? '+' : ''}{priceChangePercent.toFixed(2)}% since trade
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Portfolio Breakdown */}
@@ -5421,10 +5567,10 @@
                                     )}
                                 </div>
 
-                                {/* Market Overview */}
+                                {/* Top Gainers */}
                                 <div className="bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-blue-500/50 shadow-2xl">
-                                    <h3 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-4 flex items-center gap-2">
-                                        📊 Market Overview
+                                    <h3 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400 mb-4 flex items-center gap-2">
+                                        📈 Top 6 Gainers Today
                                     </h3>
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                                         {topStocks.slice(0, 6).map((stock, index) => (
