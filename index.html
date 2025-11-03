@@ -4350,49 +4350,80 @@
                                             const priceChange = currentPrice - trade.price;
                                             const priceChangePercent = (priceChange / trade.price) * 100;
 
+                                            // Calculate time held
+                                            const tradeTime = new Date(trade.timestamp);
+                                            const holdMinutes = Math.floor((Date.now() - tradeTime.getTime()) / (1000 * 60));
+                                            const holdText = holdMinutes < 60 ? `${holdMinutes}min ago` : holdMinutes < 1440 ? `${Math.floor(holdMinutes/60)}h ago` : `${Math.floor(holdMinutes/1440)}d ago`;
+
                                             // Generate AI summary based on trade type and outcome
                                             let aiSummary = '';
                                             let aiGrade = '';
                                             let aiColor = '';
 
                                             if (trade.type === 'buy') {
-                                                if (priceChangePercent > 5) {
-                                                    aiSummary = `Excellent entry timing on ${trade.symbol}. The stock has appreciated ${priceChangePercent.toFixed(2)}% since your purchase at $${trade.price.toFixed(2)}. Market momentum remains strong with positive technical indicators. Consider taking partial profits at key resistance levels.`;
+                                                if (priceChangePercent > 10) {
+                                                    aiSummary = `🎯 EXCEPTIONAL ENTRY! ${trade.symbol} surged ${priceChangePercent.toFixed(2)}% since your buy at $${trade.price.toFixed(2)} (${holdText}). Strong bullish momentum. Target: $${(currentPrice * 1.15).toFixed(2)}. Stop-loss: $${(currentPrice * 0.93).toFixed(2)}. Consider scaling out 25-30% to lock gains while riding trend.`;
+                                                    aiGrade = 'A++';
+                                                    aiColor = 'text-green-400';
+                                                } else if (priceChangePercent > 5) {
+                                                    aiSummary = `✅ Excellent timing! ${trade.symbol} up ${priceChangePercent.toFixed(2)}% from $${trade.price.toFixed(2)}. Stock showing strength. Watch for breakout above $${(currentPrice * 1.05).toFixed(2)}. Trail stop at $${(currentPrice * 0.95).toFixed(2)} to protect profits. Bullish pattern forming.`;
                                                     aiGrade = 'A+';
                                                     aiColor = 'text-green-400';
+                                                } else if (priceChangePercent > 2) {
+                                                    aiSummary = `📊 Solid entry on ${trade.symbol}! Up ${priceChangePercent.toFixed(2)}% from $${trade.price.toFixed(2)}. Stock consolidating - healthy action. Resistance: $${(currentPrice * 1.08).toFixed(2)}. Support: $${(currentPrice * 0.96).toFixed(2)}. Good risk/reward setup.`;
+                                                    aiGrade = 'A';
+                                                    aiColor = 'text-green-300';
                                                 } else if (priceChangePercent > 0) {
-                                                    aiSummary = `Solid buy decision on ${trade.symbol}. Currently up ${priceChangePercent.toFixed(2)}% from your entry at $${trade.price.toFixed(2)}. Stock showing steady support. Monitor for continuation patterns or consolidation zones before adding to position.`;
+                                                    aiSummary = `🟢 Decent buy on ${trade.symbol}, +${priceChangePercent.toFixed(2)}% from $${trade.price.toFixed(2)}. Price holding above entry shows buyers. Watch $${(currentPrice * 1.03).toFixed(2)} breakout. If drops below $${(trade.price * 0.98).toFixed(2)}, reassess.`;
                                                     aiGrade = 'B+';
                                                     aiColor = 'text-green-300';
-                                                } else if (priceChangePercent > -3) {
-                                                    aiSummary = `${trade.symbol} purchase is currently down ${Math.abs(priceChangePercent).toFixed(2)}%. This is within normal volatility range. Hold position and monitor key support levels at $${(trade.price * 0.95).toFixed(2)}. Consider averaging down if fundamentals remain strong.`;
-                                                    aiGrade = 'C';
+                                                } else if (priceChangePercent > -2) {
+                                                    aiSummary = `⚠️ ${trade.symbol} down ${Math.abs(priceChangePercent).toFixed(2)}% from $${trade.price.toFixed(2)}. Normal volatility. Support at $${(trade.price * 0.97).toFixed(2)}. If holds, could bounce to $${(trade.price * 1.05).toFixed(2)}. Watch closely.`;
+                                                    aiGrade = 'C+';
                                                     aiColor = 'text-yellow-400';
+                                                } else if (priceChangePercent > -5) {
+                                                    aiSummary = `🔴 ${trade.symbol} down ${Math.abs(priceChangePercent).toFixed(2)}% from $${trade.price.toFixed(2)}. Set stop-loss at $${(trade.price * 0.92).toFixed(2)} (max -8%). If breaks $${(currentPrice * 0.97).toFixed(2)}, expect drop to $${(currentPrice * 0.92).toFixed(2)}. Consider exit on bounce.`;
+                                                    aiGrade = 'C-';
+                                                    aiColor = 'text-orange-400';
                                                 } else {
-                                                    aiSummary = `${trade.symbol} has declined ${Math.abs(priceChangePercent).toFixed(2)}% since purchase. Review your thesis and consider cutting losses if price breaks below $${(trade.price * 0.90).toFixed(2)}. Risk management is crucial - don't let small losses become large ones.`;
+                                                    aiSummary = `🚨 URGENT: ${trade.symbol} down ${Math.abs(priceChangePercent).toFixed(2)}% from $${trade.price.toFixed(2)}! CUT LOSSES at market or wait for bounce to $${(currentPrice * 1.02).toFixed(2)}. Risk management critical. Review what went wrong!`;
                                                     aiGrade = 'D';
                                                     aiColor = 'text-red-400';
                                                 }
                                             } else if (trade.type === 'sell') {
                                                 const buyPrice = trade.buyPrice || trade.price;
                                                 const gainLoss = ((trade.price - buyPrice) / buyPrice) * 100;
+                                                const dollarPL = (trade.price - buyPrice) * trade.quantity;
+                                                const afterMove = ((currentPrice - trade.price) / trade.price) * 100;
 
-                                                if (gainLoss > 10) {
-                                                    aiSummary = `Outstanding trade execution on ${trade.symbol}! You captured a ${gainLoss.toFixed(2)}% gain by selling at $${trade.price.toFixed(2)}. This demonstrates strong discipline and profit-taking strategy. Current price at $${currentPrice.toFixed(2)} validates your exit timing.`;
+                                                if (gainLoss > 15) {
+                                                    aiSummary = `🏆 MASTERFUL! ${trade.symbol} +${gainLoss.toFixed(2)}% (${dollarPL >= 0 ? '+' : ''}$${dollarPL.toFixed(2)}) selling at $${trade.price.toFixed(2)}. Now $${currentPrice.toFixed(2)} (${afterMove >= 0 ? '+' : ''}${afterMove.toFixed(1)}%). ${afterMove < -2 ? 'PERFECT timing! Avoided pullback.' : 'Excellent exit!'} Study this trade!`;
+                                                    aiGrade = 'A++';
+                                                    aiColor = 'text-green-400';
+                                                } else if (gainLoss > 8) {
+                                                    aiSummary = `🎉 Excellent! ${trade.symbol} +${gainLoss.toFixed(2)}% (${dollarPL >= 0 ? '+' : ''}$${dollarPL.toFixed(2)}) at $${trade.price.toFixed(2)}. Now $${currentPrice.toFixed(2)}. ${afterMove > 3 ? `Left ${afterMove.toFixed(1)}% more but profit is profit!` : 'Great timing!'} Disciplined execution.`;
                                                     aiGrade = 'A+';
                                                     aiColor = 'text-green-400';
                                                 } else if (gainLoss > 3) {
-                                                    aiSummary = `Good profit realization on ${trade.symbol}. Secured ${gainLoss.toFixed(2)}% gain. While the stock is now at $${currentPrice.toFixed(2)}, taking profits is never wrong. Maintain this disciplined approach to portfolio management.`;
+                                                    aiSummary = `✅ Good profit on ${trade.symbol}: +${gainLoss.toFixed(2)}% (${dollarPL >= 0 ? '+' : ''}$${dollarPL.toFixed(2)}). Sold $${trade.price.toFixed(2)}, now $${currentPrice.toFixed(2)}. ${afterMove < -3 ? 'Dodged pullback!' : 'Solid trade.'} Small wins compound!`;
                                                     aiGrade = 'B+';
                                                     aiColor = 'text-green-300';
-                                                } else if (gainLoss > -2) {
-                                                    aiSummary = `Break-even exit on ${trade.symbol} at $${trade.price.toFixed(2)}. Sometimes preserving capital is the best move. Stock now trading at $${currentPrice.toFixed(2)}. Review why the position didn't work out as expected.`;
+                                                } else if (gainLoss > 0) {
+                                                    aiSummary = `🟢 Small win: ${trade.symbol} +${gainLoss.toFixed(2)}% (${dollarPL >= 0 ? '+' : ''}$${dollarPL.toFixed(2)}) at $${trade.price.toFixed(2)}. Better entry timing could improve results. Review why gain was limited.`;
+                                                    aiGrade = 'B';
+                                                    aiColor = 'text-green-300';
+                                                } else if (gainLoss > -3) {
+                                                    aiSummary = `⚪ Break-even: ${trade.symbol} ${gainLoss.toFixed(2)}% (${dollarPL >= 0 ? '+' : ''}$${dollarPL.toFixed(2)}) at $${trade.price.toFixed(2)}. Capital preserved. Analyze why it didn't work. No edge detected.`;
                                                     aiGrade = 'C';
                                                     aiColor = 'text-yellow-400';
-                                                } else {
-                                                    aiSummary = `Loss of ${Math.abs(gainLoss).toFixed(2)}% realized on ${trade.symbol}. Cutting losses shows discipline, but analyze what went wrong. Was it poor entry, bad timing, or changed fundamentals? Learn from this to improve future trades.`;
-                                                    aiGrade = 'D';
+                                                } else if (gainLoss > -8) {
+                                                    aiSummary = `🔻 Loss: ${trade.symbol} ${gainLoss.toFixed(2)}% (${dollarPL >= 0 ? '+' : ''}$${dollarPL.toFixed(2)}) at $${trade.price.toFixed(2)}. Cutting losses = discipline! ${afterMove < -5 ? 'Saved from bigger loss!' : 'Review entry setup.'} Keep losses small!`;
+                                                    aiGrade = 'C-';
                                                     aiColor = 'text-orange-400';
+                                                } else {
+                                                    aiSummary = `🚨 Big loss: ${trade.symbol} ${gainLoss.toFixed(2)}% (${dollarPL >= 0 ? '+' : ''}$${dollarPL.toFixed(2)}). REVIEW: Flawed thesis? Ignored stop? Size too big? ${afterMove < -5 ? 'At least you exited.' : ''} Learn, adapt, manage risk!`;
+                                                    aiGrade = 'D';
+                                                    aiColor = 'text-red-400';
                                                 }
                                             }
 
