@@ -218,6 +218,43 @@
                 fetchPositionStocks();
             }, [competition, currentUserId]);
 
+            // Levenshtein distance for fuzzy matching
+            const levenshteinDistance = (str1, str2) => {
+                const matrix = [];
+
+                for (let i = 0; i <= str2.length; i++) {
+                    matrix[i] = [i];
+                }
+
+                for (let j = 0; j <= str1.length; j++) {
+                    matrix[0][j] = j;
+                }
+
+                for (let i = 1; i <= str2.length; i++) {
+                    for (let j = 1; j <= str1.length; j++) {
+                        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+                            matrix[i][j] = matrix[i - 1][j - 1];
+                        } else {
+                            matrix[i][j] = Math.min(
+                                matrix[i - 1][j - 1] + 1, // substitution
+                                matrix[i][j - 1] + 1,     // insertion
+                                matrix[i - 1][j] + 1      // deletion
+                            );
+                        }
+                    }
+                }
+
+                return matrix[str2.length][str1.length];
+            };
+
+            // Calculate similarity score (0-100, higher is better)
+            const calculateSimilarity = (query, target) => {
+                const distance = levenshteinDistance(query.toLowerCase(), target.toLowerCase());
+                const maxLength = Math.max(query.length, target.length);
+                const similarity = ((maxLength - distance) / maxLength) * 100;
+                return similarity;
+            };
+
             const searchStocks = async (query) => {
                 if (!query || query.length < 1) {
                     setSearchResults([]);
@@ -233,8 +270,8 @@
                 try {
                     const searchTerm = query.toLowerCase();
 
-                    // Search in stock database
-                    const results = STOCK_DATABASE
+                    // First, try exact/partial matches
+                    let results = STOCK_DATABASE
                         .filter(stock =>
                             stock.symbol.toLowerCase().includes(searchTerm) ||
                             stock.name.toLowerCase().includes(searchTerm)
@@ -245,8 +282,42 @@
                             name: stock.name,
                             type: 'EQUITY',
                             region: 'US',
-                            currency: 'USD'
+                            currency: 'USD',
+                            similarity: 100 // Exact/partial matches get full score
                         }));
+
+                    // If no exact matches, use fuzzy matching
+                    if (results.length === 0) {
+                        console.log('🔍 No exact matches, using fuzzy search...');
+
+                        const fuzzyResults = STOCK_DATABASE
+                            .map(stock => {
+                                // Calculate similarity for both symbol and name
+                                const symbolSimilarity = calculateSimilarity(searchTerm, stock.symbol);
+                                const nameSimilarity = calculateSimilarity(searchTerm, stock.name);
+
+                                // Use the higher similarity score
+                                const bestSimilarity = Math.max(symbolSimilarity, nameSimilarity);
+
+                                return {
+                                    symbol: stock.symbol,
+                                    name: stock.name,
+                                    type: 'EQUITY',
+                                    region: 'US',
+                                    currency: 'USD',
+                                    similarity: bestSimilarity
+                                };
+                            })
+                            .filter(item => item.similarity >= 50) // Only show if >50% similar
+                            .sort((a, b) => b.similarity - a.similarity) // Sort by similarity
+                            .slice(0, 10);
+
+                        results = fuzzyResults;
+
+                        if (results.length > 0) {
+                            console.log(`✅ Found ${results.length} fuzzy matches:`, results.map(r => `${r.symbol} (${r.similarity.toFixed(0)}% match)`));
+                        }
+                    }
 
                     console.log('Search Results:', results);
 
@@ -272,7 +343,8 @@
                                         name: `${upperQuery}`,
                                         type: 'EQUITY',
                                         region: 'US',
-                                        currency: 'USD'
+                                        currency: 'USD',
+                                        similarity: 100
                                     }]);
                                 } else {
                                     // Not a valid stock
