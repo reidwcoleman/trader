@@ -40,6 +40,14 @@
         // Available: db, dbReady, SQLiteDB, initDatabase(), saveDatabase()
         // Available: FINNHUB_API_KEY, FINNHUB_API_BASE, STOCK_DATABASE, etc.
 
+        // Backend API Configuration
+        // IMPORTANT: Change this to your deployed backend URL (e.g., Render, Railway, Heroku)
+        // For local development: 'http://localhost:3001'
+        // For production: 'https://your-backend-app.onrender.com' or your deployed URL
+        const API_BASE_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:3001'
+            : 'https://your-backend-url.onrender.com'; // TODO: Replace with actual deployed backend URL
+
         const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');
             const [plan, setPlan] = useState(null);
@@ -149,7 +157,7 @@
 
             // Initialize Socket.io connection for chat
             useEffect(() => {
-                const newSocket = io('http://localhost:3001');
+                const newSocket = io(API_BASE_URL);
                 setSocket(newSocket);
 
                 // Listen for chat history
@@ -921,7 +929,7 @@
                         const passcode = generatePasscode();
 
                         // Create account on backend server
-                        const response = await fetch('http://localhost:3001/api/accounts/create', {
+                        const response = await fetch(`${API_BASE_URL}/api/accounts/create`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -1366,7 +1374,7 @@
                 // Sync to backend server for personal accounts
                 if (plan === 'personal' && userEmail) {
                     try {
-                        await fetch('http://localhost:3001/api/accounts/update-portfolio', {
+                        await fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -1425,7 +1433,7 @@
                 // Sync to backend server for personal accounts
                 if (plan === 'personal' && userEmail) {
                     try {
-                        await fetch('http://localhost:3001/api/accounts/update-portfolio', {
+                        await fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -2049,7 +2057,7 @@
                 // Sync to backend server for personal accounts
                 if (plan === 'personal' && userEmail) {
                     try {
-                        await fetch('http://localhost:3001/api/accounts/update-portfolio', {
+                        await fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -3557,7 +3565,7 @@
                                                     setLoading(true);
                                                     try {
                                                         // Login via backend server
-                                                        const response = await fetch('http://localhost:3001/api/accounts/login', {
+                                                        const response = await fetch(`${API_BASE_URL}/api/accounts/login`, {
                                                             method: 'POST',
                                                             headers: { 'Content-Type': 'application/json' },
                                                             body: JSON.stringify({
