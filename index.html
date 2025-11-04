@@ -709,21 +709,18 @@
                     )
                 }));
 
-                // Sync to backend server
+                // Sync to backend server (non-blocking)
                 if (plan === 'personal' && userEmail) {
-                    try {
-                        await fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                email: userEmail,
-                                portfolio: updatedPortfolio
-                            })
-                        });
-                        console.log('✅ Watchlist synced to backend');
-                    } catch (error) {
-                        console.error('Error syncing watchlist to backend:', error);
-                    }
+                    fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: userEmail,
+                            portfolio: updatedPortfolio
+                        })
+                    })
+                    .then(() => console.log('✅ Watchlist synced to backend'))
+                    .catch(error => console.error('Error syncing watchlist to backend:', error));
                 }
 
                 // Add to stocks array or update if exists
@@ -772,21 +769,18 @@
                     )
                 }));
 
-                // Sync to backend server
+                // Sync to backend server (non-blocking)
                 if (plan === 'personal' && userEmail) {
-                    try {
-                        await fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                email: userEmail,
-                                portfolio: updatedPortfolio
-                            })
-                        });
-                        console.log('✅ Watchlist synced to backend');
-                    } catch (error) {
-                        console.error('Error syncing watchlist to backend:', error);
-                    }
+                    fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: userEmail,
+                            portfolio: updatedPortfolio
+                        })
+                    })
+                    .then(() => console.log('✅ Watchlist synced to backend'))
+                    .catch(error => console.error('Error syncing watchlist to backend:', error));
                 }
             };
 
@@ -4911,19 +4905,16 @@
                                                             )
                                                         }));
                                                         if (plan === 'personal' && userEmail) {
-                                                            try {
-                                                                await fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
-                                                                    method: 'POST',
-                                                                    headers: { 'Content-Type': 'application/json' },
-                                                                    body: JSON.stringify({
-                                                                        email: userEmail,
-                                                                        portfolio: updatedPortfolio
-                                                                    })
-                                                                });
-                                                                console.log('✅ Watchlist synced to backend');
-                                                            } catch (error) {
-                                                                console.error('Error syncing watchlist to backend:', error);
-                                                            }
+                                                            fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
+                                                                method: 'POST',
+                                                                headers: { 'Content-Type': 'application/json' },
+                                                                body: JSON.stringify({
+                                                                    email: userEmail,
+                                                                    portfolio: updatedPortfolio
+                                                                })
+                                                            })
+                                                            .then(() => console.log('✅ Watchlist synced to backend'))
+                                                            .catch(error => console.error('Error syncing watchlist to backend:', error));
                                                         }
                                                     }}
                                                     className="mt-4 w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white py-3 rounded-xl font-bold text-lg transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2"
