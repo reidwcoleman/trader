@@ -15,8 +15,13 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
+        origin: [
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'https://reidwcoleman.github.io'
+        ],
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 const PORT = process.env.PORT || 3001;
@@ -101,8 +106,17 @@ function writeChatMessages(messages) {
     }
 }
 
-// Middleware
-app.use(cors());
+// Middleware - Configure CORS to allow requests from GitHub Pages
+app.use(cors({
+    origin: [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'https://reidwcoleman.github.io'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Email transporter configuration

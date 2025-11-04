@@ -114,13 +114,31 @@ const API_BASE_URL = window.location.hostname === 'localhost'
     : 'https://finclash-backend.onrender.com'; // ← Replace with YOUR Render URL
 ```
 
+**IMPORTANT:** Also update `server.js` CORS configuration with your GitHub Pages URL:
+
+```javascript
+// Line 105-114 in server.js
+app.use(cors({
+    origin: [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'https://your-username.github.io'  // ← Replace with YOUR GitHub Pages URL
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+```
+
 Commit and push:
 
 ```bash
-git add index.html
-git commit -m "Update production API URL for Render backend"
+git add index.html server.js
+git commit -m "Update production API URL and CORS for Render backend"
 git push
 ```
+
+This will trigger Render to redeploy with the updated CORS settings.
 
 ## Step 10: Verify Cross-Device Login
 
