@@ -20,25 +20,21 @@
 
     <!-- External JavaScript modules -->
     <script src="js/config.js"></script>
-    <script src="js/database.js"></script>
+    <!-- database.js removed - using backend server API only -->
     <script src="js/crypto-utils.js"></script>
     <script src="js/analytics.js"></script>
     <script src="js/news-feed.js"></script>
     <script src="js/short-selling.js"></script>
     <script src="js/security.js"></script>
 
-    <!-- Initialize database on page load -->
-    <script>
-        // Initialize database when page loads
-        initDatabase();
-    </script>
+    <!-- Database initialization removed - using backend server only -->
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // Database and config are loaded from external JS files
-        // Available: db, dbReady, SQLiteDB, initDatabase(), saveDatabase()
+        // Config loaded from external JS file
         // Available: FINNHUB_API_KEY, FINNHUB_API_BASE, STOCK_DATABASE, etc.
+        // All user data stored on backend server (not localStorage)
 
         // Backend API Configuration
         // IMPORTANT: Change this to your deployed backend URL (e.g., Render, Railway, Heroku)
@@ -713,12 +709,20 @@
                     )
                 }));
 
-                // Sync to SQLite database
-                if (competition?.code && plan === 'personal' && dbReady) {
+                // Sync to backend server
+                if (plan === 'personal' && userEmail) {
                     try {
-                        SQLiteDB.updateAccount(competition.code, updatedPortfolio);
+                        await fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                email: userEmail,
+                                portfolio: updatedPortfolio
+                            })
+                        });
+                        console.log('✅ Watchlist synced to backend');
                     } catch (error) {
-                        console.error('Error syncing watchlist to SQLite:', error);
+                        console.error('Error syncing watchlist to backend:', error);
                     }
                 }
 
@@ -768,12 +772,20 @@
                     )
                 }));
 
-                // Sync to SQLite database
-                if (competition?.code && plan === 'personal' && dbReady) {
+                // Sync to backend server
+                if (plan === 'personal' && userEmail) {
                     try {
-                        SQLiteDB.updateAccount(competition.code, updatedPortfolio);
+                        await fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                email: userEmail,
+                                portfolio: updatedPortfolio
+                            })
+                        });
+                        console.log('✅ Watchlist synced to backend');
                     } catch (error) {
-                        console.error('Error syncing watchlist to SQLite:', error);
+                        console.error('Error syncing watchlist to backend:', error);
                     }
                 }
             };
@@ -1154,102 +1166,15 @@
             };
 
             const signInWithEmailAndPasscode = async (email, passcode) => {
-                try {
-                    console.log('Signing in with email and passcode:', email);
-
-                    // Use SQLite database
-                    if (!dbReady) {
-                        alert('Database is still loading. Please wait a moment and try again.');
-                        return;
-                    }
-
-                    const accountData = SQLiteDB.getAccountByEmailAndPasscode(email, passcode);
-
-                    if (!accountData) {
-                        alert('Invalid email or passcode! Please check your credentials and try again.');
-                        console.error('Account not found for email:', email);
-                        return;
-                    }
-
-                    console.log('✅ Personal account loaded:', accountData);
-
-                    const memberId = Date.now().toString();
-                    const loadedCompetition = {
-                        code: accountData.account_code,
-                        totalPool: 0,
-                        startTime: accountData.created_at,
-                        members: [{
-                            id: memberId,
-                            name: accountData.user_name,
-                            contribution: 0,
-                            portfolio: accountData.portfolio,
-                            joinedAt: accountData.created_at
-                        }]
-                    };
-
-                    setCompetition(loadedCompetition);
-                    setCompetitionCode(accountData.account_code);
-                    setCurrentUserId(memberId);
-                    setUserName(accountData.user_name);
-                    setUserEmail(email);
-                    setPlan('personal');
-                    setView('trading');
-
-                    console.log('✅ Signed in to personal account successfully');
-                } catch (error) {
-                    console.error('Error signing in to personal account:', error);
-                    alert('Failed to sign in. Please try again.');
-                }
+                // This function is deprecated - use backend API login instead
+                console.warn('signInWithEmailAndPasscode is deprecated. Use backend API login.');
+                alert('Please use the Sign In button instead.');
             };
 
             const signInToPersonalAccount = async (accountCode) => {
-                try {
-                    console.log('Signing in to personal account:', accountCode);
-
-                    let accountData = null;
-
-                    // Use SQLite database
-                    if (!dbReady) {
-                        alert('Database is still loading. Please wait a moment and try again.');
-                        return;
-                    }
-
-                    accountData = SQLiteDB.getAccount(accountCode);
-
-                    if (!accountData) {
-                        alert('Account not found! Please check your account code and try again.');
-                        console.error('Account not found for code:', accountCode);
-                        return;
-                    }
-
-                    console.log('✅ Personal account loaded:', accountData);
-
-                    const memberId = Date.now().toString();
-                    const loadedCompetition = {
-                        code: accountData.account_code,
-                        totalPool: 0,
-                        startTime: accountData.created_at,
-                        members: [{
-                            id: memberId,
-                            name: accountData.user_name,
-                            contribution: 0,
-                            portfolio: accountData.portfolio,
-                            joinedAt: accountData.created_at
-                        }]
-                    };
-
-                    setCompetition(loadedCompetition);
-                    setCompetitionCode(accountData.account_code);
-                    setCurrentUserId(memberId);
-                    setUserName(accountData.user_name);
-                    setPlan('personal');
-                    setView('trading');
-
-                    console.log('✅ Signed in to personal account successfully');
-                } catch (error) {
-                    console.error('Error signing in to personal account:', error);
-                    alert('Failed to sign in. Please try again.');
-                }
+                // This function is deprecated - use backend API login instead
+                console.warn('signInToPersonalAccount is deprecated. Use backend API login.');
+                alert('Please use the Sign In button with your email and password.');
             };
 
             // Helper to calculate max shares you can buy
@@ -4985,11 +4910,19 @@
                                                                 m.id === currentUserId ? { ...m, portfolio: updatedPortfolio } : m
                                                             )
                                                         }));
-                                                        if (competition?.code && plan === 'personal' && dbReady) {
+                                                        if (plan === 'personal' && userEmail) {
                                                             try {
-                                                                SQLiteDB.updateAccount(competition.code, updatedPortfolio);
+                                                                await fetch(`${API_BASE_URL}/api/accounts/update-portfolio`, {
+                                                                    method: 'POST',
+                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                    body: JSON.stringify({
+                                                                        email: userEmail,
+                                                                        portfolio: updatedPortfolio
+                                                                    })
+                                                                });
+                                                                console.log('✅ Watchlist synced to backend');
                                                             } catch (error) {
-                                                                console.error('Error syncing watchlist to SQLite:', error);
+                                                                console.error('Error syncing watchlist to backend:', error);
                                                             }
                                                         }
                                                     }}
