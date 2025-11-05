@@ -2378,8 +2378,15 @@
 
                     const response = await fetch(url);
 
+                    // Check for rate limiting (403) - silently fall back
+                    if (response.status === 403) {
+                        console.log(`⚠️ API rate limit reached - using simulated data for ${symbol}`);
+                        return null;
+                    }
+
                     if (!response.ok) {
-                        throw new Error(`Finnhub API error: ${response.status} ${response.statusText}`);
+                        console.log(`⚠️ API unavailable (${response.status}) - using simulated data`);
+                        return null;
                     }
 
                     const data = await response.json();
@@ -2414,18 +2421,15 @@
 
                         return { labels, data: prices };
                     } else if (data.s === 'no_data') {
-                        console.warn(`⚠️ No historical data available for ${symbol} from Finnhub`);
+                        console.log(`ℹ️ No data available from API for ${symbol}`);
                         return null;
                     } else {
-                        console.warn(`⚠️ Unexpected response from Finnhub for ${symbol}:`, data);
+                        console.log(`ℹ️ Using simulated data for ${symbol}`);
                         return null;
                     }
                 } catch (error) {
-                    console.error(`❌ Error fetching historical data for ${symbol}:`, error);
-                    console.error('Error details:', {
-                        message: error.message,
-                        type: error.name
-                    });
+                    // Silently handle errors and fall back to simulated data
+                    console.log(`ℹ️ Using simulated chart data for ${symbol}`);
                     return null;
                 }
             };
@@ -2471,12 +2475,11 @@
 
                     // Fallback to generated data if API fails
                     if (!historicalData) {
-                        console.warn(`⚠️ Finnhub API unavailable - using simulated data for ${selectedStock}`);
-                        console.warn('This could be due to API rate limiting or symbol not found');
+                        console.log(`📊 Using simulated chart data for ${selectedStock}`);
                         historicalData = generateFallbackHistoricalData(stock.price);
                         setIsRealChartData(false);
                     } else {
-                        console.log(`✅ Real chart data loaded successfully from Finnhub for ${selectedStock}`);
+                        console.log(`✅ Real chart data loaded for ${selectedStock}`);
                         setIsRealChartData(true);
                     }
 
