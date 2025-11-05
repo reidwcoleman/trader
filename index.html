@@ -1246,30 +1246,109 @@
                 const previousClose = stock.previousClose || price;
                 const priceChange = stock.change || 0;
 
-                // REAL CALCULATION: RSI (Relative Strength Index) from price momentum
-                const calculateRSI = () => {
-                    // Use daily price change as momentum indicator
+                // REAL CALCULATION: Enhanced RSI (Relative Strength Index) using historical data
+                const calculateEnhancedRSI = async () => {
+                    try {
+                        // Fetch 14 days of historical data for proper RSI calculation
+                        const toDate = Math.floor(Date.now() / 1000);
+                        const fromDate = toDate - (14 * 24 * 60 * 60); // 14 days
+
+                        const response = await fetch(
+                            `${FINNHUB_API_BASE}/stock/candle?symbol=${selectedStock}&resolution=D&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`
+                        );
+                        const data = await response.json();
+
+                        if (data.s === 'ok' && data.c && data.c.length >= 14) {
+                            const closes = data.c;
+
+                            // Calculate 14-day RSI
+                            let gains = 0;
+                            let losses = 0;
+
+                            for (let i = 1; i < closes.length; i++) {
+                                const change = closes[i] - closes[i - 1];
+                                if (change > 0) {
+                                    gains += change;
+                                } else {
+                                    losses += Math.abs(change);
+                                }
+                            }
+
+                            const avgGain = gains / (closes.length - 1);
+                            const avgLoss = (losses / (closes.length - 1)) + 0.0001; // Prevent division by zero
+                            const rs = avgGain / avgLoss;
+                            const rsi = 100 - (100 / (1 + rs));
+
+                            return Math.max(0, Math.min(100, rsi));
+                        }
+                    } catch (error) {
+                        console.log('⚠️ Using simplified RSI due to API error');
+                    }
+
+                    // Fallback to simplified RSI if API fails
                     const priceChangeAmount = price - previousClose;
                     const gain = Math.max(0, priceChangeAmount);
                     const loss = Math.max(0, -priceChangeAmount);
 
-                    // If no change, return neutral RSI of 50
-                    if (gain === 0 && loss === 0) {
-                        return 50;
-                    }
+                    if (gain === 0 && loss === 0) return 50;
 
-                    // Simplified RSI calculation based on single-day momentum
-                    // Normalize by price for percentage-based calculation
                     const avgGain = (gain / previousClose) * 100;
-                    const avgLoss = (loss / previousClose) * 100 + 0.01; // Prevent division by zero
+                    const avgLoss = (loss / previousClose) * 100 + 0.01;
                     const rs = avgGain / avgLoss;
                     const rsi = 100 - (100 / (1 + rs));
 
                     return Math.max(0, Math.min(100, rsi));
                 };
 
-                const rsi = calculateRSI();
-                console.log('📊 Real RSI calculated:', rsi.toFixed(1));
+                const rsi = await calculateEnhancedRSI();
+                console.log('📊 Real 14-day RSI calculated:', rsi.toFixed(1));
+
+                // REAL CALCULATION: Moving Averages (50-day and 200-day)
+                const calculateMovingAverages = async () => {
+                    try {
+                        const toDate = Math.floor(Date.now() / 1000);
+                        const fromDate = toDate - (250 * 24 * 60 * 60); // 250 days for 200-day MA
+
+                        const response = await fetch(
+                            `${FINNHUB_API_BASE}/stock/candle?symbol=${selectedStock}&resolution=D&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`
+                        );
+                        const data = await response.json();
+
+                        if (data.s === 'ok' && data.c && data.c.length > 0) {
+                            const closes = data.c;
+
+                            // 50-day MA
+                            let ma50 = null;
+                            if (closes.length >= 50) {
+                                const last50 = closes.slice(-50);
+                                ma50 = last50.reduce((sum, val) => sum + val, 0) / 50;
+                            }
+
+                            // 200-day MA
+                            let ma200 = null;
+                            if (closes.length >= 200) {
+                                const last200 = closes.slice(-200);
+                                ma200 = last200.reduce((sum, val) => sum + val, 0) / 200;
+                            }
+
+                            return { ma50, ma200 };
+                        }
+                    } catch (error) {
+                        console.log('⚠️ Could not fetch moving averages');
+                    }
+                    return { ma50: null, ma200: null };
+                };
+
+                const { ma50, ma200 } = await calculateMovingAverages();
+                console.log('📈 Moving Averages - MA50:', ma50?.toFixed(2), 'MA200:', ma200?.toFixed(2));
+
+                // Trend analysis from moving averages
+                const trendSignal = ma50 && ma200 ?
+                    (ma50 > ma200 && price > ma50 ? 'Strong Uptrend (Golden Cross)' :
+                     ma50 > ma200 ? 'Uptrend' :
+                     ma50 < ma200 && price < ma50 ? 'Strong Downtrend (Death Cross)' :
+                     'Downtrend') :
+                    (price > previousClose ? 'Upward' : 'Downward');
 
                 // REAL CALCULATION: Intraday Volatility from high/low range
                 const intradayVolatility = ((high - low) / low * 100);
@@ -1280,8 +1359,8 @@
                 console.log('⚡ Real price momentum:', momentum.toFixed(2) + '%');
 
                 // REAL CALCULATION: Support and Resistance from actual price action
-                const support = (low * 0.98).toFixed(2); // 2% below daily low
-                const resistance = (high * 1.02).toFixed(2); // 2% above daily high
+                const support = ma50 ? Math.min(ma50, low * 0.98).toFixed(2) : (low * 0.98).toFixed(2);
+                const resistance = ma50 ? Math.max(ma50 * 1.02, high * 1.02).toFixed(2) : (high * 1.02).toFixed(2);
 
                 // TECHNICAL ANALYSIS based on real RSI and momentum
                 const isOverbought = rsi > 70;
@@ -1343,13 +1422,24 @@
                 const sentimentScoreNormalized = sentimentScore / 25; // Scale to similar range
                 const momentumScore = momentum / 2;
 
+                // Moving average trend score
+                let trendScore = 0;
+                if (ma50 && ma200) {
+                    if (ma50 > ma200 && price > ma50) trendScore = 4; // Strong uptrend
+                    else if (ma50 > ma200) trendScore = 2; // Uptrend
+                    else if (ma50 < ma200 && price < ma50) trendScore = -4; // Strong downtrend
+                    else trendScore = -2; // Downtrend
+                } else if (ma50) {
+                    trendScore = price > ma50 ? 2 : -2;
+                }
+
                 // Adjust for overbought/oversold
                 let adjustedTechnicalScore = technicalScore;
                 if (isOverbought) adjustedTechnicalScore -= 3;
                 if (isOversold) adjustedTechnicalScore += 3;
 
-                // Weighted composite score: Technical (40%), Sentiment (35%), Momentum (25%)
-                const compositeScore = (adjustedTechnicalScore * 0.4) + (sentimentScoreNormalized * 0.35) + (momentumScore * 0.25);
+                // Enhanced weighted composite score: Technical (30%), Sentiment (25%), Momentum (20%), Trend (25%)
+                const compositeScore = (adjustedTechnicalScore * 0.3) + (sentimentScoreNormalized * 0.25) + (momentumScore * 0.2) + (trendScore * 0.25);
 
                 // Risk-adjusted confidence
                 const riskAdjustment = riskLevel === 'High' ? -15 : riskLevel === 'Moderate' ? -5 : 0;
@@ -1376,11 +1466,14 @@
 
                     technical: {
                         signal: technicalSignal,
+                        trend: trendSignal,
                         priceChange: priceChange.toFixed(2),
                         currentPrice: price.toFixed(2),
                         support: support,
                         resistance: resistance,
                         rsi: rsi.toFixed(1),
+                        ma50: ma50?.toFixed(2) || 'N/A',
+                        ma200: ma200?.toFixed(2) || 'N/A',
                         momentum: momentum.toFixed(2),
                         volatility: intradayVolatility.toFixed(2),
                         open: open.toFixed(2),
@@ -1420,14 +1513,15 @@
                         confidence: overallRecommendation.confidence.toFixed(1),
                         color: overallRecommendation.color,
                         reasoning: [
-                            `📊 Real RSI at ${rsi.toFixed(1)} shows ${technicalSignal.toLowerCase()} conditions with ${momentum >= 0 ? 'positive' : 'negative'} momentum (${momentum >= 0 ? '+' : ''}${momentum.toFixed(2)}% from open)`,
+                            `📊 Real 14-day RSI at ${rsi.toFixed(1)} shows ${technicalSignal.toLowerCase()} conditions with ${momentum >= 0 ? 'positive' : 'negative'} momentum (${momentum >= 0 ? '+' : ''}${momentum.toFixed(2)}% from open)`,
+                            `📈 Trend Analysis: ${trendSignal}${ma50 && ma200 ? ` (MA50: $${ma50.toFixed(2)}, MA200: $${ma200.toFixed(2)}, Current: $${price.toFixed(2)})` : ''}`,
                             `📰 Sentiment analysis of ${stockNews.length} articles: ${positiveCount} positive, ${negativeCount} negative, ${neutralCount} neutral (Score: ${sentimentScore.toFixed(0)}/100)`,
                             `⚡ Intraday volatility at ${intradayVolatility.toFixed(2)}% with ${riskLevel.toLowerCase()} risk profile (Risk score: ${riskRating}/10)`,
                             `💡 ${overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Buy' ?
-                                `Technical and sentiment align for bullish entry. Consider ${momentum > 0 ? 'buying on strength' : 'buying on dips near support at $${support}'}` :
+                                `Multiple indicators align for bullish entry. ${trendSignal.includes('Uptrend') ? 'Trend supports upward move.' : ''} Consider ${momentum > 0 ? 'buying on strength' : 'buying on dips near support at $${support}'}` :
                                 overallRecommendation.action === 'Strong Sell' || overallRecommendation.action === 'Sell' ?
-                                `Indicators suggest caution. ${isOverbought ? 'RSI overbought suggests profit-taking' : 'Consider protective stops or exit strategies'}` :
-                                `Mixed signals warrant patience. Wait for ${rsi < 50 ? 'upward momentum' : 'clearer direction'} before committing capital`}`
+                                `Multiple indicators suggest caution. ${trendSignal.includes('Downtrend') ? 'Trend shows weakness.' : ''} ${isOverbought ? 'RSI overbought suggests profit-taking' : 'Consider protective stops or exit strategies'}` :
+                                `Mixed signals warrant patience. ${trendSignal} trend requires confirmation. Wait for ${rsi < 50 ? 'upward momentum' : 'clearer direction'} before committing capital`}`
                         ],
                         strategy: overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Buy' ?
                                 'Long position with tight stops' :
@@ -2064,49 +2158,161 @@
 
                 const winRate = sellTrades.length > 0 ? (profitableTrades / sellTrades.length) * 100 : 0;
 
-                // Generate AI commentary
+                // Generate Enhanced AI commentary with risk-reward analysis
                 const commentary = [];
 
-                if (winRate >= 70) {
-                    commentary.push("Outstanding day! You're trading with confidence and precision.");
+                // Performance commentary
+                if (winRate >= 70 && totalProfitLoss > 0) {
+                    commentary.push(`🎯 Exceptional performance today! ${winRate.toFixed(1)}% win rate with $${totalProfitLoss.toFixed(2)} profit shows strong trading discipline.`);
+                } else if (winRate >= 70) {
+                    commentary.push(`🎯 Great win rate at ${winRate.toFixed(1)}%, but watch position sizing - winners aren't big enough relative to losers.`);
+                } else if (winRate >= 50 && totalProfitLoss > 0) {
+                    commentary.push(`✅ Solid day with ${winRate.toFixed(1)}% win rate. Your risk-reward ratio is working in your favor.`);
                 } else if (winRate >= 50) {
-                    commentary.push("Good day overall. More wins than losses.");
+                    commentary.push(`⚖️ Win rate is positive at ${winRate.toFixed(1)}%, but P/L is negative. Consider letting winners run longer and cutting losers faster.`);
                 } else if (sellTrades.length > 0) {
-                    commentary.push("Challenging day. Review your trades and adjust your strategy.");
+                    commentary.push(`📉 Challenging day with ${winRate.toFixed(1)}% win rate. Take time to analyze what went wrong before your next trade.`);
                 }
 
+                // Trading frequency analysis
                 if (todayTrades.length > 20) {
-                    commentary.push("⚠️ You're overtrading! Too many trades can lead to emotional decisions and higher fees.");
+                    commentary.push("⚠️ Overtrading Alert: 20+ trades today increases emotional decision-making and commission costs. Focus on quality over quantity.");
                 } else if (todayTrades.length > 10) {
-                    commentary.push("High activity today. Make sure each trade has a clear reason.");
+                    commentary.push(`📊 High trading activity: ${todayTrades.length} trades today. Ensure each trade had a clear thesis and proper risk management.`);
+                } else if (todayTrades.length >= 5) {
+                    commentary.push(`✅ Moderate trading volume: ${todayTrades.length} trades shows good discipline and selective entry criteria.`);
+                } else if (todayTrades.length > 0) {
+                    commentary.push(`🎯 Conservative approach: ${todayTrades.length} trades today. Quality > quantity - excellent restraint.`);
                 }
 
-                if (bestTrade && bestTrade.profit > 0) {
-                    commentary.push(`Your best trade was ${bestTrade.symbol} with +$${bestTrade.profit.toFixed(2)} profit!`);
+                // Best/worst trade commentary
+                if (bestTrade && worstTrade && bestTrade.profit > 0 && worstTrade.profit < 0) {
+                    const riskRewardRatio = Math.abs(bestTrade.profit / worstTrade.profit);
+                    if (riskRewardRatio >= 2) {
+                        commentary.push(`💎 Excellent risk-reward: Best trade ${bestTrade.symbol} (+$${bestTrade.profit.toFixed(2)}) vs worst ${worstTrade.symbol} ($${worstTrade.profit.toFixed(2)}) = ${riskRewardRatio.toFixed(1)}:1 ratio!`);
+                    } else {
+                        commentary.push(`⚠️ Risk-reward needs improvement: Best trade ${bestTrade.symbol} (+$${bestTrade.profit.toFixed(2)}) vs worst ${worstTrade.symbol} ($${worstTrade.profit.toFixed(2)}) = only ${riskRewardRatio.toFixed(1)}:1 ratio.`);
+                    }
+                } else if (bestTrade && bestTrade.profit > 0) {
+                    commentary.push(`🏆 Your best trade was ${bestTrade.symbol} with +$${bestTrade.profit.toFixed(2)} profit. Study what you did right!`);
                 }
 
-                // Behavioral insights
+                // Enhanced behavioral insights with portfolio analysis
                 const insights = [];
 
+                // Calculate average trade size
+                const avgTradeSize = todayTrades.reduce((sum, t) => sum + (t.price * t.quantity), 0) / todayTrades.length;
+
+                // Calculate average holding time for completed trades
+                const completedTrades = sellTrades.filter(sell => {
+                    const buy = portfolio.history.find(h =>
+                        h.type === 'buy' &&
+                        h.symbol === sell.symbol &&
+                        new Date(h.timestamp) < new Date(sell.timestamp)
+                    );
+                    return buy;
+                });
+
+                let avgHoldingTime = 0;
+                if (completedTrades.length > 0) {
+                    const totalHoldingTime = completedTrades.reduce((sum, sell) => {
+                        const buy = portfolio.history.find(h =>
+                            h.type === 'buy' &&
+                            h.symbol === sell.symbol &&
+                            new Date(h.timestamp) < new Date(sell.timestamp)
+                        );
+                        if (buy) {
+                            const holdingTime = (new Date(sell.timestamp) - new Date(buy.timestamp)) / (1000 * 60 * 60); // Hours
+                            return sum + holdingTime;
+                        }
+                        return sum;
+                    }, 0);
+                    avgHoldingTime = totalHoldingTime / completedTrades.length;
+                }
+
+                // Win rate insights
                 if (winRate < 50 && sellTrades.length >= 3) {
                     insights.push({
                         icon: "📊",
-                        text: "Your win rate is below 50%. Focus on quality over quantity.",
+                        text: "Your win rate is below 50%. Focus on quality over quantity and wait for better setups.",
+                        type: "warning"
+                    });
+                } else if (winRate >= 70) {
+                    insights.push({
+                        icon: "🎯",
+                        text: `Excellent ${winRate.toFixed(1)}% win rate! Your trade selection is sharp today.`,
+                        type: "success"
+                    });
+                }
+
+                // P/L insights
+                if (totalProfitLoss > 0) {
+                    const returnPct = (totalProfitLoss / getCurrentPortfolio().cash) * 100;
+                    insights.push({
+                        icon: "💰",
+                        text: `Profit: $${totalProfitLoss.toFixed(2)} (${returnPct.toFixed(2)}% portfolio return). Great work!`,
+                        type: "success"
+                    });
+                } else if (totalProfitLoss < 0) {
+                    const lossPct = (Math.abs(totalProfitLoss) / getCurrentPortfolio().cash) * 100;
+                    insights.push({
+                        icon: "📉",
+                        text: `Loss: $${Math.abs(totalProfitLoss).toFixed(2)} (${lossPct.toFixed(2)}% portfolio drawdown). Review your strategy.`,
                         type: "warning"
                     });
                 }
 
-                if (totalProfitLoss > 0) {
+                // Holding time insights
+                if (avgHoldingTime > 0) {
+                    if (avgHoldingTime < 1) {
+                        insights.push({
+                            icon: "⚡",
+                            text: `Average holding time: ${Math.round(avgHoldingTime * 60)} minutes. You're day trading - ensure you're not overtrading.`,
+                            type: "info"
+                        });
+                    } else if (avgHoldingTime < 24) {
+                        insights.push({
+                            icon: "⏰",
+                            text: `Average holding time: ${avgHoldingTime.toFixed(1)} hours. Good intraday trading discipline.`,
+                            type: "success"
+                        });
+                    } else {
+                        insights.push({
+                            icon: "📅",
+                            text: `Average holding time: ${(avgHoldingTime / 24).toFixed(1)} days. Swing trading approach detected.`,
+                            type: "info"
+                        });
+                    }
+                }
+
+                // Trading volume insights
+                if (avgTradeSize > 50000) {
                     insights.push({
-                        icon: "💰",
-                        text: `You made $${totalProfitLoss.toFixed(2)} today. Great work!`,
-                        type: "success"
+                        icon: "💼",
+                        text: `High average trade size: $${avgTradeSize.toFixed(0)}. Managing risk well on large positions.`,
+                        type: "info"
                     });
-                } else if (totalProfitLoss < 0) {
+                } else if (avgTradeSize < 5000) {
                     insights.push({
-                        icon: "📉",
-                        text: `You lost $${Math.abs(totalProfitLoss).toFixed(2)} today. Tomorrow is a new day.`,
+                        icon: "🔍",
+                        text: `Small position sizing: $${avgTradeSize.toFixed(0)} avg. Consider larger positions if conviction is high.`,
+                        type: "info"
+                    });
+                }
+
+                // Stock diversity
+                const uniqueStocks = new Set(todayTrades.map(t => t.symbol));
+                if (uniqueStocks.size === 1 && todayTrades.length > 5) {
+                    insights.push({
+                        icon: "⚠️",
+                        text: `All trades in one stock (${[...uniqueStocks][0]}). Diversify to manage concentration risk.`,
                         type: "warning"
+                    });
+                } else if (uniqueStocks.size >= 5) {
+                    insights.push({
+                        icon: "🌐",
+                        text: `Good diversification: traded ${uniqueStocks.size} different stocks today.`,
+                        type: "success"
                     });
                 }
 
