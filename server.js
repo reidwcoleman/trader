@@ -3,7 +3,10 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// Initialize Stripe only if key is provided (optional for personal accounts)
+const stripe = process.env.STRIPE_SECRET_KEY
+    ? require('stripe')(process.env.STRIPE_SECRET_KEY)
+    : null;
 const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
@@ -222,6 +225,14 @@ app.post('/api/send-password-reset', async (req, res) => {
 // Stripe checkout session endpoint for $5 family access
 app.post('/api/create-checkout-session', async (req, res) => {
     try {
+        // Check if Stripe is configured
+        if (!stripe) {
+            return res.status(503).json({
+                success: false,
+                message: 'Payment processing is not configured. Please use a Personal account instead.'
+            });
+        }
+
         const { email, userId } = req.body;
 
         if (!email || !isValidEmail(email)) {
@@ -284,6 +295,14 @@ app.post('/api/create-checkout-session', async (req, res) => {
 // Verify payment and grant family access
 app.get('/api/verify-payment/:sessionId', async (req, res) => {
     try {
+        // Check if Stripe is configured
+        if (!stripe) {
+            return res.status(503).json({
+                success: false,
+                message: 'Payment processing is not configured.'
+            });
+        }
+
         const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
 
         if (session.payment_status === 'paid') {
