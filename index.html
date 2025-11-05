@@ -2185,253 +2185,100 @@
                 };
             };
 
-            // Try Yahoo Finance through CORS proxy
-            const fetchThroughProxy = async (symbol, period, interval, period1, period2) => {
-                try {
-                    // Try multiple CORS proxies in order
-                    const proxies = [
-                        'https://corsproxy.io/?',
-                        'https://api.allorigins.win/raw?url=',
-                        'https://cors-anywhere.herokuapp.com/'
-                    ];
-
-                    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=${interval}&includePrePost=false`;
-
-                    for (let i = 0; i < proxies.length; i++) {
-                        try {
-                            console.log(`📊 Trying CORS proxy ${i + 1}/${proxies.length} for ${symbol}...`);
-                            const proxyUrl = proxies[i] + encodeURIComponent(yahooUrl);
-
-                            const response = await fetch(proxyUrl, {
-                                method: 'GET',
-                                headers: { 'Accept': 'application/json' }
-                            });
-
-                            if (!response.ok) continue;
-
-                            const data = await response.json();
-
-                            if (data.chart && data.chart.result && data.chart.result[0]) {
-                                console.log(`✅ Proxy ${i + 1} succeeded for ${symbol}`);
-                                return data;
-                            }
-                        } catch (proxyError) {
-                            console.warn(`Proxy ${i + 1} failed:`, proxyError.message);
-                            continue;
-                        }
-                    }
-
-                    console.warn(`All CORS proxies failed for ${symbol}`);
-                    return null;
-                } catch (error) {
-                    console.error('CORS proxy error:', error.message);
-                    return null;
-                }
-            };
-
-            // Fetch real historical price data - tries multiple APIs
+            // Fetch 100% accurate real historical price data using Finnhub Stock Candles API
             const fetchHistoricalData = async (symbol, period = '1M') => {
                 try {
-                    // Calculate date range based on period
-                    const toDate = new Date();
+                    console.log(`📊 Fetching real historical data for ${symbol} (${period})...`);
+
+                    // Calculate date range and resolution based on period
+                    const toDate = Math.floor(Date.now() / 1000); // Current timestamp in seconds
                     let fromDate;
-                    let range, interval;
+                    let resolution;
 
                     switch (period) {
                         case '1D':
-                            // Use 5 days lookback with hourly intervals for better reliability
-                            fromDate = new Date(toDate.getTime() - (5 * 24 * 60 * 60 * 1000));
-                            range = '5d';
-                            interval = '1h'; // Hourly is more reliable than 5m through proxies
+                            // Last 24 hours with 5-minute intervals
+                            fromDate = toDate - (24 * 60 * 60);
+                            resolution = '5';
                             break;
                         case '1W':
-                            fromDate = new Date(toDate.getTime() - (7 * 24 * 60 * 60 * 1000));
-                            range = '5d';
-                            interval = '1h'; // Use hourly for better proxy compatibility
+                            // Last 7 days with hourly intervals
+                            fromDate = toDate - (7 * 24 * 60 * 60);
+                            resolution = '60';
                             break;
                         case '1M':
-                            fromDate = new Date(toDate.getTime() - (30 * 24 * 60 * 60 * 1000));
-                            range = '1mo';
-                            interval = '1d';
+                            // Last 30 days with daily intervals
+                            fromDate = toDate - (30 * 24 * 60 * 60);
+                            resolution = 'D';
                             break;
                         case '3M':
-                            fromDate = new Date(toDate.getTime() - (90 * 24 * 60 * 60 * 1000));
-                            range = '3mo';
-                            interval = '1d';
+                            // Last 90 days with daily intervals
+                            fromDate = toDate - (90 * 24 * 60 * 60);
+                            resolution = 'D';
                             break;
                         case 'ALL':
-                            fromDate = new Date(toDate.getTime() - (365 * 24 * 60 * 60 * 1000));
-                            range = '1y';
-                            interval = '1d';
+                            // Last 365 days with daily intervals
+                            fromDate = toDate - (365 * 24 * 60 * 60);
+                            resolution = 'D';
                             break;
                         default:
-                            fromDate = new Date(toDate.getTime() - (30 * 24 * 60 * 60 * 1000));
-                            range = '1mo';
-                            interval = '1d';
+                            // Default to 30 days
+                            fromDate = toDate - (30 * 24 * 60 * 60);
+                            resolution = 'D';
                     }
 
-                    // Calculate timestamps for Yahoo Finance
-                    const period1 = Math.floor(fromDate.getTime() / 1000);
-                    const period2 = Math.floor(toDate.getTime() / 1000);
+                    // Finnhub Stock Candles API endpoint
+                    const url = `${FINNHUB_API_BASE}/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`;
 
-                    // TRY 1: Yahoo Finance API (no API key required)
-                    try {
+                    const response = await fetch(url);
 
-                        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=${interval}&includePrePost=false`;
+                    if (!response.ok) {
+                        throw new Error(`Finnhub API error: ${response.status} ${response.statusText}`);
+                    }
 
-                        console.log(`📊 [1/2] Trying Yahoo Finance for ${symbol} (${period})...`);
+                    const data = await response.json();
 
-                        const response = await fetch(url, {
-                            method: 'GET',
-                            headers: {
-                                'Accept': 'application/json'
+                    // Check if we got valid data
+                    if (data.s === 'ok' && data.t && data.c && data.t.length > 0) {
+                        const timestamps = data.t;
+                        const closePrices = data.c;
+
+                        // Format labels based on period
+                        const labels = timestamps.map(timestamp => {
+                            const date = new Date(timestamp * 1000);
+                            if (period === '1D') {
+                                return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                            } else if (period === '1W') {
+                                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric' });
+                            } else {
+                                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                             }
                         });
 
-                        if (!response.ok) {
-                            console.warn(`Yahoo Finance failed: ${response.status} ${response.statusText}`);
-                            throw new Error(`HTTP ${response.status}`);
-                        }
+                        // Format prices
+                        const prices = closePrices.map(price => price.toFixed(2));
 
-                        const data = await response.json();
+                        console.log(`✅ Real historical data loaded for ${symbol} (${period}):`, {
+                            dataPoints: prices.length,
+                            firstPrice: prices[0],
+                            lastPrice: prices[prices.length - 1],
+                            timeRange: `${labels[0]} to ${labels[labels.length - 1]}`,
+                            source: 'Finnhub API'
+                        });
 
-                        if (data.chart && data.chart.result && data.chart.result[0]) {
-                            const result = data.chart.result[0];
-                            const timestamps = result.timestamp;
-                            const prices = result.indicators.quote[0].close;
-
-                            if (timestamps && prices && timestamps.length > 0) {
-                                const labels = timestamps.map(timestamp => {
-                                    const date = new Date(timestamp * 1000);
-                                    if (period === '1D') {
-                                        return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-                                    } else if (period === '1W') {
-                                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric' });
-                                    } else {
-                                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                                    }
-                                });
-
-                                // Filter out null prices and format
-                                const validData = [];
-                                const validLabels = [];
-                                const validTimestamps = [];
-                                for (let i = 0; i < prices.length; i++) {
-                                    if (prices[i] !== null && prices[i] !== undefined) {
-                                        validData.push(prices[i].toFixed(2));
-                                        validLabels.push(labels[i]);
-                                        validTimestamps.push(timestamps[i]);
-                                    }
-                                }
-
-                                // For 1D, filter to show only last 24 hours of data
-                                if (period === '1D') {
-                                    const oneDayAgo = Date.now() / 1000 - (24 * 60 * 60);
-                                    const filtered = validTimestamps.map((ts, idx) => ({ ts, label: validLabels[idx], price: validData[idx] }))
-                                        .filter(item => item.ts >= oneDayAgo);
-
-                                    if (filtered.length > 0) {
-                                        console.log(`✅ Loaded Yahoo Finance data for ${symbol} (${period}):`, {
-                                            dataPoints: filtered.length,
-                                            firstPrice: filtered[0].price,
-                                            lastPrice: filtered[filtered.length - 1].price,
-                                            timeRange: `${filtered[0].label} to ${filtered[filtered.length - 1].label}`
-                                        });
-
-                                        return {
-                                            labels: filtered.map(item => item.label),
-                                            data: filtered.map(item => item.price)
-                                        };
-                                    }
-                                }
-
-                                console.log(`✅ Loaded Yahoo Finance data for ${symbol} (${period}):`, {
-                                    dataPoints: validData.length,
-                                    firstPrice: validData[0],
-                                    lastPrice: validData[validData.length - 1]
-                                });
-
-                                return { labels: validLabels, data: validData };
-                            }
-                        }
-
-                        console.warn(`No historical data available for ${symbol} from Yahoo Finance`);
-                    } catch (yahooError) {
-                        // Yahoo Finance failed (CORS, network, or HTTP error)
-                        console.warn(`Yahoo Finance blocked: ${yahooError.message}`);
-                        console.log(`📊 [2/2] Trying CORS proxy for ${symbol} (${period})...`);
-
-                        // Try CORS proxy as fallback
-                        const proxyData = await fetchThroughProxy(symbol, period, interval, period1, period2);
-                        if (proxyData && proxyData.chart && proxyData.chart.result && proxyData.chart.result[0]) {
-                            const result = proxyData.chart.result[0];
-                            const timestamps = result.timestamp;
-                            const prices = result.indicators.quote[0].close;
-
-                            if (timestamps && prices && timestamps.length > 0) {
-                                const labels = timestamps.map(timestamp => {
-                                    const date = new Date(timestamp * 1000);
-                                    if (period === '1D') {
-                                        return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-                                    } else if (period === '1W') {
-                                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric' });
-                                    } else {
-                                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                                    }
-                                });
-
-                                const validData = [];
-                                const validLabels = [];
-                                const validTimestamps = [];
-                                for (let i = 0; i < prices.length; i++) {
-                                    if (prices[i] !== null && prices[i] !== undefined) {
-                                        validData.push(prices[i].toFixed(2));
-                                        validLabels.push(labels[i]);
-                                        validTimestamps.push(timestamps[i]);
-                                    }
-                                }
-
-                                // For 1D, filter to show only last 24 hours of data
-                                if (period === '1D') {
-                                    const oneDayAgo = Date.now() / 1000 - (24 * 60 * 60);
-                                    const filtered = validTimestamps.map((ts, idx) => ({ ts, label: validLabels[idx], price: validData[idx] }))
-                                        .filter(item => item.ts >= oneDayAgo);
-
-                                    if (filtered.length > 0) {
-                                        console.log(`✅ Loaded data via CORS proxy for ${symbol} (${period}):`, {
-                                            dataPoints: filtered.length,
-                                            firstPrice: filtered[0].price,
-                                            lastPrice: filtered[filtered.length - 1].price,
-                                            timeRange: `${filtered[0].label} to ${filtered[filtered.length - 1].label}`
-                                        });
-
-                                        return {
-                                            labels: filtered.map(item => item.label),
-                                            data: filtered.map(item => item.price)
-                                        };
-                                    }
-                                }
-
-                                console.log(`✅ Loaded data via CORS proxy for ${symbol} (${period}):`, {
-                                    dataPoints: validData.length,
-                                    firstPrice: validData[0],
-                                    lastPrice: validData[validData.length - 1]
-                                });
-
-                                return { labels: validLabels, data: validData };
-                            }
-                        }
+                        return { labels, data: prices };
+                    } else if (data.s === 'no_data') {
+                        console.warn(`⚠️ No historical data available for ${symbol} from Finnhub`);
+                        return null;
+                    } else {
+                        console.warn(`⚠️ Unexpected response from Finnhub for ${symbol}:`, data);
+                        return null;
                     }
-
-                    // Both direct access and proxy failed, return null to trigger simulated data
-                    console.warn(`All methods failed for ${symbol}, will use simulated data`);
-                    return null;
                 } catch (error) {
                     console.error(`❌ Error fetching historical data for ${symbol}:`, error);
                     console.error('Error details:', {
                         message: error.message,
-                        type: error.name,
-                        stack: error.stack?.split('\n')[0]
+                        type: error.name
                     });
                     return null;
                 }
@@ -2473,17 +2320,17 @@
                 const loadChart = async () => {
                     console.log(`🔄 Loading chart for ${selectedStock} (${chartPeriod})...`);
 
-                    // Try to fetch real data from Yahoo Finance
+                    // Fetch real data from Finnhub API
                     let historicalData = await fetchHistoricalData(selectedStock, chartPeriod);
 
                     // Fallback to generated data if API fails
                     if (!historicalData) {
-                        console.warn(`⚠️ Yahoo Finance unavailable - using simulated data for ${selectedStock}`);
-                        console.warn('This could be due to CORS restrictions or API rate limiting');
+                        console.warn(`⚠️ Finnhub API unavailable - using simulated data for ${selectedStock}`);
+                        console.warn('This could be due to API rate limiting or symbol not found');
                         historicalData = generateFallbackHistoricalData(stock.price);
                         setIsRealChartData(false);
                     } else {
-                        console.log(`✅ Real chart data loaded successfully for ${selectedStock}`);
+                        console.log(`✅ Real chart data loaded successfully from Finnhub for ${selectedStock}`);
                         setIsRealChartData(true);
                     }
 
@@ -4826,7 +4673,7 @@
                                                     {isRealChartData ? (
                                                         <div className="flex items-center gap-1 bg-green-500/20 border border-green-500 rounded-full px-2 py-1">
                                                             <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                                                            <span className="text-green-300 text-[10px] font-black uppercase tracking-wide">Live Data</span>
+                                                            <span className="text-green-300 text-[10px] font-black uppercase tracking-wide">Finnhub Live</span>
                                                         </div>
                                                     ) : (
                                                         <div className="flex items-center gap-1 bg-yellow-500/20 border border-yellow-500 rounded-full px-2 py-1">
@@ -4855,7 +4702,7 @@
                                             </div>
                                             {!isRealChartData && (
                                                 <div className="mt-3 text-xs text-yellow-300/70 italic text-center">
-                                                    ⚠️ Using simulated historical data - real data temporarily unavailable
+                                                    ⚠️ Using simulated historical data - Finnhub API temporarily unavailable
                                                 </div>
                                             )}
                                         </div>
