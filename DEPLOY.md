@@ -2,60 +2,42 @@
 
 This guide will help you deploy FinClash so it works on all devices worldwide.
 
+## ✅ Backend Already Deployed!
+
+Your backend is already deployed and running at:
+**https://finclash-backend.onrender.com**
+
+Every push to `main` branch automatically triggers a new deployment via GitHub Actions!
+
 ## Architecture
 
 - **Frontend**: GitHub Pages (serves index.html and static files)
-- **Backend**: Render.com (Node.js server with Express API)
+- **Backend**: Render.com (Node.js server with Express API) ✅ DEPLOYED
 - **Database**: JSON files (accounts, chat messages)
+- **Auto-Deploy**: GitHub Actions triggers Render deployment on every push
 
 ## Quick Deploy Steps
 
-### 1. Deploy Backend to Render
+### 1. Backend - Already Done! ✅
 
-**Option A: Automatic Deploy (Recommended)**
+Your backend is live at: `https://finclash-backend.onrender.com`
 
-1. Go to https://render.com and sign in with GitHub
-2. Click **"New +"** → **"Blueprint"**
-3. Select your repository: `reidwcoleman/trader`
-4. Render will read `render.yaml` and auto-configure
-5. Add environment variables in Render dashboard:
-   - `EMAIL_USER`: your-email@gmail.com
-   - `EMAIL_PASSWORD`: your-gmail-app-password
-   - `STRIPE_SECRET_KEY`: your-stripe-key
-6. Click **"Apply"** - your backend will deploy automatically!
+**Automatic Deployment Setup:**
+- ✅ Render service created: `srv-d44n2mngi27c73adef7g`
+- ✅ GitHub Actions workflow configured
+- ✅ Auto-deploy on every push to `main`
 
-**Option B: Manual Deploy**
-
-Follow the detailed guide in `RENDER_DEPLOYMENT.md`
-
-### 2. Get Your Backend URL
-
-Once deployed, copy your Render URL:
-```
-https://finclash-backend.onrender.com
+**To manually trigger deployment:**
+```bash
+curl -X POST https://api.render.com/deploy/srv-d44n2mngi27c73adef7g?key=41MzdQrMfwU
 ```
 
-If you chose a different name, it will be:
-```
-https://YOUR-SERVICE-NAME.onrender.com
-```
+**View your backend:**
+- Dashboard: https://dashboard.render.com
+- Live URL: https://finclash-backend.onrender.com
+- Health check: https://finclash-backend.onrender.com/api/health
 
-### 3. Update Frontend Configuration
-
-The code already auto-detects the environment! ✅
-
-- **Localhost**: Uses `http://localhost:3001`
-- **Production**: Uses `https://finclash-backend.onrender.com`
-
-If your Render URL is different, edit `index.html` line 48:
-
-```javascript
-const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:3001'
-    : 'https://YOUR-BACKEND-URL.onrender.com'; // ← Update this
-```
-
-### 4. Enable GitHub Pages
+### 2. Enable GitHub Pages
 
 1. Go to GitHub repository settings
 2. Navigate to **Pages** (left sidebar)
@@ -69,7 +51,7 @@ Your app will be live at:
 https://reidwcoleman.github.io/trader/
 ```
 
-### 5. Test Cross-Device Access
+### 3. Test Cross-Device Access
 
 1. **On your computer**:
    - Go to `https://reidwcoleman.github.io/trader/`

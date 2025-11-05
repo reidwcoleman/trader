@@ -1,0 +1,22 @@
+name: Deploy to Render
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Render Deployment
+        run: |
+          curl -X POST https://api.render.com/deploy/srv-d44n2mngi27c73adef7g?key=41MzdQrMfwU
+
+      - name: Deployment Status
+        run: |
+          echo "✅ Render deployment triggered successfully!"
+          echo "🔗 Backend: https://finclash-backend.onrender.com"
+          echo "⏰ Deployment usually takes 2-3 minutes"
