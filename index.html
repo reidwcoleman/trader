@@ -43,10 +43,10 @@
         // Backend API Configuration
         // Automatically detects environment:
         // - localhost: http://localhost:3001 (local development)
-        // - production: https://finclash-backend.onrender.com (deployed backend)
+        // - production: https://trader-umh8.onrender.com (deployed backend)
         const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:3001'
-            : 'https://finclash-backend.onrender.com';
+            : 'https://trader-umh8.onrender.com';
 
         const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');
@@ -156,31 +156,30 @@
             }, [competition, currentUserId]);
 
             // Initialize Socket.io connection for chat
-            // Socket.io disabled - backend not deployed
-            // useEffect(() => {
-            //     const newSocket = io(API_BASE_URL);
-            //     setSocket(newSocket);
+            useEffect(() => {
+                const newSocket = io(API_BASE_URL);
+                setSocket(newSocket);
 
-            //     // Listen for chat history
-            //     newSocket.on('chat_history', (messages) => {
-            //         setChatMessages(messages);
-            //     });
+                // Listen for chat history
+                newSocket.on('chat_history', (messages) => {
+                    setChatMessages(messages);
+                });
 
-            //     // Listen for new messages
-            //     newSocket.on('chat_message', (message) => {
-            //         setChatMessages(prev => [...prev, message]);
-            //         // Auto-scroll to bottom
-            //         setTimeout(() => {
-            //             if (chatContainerRef.current) {
-            //                 chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-            //             }
-            //         }, 100);
-            //     });
+                // Listen for new messages
+                newSocket.on('chat_message', (message) => {
+                    setChatMessages(prev => [...prev, message]);
+                    // Auto-scroll to bottom
+                    setTimeout(() => {
+                        if (chatContainerRef.current) {
+                            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+                        }
+                    }, 100);
+                });
 
-            //     return () => {
-            //         newSocket.close();
-            //     };
-            // }, []);
+                return () => {
+                    newSocket.close();
+                };
+            }, []);
 
             // Auto-fetch stock data for portfolio positions
             useEffect(() => {
