@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact & Support | FinClash</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #e8e8e8;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #f5f5f5;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #b0b0b0;
+            font-size: 18px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #a78bfa;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .contact-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .contact-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .contact-card h3 {
+            font-size: 24px;
+            color: #8b5cf6;
+            margin-bottom: 15px;
+        }
+
+        .contact-card p {
+            color: #d1d5db;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .contact-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .contact-button:hover {
+            transform: scale(1.05);
+        }
+
+        .faq-section {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .faq-section h2 {
+            font-size: 32px;
+            color: #8b5cf6;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .faq-item {
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .faq-question {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f5f5f5;
+            margin-bottom: 12px;
+        }
+
+        .faq-answer {
+            color: #d1d5db;
+            line-height: 1.8;
+        }
+
+        .response-time {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .response-time p {
+            color: #6ee7b7;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        a {
+            color: #8b5cf6;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to FinClash</a>
+
+        <header>
+            <h1>Contact & Support</h1>
+            <p class="subtitle">We're here to help! Reach out anytime.</p>
+        </header>
+
+        <div class="response-time">
+            <p>⚡ Typical response time: 24-48 hours | We respond to all inquiries</p>
+        </div>
+
+        <div class="contact-grid">
+            <div class="contact-card">
+                <div class="contact-icon">📧</div>
+                <h3>Email Support</h3>
+                <p>Send us an email for any questions, issues, or feedback. We read and respond to every message.</p>
+                <a href="mailto:finclash101@gmail.com" class="contact-button">Email Us</a>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-icon">🐛</div>
+                <h3>Report a Bug</h3>
+                <p>Found a technical issue? Help us improve by reporting bugs and errors.</p>
+                <a href="mailto:finclash101@gmail.com?subject=Bug%20Report" class="contact-button">Report Bug</a>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-icon">💡</div>
+                <h3>Feature Request</h3>
+                <p>Have an idea for a new feature? We'd love to hear your suggestions!</p>
+                <a href="mailto:finclash101@gmail.com?subject=Feature%20Request" class="contact-button">Suggest Feature</a>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-icon">🛡️</div>
+                <h3>Safety & Security</h3>
+                <p>Report security issues, harassment, or safety concerns immediately.</p>
+                <a href="mailto:finclash101@gmail.com?subject=Safety%20Report" class="contact-button">Report Issue</a>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-icon">💬</div>
+                <h3>General Inquiry</h3>
+                <p>Questions about FinClash, partnerships, or just want to chat?</p>
+                <a href="mailto:finclash101@gmail.com?subject=General%20Inquiry" class="contact-button">Contact Us</a>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-icon">🤝</div>
+                <h3>Feedback</h3>
+                <p>Love FinClash? Tell us what you think or how we can improve!</p>
+                <a href="mailto:finclash101@gmail.com?subject=Feedback" class="contact-button">Give Feedback</a>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ How do I reset my password?</div>
+                <div class="faq-answer">
+                    Currently, you can request a password reset by emailing us at <a href="mailto:finclash101@gmail.com">finclash101@gmail.com</a>
+                    with your account email. We're working on an automated password reset feature.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ Is FinClash really free?</div>
+                <div class="faq-answer">
+                    Yes! FinClash is completely free to use. You start with $100,000 in virtual currency and can trade unlimited stocks
+                    without any fees or subscriptions. This is educational software, not a real brokerage.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ Can I withdraw my virtual earnings as real money?</div>
+                <div class="faq-answer">
+                    No. FinClash uses virtual currency only. Your portfolio, trades, and gains are simulations for educational purposes.
+                    You cannot convert virtual money to real money or make actual financial transactions.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ How accurate is the stock data?</div>
+                <div class="faq-answer">
+                    We use real-time data from Finnhub API, providing accurate market prices. However, there may be slight delays
+                    (typically 15 seconds to 1 minute) and occasional rate limits. The data is for educational purposes only.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ My portfolio disappeared after signing out. What happened?</div>
+                <div class="faq-answer">
+                    Your portfolio is saved to our backend servers and linked to your email account. Simply sign back in with the same
+                    email and password, and your portfolio will be restored. If you're having issues, email us immediately.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ Can I use FinClash on mobile?</div>
+                <div class="faq-answer">
+                    Yes! FinClash is fully responsive and works on mobile browsers. Simply visit
+                    <a href="https://reidwcoleman.github.io/trader">reidwcoleman.github.io/trader</a> on your phone or tablet.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ How do I delete my account?</div>
+                <div class="faq-answer">
+                    Email us at <a href="mailto:finclash101@gmail.com">finclash101@gmail.com</a> with subject "Delete Account"
+                    and we'll process your request within 5-7 business days. Include the email address associated with your account.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ Does FinClash provide investment advice?</div>
+                <div class="faq-answer">
+                    No. FinClash is for educational purposes only. We do not provide financial advice, investment recommendations,
+                    or professional guidance. Always consult a licensed financial advisor before making real investment decisions.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ I found a bug. How do I report it?</div>
+                <div class="faq-answer">
+                    Thank you for helping us improve! Email us at <a href="mailto:finclash101@gmail.com?subject=Bug%20Report">finclash101@gmail.com</a>
+                    with subject "Bug Report". Include:
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>What you were doing when the bug occurred</li>
+                        <li>What you expected to happen</li>
+                        <li>What actually happened</li>
+                        <li>Screenshots if possible</li>
+                        <li>Your device/browser information</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ Can I suggest a new feature?</div>
+                <div class="faq-answer">
+                    Absolutely! We love hearing from our users. Email us at
+                    <a href="mailto:finclash101@gmail.com?subject=Feature%20Request">finclash101@gmail.com</a> with your ideas.
+                    We review all suggestions and prioritize features based on user demand.
+                </div>
+            </div>
+        </div>
+
+        <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 16px; padding: 30px; text-align: center;">
+            <h2 style="color: #8b5cf6; margin-bottom: 15px;">📬 Main Contact</h2>
+            <p style="color: #d1d5db; margin-bottom: 20px;">
+                For all inquiries, support requests, or feedback:
+            </p>
+            <a href="mailto:finclash101@gmail.com" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 18px;">
+                finclash101@gmail.com
+            </a>
+            <p style="color: #b0b0b0; margin-top: 20px; font-size: 14px;">
+                We typically respond within 24-48 hours
+            </p>
+        </div>
+    </div>
+</body>
+</html>

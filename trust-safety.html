@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trust & Safety | FinClash</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #e8e8e8;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #f5f5f5;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #b0b0b0;
+            font-size: 16px;
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+        }
+
+        h2 {
+            font-size: 28px;
+            color: #8b5cf6;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 20px;
+            color: #a78bfa;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #d1d5db;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            color: #d1d5db;
+        }
+
+        strong {
+            color: #f5f5f5;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #a78bfa;
+        }
+
+        .alert-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .security-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .report-box {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .report-box h3 {
+            margin-top: 0;
+            color: #d8b4fe;
+        }
+
+        a {
+            color: #8b5cf6;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .icon {
+            font-size: 24px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to FinClash</a>
+
+        <header>
+            <h1><span class="icon">🛡️</span>Trust & Safety</h1>
+            <p class="subtitle">Our commitment to keeping FinClash safe and secure</p>
+        </header>
+
+        <div class="content">
+            <h2>Our Safety Promise</h2>
+            <p>At FinClash, we're committed to maintaining a safe, respectful, and educational environment for all users. This page outlines our community guidelines, security measures, and how to report concerns.</p>
+
+            <div class="security-box">
+                <h3 style="margin-top: 0; color: #6ee7b7;"><span class="icon">✅</span>Your Security is Our Priority</h3>
+                <p>We implement industry-standard security measures to protect your account and data:</p>
+                <ul>
+                    <li><strong>Password encryption:</strong> Passwords are hashed using bcrypt (industry standard)</li>
+                    <li><strong>HTTPS encryption:</strong> All data transmitted is encrypted</li>
+                    <li><strong>Secure authentication:</strong> Session-based login with secure cookies</li>
+                    <li><strong>Regular security audits:</strong> We continuously monitor for vulnerabilities</li>
+                </ul>
+            </div>
+
+            <h2>Community Guidelines</h2>
+
+            <h3>Be Respectful</h3>
+            <ul>
+                <li>Treat all users with respect and kindness</li>
+                <li>No harassment, bullying, or hate speech</li>
+                <li>Respect others' privacy and personal information</li>
+                <li>Be supportive of new traders learning the platform</li>
+            </ul>
+
+            <h3>Be Honest</h3>
+            <ul>
+                <li>Do not impersonate others or create fake accounts</li>
+                <li>Do not misrepresent yourself or your trading experience</li>
+                <li>Share educational content, not misleading information</li>
+                <li>Remember: This is a learning platform, not a competition</li>
+            </ul>
+
+            <h3>Use the Platform Appropriately</h3>
+            <ul>
+                <li>Use FinClash for educational purposes only</li>
+                <li>Do not attempt to hack, exploit, or manipulate the system</li>
+                <li>Do not use automated tools (bots) without permission</li>
+                <li>Do not share your password or account access</li>
+            </ul>
+
+            <h2>Prohibited Content and Behavior</h2>
+            <p>The following are <strong>strictly prohibited</strong> on FinClash:</p>
+
+            <h3>🚫 Harassment & Abuse</h3>
+            <ul>
+                <li>Threats, intimidation, or bullying</li>
+                <li>Hate speech or discrimination based on race, ethnicity, religion, gender, sexual orientation, disability, or age</li>
+                <li>Doxxing (sharing personal information without consent)</li>
+                <li>Sexual harassment or unwanted advances</li>
+            </ul>
+
+            <h3>🚫 Fraud & Deception</h3>
+            <ul>
+                <li>Phishing attempts or scams</li>
+                <li>Impersonation of other users or staff</li>
+                <li>Creating multiple accounts to manipulate rankings</li>
+                <li>False financial advice or "pump and dump" schemes</li>
+            </ul>
+
+            <h3>🚫 Malicious Activity</h3>
+            <ul>
+                <li>Hacking attempts or unauthorized access</li>
+                <li>Distributing malware or viruses</li>
+                <li>DDoS attacks or service disruption</li>
+                <li>Data scraping or automated bot usage</li>
+            </ul>
+
+            <h3>🚫 Illegal Content</h3>
+            <ul>
+                <li>Child exploitation or abuse (zero tolerance)</li>
+                <li>Terrorism, violence, or illegal activities</li>
+                <li>Copyright infringement</li>
+                <li>Sale of illegal goods or services</li>
+            </ul>
+
+            <h2>Account Security Best Practices</h2>
+
+            <h3>Protect Your Account</h3>
+            <ul>
+                <li><strong>Strong passwords:</strong> Use at least 8 characters with a mix of letters, numbers, and symbols</li>
+                <li><strong>Unique passwords:</strong> Don't reuse passwords from other sites</li>
+                <li><strong>Keep it private:</strong> Never share your password with anyone</li>
+                <li><strong>Sign out:</strong> Always sign out on shared or public devices</li>
+                <li><strong>Verify emails:</strong> Be cautious of phishing emails pretending to be from FinClash</li>
+            </ul>
+
+            <h3>Recognize Phishing Attempts</h3>
+            <p>We will <strong>NEVER</strong>:</p>
+            <ul>
+                <li>Ask for your password via email</li>
+                <li>Request sensitive information over email or chat</li>
+                <li>Threaten to close your account unless you provide information</li>
+                <li>Send unsolicited links asking you to "verify" your account</li>
+            </ul>
+
+            <h2>How We Respond to Violations</h2>
+
+            <h3>Enforcement Actions</h3>
+            <p>Depending on the severity, we may take the following actions:</p>
+            <ol>
+                <li><strong>Warning:</strong> For minor first-time violations</li>
+                <li><strong>Temporary suspension:</strong> For repeated or moderate violations (7-30 days)</li>
+                <li><strong>Permanent ban:</strong> For severe or repeated violations</li>
+                <li><strong>Legal action:</strong> For illegal activity or threats</li>
+            </ol>
+
+            <h3>Appeals Process</h3>
+            <p>If you believe you were suspended or banned in error:</p>
+            <ol>
+                <li>Email us at <a href="mailto:finclash101@gmail.com">finclash101@gmail.com</a> with subject "Account Appeal"</li>
+                <li>Provide your email address and a detailed explanation</li>
+                <li>We will review within 5-7 business days</li>
+                <li>Our decision on appeals is final</li>
+            </ol>
+
+            <div class="alert-box">
+                <h3 style="margin-top: 0; color: #fca5a5;"><span class="icon">⚠️</span>Zero Tolerance Policy</h3>
+                <p>We have a <strong>zero tolerance policy</strong> for:</p>
+                <ul>
+                    <li>Child exploitation or abuse</li>
+                    <li>Terrorism or violence</li>
+                    <li>Severe harassment or threats</li>
+                    <li>Illegal activities</li>
+                </ul>
+                <p><strong>These violations result in immediate permanent ban and may be reported to law enforcement.</strong></p>
+            </div>
+
+            <h2>How to Report Issues</h2>
+
+            <h3>Report Abusive Behavior or Content</h3>
+            <p>If you encounter harassment, inappropriate content, or safety concerns:</p>
+            <ul>
+                <li>Email us immediately at <a href="mailto:finclash101@gmail.com?subject=Safety%20Report">finclash101@gmail.com</a></li>
+                <li>Use subject line: "Safety Report" or "Trust & Safety Issue"</li>
+                <li>Include as much detail as possible (username, date/time, description)</li>
+                <li>Attach screenshots if available</li>
+            </ul>
+
+            <h3>Report Security Vulnerabilities</h3>
+            <p>If you discover a security bug or vulnerability:</p>
+            <ul>
+                <li>Email: <a href="mailto:finclash101@gmail.com?subject=Security%20Vulnerability">finclash101@gmail.com</a></li>
+                <li>Use subject line: "Security Vulnerability"</li>
+                <li>Please do not exploit the vulnerability</li>
+                <li>We appreciate responsible disclosure</li>
+            </ul>
+
+            <h3>Emergency Contact</h3>
+            <p>For immediate safety threats or illegal activity:</p>
+            <ul>
+                <li><strong>Contact local law enforcement first</strong> (911 in the US)</li>
+                <li>Then notify us at <a href="mailto:finclash101@gmail.com">finclash101@gmail.com</a></li>
+            </ul>
+
+            <div class="report-box">
+                <h3><span class="icon">📧</span>Report an Issue</h3>
+                <p>We take all reports seriously and review them within 24-48 hours.</p>
+                <p><strong>Email:</strong> <a href="mailto:finclash101@gmail.com">finclash101@gmail.com</a></p>
+                <p><strong>Subject lines:</strong></p>
+                <ul>
+                    <li>"Safety Report" - For harassment or abuse</li>
+                    <li>"Security Vulnerability" - For technical security issues</li>
+                    <li>"Account Appeal" - To appeal a suspension</li>
+                    <li>"Privacy Concern" - For data privacy issues</li>
+                </ul>
+                <p><strong>What to include:</strong></p>
+                <ul>
+                    <li>Your email address</li>
+                    <li>Detailed description of the issue</li>
+                    <li>Date and time of incident</li>
+                    <li>Any relevant usernames or account info</li>
+                    <li>Screenshots or evidence (if applicable)</li>
+                </ul>
+            </div>
+
+            <h2>Data Privacy & Protection</h2>
+            <p>Your privacy matters to us. See our <a href="privacy-policy.html">Privacy Policy</a> for details on how we handle your data. Key points:</p>
+            <ul>
+                <li>We never sell your personal information</li>
+                <li>Your trading data is private by default</li>
+                <li>You can request deletion of your account and data at any time</li>
+                <li>We comply with GDPR, CCPA, and other privacy regulations</li>
+            </ul>
+
+            <h2>Continuous Improvement</h2>
+            <p>We're constantly working to improve our Trust & Safety practices:</p>
+            <ul>
+                <li>Regular security audits and updates</li>
+                <li>Monitoring for abusive behavior and content</li>
+                <li>Updating policies based on user feedback</li>
+                <li>Training our team on best practices</li>
+            </ul>
+
+            <h2>Educational Mission</h2>
+            <p>Remember: FinClash exists to help people learn about investing in a safe, risk-free environment. We encourage:</p>
+            <ul>
+                <li><strong>Learning:</strong> Asking questions and sharing knowledge</li>
+                <li><strong>Experimentation:</strong> Trying different strategies without fear</li>
+                <li><strong>Community:</strong> Supporting each other's growth</li>
+                <li><strong>Respect:</strong> Treating everyone with kindness</li>
+            </ul>
+
+            <div class="security-box">
+                <h3 style="margin-top: 0; color: #6ee7b7;"><span class="icon">💚</span>Thank You</h3>
+                <p>Thank you for helping us maintain a safe, positive community. Together, we can make FinClash the best place to learn about investing.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

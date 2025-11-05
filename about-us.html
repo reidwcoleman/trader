@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | FinClash Creators</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #e8e8e8;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #f5f5f5;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #b0b0b0;
+            font-size: 18px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #a78bfa;
+        }
+
+        .mission-box {
+            background: rgba(139, 92, 246, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .mission-box h2 {
+            font-size: 32px;
+            color: #d8b4fe;
+            margin-bottom: 20px;
+        }
+
+        .mission-box p {
+            font-size: 18px;
+            color: #d1d5db;
+            line-height: 1.8;
+        }
+
+        .creators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        @media (max-width: 768px) {
+            .creators-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .creator-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .creator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .creator-avatar {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
+            border: 4px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .creator-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #f5f5f5;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .creator-role {
+            font-size: 18px;
+            color: #8b5cf6;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .creator-bio {
+            color: #d1d5db;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        .creator-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .skill-tag {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #d8b4fe;
+            font-weight: 600;
+        }
+
+        .creator-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .creator-link:hover {
+            transform: scale(1.05);
+        }
+
+        .values-section {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .values-section h2 {
+            font-size: 32px;
+            color: #8b5cf6;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .value-item {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .value-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .value-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f5f5f5;
+            margin-bottom: 10px;
+        }
+
+        .value-description {
+            color: #d1d5db;
+            font-size: 15px;
+        }
+
+        .contact-section {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .contact-section h2 {
+            font-size: 28px;
+            color: #6ee7b7;
+            margin-bottom: 15px;
+        }
+
+        .contact-section p {
+            color: #d1d5db;
+            margin-bottom: 20px;
+        }
+
+        .contact-email {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            transition: all 0.2s;
+        }
+
+        .contact-email:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to FinClash</a>
+
+        <header>
+            <h1>Meet the FinClash Team</h1>
+            <p class="subtitle">Building the future of virtual trading education</p>
+        </header>
+
+        <div class="mission-box">
+            <h2>🎯 Our Mission</h2>
+            <p>
+                We created FinClash to make stock market education accessible, engaging, and risk-free for everyone.
+                Whether you're a complete beginner or an experienced trader, FinClash provides a safe environment
+                to learn, practice, and master investment strategies without risking real money.
+            </p>
+        </div>
+
+        <div class="creators-grid">
+            <!-- Reid Coleman -->
+            <div class="creator-card">
+                <div class="creator-avatar">R</div>
+                <h2 class="creator-name">Reid Coleman</h2>
+                <p class="creator-role">Co-Founder & Lead Developer</p>
+                <p class="creator-bio">
+                    Reid is a passionate full-stack developer with a love for building innovative financial technology platforms.
+                    He handles the core architecture, backend systems, and ensures FinClash runs smoothly for all users.
+                    With expertise in React, Node.js, and cloud infrastructure, Reid brings technical excellence to every feature.
+                </p>
+                <div class="creator-skills">
+                    <span class="skill-tag">Full-Stack Development</span>
+                    <span class="skill-tag">React & JavaScript</span>
+                    <span class="skill-tag">Backend Architecture</span>
+                    <span class="skill-tag">Cloud Infrastructure</span>
+                </div>
+                <a href="about.html" class="creator-link">Learn More About Reid →</a>
+            </div>
+
+            <!-- Cameron Dietzel -->
+            <div class="creator-card">
+                <div class="creator-avatar">C</div>
+                <h2 class="creator-name">Cameron Dietzel</h2>
+                <p class="creator-role">Co-Founder & Product Designer</p>
+                <p class="creator-bio">
+                    Cameron brings the creative vision and user experience expertise that makes FinClash intuitive and engaging.
+                    He focuses on UI/UX design, product strategy, and ensuring every feature serves our educational mission.
+                    Cameron's attention to detail ensures FinClash is not just functional, but delightful to use.
+                </p>
+                <div class="creator-skills">
+                    <span class="skill-tag">UI/UX Design</span>
+                    <span class="skill-tag">Product Strategy</span>
+                    <span class="skill-tag">User Experience</span>
+                    <span class="skill-tag">Trading Analysis</span>
+                </div>
+                <a href="about-cameron.html" class="creator-link">Learn More About Cameron →</a>
+            </div>
+        </div>
+
+        <div class="values-section">
+            <h2>What Drives Us</h2>
+            <div class="values-grid">
+                <div class="value-item">
+                    <div class="value-icon">📚</div>
+                    <div class="value-title">Education First</div>
+                    <p class="value-description">We believe financial literacy should be accessible to everyone, not just the privileged few.</p>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon">🛡️</div>
+                    <div class="value-title">Safe Learning</div>
+                    <p class="value-description">Practice trading without risk. Learn from mistakes without losing real money.</p>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon">🚀</div>
+                    <div class="value-title">Innovation</div>
+                    <p class="value-description">We continuously improve FinClash with new features, better data, and enhanced experiences.</p>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon">🤝</div>
+                    <div class="value-title">Community</div>
+                    <p class="value-description">Building a supportive community where traders help each other learn and grow.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="values-section">
+            <h2>Our Story</h2>
+            <p style="color: #d1d5db; font-size: 17px; line-height: 1.8; text-align: center; max-width: 800px; margin: 0 auto;">
+                FinClash was born from a simple idea: what if anyone could learn to trade stocks without risking their hard-earned money?
+                We saw how intimidating the stock market can be for beginners, and how expensive mistakes can discourage people from learning.
+                So we built FinClash—a platform that combines real market data with virtual currency, giving everyone the chance to learn,
+                experiment, and build confidence before investing real money. Since launch, we've helped thousands of users take their first
+                steps into the world of investing, and we're just getting started.
+            </p>
+        </div>
+
+        <div class="contact-section">
+            <h2>💬 Get in Touch</h2>
+            <p>Have questions, feedback, or just want to say hi? We'd love to hear from you!</p>
+            <a href="mailto:finclash101@gmail.com" class="contact-email">Email Us: finclash101@gmail.com</a>
+        </div>
+    </div>
+</body>
+</html>
