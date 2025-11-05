@@ -3828,6 +3828,143 @@
                             </div>
                         </div>
 
+                        {/* AI Portfolio Health Analysis */}
+                        {mainTab === 'portfolio' && (() => {
+                            // Calculate portfolio metrics for AI analysis
+                            const totalPositions = portfolio.positions.length;
+                            const profitablePositions = portfolio.positions.filter(pos => {
+                                const stock = stocks.find(s => s.symbol === pos.symbol);
+                                return stock && (stock.price * pos.shares) > (pos.avgPrice * pos.shares);
+                            }).length;
+
+                            const lossingPositions = totalPositions - profitablePositions;
+                            const winRate = totalPositions > 0 ? (profitablePositions / totalPositions) * 100 : 0;
+
+                            // Calculate diversification (unique sectors - simplified)
+                            const diversificationScore = Math.min(100, (totalPositions / 10) * 100);
+
+                            // Calculate overall risk level
+                            let riskLevel = 'Low';
+                            let riskColor = 'green';
+                            if (portfolioReturn < -10) {
+                                riskLevel = 'High';
+                                riskColor = 'red';
+                            } else if (portfolioReturn < -5 || lossingPositions > profitablePositions) {
+                                riskLevel = 'Medium';
+                                riskColor = 'yellow';
+                            }
+
+                            // Generate AI recommendations
+                            const recommendations = [];
+                            if (diversificationScore < 30 && totalPositions > 0) {
+                                recommendations.push({ icon: '📊', text: 'Consider diversifying across more sectors', priority: 'high' });
+                            }
+                            if (portfolioReturn < -10) {
+                                recommendations.push({ icon: '🛡️', text: 'High portfolio risk - review stop-loss positions', priority: 'high' });
+                            }
+                            if (portfolio.cash > portfolioValue * 0.5) {
+                                recommendations.push({ icon: '💰', text: 'High cash balance - consider deploying capital', priority: 'medium' });
+                            }
+                            if (winRate > 70 && portfolioReturn > 10) {
+                                recommendations.push({ icon: '🚀', text: 'Strong performance - consider taking profits on top performers', priority: 'medium' });
+                            }
+                            if (totalPositions === 0) {
+                                recommendations.push({ icon: '🎯', text: 'Portfolio empty - start with diversified positions', priority: 'high' });
+                            }
+                            if (lossingPositions > profitablePositions && totalPositions > 0) {
+                                recommendations.push({ icon: '⚠️', text: 'More losing than winning positions - review strategy', priority: 'high' });
+                            }
+
+                            return (
+                                <div className="bg-gradient-to-br from-purple-900/60 via-indigo-900/60 to-purple-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 mb-6 shadow-2xl relative overflow-hidden">
+                                    {/* Animated background */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 animate-pulse"></div>
+
+                                    <div className="relative">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-4xl animate-pulse">🧠</span>
+                                                <h2 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+                                                    AI Portfolio Health
+                                                </h2>
+                                                <span className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full font-bold">LIVE</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Portfolio Health Metrics */}
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                            {/* Risk Level */}
+                                            <div className={`bg-gradient-to-br ${
+                                                riskColor === 'green' ? 'from-green-900/40 to-emerald-900/40 border-green-500/50' :
+                                                riskColor === 'yellow' ? 'from-yellow-900/40 to-orange-900/40 border-yellow-500/50' :
+                                                'from-red-900/40 to-pink-900/40 border-red-500/50'
+                                            } rounded-xl p-4 border-2`}>
+                                                <div className="text-xs text-gray-300 font-bold mb-2">RISK LEVEL</div>
+                                                <div className={`text-2xl font-black ${
+                                                    riskColor === 'green' ? 'text-green-300' :
+                                                    riskColor === 'yellow' ? 'text-yellow-300' :
+                                                    'text-red-300'
+                                                }`}>{riskLevel}</div>
+                                            </div>
+
+                                            {/* Win Rate */}
+                                            <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/40 rounded-xl p-4 border-2 border-blue-500/50">
+                                                <div className="text-xs text-gray-300 font-bold mb-2">WIN RATE</div>
+                                                <div className="text-2xl font-black text-cyan-300">{winRate.toFixed(0)}%</div>
+                                                <div className="text-[10px] text-gray-400 mt-1">{profitablePositions}/{totalPositions} profitable</div>
+                                            </div>
+
+                                            {/* Diversification */}
+                                            <div className="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 rounded-xl p-4 border-2 border-indigo-500/50">
+                                                <div className="text-xs text-gray-300 font-bold mb-2">DIVERSIFICATION</div>
+                                                <div className="text-2xl font-black text-purple-300">{diversificationScore.toFixed(0)}%</div>
+                                                <div className="text-[10px] text-gray-400 mt-1">{totalPositions} positions</div>
+                                            </div>
+
+                                            {/* Portfolio Momentum */}
+                                            <div className={`bg-gradient-to-br ${
+                                                portfolioReturn > 5 ? 'from-green-900/40 to-emerald-900/40 border-green-500/50' :
+                                                portfolioReturn < -5 ? 'from-red-900/40 to-pink-900/40 border-red-500/50' :
+                                                'from-gray-900/40 to-slate-900/40 border-gray-500/50'
+                                            } rounded-xl p-4 border-2`}>
+                                                <div className="text-xs text-gray-300 font-bold mb-2">MOMENTUM</div>
+                                                <div className={`text-2xl font-black ${
+                                                    portfolioReturn > 5 ? 'text-green-300' :
+                                                    portfolioReturn < -5 ? 'text-red-300' :
+                                                    'text-gray-300'
+                                                }`}>
+                                                    {portfolioReturn > 5 ? '📈 Strong' : portfolioReturn < -5 ? '📉 Weak' : '➡️ Neutral'}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* AI Recommendations */}
+                                        {recommendations.length > 0 && (
+                                            <div className="bg-black/20 rounded-xl p-4 border border-purple-500/30">
+                                                <div className="text-sm font-bold text-purple-200 mb-3 flex items-center gap-2">
+                                                    <span>⚡</span>
+                                                    <span>AI Recommendations</span>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    {recommendations.map((rec, idx) => (
+                                                        <div key={idx} className={`flex items-start gap-2 text-sm ${
+                                                            rec.priority === 'high' ? 'text-yellow-300' : 'text-blue-300'
+                                                        }`}>
+                                                            <span className="text-lg">{rec.icon}</span>
+                                                            <span className="flex-1">{rec.text}</span>
+                                                            {rec.priority === 'high' && (
+                                                                <span className="text-[10px] bg-red-500/30 px-2 py-0.5 rounded-full font-bold text-red-300">HIGH</span>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })()}
+
                         {/* Portfolio View */}
                         {mainTab === 'portfolio' && (
                             <>
@@ -4813,6 +4950,157 @@
                                                         >
                                                             Full Analysis →
                                                         </button>
+                                                    </div>
+                                                );
+                                            })()}
+
+                                            {/* Smart Buy/Sell Timing Suggestions */}
+                                            {(() => {
+                                                const stock = stocks.find(s => s.symbol === selectedStock);
+                                                if (!stock) return null;
+
+                                                const change = stock.change || 0;
+                                                const price = stock.price || 0;
+
+                                                // Analyze timing based on multiple factors
+                                                const currentHour = new Date().getHours();
+                                                const currentMinutes = new Date().getMinutes();
+                                                const isMarketOpening = marketOpen && currentHour === 9 && currentMinutes >= 30 && currentMinutes < 45;
+                                                const isMarketClosing = marketOpen && currentHour === 15 && currentMinutes >= 45;
+                                                const isMidDay = marketOpen && currentHour >= 11 && currentHour <= 14;
+
+                                                // Get position info
+                                                const position = portfolio.positions.find(p => p.symbol === selectedStock);
+                                                const hasPosition = position && position.shares > 0;
+                                                const positionReturn = hasPosition ? ((price - position.avgPrice) / position.avgPrice) * 100 : 0;
+
+                                                let buyTiming = { score: 50, label: 'Neutral', color: 'gray', reason: '' };
+                                                let sellTiming = { score: 50, label: 'Neutral', color: 'gray', reason: '' };
+
+                                                // Buy timing analysis
+                                                if (change < -3 && isMidDay) {
+                                                    buyTiming = { score: 85, label: 'Excellent', color: 'green', reason: 'Strong dip during stable hours' };
+                                                } else if (change < -1.5 && !isMarketOpening) {
+                                                    buyTiming = { score: 75, label: 'Good', color: 'green', reason: 'Pullback opportunity' };
+                                                } else if (change > 0 && change < 2 && isMidDay) {
+                                                    buyTiming = { score: 65, label: 'Fair', color: 'yellow', reason: 'Moderate momentum' };
+                                                } else if (change > 5) {
+                                                    buyTiming = { score: 25, label: 'Poor', color: 'red', reason: 'Overextended - wait for pullback' };
+                                                } else if (isMarketOpening || isMarketClosing) {
+                                                    buyTiming = { score: 40, label: 'Caution', color: 'yellow', reason: 'High volatility period' };
+                                                } else {
+                                                    buyTiming = { score: 50, label: 'Neutral', color: 'gray', reason: 'Standard market conditions' };
+                                                }
+
+                                                // Sell timing analysis
+                                                if (hasPosition) {
+                                                    if (positionReturn > 15 && change > 0) {
+                                                        sellTiming = { score: 85, label: 'Excellent', color: 'green', reason: 'Strong gains with continued momentum' };
+                                                    } else if (positionReturn > 8 && change < -2) {
+                                                        sellTiming = { score: 90, label: 'Excellent', color: 'green', reason: 'Lock in profits before reversal' };
+                                                    } else if (positionReturn < -10) {
+                                                        sellTiming = { score: 80, label: 'Consider', color: 'yellow', reason: 'Cut losses or wait for recovery' };
+                                                    } else if (positionReturn > 0 && positionReturn < 5) {
+                                                        sellTiming = { score: 40, label: 'Hold', color: 'gray', reason: 'Let winners run' };
+                                                    } else if (isMarketClosing) {
+                                                        sellTiming = { score: 60, label: 'Fair', color: 'yellow', reason: 'End of day - reduce exposure' };
+                                                    }
+                                                } else {
+                                                    if (change > 10) {
+                                                        sellTiming = { score: 70, label: 'Good', color: 'green', reason: 'Consider shorting (advanced)' };
+                                                    } else {
+                                                        sellTiming = { score: 30, label: 'N/A', color: 'gray', reason: 'No position to sell' };
+                                                    }
+                                                }
+
+                                                const getBgColor = (color) => {
+                                                    if (color === 'green') return 'from-green-900/40 to-emerald-900/40 border-green-500/50';
+                                                    if (color === 'red') return 'from-red-900/40 to-rose-900/40 border-red-500/50';
+                                                    if (color === 'yellow') return 'from-yellow-900/40 to-amber-900/40 border-yellow-500/50';
+                                                    return 'from-gray-900/40 to-slate-900/40 border-gray-500/50';
+                                                };
+
+                                                const getTextColor = (color) => {
+                                                    if (color === 'green') return 'text-green-300';
+                                                    if (color === 'red') return 'text-red-300';
+                                                    if (color === 'yellow') return 'text-yellow-300';
+                                                    return 'text-gray-300';
+                                                };
+
+                                                return (
+                                                    <div className="mt-4 bg-black/20 rounded-xl p-4 border border-purple-500/30">
+                                                        <div className="flex items-center gap-2 mb-3">
+                                                            <span className="text-lg">⏰</span>
+                                                            <span className="text-sm font-bold text-purple-200">AI Timing Suggestions</span>
+                                                            {!marketOpen && <span className="text-xs text-red-300 bg-red-900/30 px-2 py-0.5 rounded-full">Market Closed</span>}
+                                                        </div>
+
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                            {/* Buy Timing */}
+                                                            <div className={`bg-gradient-to-br ${getBgColor(buyTiming.color)} rounded-lg p-3 border-2`}>
+                                                                <div className="flex items-center justify-between mb-2">
+                                                                    <span className="text-xs font-bold text-gray-300">BUY TIMING</span>
+                                                                    <span className={`text-sm font-black ${getTextColor(buyTiming.color)}`}>
+                                                                        {buyTiming.score}/100
+                                                                    </span>
+                                                                </div>
+                                                                <div className={`text-lg font-black ${getTextColor(buyTiming.color)} mb-1`}>
+                                                                    {buyTiming.label}
+                                                                </div>
+                                                                <div className="text-xs text-gray-300">
+                                                                    {buyTiming.reason}
+                                                                </div>
+                                                                {/* Visual score bar */}
+                                                                <div className="mt-2 bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                                                                    <div
+                                                                        className={`h-full ${
+                                                                            buyTiming.color === 'green' ? 'bg-green-500' :
+                                                                            buyTiming.color === 'red' ? 'bg-red-500' :
+                                                                            buyTiming.color === 'yellow' ? 'bg-yellow-500' :
+                                                                            'bg-gray-500'
+                                                                        }`}
+                                                                        style={{ width: `${buyTiming.score}%` }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Sell Timing */}
+                                                            <div className={`bg-gradient-to-br ${getBgColor(sellTiming.color)} rounded-lg p-3 border-2`}>
+                                                                <div className="flex items-center justify-between mb-2">
+                                                                    <span className="text-xs font-bold text-gray-300">SELL TIMING</span>
+                                                                    <span className={`text-sm font-black ${getTextColor(sellTiming.color)}`}>
+                                                                        {sellTiming.score}/100
+                                                                    </span>
+                                                                </div>
+                                                                <div className={`text-lg font-black ${getTextColor(sellTiming.color)} mb-1`}>
+                                                                    {sellTiming.label}
+                                                                </div>
+                                                                <div className="text-xs text-gray-300">
+                                                                    {sellTiming.reason}
+                                                                </div>
+                                                                {/* Visual score bar */}
+                                                                <div className="mt-2 bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                                                                    <div
+                                                                        className={`h-full ${
+                                                                            sellTiming.color === 'green' ? 'bg-green-500' :
+                                                                            sellTiming.color === 'red' ? 'bg-red-500' :
+                                                                            sellTiming.color === 'yellow' ? 'bg-yellow-500' :
+                                                                            'bg-gray-500'
+                                                                        }`}
+                                                                        style={{ width: `${sellTiming.score}%` }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {hasPosition && (
+                                                            <div className="mt-2 pt-2 border-t border-purple-500/20 text-[10px] text-purple-300">
+                                                                💼 Current Position: {position.shares} shares @ ${position.avgPrice.toFixed(2)}
+                                                                | Return: <span className={positionReturn >= 0 ? 'text-green-300' : 'text-red-300'}>
+                                                                    {positionReturn >= 0 ? '+' : ''}{positionReturn.toFixed(2)}%
+                                                                </span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 );
                                             })()}
