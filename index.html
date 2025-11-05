@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinClash - Stock Trading Simulator</title>
+
+    <!-- Development build - CDN libraries for rapid prototyping -->
+    <!-- Note: For production deployment, these should be built/bundled properly -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -37,12 +40,8 @@
         // All user data stored on backend server (not localStorage)
 
         // Backend API Configuration
-        // IMPORTANT: Change this to your deployed backend URL (e.g., Render, Railway, Heroku)
-        // For local development: 'http://localhost:3001'
-        // For production: 'https://trader1.onrender.com'
-        const API_BASE_URL = window.location.hostname === 'localhost'
-            ? 'http://localhost:3001'
-            : 'https://trader1.onrender.com';
+        // Running on local backend server
+        const API_BASE_URL = 'http://localhost:3001';
 
         const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');
@@ -977,83 +976,9 @@
                         return;
                     }
 
-                    // Family plans save to Supabase
-                    if (!supabase) {
-                        alert('Supabase is not configured. Please update the SUPABASE_URL and SUPABASE_ANON_KEY in index.html.\n\nGet these values from: https://supabase.com/dashboard → Your Project → Settings → API');
-                        return;
-                    }
-
-                    console.log('Creating competition with code:', code, 'plan:', plan);
-                    const { data: compData, error: compError } = await supabase
-                        .from('competitions')
-                        .insert([{
-                            code: code,
-                            plan_type: plan, // Save 'family-public' or 'family-private'
-                            total_pool: parseFloat(contributionAmount)
-                        }])
-                        .select()
-                        .single();
-
-                    if (compError) {
-                        console.error('Supabase error creating competition:', compError);
-                        alert(`Failed to create competition: ${compError.message}\n\nPlease check browser console for details.`);
-                        return;
-                    }
-
-                    console.log('Competition created in Supabase:', compData);
-
-                    // Save member to Supabase
-                    console.log('Creating member with ID:', memberId);
-                    const { data: memberData, error: memberError } = await supabase
-                        .from('members')
-                        .insert([{
-                            competition_code: code,
-                            member_id: memberId,
-                            name: memberName,
-                            contribution: parseFloat(contributionAmount),
-                            portfolio: {
-                                cash: 100000,
-                                positions: {},
-                                history: [],
-                                lastBuyTime: {},
-                                watchlist: []
-                            }
-                        }])
-                        .select()
-                        .single();
-
-                    if (memberError) {
-                        console.error('Supabase error creating member:', memberError);
-                        alert(`Failed to create member: ${memberError.message}\n\nPlease check browser console for details.`);
-                        return;
-                    }
-
-                    console.log('Member created in Supabase:', memberData);
-
-                    const newCompetition = {
-                        code,
-                        totalPool: parseFloat(contributionAmount),
-                        startTime: compData.start_time,
-                        members: [{
-                            id: memberId,
-                            name: memberName,
-                            contribution: parseFloat(contributionAmount),
-                            portfolio: {
-                                cash: 100000,
-                                positions: {},
-                                history: [],
-                                lastBuyTime: {},
-                                watchlist: []
-                            },
-                            joinedAt: memberData.joined_at
-                        }]
-                    };
-
-                    setCompetition(newCompetition);
-                    setCompetitionCode(code);
-                    setCurrentUserId(memberId);
-                    setView('code-display');
-                    console.log('✅ Competition created successfully:', code);
+                    // Family plans - not currently supported
+                    alert('Family plans are not currently available. Please use a Personal plan instead.');
+                    return;
                 } catch (error) {
                     console.error('Error creating competition:', error);
                     alert('Failed to create competition. Please try again.');
@@ -1061,102 +986,8 @@
             };
 
             const joinCompetition = async (code, memberName, contributionAmount) => {
-                const memberId = Date.now().toString();
-
-                try {
-                    if (!supabase) {
-                        alert('Supabase is not configured. Please update the SUPABASE_URL and SUPABASE_ANON_KEY in index.html.\n\nGet these values from: https://supabase.com/dashboard → Your Project → Settings → API');
-                        return;
-                    }
-
-                    // Check if competition exists
-                    const { data: compData, error: compError } = await supabase
-                        .from('competitions')
-                        .select('*')
-                        .eq('code', code)
-                        .single();
-
-                    if (compError || !compData) {
-                        alert('Competition not found! Please check the code and try again.');
-                        console.error('Competition not found:', compError);
-                        return;
-                    }
-
-                    // Get existing members
-                    const { data: existingMembers, error: membersError } = await supabase
-                        .from('members')
-                        .select('*')
-                        .eq('competition_code', code);
-
-                    if (membersError) {
-                        console.error('Error fetching members:', membersError);
-                        alert('Failed to load competition members. Please try again.');
-                        return;
-                    }
-
-                    // Add new member
-                    const { data: newMemberData, error: newMemberError } = await supabase
-                        .from('members')
-                        .insert([{
-                            competition_code: code,
-                            member_id: memberId,
-                            name: memberName,
-                            contribution: parseFloat(contributionAmount || 0),
-                            portfolio: {
-                                cash: 100000,
-                                positions: {},
-                                history: [],
-                                lastBuyTime: {},
-                                watchlist: []
-                            }
-                        }])
-                        .select()
-                        .single();
-
-                    if (newMemberError) {
-                        console.error('Error joining competition:', newMemberError);
-                        alert('Failed to join competition. Please try again.');
-                        return;
-                    }
-
-                    // Update total pool
-                    const newTotalPool = compData.total_pool + parseFloat(contributionAmount || 0);
-                    const { error: updateError } = await supabase
-                        .from('competitions')
-                        .update({ total_pool: newTotalPool })
-                        .eq('code', code);
-
-                    if (updateError) {
-                        console.error('Error updating pool:', updateError);
-                    }
-
-                    // Build competition object with all members
-                    const allMembers = [...existingMembers, newMemberData].map(m => ({
-                        id: m.member_id,
-                        name: m.name,
-                        contribution: m.contribution,
-                        portfolio: m.portfolio,
-                        joinedAt: m.joined_at
-                    }));
-
-                    const joinedCompetition = {
-                        code: code,
-                        totalPool: newTotalPool,
-                        startTime: compData.start_time,
-                        members: allMembers
-                    };
-
-                    setCompetition(joinedCompetition);
-                    setCompetitionCode(code);
-                    setCurrentUserId(memberId);
-                    setPlan(compData.plan_type || 'family-public'); // Set plan type from competition
-                    setView('trading');
-
-                    console.log('✅ Joined competition successfully:', code, 'plan:', compData.plan_type);
-                } catch (error) {
-                    console.error('Error joining competition:', error);
-                    alert('Failed to join competition. Please try again.');
-                }
+                alert('Join competition feature is not currently available. Please create a Personal account instead.');
+                return;
             };
 
             const signInWithEmailAndPasscode = async (email, passcode) => {
