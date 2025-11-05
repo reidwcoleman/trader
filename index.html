@@ -155,31 +155,32 @@
                 }
             }, [competition, currentUserId]);
 
+            // Socket.io disabled - causing CORS errors
             // Initialize Socket.io connection for chat
-            useEffect(() => {
-                const newSocket = io(API_BASE_URL);
-                setSocket(newSocket);
+            // useEffect(() => {
+            //     const newSocket = io(API_BASE_URL);
+            //     setSocket(newSocket);
 
-                // Listen for chat history
-                newSocket.on('chat_history', (messages) => {
-                    setChatMessages(messages);
-                });
+            //     // Listen for chat history
+            //     newSocket.on('chat_history', (messages) => {
+            //         setChatMessages(messages);
+            //     });
 
-                // Listen for new messages
-                newSocket.on('chat_message', (message) => {
-                    setChatMessages(prev => [...prev, message]);
-                    // Auto-scroll to bottom
-                    setTimeout(() => {
-                        if (chatContainerRef.current) {
-                            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-                        }
-                    }, 100);
-                });
+            //     // Listen for new messages
+            //     newSocket.on('chat_message', (message) => {
+            //         setChatMessages(prev => [...prev, message]);
+            //         // Auto-scroll to bottom
+            //         setTimeout(() => {
+            //             if (chatContainerRef.current) {
+            //                 chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            //             }
+            //         }, 100);
+            //     });
 
-                return () => {
-                    newSocket.close();
-                };
-            }, []);
+            //     return () => {
+            //         newSocket.close();
+            //     };
+            // }, []);
 
             // Auto-fetch stock data for portfolio positions
             useEffect(() => {
