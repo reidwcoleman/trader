@@ -397,6 +397,16 @@
                 setHasLoaded(true);
             }, []);
 
+            // Auto-redirect from code-display to trading view
+            useEffect(() => {
+                if (view === 'code-display') {
+                    const timer = setTimeout(() => {
+                        setView('trading');
+                    }, 2500); // Show welcome message for 2.5 seconds
+                    return () => clearTimeout(timer);
+                }
+            }, [view]);
+
             // Toast notification system
             const showToast = (message, type = 'info', duration = 5000) => {
                 const id = Date.now() + Math.random();
@@ -984,7 +994,12 @@
                         const data = await response.json();
 
                         if (!response.ok) {
-                            alert(data.error || 'Failed to create account');
+                            console.error('❌ Account creation failed:', data.error);
+                            if (response.status === 400 && data.error && data.error.includes('already exists')) {
+                                alert('An account with this email already exists. Please sign in instead or use a different email.');
+                            } else {
+                                alert(data.error || 'Failed to create account. Please try again.');
+                            }
                             return;
                         }
 
@@ -3108,14 +3123,6 @@
 
             // Code Display Screen (after creating competition)
             if (view === 'code-display') {
-                // Auto-redirect to trading view after showing brief welcome
-                React.useEffect(() => {
-                    const timer = setTimeout(() => {
-                        setView('trading');
-                    }, 2500); // Show welcome message for 2.5 seconds
-                    return () => clearTimeout(timer);
-                }, []);
-
                 return (
                     <div className={`min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-900 p-4 md:p-8 flex items-center justify-center ${hasLoaded ? 'flicker-in' : ''}`}>
                         <div className="max-w-2xl w-full">
