@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinClash - Stock Trading Simulator</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
 
     <!-- Development build - CDN libraries for rapid prototyping -->
     <!-- Note: For production deployment, these should be built/bundled properly -->
@@ -155,30 +156,31 @@
             }, [competition, currentUserId]);
 
             // Initialize Socket.io connection for chat
-            useEffect(() => {
-                const newSocket = io(API_BASE_URL);
-                setSocket(newSocket);
+            // Socket.io disabled - backend not deployed
+            // useEffect(() => {
+            //     const newSocket = io(API_BASE_URL);
+            //     setSocket(newSocket);
 
-                // Listen for chat history
-                newSocket.on('chat_history', (messages) => {
-                    setChatMessages(messages);
-                });
+            //     // Listen for chat history
+            //     newSocket.on('chat_history', (messages) => {
+            //         setChatMessages(messages);
+            //     });
 
-                // Listen for new messages
-                newSocket.on('chat_message', (message) => {
-                    setChatMessages(prev => [...prev, message]);
-                    // Auto-scroll to bottom
-                    setTimeout(() => {
-                        if (chatContainerRef.current) {
-                            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-                        }
-                    }, 100);
-                });
+            //     // Listen for new messages
+            //     newSocket.on('chat_message', (message) => {
+            //         setChatMessages(prev => [...prev, message]);
+            //         // Auto-scroll to bottom
+            //         setTimeout(() => {
+            //             if (chatContainerRef.current) {
+            //                 chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            //             }
+            //         }, 100);
+            //     });
 
-                return () => {
-                    newSocket.close();
-                };
-            }, []);
+            //     return () => {
+            //         newSocket.close();
+            //     };
+            // }, []);
 
             // Auto-fetch stock data for portfolio positions
             useEffect(() => {
