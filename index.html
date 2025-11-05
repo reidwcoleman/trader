@@ -865,10 +865,15 @@
                 };
 
                 if (plan === 'personal') {
-                    return competition?.members[0]?.portfolio || defaultPortfolio;
+                    const portfolio = competition?.members[0]?.portfolio || defaultPortfolio;
+                    console.log('📂 getCurrentPortfolio (personal):', portfolio);
+                    console.log('📊 Current positions:', portfolio.positions);
+                    return portfolio;
                 }
                 const member = competition?.members.find(m => m.id === currentUserId);
-                return member?.portfolio || defaultPortfolio;
+                const portfolio = member?.portfolio || defaultPortfolio;
+                console.log('📂 getCurrentPortfolio (family):', portfolio);
+                return portfolio;
             };
 
             const calculatePortfolioValue = (portfolio) => {
@@ -1798,7 +1803,11 @@
                     }
                 } else {
                     // SELL - Check position
+                    console.log('🔍 Checking sell position for', selectedStock);
+                    console.log('📊 All positions:', portfolio.positions);
                     const currentPosition = portfolio.positions[selectedStock] || 0;
+                    console.log(`📈 ${selectedStock} position:`, currentPosition);
+                    console.log('🔢 Trying to sell:', quantity);
                     if (quantity > currentPosition) {
                         showToast(`Insufficient shares! You only own ${currentPosition} shares of ${selectedStock}`, 'error');
                         return;
@@ -3232,6 +3241,11 @@
                                                         // Sign in with account data from backend
                                                         const account = data.account;
                                                         const code = account.accountCode;
+
+                                                        console.log('📦 Portfolio loaded from backend:', account.portfolio);
+                                                        console.log('📊 Positions:', account.portfolio?.positions);
+                                                        console.log('💵 Cash:', account.portfolio?.cash);
+
                                                         const newCompetition = {
                                                             code: code,
                                                             totalPool: 0,
@@ -3253,6 +3267,7 @@
                                                         setView('app');
                                                         setUserPassword('');
                                                         console.log('✅ Signed in successfully');
+                                                        console.log('🎯 Competition state:', newCompetition);
                                                     } catch (error) {
                                                         console.error('Sign in error:', error);
                                                         alert('Failed to sign in. Please check that the server is running (npm start).');
