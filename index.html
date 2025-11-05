@@ -3026,6 +3026,14 @@
 
             // Code Display Screen (after creating competition)
             if (view === 'code-display') {
+                // Auto-redirect to trading view after showing brief welcome
+                React.useEffect(() => {
+                    const timer = setTimeout(() => {
+                        setView('trading');
+                    }, 2500); // Show welcome message for 2.5 seconds
+                    return () => clearTimeout(timer);
+                }, []);
+
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-900 p-4 md:p-8 flex items-center justify-center">
                         <div className="max-w-2xl w-full">
@@ -3035,128 +3043,30 @@
                                     <div className="inline-block bg-green-500 rounded-full p-6 mb-4">
                                         <span className="text-7xl">✅</span>
                                     </div>
-                                    <h1 className="text-4xl font-black text-white mb-2">{plan === 'personal' ? 'Account Created!' : 'Competition Created!'}</h1>
-                                    <p className="text-purple-200 text-lg">{plan === 'personal' ? 'Save this code to sign in from any device' : 'Share this code with your family members'}</p>
+                                    <h1 className="text-4xl font-black text-white mb-2">Welcome to FinClash!</h1>
+                                    <p className="text-purple-200 text-lg">Your account is ready. Let's start trading!</p>
                                 </div>
 
-                                {/* Login Credentials Display */}
-                                {plan === 'personal' ? (
-                                    <div className="space-y-4 mb-6">
-                                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
-                                            <div className="text-center">
-                                                <p className="text-purple-200 text-sm font-semibold mb-2">YOUR ACCOUNT CODE</p>
-                                                <div className="bg-gradient-to-r from-green-400 to-emerald-400 rounded-xl p-4">
-                                                    <div className="text-3xl font-black text-gray-900 tracking-widest font-mono">
-                                                        {competitionCode}
-                                                    </div>
-                                                </div>
-                                                <p className="text-purple-200 text-xs mt-2">Use this code to sign in quickly</p>
-                                            </div>
-                                        </div>
-                                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
-                                            <div className="text-center">
-                                                <p className="text-purple-200 text-sm font-semibold mb-2">YOUR EMAIL</p>
-                                                <div className="bg-gradient-to-r from-blue-400 to-cyan-400 rounded-xl p-4">
-                                                    <div className="text-2xl font-bold text-gray-900">
-                                                        {userEmail}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border-2 border-white/30">
-                                            <div className="text-center">
-                                                <p className="text-purple-200 text-sm font-semibold mb-2">YOUR PASSCODE</p>
-                                                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl p-6">
-                                                    <div className="text-5xl font-black text-gray-900 tracking-widest font-mono">
-                                                        {generatedPasscode}
-                                                    </div>
-                                                </div>
-                                                <p className="text-purple-200 text-xs mt-2">Legacy 6-digit code (optional)</p>
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(`Account Code: ${competitionCode}\nEmail: ${userEmail}\nPasscode: ${generatedPasscode}`);
-                                                setCopySuccess(true);
-                                                setTimeout(() => setCopySuccess(false), 2000);
-                                            }}
-                                            className="w-full bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2"
-                                        >
-                                            {copySuccess ? '✓ Copied!' : '📋 Copy All Login Info'}
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-6 border-2 border-white/30">
-                                        <div className="text-center">
-                                            <p className="text-purple-200 text-sm font-semibold mb-3">YOUR COMPETITION CODE</p>
-                                            <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl p-6 mb-4">
-                                                <div className="text-6xl font-black text-gray-900 tracking-widest font-mono">
-                                                    {competitionCode}
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    navigator.clipboard.writeText(competitionCode);
-                                                    setCopySuccess(true);
-                                                    setTimeout(() => setCopySuccess(false), 2000);
-                                                }}
-                                                className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 mx-auto"
-                                            >
-                                                {copySuccess ? '✓ Copied!' : '📋 Copy Code'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Instructions */}
+                                {/* Getting Started Guide */}
                                 <div className="bg-blue-900/50 rounded-xl p-6 mb-6 border border-blue-500">
-                                    <h3 className="text-white font-bold mb-3 text-lg">{plan === 'personal' ? '🔐 Important - Save Your Login Info!' : '📱 How to Share:'}</h3>
-                                    {plan === 'personal' ? (
-                                        <ul className="text-purple-200 space-y-2 list-disc list-inside">
-                                            <li><strong>Email + Password:</strong> Sign in with your email and password</li>
-                                            <li>Save your account code and passcode for reference</li>
-                                            <li>Your portfolio and trades are saved automatically</li>
-                                            <li className="text-green-300 font-semibold">You start with $100,000 virtual cash - Happy trading! 📈</li>
-                                        </ul>
-                                    ) : (
-                                        <ol className="text-purple-200 space-y-2 list-decimal list-inside">
-                                            <li>Copy the code above</li>
-                                            <li>Share it with your family members via text, email, or in person</li>
-                                            <li>They click "Join Pool" and enter this code</li>
-                                            <li>Everyone trades with $100,000 virtual cash</li>
-                                            <li>Winner takes the prize pool: <span className="text-green-300 font-bold">${competition?.totalPool || 0}</span></li>
-                                        </ol>
-                                    )}
+                                    <h3 className="text-white font-bold mb-3 text-lg">📈 Quick Start Guide:</h3>
+                                    <ul className="text-purple-200 space-y-2 list-disc list-inside">
+                                        <li><strong>Search Stocks:</strong> Use the search bar to find companies</li>
+                                        <li><strong>View Details:</strong> Click any stock to see price charts and company info</li>
+                                        <li><strong>Make Trades:</strong> Buy or sell stocks with your virtual cash</li>
+                                        <li><strong>Track Portfolio:</strong> Monitor your investments in the Portfolio tab</li>
+                                        <li><strong>Stay Updated:</strong> Check Market Movers and News for insights</li>
+                                    </ul>
                                 </div>
 
-                                {/* Competition Info */}
-                                <div className="bg-purple-900/50 rounded-xl p-4 mb-6 border border-purple-500">
-                                    <div className="grid grid-cols-2 gap-4 text-center">
-                                        <div>
-                                            <div className="text-purple-300 text-sm">Your Name</div>
-                                            <div className="text-white font-bold text-lg">{userName}</div>
-                                        </div>
-                                        <div>
-                                            <div className="text-purple-300 text-sm">Your Entry</div>
-                                            <div className="text-green-300 font-bold text-lg">${contribution}</div>
-                                        </div>
-                                    </div>
+                                <div className="bg-green-900/30 rounded-xl p-4 border border-green-500/50 mb-6">
+                                    <p className="text-green-300 font-semibold text-center">
+                                        🎯 You start with $100,000 virtual cash - Happy trading!
+                                    </p>
                                 </div>
 
-                                {/* Action Buttons */}
-                                <div className="grid grid-cols-1 gap-4">
-                                    <button
-                                        onClick={() => setView('trading')}
-                                        className="bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-300 hover:to-emerald-400 text-white py-5 rounded-xl font-black text-xl transition-all duration-300 shadow-lg"
-                                    >
-                                        🚀 Start Trading
-                                    </button>
-                                    <button
-                                        onClick={() => setView('plan-select')}
-                                        className="bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-xl font-bold transition-all duration-300"
-                                    >
-                                        ← Back to Home
-                                    </button>
+                                <div className="text-center">
+                                    <p className="text-purple-300 text-sm">Redirecting to trading platform...</p>
                                 </div>
                             </div>
                         </div>
