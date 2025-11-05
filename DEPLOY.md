@@ -23,13 +23,13 @@ Every push to `main` branch automatically triggers a new deployment via GitHub A
 Your backend is live at: `https://finclash-backend.onrender.com`
 
 **Automatic Deployment Setup:**
-- ✅ Render service created: `srv-d44n2mngi27c73adef7g`
+- ✅ Render service created: `srv-d45cgo3uibrs73f2653g`
 - ✅ GitHub Actions workflow configured
 - ✅ Auto-deploy on every push to `main`
 
 **To manually trigger deployment:**
 ```bash
-curl -X POST https://api.render.com/deploy/srv-d44n2mngi27c73adef7g?key=41MzdQrMfwU
+curl -X POST https://api.render.com/deploy/srv-d45cgo3uibrs73f2653g?key=KAW-wS5Qfy8
 ```
 
 **View your backend:**

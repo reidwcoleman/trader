@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Trigger Render Deployment
         run: |
-          curl -X POST https://api.render.com/deploy/srv-d44n2mngi27c73adef7g?key=41MzdQrMfwU
+          curl -X POST https://api.render.com/deploy/srv-d45cgo3uibrs73f2653g?key=KAW-wS5Qfy8
 
       - name: Deployment Status
         run: |
