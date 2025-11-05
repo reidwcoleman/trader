@@ -40,8 +40,12 @@
         // All user data stored on backend server (not localStorage)
 
         // Backend API Configuration
-        // Running on local backend server
-        const API_BASE_URL = 'http://localhost:3001';
+        // Automatically detects environment:
+        // - localhost: http://localhost:3001 (local development)
+        // - production: https://finclash-backend.onrender.com (deployed backend)
+        const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:3001'
+            : 'https://finclash-backend.onrender.com';
 
         const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');

@@ -24,5 +24,10 @@ Thumbs.db
 dist/
 build/
 .env
-family-users.json
 .env.production
+
+# User data files (not committed to git)
+family-users.json
+accounts.json
+chat-messages.json
+data/*.json
