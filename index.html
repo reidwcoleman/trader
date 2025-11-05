@@ -907,6 +907,38 @@
                 return Math.floor(100000 + Math.random() * 900000).toString();
             };
 
+            // Password strength checker
+            const checkPasswordStrength = (password) => {
+                if (!password) return null;
+
+                const requirements = {
+                    minLength: password.length >= 8,
+                    hasUpperCase: /[A-Z]/.test(password),
+                    hasLowerCase: /[a-z]/.test(password),
+                    hasNumber: /[0-9]/.test(password),
+                    hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+                };
+
+                const metRequirements = Object.values(requirements).filter(Boolean).length;
+
+                let strength = 'weak';
+                let color = 'red';
+                if (metRequirements >= 5) {
+                    strength = 'strong';
+                    color = 'green';
+                } else if (metRequirements >= 3) {
+                    strength = 'medium';
+                    color = 'yellow';
+                }
+
+                return {
+                    strength,
+                    color,
+                    requirements,
+                    score: metRequirements
+                };
+            };
+
             const createCompetition = async (memberName, contributionAmount, password = null) => {
                 const code = generateCompetitionCode();
                 const memberId = Date.now().toString();
@@ -3170,10 +3202,64 @@
                                                 <input
                                                     type="password"
                                                     value={userPassword}
-                                                    onChange={(e) => setUserPassword(e.target.value)}
+                                                    onChange={(e) => {
+                                                        setUserPassword(e.target.value);
+                                                        setPasswordStrength(checkPasswordStrength(e.target.value));
+                                                    }}
                                                     placeholder="Create a password"
                                                     className="w-full bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
                                                 />
+
+                                                {/* Password Strength Indicator */}
+                                                {userPassword && passwordStrength && (
+                                                    <div className="mt-3">
+                                                        {/* Strength Bar */}
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            <div className="flex-1 bg-blue-900/40 rounded-full h-2 overflow-hidden">
+                                                                <div
+                                                                    className={`h-full transition-all duration-300 ${
+                                                                        passwordStrength.color === 'green' ? 'bg-green-500' :
+                                                                        passwordStrength.color === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'
+                                                                    }`}
+                                                                    style={{width: `${(passwordStrength.score / 5) * 100}%`}}
+                                                                ></div>
+                                                            </div>
+                                                            <span className={`text-sm font-bold ${
+                                                                passwordStrength.color === 'green' ? 'text-green-400' :
+                                                                passwordStrength.color === 'yellow' ? 'text-yellow-400' : 'text-red-400'
+                                                            }`}>
+                                                                {passwordStrength.strength.toUpperCase()}
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Requirements Checklist */}
+                                                        <div className="bg-blue-900/20 rounded-lg p-3 space-y-1">
+                                                            <p className="text-xs text-blue-300 font-bold mb-2">Password Requirements:</p>
+                                                            <div className="space-y-1">
+                                                                <div className={`text-xs flex items-center gap-2 ${passwordStrength.requirements.minLength ? 'text-green-400' : 'text-gray-400'}`}>
+                                                                    <span>{passwordStrength.requirements.minLength ? '✓' : '○'}</span>
+                                                                    <span>At least 8 characters</span>
+                                                                </div>
+                                                                <div className={`text-xs flex items-center gap-2 ${passwordStrength.requirements.hasUpperCase ? 'text-green-400' : 'text-gray-400'}`}>
+                                                                    <span>{passwordStrength.requirements.hasUpperCase ? '✓' : '○'}</span>
+                                                                    <span>One uppercase letter (A-Z)</span>
+                                                                </div>
+                                                                <div className={`text-xs flex items-center gap-2 ${passwordStrength.requirements.hasLowerCase ? 'text-green-400' : 'text-gray-400'}`}>
+                                                                    <span>{passwordStrength.requirements.hasLowerCase ? '✓' : '○'}</span>
+                                                                    <span>One lowercase letter (a-z)</span>
+                                                                </div>
+                                                                <div className={`text-xs flex items-center gap-2 ${passwordStrength.requirements.hasNumber ? 'text-green-400' : 'text-gray-400'}`}>
+                                                                    <span>{passwordStrength.requirements.hasNumber ? '✓' : '○'}</span>
+                                                                    <span>One number (0-9)</span>
+                                                                </div>
+                                                                <div className={`text-xs flex items-center gap-2 ${passwordStrength.requirements.hasSpecial ? 'text-green-400' : 'text-gray-400'}`}>
+                                                                    <span>{passwordStrength.requirements.hasSpecial ? '✓' : '○'}</span>
+                                                                    <span>One special character (!@#$%^&*)</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <button
@@ -3186,8 +3272,8 @@
                                                         alert('Please enter a valid email address');
                                                         return;
                                                     }
-                                                    if (!userPassword || userPassword.length < 6) {
-                                                        alert('Password must be at least 6 characters long');
+                                                    if (!userPassword || userPassword.length < 8) {
+                                                        alert('Password must be at least 8 characters long');
                                                         return;
                                                     }
 
@@ -5921,6 +6007,78 @@
                         )}
                     </div>
                 </div>
+
+                {/* Footer - appears on all views */}
+                <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-t border-gray-700/50 mt-auto">
+                    <div className="max-w-7xl mx-auto px-4 py-8">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-6">
+                            {/* About Section */}
+                            <div>
+                                <h3 className="text-white font-bold text-lg mb-3">FinClash</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed">
+                                    Virtual stock trading simulator for educational purposes. Practice trading with $100,000 in virtual currency.
+                                </p>
+                            </div>
+
+                            {/* Legal Links */}
+                            <div>
+                                <h3 className="text-white font-bold text-lg mb-3">Legal</h3>
+                                <ul className="space-y-2">
+                                    <li>
+                                        <a href="privacy-policy.html" target="_blank" className="text-gray-400 hover:text-purple-400 text-sm transition-colors">
+                                            Privacy Policy
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="terms-of-service.html" target="_blank" className="text-gray-400 hover:text-purple-400 text-sm transition-colors">
+                                            Terms of Service
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="trust-safety.html" target="_blank" className="text-gray-400 hover:text-purple-400 text-sm transition-colors">
+                                            Trust & Safety
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Company Links */}
+                            <div>
+                                <h3 className="text-white font-bold text-lg mb-3">Company</h3>
+                                <ul className="space-y-2">
+                                    <li>
+                                        <a href="about-us.html" target="_blank" className="text-gray-400 hover:text-purple-400 text-sm transition-colors">
+                                            About Us
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="contact.html" target="_blank" className="text-gray-400 hover:text-purple-400 text-sm transition-colors">
+                                            Contact & Support
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Disclaimer */}
+                            <div>
+                                <h3 className="text-white font-bold text-lg mb-3">Disclaimer</h3>
+                                <p className="text-gray-400 text-xs leading-relaxed">
+                                    FinClash is for educational purposes only. All trading uses virtual currency. Not real money. Not financial advice.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Bottom Bar */}
+                        <div className="border-t border-gray-700/50 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                            <p className="text-gray-500 text-sm">
+                                © 2025 FinClash. All rights reserved.
+                            </p>
+                            <p className="text-gray-500 text-sm">
+                                Created by Reid Coleman & Cameron Dietzel
+                            </p>
+                        </div>
+                    </div>
+                </footer>
                 </>
             );
         };
