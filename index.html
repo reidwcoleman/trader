@@ -3836,7 +3836,7 @@
                                         if (!stock) return;
 
                                         const change = stock.change || 0;
-                                        const position = portfolio.positions.find(p => p.symbol === symbol);
+                                        const positionShares = portfolio.positions[symbol] || 0;
 
                                         // Generate alerts based on price movement
                                         if (change > 5) {
@@ -5062,8 +5062,8 @@
                                 stocks.forEach(stock => {
                                     const change = stock.change || 0;
                                     const price = stock.price || 0;
-                                    const position = portfolio.positions.find(p => p.symbol === stock.symbol);
-                                    const hasPosition = position && position.shares > 0;
+                                    const positionShares = portfolio.positions[stock.symbol] || 0;
+                                    const hasPosition = positionShares > 0;
 
                                     let score = 50; // Base score
                                     let reasons = [];
@@ -5110,18 +5110,19 @@
                                     }
 
                                     // Position analysis
-                                    if (hasPosition) {
-                                        const positionReturn = ((price - position.avgPrice) / position.avgPrice) * 100;
-                                        if (positionReturn > 15) {
-                                            score -= 20;
-                                            type = 'TAKE PROFIT';
-                                            reasons = ['Lock in strong gains'];
-                                        } else if (positionReturn < -10) {
-                                            score -= 15;
-                                            type = 'CUT LOSS';
-                                            reasons = ['Limit downside risk'];
-                                        }
-                                    }
+                                    // Note: avgPrice tracking not implemented yet
+                                    // if (hasPosition) {
+                                    //     const positionReturn = ((price - avgPrice) / avgPrice) * 100;
+                                    //     if (positionReturn > 15) {
+                                    //         score -= 20;
+                                    //         type = 'TAKE PROFIT';
+                                    //         reasons = ['Lock in strong gains'];
+                                    //     } else if (positionReturn < -10) {
+                                    //         score -= 15;
+                                    //         type = 'CUT LOSS';
+                                    //         reasons = ['Limit downside risk'];
+                                    //     }
+                                    // }
 
                                     // Risk assessment
                                     let risk = 'MEDIUM';
@@ -5462,9 +5463,9 @@
                                                 const isMidDay = marketOpen && currentHour >= 11 && currentHour <= 14;
 
                                                 // Get position info
-                                                const position = portfolio.positions.find(p => p.symbol === selectedStock);
-                                                const hasPosition = position && position.shares > 0;
-                                                const positionReturn = hasPosition ? ((price - position.avgPrice) / position.avgPrice) * 100 : 0;
+                                                const positionShares = portfolio.positions[selectedStock] || 0;
+                                                const hasPosition = positionShares > 0;
+                                                const positionReturn = 0; // avgPrice tracking not implemented yet
 
                                                 let buyTiming = { score: 50, label: 'Neutral', color: 'gray', reason: '' };
                                                 let sellTiming = { score: 50, label: 'Neutral', color: 'gray', reason: '' };
@@ -5587,10 +5588,7 @@
 
                                                         {hasPosition && (
                                                             <div className="mt-2 pt-2 border-t border-purple-500/20 text-[10px] text-purple-300">
-                                                                💼 Current Position: {position.shares} shares @ ${position.avgPrice.toFixed(2)}
-                                                                | Return: <span className={positionReturn >= 0 ? 'text-green-300' : 'text-red-300'}>
-                                                                    {positionReturn >= 0 ? '+' : ''}{positionReturn.toFixed(2)}%
-                                                                </span>
+                                                                💼 Current Position: {positionShares} shares
                                                             </div>
                                                         )}
                                                     </div>
