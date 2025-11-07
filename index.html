@@ -4229,7 +4229,13 @@
                 if (plan === 'personal' && view === 'setup-family') {
                     return (
                         <div className="min-h-screen bg-black relative overflow-hidden p-4 md:p-8">
-                            <div className="max-w-2xl mx-auto">
+                            <div className="max-w-2xl mx-auto relative z-10">
+                            {/* Animated Background Glows */}
+                            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                                <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
+                                <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-green-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+                            </div>
                                 <button
                                     onClick={() => {
                                         setView('plan-select');
@@ -4237,12 +4243,12 @@
                                         setShowPasswordReset(false);
                                         setAuthError('');
                                     }}
-                                    className="mb-6 text-cyan-300 hover:text-cyan-200 font-semibold"
+                                    className="mb-6 text-cyan-400 hover:text-cyan-300 font-bold transition-all duration-300 flex items-center gap-2 group"
                                 >
-                                    ← Back to Plans
+                                    <span className="group-hover:-translate-x-1 transition-transform duration-300">←</span><span>Back to Plans</span>
                                 </button>
 
-                                <div className="bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 border-2 border-blue-500/50 shadow-2xl">
+                                <div className="bg-black/80 backdrop-blur-2xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/30 shadow-2xl relative overflow-hidden" style={{boxShadow: '0 0 60px rgba(6, 182, 212, 0.2'}}">
                                     {/* Create Account Form */}
                                     {accountMode === 'create' && (
                                         <div className="space-y-6">
@@ -4259,29 +4265,29 @@
                                             )}
 
                                             <div>
-                                                <label className="block text-blue-300 font-bold mb-3 text-sm uppercase tracking-wide">Your Name</label>
+                                                <label className="block text-cyan-400 font-bold mb-3 text-sm uppercase tracking-wide">Your Name</label>
                                                 <input
                                                     type="text"
                                                     value={userName}
                                                     onChange={(e) => setUserName(e.target.value)}
                                                     placeholder="Enter your name"
-                                                    className="w-full bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
+                                                    className="w-full bg-black/60 border-2 border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-400 rounded-xl px-4 py-4 text-white text-lg placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-all"
                                                 />
                                             </div>
 
                                             <div>
-                                                <label className="block text-blue-300 font-bold mb-3 text-sm uppercase tracking-wide">Email Address</label>
+                                                <label className="block text-cyan-400 font-bold mb-3 text-sm uppercase tracking-wide">Email Address</label>
                                                 <input
                                                     type="email"
                                                     value={userEmail}
                                                     onChange={(e) => setUserEmail(e.target.value)}
                                                     placeholder="your@email.com"
-                                                    className="w-full bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
+                                                    className="w-full bg-black/60 border-2 border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-400 rounded-xl px-4 py-4 text-white text-lg placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-all"
                                                 />
                                             </div>
 
                                             <div>
-                                                <label className="block text-blue-300 font-bold mb-3 text-sm uppercase tracking-wide">Password</label>
+                                                <label className="block text-cyan-400 font-bold mb-3 text-sm uppercase tracking-wide">Password</label>
                                                 <input
                                                     type="password"
                                                     value={userPassword}
@@ -4290,7 +4296,7 @@
                                                         setPasswordStrength(checkPasswordStrength(e.target.value));
                                                     }}
                                                     placeholder="Create a password"
-                                                    className="w-full bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
+                                                    className="w-full bg-black/60 border-2 border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-400 rounded-xl px-4 py-4 text-white text-lg placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-all"
                                                 />
 
                                                 {/* Password Strength Indicator */}
@@ -4401,7 +4407,7 @@
                                                     value={userEmail}
                                                     onChange={(e) => setUserEmail(e.target.value)}
                                                     placeholder="your@email.com"
-                                                    className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
+                                                    className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-all"
                                                 />
                                             </div>
 
@@ -4412,7 +4418,7 @@
                                                     value={userPassword}
                                                     onChange={(e) => setUserPassword(e.target.value)}
                                                     placeholder="Enter your password"
-                                                    className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
+                                                    className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-all"
                                                 />
                                             </div>
 
@@ -4502,15 +4508,15 @@
                 // Family/Competition screens
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-900 p-4 md:p-8">
-                        <div className="max-w-2xl mx-auto">
+                        <div className="max-w-2xl mx-auto relative z-10">
                             <button
                                 onClick={() => setView('plan-select')}
-                                className="mb-6 text-cyan-300 hover:text-cyan-200 font-semibold"
+                                className="mb-6 text-cyan-400 hover:text-cyan-300 font-bold transition-all duration-300 flex items-center gap-2 group"
                             >
-                                ← Back to Plans
+                                <span className="group-hover:-translate-x-1 transition-transform duration-300">←</span><span>Back to Plans</span>
                             </button>
 
-                            <div className="bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 border-2 border-blue-500/50 shadow-2xl">
+                            <div className="bg-black/80 backdrop-blur-2xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/30 shadow-2xl relative overflow-hidden" style={{boxShadow: '0 0 60px rgba(6, 182, 212, 0.2'}}">
                                 <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-8 text-center">
                                     {view === 'setup-family' ? 'Create Competition' : 'Join Competition'}
                                 </h2>
@@ -4518,37 +4524,37 @@
                                 <div className="space-y-6">
                                     {view === 'join-family' && (
                                         <div>
-                                            <label className="block text-blue-300 font-bold mb-3 text-sm uppercase tracking-wide">Competition Code</label>
+                                            <label className="block text-cyan-400 font-bold mb-3 text-sm uppercase tracking-wide">Competition Code</label>
                                             <input
                                                 type="text"
                                                 value={joinCode}
                                                 onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                                                 placeholder="Enter 6-character code"
                                                 maxLength="6"
-                                                className="w-full bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-4 py-4 text-white text-2xl font-bold placeholder-blue-300 text-center tracking-widest uppercase focus:border-cyan-400 focus:outline-none transition-all"
+                                                className="w-full bg-black/60 border-2 border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-400 rounded-xl px-4 py-4 text-white text-2xl font-bold placeholder-gray-500 text-center tracking-widest uppercase focus:border-cyan-400 focus:outline-none transition-all"
                                             />
                                         </div>
                                     )}
 
                                     <div>
-                                        <label className="block text-blue-300 font-bold mb-3 text-sm uppercase tracking-wide">Your Name</label>
+                                        <label className="block text-cyan-400 font-bold mb-3 text-sm uppercase tracking-wide">Your Name</label>
                                         <input
                                             type="text"
                                             value={userName}
                                             onChange={(e) => setUserName(e.target.value)}
                                             placeholder="Enter your name"
-                                            className="w-full bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
+                                            className="w-full bg-black/60 border-2 border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-400 rounded-xl px-4 py-4 text-white text-lg placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-all"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-blue-300 font-bold mb-3 text-sm uppercase tracking-wide">Entry Amount ($)</label>
+                                        <label className="block text-cyan-400 font-bold mb-3 text-sm uppercase tracking-wide">Entry Amount ($)</label>
                                         <input
                                             type="number"
                                             value={contribution}
                                             onChange={(e) => setContribution(e.target.value)}
                                             placeholder="0.00"
-                                            className="w-full bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-4 py-4 text-white text-2xl font-bold placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
+                                            className="w-full bg-black/60 border-2 border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-400 rounded-xl px-4 py-4 text-white text-2xl font-bold placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-all"
                                         />
                                     </div>
 
@@ -6387,7 +6393,7 @@
                                         placeholder="Search stocks (e.g., AAPL, TSLA, NVDA)..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all focus:shadow-lg focus:shadow-cyan-500/30 focus:scale-[1.02]"
+                                        className="w-full bg-black/60 border-2 border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-400 rounded-xl px-4 py-4 text-white text-lg placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-all focus:shadow-lg focus:shadow-cyan-500/30 focus:scale-[1.02]"
                                     />
                                     {searching && (
                                         <div className="absolute right-4 top-4">
@@ -7484,7 +7490,7 @@
                                                 placeholder="Search for any stock (e.g., AAPL, TSLA, NVDA, GOOGL)..."
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full bg-blue-900/40 border-2 border-blue-500/50 rounded-xl px-6 py-4 text-white text-lg placeholder-blue-300 focus:border-cyan-400 focus:outline-none transition-all"
+                                                className="w-full bg-black/60 border-2 border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-400 rounded-xl px-6 py-4 text-white text-lg placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-all"
                                             />
                                             {searching && (
                                                 <div className="absolute right-6 top-5">
