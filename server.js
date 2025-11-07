@@ -156,6 +156,9 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+// Serve static files (HTML, CSS, JS, images)
+app.use(express.static(__dirname));
+
 // Email transporter configuration
 const transporter = nodemailer.createTransport({
     service: 'gmail', // You can change this to any email service
