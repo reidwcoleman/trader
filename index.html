@@ -3478,21 +3478,24 @@
 
                             {/* What is FinClash Section */}
                             <div id="what-is-finclash-section" className="mt-20 max-w-6xl mx-auto">
-                                <div className="bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 md:p-12 border-2 border-blue-500/50 shadow-2xl">
-                                    <div className="text-center mb-8">
+                                <div className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
+                                    {/* Animated shine effect */}
+                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+
+                                    <div className="relative text-center mb-8">
                                         <h2 className="text-5xl md:text-6xl font-black mb-4">
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">What is FinClash?</span>
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300">What is FinClash?</span>
                                         </h2>
-                                        <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto rounded-full"></div>
+                                        <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 mx-auto rounded-full" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.5)'}}></div>
                                     </div>
 
-                                    <div className="grid md:grid-cols-2 gap-8 text-blue-100">
+                                    <div className="relative grid md:grid-cols-2 gap-8 text-gray-300">
                                         <div className="space-y-4">
                                             <p className="text-lg leading-relaxed">
-                                                <span className="text-cyan-300 font-bold">FinClash</span> is the ultimate stock trading simulator that combines the thrill of the stock market with competitive gameplay. Built with cutting-edge AI technology powered by <span className="text-purple-300 font-bold">UltraThink</span>, we provide real-time market data, intelligent analysis, and a platform where you can compete with friends and family for real money prizes.
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400 font-bold">FinClash</span> is the ultimate stock trading simulator that combines the thrill of the stock market with competitive gameplay. Built with cutting-edge AI technology powered by <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-purple-400 font-bold">UltraThink</span>, we provide real-time market data, intelligent analysis, and a platform where you can compete with friends and family for <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-400 font-bold">real money prizes</span>.
                                             </p>
                                             <p className="text-lg leading-relaxed">
-                                                Whether you're a beginner learning to trade or an experienced investor looking to test strategies, FinClash offers a risk-free environment with <span className="text-green-300 font-bold">$100,000 virtual capital</span> to start trading immediately.
+                                                Whether you're a beginner learning to trade or an experienced investor looking to test strategies, FinClash offers a risk-free environment with <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400 font-bold" style={{textShadow: '0 0 20px rgba(74, 222, 128, 0.3)'}}>$100,000 virtual capital</span> to start trading immediately.
                                             </p>
                                         </div>
                                         <div className="space-y-4">
@@ -3500,31 +3503,40 @@
                                                 Our platform features three account types to match your needs:
                                             </p>
                                             <ul className="space-y-3">
-                                                <li className="flex items-start gap-3">
-                                                    <span className="text-cyan-400 text-2xl flex-shrink-0">👤</span>
+                                                <li className="group/item flex items-start gap-3 p-3 rounded-xl hover:bg-cyan-500/10 transition-all duration-300 cursor-pointer">
+                                                    <div className="relative">
+                                                        <div className="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+                                                        <span className="relative text-cyan-400 text-2xl flex-shrink-0 transform group-hover/item:scale-110 transition-transform duration-300">👤</span>
+                                                    </div>
                                                     <div>
-                                                        <span className="font-bold text-cyan-300">Personal</span> - Free forever, perfect for solo practice
+                                                        <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400">Personal</span> - Free forever, perfect for solo practice
                                                     </div>
                                                 </li>
-                                                <li className="flex items-start gap-3">
-                                                    <span className="text-green-400 text-2xl flex-shrink-0">👥</span>
+                                                <li className="group/item flex items-start gap-3 p-3 rounded-xl hover:bg-green-500/10 transition-all duration-300 cursor-pointer">
+                                                    <div className="relative">
+                                                        <div className="absolute inset-0 bg-green-500/20 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+                                                        <span className="relative text-green-400 text-2xl flex-shrink-0 transform group-hover/item:scale-110 transition-transform duration-300">👥</span>
+                                                    </div>
                                                     <div>
-                                                        <span className="font-bold text-green-300">Public</span> - Compete with others, 1% fee per trade
+                                                        <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-400">Public</span> - Compete with others, 1% fee per trade
                                                     </div>
                                                 </li>
-                                                <li className="flex items-start gap-3">
-                                                    <span className="text-purple-400 text-2xl flex-shrink-0">👑</span>
+                                                <li className="group/item flex items-start gap-3 p-3 rounded-xl hover:bg-purple-500/10 transition-all duration-300 cursor-pointer">
+                                                    <div className="relative">
+                                                        <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+                                                        <span className="relative text-purple-400 text-2xl flex-shrink-0 transform group-hover/item:scale-110 transition-transform duration-300">👑</span>
+                                                    </div>
                                                     <div>
-                                                        <span className="font-bold text-purple-300">Private</span> - Premium competition, $0.05 flat fee
+                                                        <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-purple-400">Private</span> - Premium competition, $0.05 flat fee
                                                     </div>
                                                 </li>
                                             </ul>
                                         </div>
                                     </div>
 
-                                    <div className="mt-8 pt-8 border-t border-blue-500/30 text-center">
-                                        <p className="text-xl text-blue-200">
-                                            Created by <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">Reid Coleman</span> & <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">Cameron Dietzel</span>
+                                    <div className="relative mt-8 pt-8 border-t border-cyan-500/30 text-center">
+                                        <p className="text-xl text-gray-300">
+                                            Created by <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">Reid Coleman</span> & <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">Cameron Dietzel</span>
                                         </p>
                                     </div>
                                 </div>
@@ -3532,73 +3544,91 @@
 
                             {/* How to Use Section */}
                             <div id="how-to-use-section" className="mt-20 max-w-6xl mx-auto">
-                                <div className="bg-gradient-to-br from-blue-900/60 to-purple-950/60 backdrop-blur-xl rounded-3xl p-8 md:p-12 border-2 border-purple-500/50 shadow-2xl">
-                                    <div className="text-center mb-12">
+                                <div className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
+                                    {/* Animated shine effect */}
+                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+
+                                    <div className="relative text-center mb-12">
                                         <h2 className="text-5xl md:text-6xl font-black mb-4">
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-400">How to Use FinClash</span>
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-green-400 to-cyan-300">How to Use FinClash</span>
                                         </h2>
-                                        <div className="w-24 h-1 bg-gradient-to-r from-purple-400 to-pink-500 mx-auto rounded-full"></div>
+                                        <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 via-green-500 to-cyan-400 mx-auto rounded-full" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.5)'}}></div>
                                     </div>
 
-                                    <div className="grid md:grid-cols-3 gap-8">
+                                    <div className="relative grid md:grid-cols-3 gap-8">
                                         {/* Step 1 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-center">
-                                                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full mb-4">
-                                                    <span className="text-3xl font-black text-white">1</span>
+                                        <div className="group/step relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/step:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+                                            <div className="relative text-center">
+                                                <div className="relative inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full mb-4 transform group-hover/step:scale-110 transition-transform duration-300">
+                                                    <div className="absolute inset-0 bg-cyan-500/30 blur-xl rounded-full"></div>
+                                                    <span className="relative text-3xl font-black text-white">1</span>
                                                 </div>
-                                                <h3 className="text-2xl font-black text-cyan-300 mb-4">Choose Your Plan</h3>
-                                                <p className="text-blue-100 leading-relaxed">
-                                                    Select from Personal (free), Public (1% fee), or Private ($0.05 fee) based on whether you want to trade solo or compete for real money.
+                                                <h3 className="text-2xl font-black mb-4">
+                                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400">Choose Your Plan</span>
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">
+                                                    Select from <span className="text-cyan-400 font-bold">Personal</span> (free), <span className="text-green-400 font-bold">Public</span> (1% fee), or <span className="text-purple-400 font-bold">Private</span> ($0.05 fee) based on whether you want to trade solo or compete for real money.
                                                 </p>
                                             </div>
                                         </div>
 
                                         {/* Step 2 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-green-500/30 hover:border-green-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-center">
-                                                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full mb-4">
-                                                    <span className="text-3xl font-black text-white">2</span>
+                                        <div className="group/step relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-green-500/30 hover:border-green-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(34, 197, 94, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/step:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-green-400/10 to-transparent"></div>
+                                            <div className="relative text-center">
+                                                <div className="relative inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full mb-4 transform group-hover/step:scale-110 transition-transform duration-300">
+                                                    <div className="absolute inset-0 bg-green-500/30 blur-xl rounded-full"></div>
+                                                    <span className="relative text-3xl font-black text-white">2</span>
                                                 </div>
-                                                <h3 className="text-2xl font-black text-green-300 mb-4">Create Account</h3>
-                                                <p className="text-blue-100 leading-relaxed">
-                                                    Sign up with your email and create a secure password. You'll instantly receive $100,000 in virtual capital to start trading.
+                                                <h3 className="text-2xl font-black mb-4">
+                                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-400">Create Account</span>
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">
+                                                    Sign up with your email and create a secure password. You'll instantly receive <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400 font-bold">$100,000 in virtual capital</span> to start trading.
                                                 </p>
                                             </div>
                                         </div>
 
                                         {/* Step 3 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30 hover:border-purple-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-center">
-                                                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full mb-4">
-                                                    <span className="text-3xl font-black text-white">3</span>
+                                        <div className="group/step relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-purple-500/30 hover:border-purple-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(168, 85, 247, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/step:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent"></div>
+                                            <div className="relative text-center">
+                                                <div className="relative inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full mb-4 transform group-hover/step:scale-110 transition-transform duration-300">
+                                                    <div className="absolute inset-0 bg-purple-500/30 blur-xl rounded-full"></div>
+                                                    <span className="relative text-3xl font-black text-white">3</span>
                                                 </div>
-                                                <h3 className="text-2xl font-black text-purple-300 mb-4">Start Trading</h3>
-                                                <p className="text-blue-100 leading-relaxed">
-                                                    Use our AI-powered analysis to research stocks, execute trades, and compete on the leaderboard. The winner takes all!
+                                                <h3 className="text-2xl font-black mb-4">
+                                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-purple-400">Start Trading</span>
+                                                </h3>
+                                                <p className="text-gray-300 leading-relaxed">
+                                                    Use our <span className="text-purple-400 font-bold">AI-powered analysis</span> to research stocks, execute trades, and compete on the leaderboard. The winner takes all!
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="mt-12 bg-gradient-to-r from-blue-900/60 to-purple-900/60 rounded-2xl p-6 border border-blue-500/30">
-                                        <h3 className="text-2xl font-black text-cyan-300 mb-4 text-center">Pro Tips 💡</h3>
-                                        <ul className="grid md:grid-cols-2 gap-4 text-blue-100">
-                                            <li className="flex items-start gap-3">
-                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                                                <span>Use UltraThink AI analysis to make informed decisions</span>
+                                    <div className="relative mt-12 bg-black/60 rounded-2xl p-6 border-2 border-cyan-500/30 overflow-hidden">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-green-500/5 to-transparent"></div>
+                                        <h3 className="relative text-2xl font-black mb-4 text-center">
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-green-400">Pro Tips 💡</span>
+                                        </h3>
+                                        <ul className="relative grid md:grid-cols-2 gap-4 text-gray-300">
+                                            <li className="flex items-start gap-3 group/tip cursor-pointer p-2 rounded-lg hover:bg-green-500/10 transition-all duration-300">
+                                                <span className="text-green-400 text-xl flex-shrink-0 transform group-hover/tip:scale-125 transition-transform duration-300">✓</span>
+                                                <span>Use <span className="text-purple-400 font-bold">UltraThink AI</span> analysis to make informed decisions</span>
                                             </li>
-                                            <li className="flex items-start gap-3">
-                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                                                <span>Monitor real-time market news and trends</span>
+                                            <li className="flex items-start gap-3 group/tip cursor-pointer p-2 rounded-lg hover:bg-green-500/10 transition-all duration-300">
+                                                <span className="text-green-400 text-xl flex-shrink-0 transform group-hover/tip:scale-125 transition-transform duration-300">✓</span>
+                                                <span>Monitor <span className="text-cyan-400 font-bold">real-time</span> market news and trends</span>
                                             </li>
-                                            <li className="flex items-start gap-3">
-                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                                                <span>Diversify your portfolio across multiple stocks</span>
+                                            <li className="flex items-start gap-3 group/tip cursor-pointer p-2 rounded-lg hover:bg-green-500/10 transition-all duration-300">
+                                                <span className="text-green-400 text-xl flex-shrink-0 transform group-hover/tip:scale-125 transition-transform duration-300">✓</span>
+                                                <span><span className="text-cyan-400 font-bold">Diversify</span> your portfolio across multiple stocks</span>
                                             </li>
-                                            <li className="flex items-start gap-3">
-                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                                                <span>Track your competition on the live leaderboard</span>
+                                            <li className="flex items-start gap-3 group/tip cursor-pointer p-2 rounded-lg hover:bg-green-500/10 transition-all duration-300">
+                                                <span className="text-green-400 text-xl flex-shrink-0 transform group-hover/tip:scale-125 transition-transform duration-300">✓</span>
+                                                <span>Track your competition on the <span className="text-cyan-400 font-bold">live leaderboard</span></span>
                                             </li>
                                         </ul>
                                     </div>
@@ -3607,77 +3637,107 @@
 
                             {/* Features Section */}
                             <div id="features-section" className="mt-20 max-w-6xl mx-auto">
-                                <div className="bg-gradient-to-br from-blue-900/60 to-cyan-950/60 backdrop-blur-xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/50 shadow-2xl">
-                                    <div className="text-center mb-12">
+                                <div className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
+                                    {/* Animated shine effect */}
+                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+
+                                    <div className="relative text-center mb-12">
                                         <h2 className="text-5xl md:text-6xl font-black mb-4">
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-green-400">Features</span>
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-green-400 to-cyan-300">Features</span>
                                         </h2>
-                                        <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-green-500 mx-auto rounded-full"></div>
-                                        <p className="text-xl text-blue-200 mt-4">Everything you need to master the market</p>
+                                        <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 via-green-500 to-cyan-400 mx-auto rounded-full" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.5)'}}></div>
+                                        <p className="text-xl text-gray-300 mt-4">Everything you need to master the market</p>
                                     </div>
 
-                                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <div className="relative grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {/* Feature 1 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-4xl mb-4">🧠</div>
-                                            <h3 className="text-xl font-black text-cyan-300 mb-2">UltraThink AI</h3>
-                                            <p className="text-blue-100">Advanced AI-powered stock analysis and recommendations</p>
+                                        <div className="group/feature relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 15px rgba(6, 182, 212, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/feature:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+                                            <div className="relative text-4xl mb-4 transform group-hover/feature:scale-110 transition-transform duration-300">🧠</div>
+                                            <h3 className="relative text-xl font-black mb-2">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400">UltraThink AI</span>
+                                            </h3>
+                                            <p className="relative text-gray-300">Advanced <span className="text-cyan-400 font-bold">AI-powered</span> stock analysis and recommendations</p>
                                         </div>
 
                                         {/* Feature 2 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-green-500/30 hover:border-green-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-4xl mb-4">📊</div>
-                                            <h3 className="text-xl font-black text-green-300 mb-2">Real-Time Data</h3>
-                                            <p className="text-blue-100">Live stock prices, charts, and market updates</p>
+                                        <div className="group/feature relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-green-500/30 hover:border-green-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 15px rgba(34, 197, 94, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/feature:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-green-400/10 to-transparent"></div>
+                                            <div className="relative text-4xl mb-4 transform group-hover/feature:scale-110 transition-transform duration-300">📊</div>
+                                            <h3 className="relative text-xl font-black mb-2">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-400">Real-Time Data</span>
+                                            </h3>
+                                            <p className="relative text-gray-300">Live stock prices, charts, and <span className="text-green-400 font-bold">market updates</span></p>
                                         </div>
 
                                         {/* Feature 3 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30 hover:border-purple-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-4xl mb-4">🏆</div>
-                                            <h3 className="text-xl font-black text-purple-300 mb-2">Leaderboards</h3>
-                                            <p className="text-blue-100">Compete and see rankings in real-time</p>
+                                        <div className="group/feature relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-purple-500/30 hover:border-purple-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 15px rgba(168, 85, 247, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/feature:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent"></div>
+                                            <div className="relative text-4xl mb-4 transform group-hover/feature:scale-110 transition-transform duration-300">🏆</div>
+                                            <h3 className="relative text-xl font-black mb-2">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-purple-400">Leaderboards</span>
+                                            </h3>
+                                            <p className="relative text-gray-300">Compete and see <span className="text-purple-400 font-bold">rankings</span> in real-time</p>
                                         </div>
 
                                         {/* Feature 4 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/30 hover:border-yellow-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-4xl mb-4">💰</div>
-                                            <h3 className="text-xl font-black text-yellow-300 mb-2">Real Money Prizes</h3>
-                                            <p className="text-blue-100">Winner-takes-all competitions with actual payouts</p>
+                                        <div className="group/feature relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-green-500/30 hover:border-green-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 15px rgba(34, 197, 94, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/feature:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-green-400/10 to-transparent"></div>
+                                            <div className="relative text-4xl mb-4 transform group-hover/feature:scale-110 transition-transform duration-300">💰</div>
+                                            <h3 className="relative text-xl font-black mb-2">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400">Real Money Prizes</span>
+                                            </h3>
+                                            <p className="relative text-gray-300"><span className="text-green-400 font-bold">Winner-takes-all</span> competitions with actual payouts</p>
                                         </div>
 
                                         {/* Feature 5 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-pink-500/30 hover:border-pink-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-4xl mb-4">📰</div>
-                                            <h3 className="text-xl font-black text-pink-300 mb-2">Live Market News</h3>
-                                            <p className="text-blue-100">Stay updated with breaking financial news</p>
+                                        <div className="group/feature relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 15px rgba(6, 182, 212, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/feature:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+                                            <div className="relative text-4xl mb-4 transform group-hover/feature:scale-110 transition-transform duration-300">📰</div>
+                                            <h3 className="relative text-xl font-black mb-2">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400">Live Market News</span>
+                                            </h3>
+                                            <p className="relative text-gray-300">Stay updated with <span className="text-cyan-400 font-bold">breaking financial news</span></p>
                                         </div>
 
                                         {/* Feature 6 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-orange-500/30 hover:border-orange-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-4xl mb-4">🔐</div>
-                                            <h3 className="text-xl font-black text-orange-300 mb-2">Secure Payments</h3>
-                                            <p className="text-blue-100">Stripe integration for safe, encrypted transactions</p>
+                                        <div className="group/feature relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-green-500/30 hover:border-green-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 15px rgba(34, 197, 94, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/feature:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-green-400/10 to-transparent"></div>
+                                            <div className="relative text-4xl mb-4 transform group-hover/feature:scale-110 transition-transform duration-300">🔐</div>
+                                            <h3 className="relative text-xl font-black mb-2">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-400">Secure Payments</span>
+                                            </h3>
+                                            <p className="relative text-gray-300"><span className="text-green-400 font-bold">Stripe</span> integration for safe, encrypted transactions</p>
                                         </div>
 
                                         {/* Feature 7 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/30 hover:border-blue-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-4xl mb-4">📱</div>
-                                            <h3 className="text-xl font-black text-blue-300 mb-2">Mobile Responsive</h3>
-                                            <p className="text-blue-100">Trade anywhere on any device</p>
+                                        <div className="group/feature relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 15px rgba(6, 182, 212, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/feature:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+                                            <div className="relative text-4xl mb-4 transform group-hover/feature:scale-110 transition-transform duration-300">📱</div>
+                                            <h3 className="relative text-xl font-black mb-2">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400">Mobile Responsive</span>
+                                            </h3>
+                                            <p className="relative text-gray-300">Trade anywhere on <span className="text-cyan-400 font-bold">any device</span></p>
                                         </div>
 
                                         {/* Feature 8 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/30 hover:border-indigo-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-4xl mb-4">🎯</div>
-                                            <h3 className="text-xl font-black text-indigo-300 mb-2">Watchlists</h3>
-                                            <p className="text-blue-100">Track your favorite stocks and get alerts</p>
+                                        <div className="group/feature relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-purple-500/30 hover:border-purple-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 15px rgba(168, 85, 247, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/feature:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent"></div>
+                                            <div className="relative text-4xl mb-4 transform group-hover/feature:scale-110 transition-transform duration-300">🎯</div>
+                                            <h3 className="relative text-xl font-black mb-2">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-purple-400">Watchlists</span>
+                                            </h3>
+                                            <p className="relative text-gray-300">Track your favorite stocks and get <span className="text-purple-400 font-bold">alerts</span></p>
                                         </div>
 
                                         {/* Feature 9 */}
-                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-teal-500/30 hover:border-teal-400 transition-all duration-300 hover:scale-105">
-                                            <div className="text-4xl mb-4">📈</div>
-                                            <h3 className="text-xl font-black text-teal-300 mb-2">Portfolio Analytics</h3>
-                                            <p className="text-blue-100">Detailed performance metrics and insights</p>
+                                        <div className="group/feature relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 15px rgba(6, 182, 212, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/feature:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+                                            <div className="relative text-4xl mb-4 transform group-hover/feature:scale-110 transition-transform duration-300">📈</div>
+                                            <h3 className="relative text-xl font-black mb-2">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400">Portfolio Analytics</span>
+                                            </h3>
+                                            <p className="relative text-gray-300">Detailed <span className="text-cyan-400 font-bold">performance metrics</span> and insights</p>
                                         </div>
                                     </div>
                                 </div>
@@ -3686,80 +3746,89 @@
                             {/* Market Movers section removed - use dedicated Market Movers tab instead to avoid API rate limiting */}
 
                             {/* UltraThink Premium Footer */}
-                            <footer className="mt-20 border-t border-cyan-500/30 pt-12 bg-gradient-to-b from-transparent via-blue-950/30 to-purple-950/50">
+                            <footer className="mt-20 border-t border-cyan-500/30 pt-12 bg-black/20">
                                 <div className="max-w-7xl mx-auto px-4">
                                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                                         {/* About Section */}
-                                        <div className="bg-gradient-to-br from-cyan-900/40 to-blue-900/40 backdrop-blur-xl rounded-2xl p-6 border border-cyan-500/40 hover:border-cyan-400/60 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/20">
-                                            <h3 className="text-xl font-black text-cyan-300 mb-4 flex items-center gap-2">
-                                                <span className="text-2xl">👨‍💻</span> About Us
+                                        <div className="group/footer relative bg-black/80 backdrop-blur-xl rounded-2xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 transform hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/footer:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+                                            <h3 className="relative text-xl font-black mb-4 flex items-center gap-2">
+                                                <span className="text-2xl transform group-hover/footer:scale-110 transition-transform duration-300">👨‍💻</span>
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400">About Us</span>
                                             </h3>
-                                            <div className="space-y-2">
+                                            <div className="relative space-y-2">
                                                 <a
                                                     href="about.html"
-                                                    className="text-cyan-200 hover:text-cyan-100 transition-all duration-300 font-bold block group"
+                                                    className="text-gray-300 hover:text-cyan-300 transition-all duration-300 font-bold block group/link"
                                                 >
-                                                    <span className="group-hover:translate-x-1 inline-block transition-transform duration-300">Meet Reid →</span>
+                                                    <span className="group-hover/link:translate-x-1 inline-block transition-transform duration-300">Meet Reid →</span>
                                                 </a>
                                                 <a
                                                     href="about-cameron.html"
-                                                    className="text-purple-200 hover:text-purple-100 transition-all duration-300 font-bold block group"
+                                                    className="text-gray-300 hover:text-purple-300 transition-all duration-300 font-bold block group/link"
                                                 >
-                                                    <span className="group-hover:translate-x-1 inline-block transition-transform duration-300">Meet Cameron →</span>
+                                                    <span className="group-hover/link:translate-x-1 inline-block transition-transform duration-300">Meet Cameron →</span>
                                                 </a>
                                             </div>
-                                            <p className="text-blue-300 text-sm leading-relaxed mt-3">The minds behind FinClash</p>
+                                            <p className="relative text-gray-400 text-sm leading-relaxed mt-3">The minds behind <span className="text-cyan-400 font-bold">FinClash</span></p>
                                         </div>
 
                                         {/* Contact Section */}
-                                        <div className="bg-gradient-to-br from-blue-900/40 to-indigo-900/40 backdrop-blur-xl rounded-2xl p-6 border border-blue-500/40 hover:border-blue-400/60 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20">
-                                            <h3 className="text-xl font-black text-blue-300 mb-4 flex items-center gap-2">
-                                                <span className="text-2xl">📧</span> Contact
+                                        <div className="group/footer relative bg-black/80 backdrop-blur-xl rounded-2xl p-6 border-2 border-green-500/30 hover:border-green-400 transition-all duration-300 transform hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(34, 197, 94, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/footer:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-green-400/10 to-transparent"></div>
+                                            <h3 className="relative text-xl font-black mb-4 flex items-center gap-2">
+                                                <span className="text-2xl transform group-hover/footer:scale-110 transition-transform duration-300">📧</span>
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-400">Contact</span>
                                             </h3>
                                             <a
                                                 href="mailto:finclash101@gmail.com"
-                                                className="text-blue-200 hover:text-blue-100 transition-all duration-300 font-bold block mb-3 text-sm break-all"
+                                                className="relative text-gray-300 hover:text-green-300 transition-all duration-300 font-bold block mb-3 text-sm break-all"
                                             >
                                                 finclash101@gmail.com
                                             </a>
-                                            <p className="text-blue-400 text-sm leading-relaxed">Questions? We'd love to hear from you!</p>
+                                            <p className="relative text-gray-400 text-sm leading-relaxed">Questions? We'd love to <span className="text-green-400 font-bold">hear from you!</span></p>
                                         </div>
 
                                         {/* Security Section */}
-                                        <div className="bg-gradient-to-br from-orange-900/30 to-red-900/30 backdrop-blur-xl rounded-2xl p-6 border border-orange-500/40 hover:border-orange-400/60 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20">
-                                            <h3 className="text-xl font-black text-orange-300 mb-4 flex items-center gap-2">
-                                                <span className="text-2xl">🔒</span> Security
+                                        <div className="group/footer relative bg-black/80 backdrop-blur-xl rounded-2xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 transform hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/footer:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+                                            <h3 className="relative text-xl font-black mb-4 flex items-center gap-2">
+                                                <span className="text-2xl transform group-hover/footer:scale-110 transition-transform duration-300">🔒</span>
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400">Security</span>
                                             </h3>
                                             <a
                                                 href="mailto:finclash101@gmail.com?subject=Security%20Issue%20Report"
-                                                className="text-orange-200 hover:text-orange-100 transition-all duration-300 font-bold block mb-3"
+                                                className="relative text-gray-300 hover:text-cyan-300 transition-all duration-300 font-bold block mb-3"
                                             >
                                                 Report Issues
                                             </a>
-                                            <p className="text-orange-400 text-sm leading-relaxed">Help us keep FinClash secure & safe</p>
+                                            <p className="relative text-gray-400 text-sm leading-relaxed">Help us keep FinClash <span className="text-cyan-400 font-bold">secure & safe</span></p>
                                         </div>
 
                                         {/* Feedback Section */}
-                                        <div className="bg-gradient-to-br from-purple-900/40 to-pink-900/30 backdrop-blur-xl rounded-2xl p-6 border border-purple-500/40 hover:border-purple-400/60 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20">
-                                            <h3 className="text-xl font-black text-purple-300 mb-4 flex items-center gap-2">
-                                                <span className="text-2xl">💡</span> Feedback
+                                        <div className="group/footer relative bg-black/80 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/30 hover:border-purple-400 transition-all duration-300 transform hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(168, 85, 247, 0.1)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/footer:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent"></div>
+                                            <h3 className="relative text-xl font-black mb-4 flex items-center gap-2">
+                                                <span className="text-2xl transform group-hover/footer:scale-110 transition-transform duration-300">💡</span>
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-purple-400">Feedback</span>
                                             </h3>
                                             <a
                                                 href="mailto:finclash101@gmail.com?subject=FinClash%20Feedback"
-                                                className="text-purple-200 hover:text-purple-100 transition-all duration-300 font-bold block mb-3"
+                                                className="relative text-gray-300 hover:text-purple-300 transition-all duration-300 font-bold block mb-3"
                                             >
                                                 Share Ideas
                                             </a>
-                                            <p className="text-purple-400 text-sm leading-relaxed">Help us improve your experience</p>
+                                            <p className="relative text-gray-400 text-sm leading-relaxed">Help us <span className="text-purple-400 font-bold">improve</span> your experience</p>
                                         </div>
                                     </div>
 
                                     {/* UltraThink AI Badge */}
                                     <div className="flex justify-center mb-8">
-                                        <div className="bg-gradient-to-r from-purple-900/60 to-blue-900/60 backdrop-blur-xl rounded-full px-6 py-3 border border-purple-500/50 flex items-center gap-3 shadow-xl">
-                                            <span className="text-2xl">🧠</span>
-                                            <span className="text-purple-200 font-bold text-sm">Powered by</span>
-                                            <span className="text-transparent bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text font-black text-lg">UltraThink AI</span>
+                                        <div className="group relative bg-black/80 backdrop-blur-xl rounded-full px-6 py-3 border-2 border-purple-500/30 hover:border-purple-400 flex items-center gap-3 transition-all duration-300 overflow-hidden" style={{boxShadow: '0 0 30px rgba(168, 85, 247, 0.2)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent"></div>
+                                            <span className="relative text-2xl transform group-hover:scale-110 transition-transform duration-300">🧠</span>
+                                            <span className="relative text-gray-300 font-bold text-sm">Powered by</span>
+                                            <span className="relative text-transparent bg-gradient-to-r from-cyan-300 via-purple-400 to-green-400 bg-clip-text font-black text-lg">UltraThink AI</span>
                                             <span className="relative flex h-2 w-2">
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -3770,11 +3839,11 @@
                                     {/* Bottom Bar with Enhanced Typography */}
                                     <div className="text-center py-8 border-t border-cyan-500/20">
                                         <div className="flex flex-wrap justify-center items-center gap-2 mb-3">
-                                            <span className="text-blue-300 text-sm">© 2025</span>
-                                            <span className="text-transparent bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text font-black text-lg">FinClash</span>
+                                            <span className="text-gray-400 text-sm">© 2025</span>
+                                            <span className="text-transparent bg-gradient-to-r from-cyan-300 via-green-400 to-cyan-300 bg-clip-text font-black text-lg">FinClash</span>
                                         </div>
-                                        <p className="text-blue-300 text-sm mb-4">
-                                            Created by <span className="font-bold text-cyan-300 hover:text-cyan-200 transition-colors duration-300">Reid Coleman</span> and <span className="font-bold text-cyan-300 hover:text-cyan-200 transition-colors duration-300">Cameron Dietzel</span>
+                                        <p className="text-gray-300 text-sm mb-4">
+                                            Created by <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400 hover:from-cyan-200 hover:to-cyan-300 transition-all duration-300 cursor-pointer">Reid Coleman</span> and <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400 hover:from-cyan-200 hover:to-cyan-300 transition-all duration-300 cursor-pointer">Cameron Dietzel</span>
                                         </p>
 
                                         {/* Legal Links */}
@@ -3782,14 +3851,14 @@
                                             <a href="privacy.html" className="text-cyan-300 hover:text-cyan-200 text-sm font-bold transition-colors duration-300 hover:underline">
                                                 Privacy Policy
                                             </a>
-                                            <span className="text-blue-500">•</span>
+                                            <span className="text-cyan-500/50">•</span>
                                             <a href="terms.html" className="text-cyan-300 hover:text-cyan-200 text-sm font-bold transition-colors duration-300 hover:underline">
                                                 Terms of Service
                                             </a>
                                         </div>
 
-                                        <p className="text-blue-400 text-xs max-w-2xl mx-auto leading-relaxed">
-                                            Virtual trading simulator for educational purposes only • Not financial advice • Trade responsibly
+                                        <p className="text-gray-400 text-xs max-w-2xl mx-auto leading-relaxed">
+                                            Virtual trading simulator for <span className="text-cyan-400">educational purposes</span> only • Not financial advice • Trade <span className="text-green-400">responsibly</span>
                                         </p>
                                     </div>
                                 </div>
