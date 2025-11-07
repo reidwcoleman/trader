@@ -4248,7 +4248,7 @@
                                     <span className="group-hover:-translate-x-1 transition-transform duration-300">←</span><span>Back to Plans</span>
                                 </button>
 
-                                <div className="bg-black/80 backdrop-blur-2xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/30 shadow-2xl relative overflow-hidden" style={{boxShadow: '0 0 60px rgba(6, 182, 212, 0.2'}}">
+                                <div className="bg-black/80 backdrop-blur-2xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/30 shadow-2xl relative overflow-hidden" style={{boxShadow: '0 0 60px rgba(6, 182, 212, 0.2)'}}">
                                     {/* Create Account Form */}
                                     {accountMode === 'create' && (
                                         <div className="space-y-6">
@@ -4516,7 +4516,7 @@
                                 <span className="group-hover:-translate-x-1 transition-transform duration-300">←</span><span>Back to Plans</span>
                             </button>
 
-                            <div className="bg-black/80 backdrop-blur-2xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/30 shadow-2xl relative overflow-hidden" style={{boxShadow: '0 0 60px rgba(6, 182, 212, 0.2'}}">
+                            <div className="bg-black/80 backdrop-blur-2xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/30 shadow-2xl relative overflow-hidden" style={{boxShadow: '0 0 60px rgba(6, 182, 212, 0.2)'}}">
                                 <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-8 text-center">
                                     {view === 'setup-family' ? 'Create Competition' : 'Join Competition'}
                                 </h2>
@@ -5862,12 +5862,15 @@
                         })()}
 
                         {/* Portfolio Positions */}
-                        <div className="bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-blue-500/50 shadow-2xl">
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 flex items-center gap-2">
+                        <div className="group relative bg-black/80 backdrop-blur-2xl rounded-2xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
+                            {/* Animated shine effect */}
+                            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+
+                            <div className="relative flex items-center justify-between mb-6">
+                                <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 flex items-center gap-2">
                                     💼 Your Holdings
                                 </h3>
-                                <div className="text-sm text-blue-300 font-semibold bg-blue-700/50 px-3 py-1 rounded-full">
+                                <div className="text-sm text-cyan-300 font-semibold bg-cyan-500/20 px-3 py-1 rounded-full border border-cyan-500/30">
                                     {Object.entries(portfolio.positions).filter(([_, qty]) => qty > 0).length} stocks
                                 </div>
                             </div>
