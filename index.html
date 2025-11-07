@@ -4810,70 +4810,98 @@
                         {/* Market Movers section removed - use dedicated Market Movers tab to avoid API rate limiting */}
 
                         {/* Main Tab Navigation */}
-                        <div className="group/nav relative mb-6 bg-black/80 backdrop-blur-2xl rounded-2xl p-2 border-2 border-cyan-500/30 overflow-hidden" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.2)'}}>
-                            {/* Nav shine effect */}
-                            <div className="absolute inset-0 -translate-x-full group-hover/nav:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent pointer-events-none"></div>
+                        <div className="group/nav relative mb-6 bg-gradient-to-br from-black/95 via-black/90 to-black/95 backdrop-blur-3xl rounded-3xl p-3 border-2 border-cyan-500/40 hover:border-cyan-400/60 overflow-hidden transition-all duration-500" style={{boxShadow: '0 0 50px rgba(6, 182, 212, 0.3), inset 0 0 30px rgba(6, 182, 212, 0.05)'}}>
+                            {/* Animated background gradient */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-blue-600/5 to-purple-600/5 opacity-50"></div>
 
-                            <div className="relative flex gap-2">
+                            {/* Nav shine effect */}
+                            <div className="absolute inset-0 -translate-x-full group-hover/nav:translate-x-full transition-transform duration-[1500ms] bg-gradient-to-r from-transparent via-cyan-400/15 to-transparent pointer-events-none"></div>
+
+                            <div className="relative flex gap-3">
                                 <button
                                     onClick={() => setMainTab('portfolio')}
-                                    className={`group/tab relative flex-1 py-4 rounded-xl font-black text-lg transition-all duration-300 overflow-hidden ${
+                                    className={`group/tab relative flex-1 py-5 rounded-2xl font-black text-lg transition-all duration-500 overflow-hidden ${
                                         mainTab === 'portfolio'
-                                            ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white'
-                                            : 'text-gray-300 hover:text-white hover:bg-cyan-500/20'
+                                            ? 'bg-gradient-to-br from-cyan-400 via-cyan-500 to-blue-600 text-white scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-gradient-to-br hover:from-cyan-500/30 hover:to-blue-600/30 hover:scale-102'
                                     }`}
-                                    style={mainTab === 'portfolio' ? {boxShadow: '0 0 25px rgba(6, 182, 212, 0.5)'} : {}}
+                                    style={mainTab === 'portfolio' ? {boxShadow: '0 0 35px rgba(6, 182, 212, 0.7), 0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1)'} : {}}
                                 >
-                                    {mainTab === 'portfolio' && <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>}
-                                    <span className="relative">💼 Portfolio</span>
+                                    {mainTab === 'portfolio' && (
+                                        <>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+                                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 animate-pulse"></div>
+                                        </>
+                                    )}
+                                    <span className="relative drop-shadow-lg">💼 Portfolio</span>
                                 </button>
                                 <button
                                     onClick={() => setMainTab('trading')}
-                                    className={`group/tab relative flex-1 py-4 rounded-xl font-black text-lg transition-all duration-300 overflow-hidden ${
+                                    className={`group/tab relative flex-1 py-5 rounded-2xl font-black text-lg transition-all duration-500 overflow-hidden ${
                                         mainTab === 'trading'
-                                            ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white'
-                                            : 'text-gray-300 hover:text-white hover:bg-cyan-500/20'
+                                            ? 'bg-gradient-to-br from-cyan-400 via-cyan-500 to-blue-600 text-white scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-gradient-to-br hover:from-cyan-500/30 hover:to-blue-600/30 hover:scale-102'
                                     }`}
-                                    style={mainTab === 'trading' ? {boxShadow: '0 0 25px rgba(6, 182, 212, 0.5)'} : {}}
+                                    style={mainTab === 'trading' ? {boxShadow: '0 0 35px rgba(6, 182, 212, 0.7), 0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1)'} : {}}
                                 >
-                                    {mainTab === 'trading' && <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>}
-                                    <span className="relative">📈 Trading</span>
+                                    {mainTab === 'trading' && (
+                                        <>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+                                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 animate-pulse"></div>
+                                        </>
+                                    )}
+                                    <span className="relative drop-shadow-lg">📈 Trading</span>
                                 </button>
                                 <button
                                     onClick={() => setMainTab('watchlist')}
-                                    className={`group/tab relative flex-1 py-4 rounded-xl font-black text-lg transition-all duration-300 overflow-hidden ${
+                                    className={`group/tab relative flex-1 py-5 rounded-2xl font-black text-lg transition-all duration-500 overflow-hidden ${
                                         mainTab === 'watchlist'
-                                            ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white'
-                                            : 'text-gray-300 hover:text-white hover:bg-cyan-500/20'
+                                            ? 'bg-gradient-to-br from-cyan-400 via-cyan-500 to-blue-600 text-white scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-gradient-to-br hover:from-cyan-500/30 hover:to-blue-600/30 hover:scale-102'
                                     }`}
-                                    style={mainTab === 'watchlist' ? {boxShadow: '0 0 25px rgba(6, 182, 212, 0.5)'} : {}}
+                                    style={mainTab === 'watchlist' ? {boxShadow: '0 0 35px rgba(6, 182, 212, 0.7), 0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1)'} : {}}
                                 >
-                                    {mainTab === 'watchlist' && <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>}
-                                    <span className="relative">⭐ Watchlist</span>
+                                    {mainTab === 'watchlist' && (
+                                        <>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+                                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 animate-pulse"></div>
+                                        </>
+                                    )}
+                                    <span className="relative drop-shadow-lg">⭐ Watchlist</span>
                                 </button>
                                 <button
                                     onClick={() => setMainTab('news')}
-                                    className={`group/tab relative flex-1 py-4 rounded-xl font-black text-lg transition-all duration-300 overflow-hidden ${
+                                    className={`group/tab relative flex-1 py-5 rounded-2xl font-black text-lg transition-all duration-500 overflow-hidden ${
                                         mainTab === 'news'
-                                            ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white'
-                                            : 'text-gray-300 hover:text-white hover:bg-cyan-500/20'
+                                            ? 'bg-gradient-to-br from-cyan-400 via-cyan-500 to-blue-600 text-white scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-gradient-to-br hover:from-cyan-500/30 hover:to-blue-600/30 hover:scale-102'
                                     }`}
-                                    style={mainTab === 'news' ? {boxShadow: '0 0 25px rgba(6, 182, 212, 0.5)'} : {}}
+                                    style={mainTab === 'news' ? {boxShadow: '0 0 35px rgba(6, 182, 212, 0.7), 0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1)'} : {}}
                                 >
-                                    {mainTab === 'news' && <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>}
-                                    <span className="relative">📰 News</span>
+                                    {mainTab === 'news' && (
+                                        <>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+                                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 animate-pulse"></div>
+                                        </>
+                                    )}
+                                    <span className="relative drop-shadow-lg">📰 News</span>
                                 </button>
                                 <button
                                     onClick={() => setMainTab('ai-analysis')}
-                                    className={`group/tab relative flex-1 py-4 rounded-xl font-black text-lg transition-all duration-300 overflow-hidden ${
+                                    className={`group/tab relative flex-1 py-5 rounded-2xl font-black text-lg transition-all duration-500 overflow-hidden ${
                                         mainTab === 'ai-analysis'
-                                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                                            : 'text-gray-300 hover:text-white hover:bg-purple-500/20'
+                                            ? 'bg-gradient-to-br from-purple-500 via-purple-600 to-pink-600 text-white scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-gradient-to-br hover:from-purple-500/30 hover:to-pink-600/30 hover:scale-102'
                                     }`}
-                                    style={mainTab === 'ai-analysis' ? {boxShadow: '0 0 25px rgba(168, 85, 247, 0.5)'} : {}}
+                                    style={mainTab === 'ai-analysis' ? {boxShadow: '0 0 35px rgba(168, 85, 247, 0.7), 0 0 60px rgba(168, 85, 247, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1)'} : {}}
                                 >
-                                    {mainTab === 'ai-analysis' && <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>}
-                                    <span className="relative">🧠 AI Analysis</span>
+                                    {mainTab === 'ai-analysis' && (
+                                        <>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+                                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-600/20 animate-pulse"></div>
+                                        </>
+                                    )}
+                                    <span className="relative drop-shadow-lg">🧠 AI Analysis</span>
                                 </button>
                                 <button
                                     onClick={() => {
@@ -4882,15 +4910,20 @@
                                             fetchMarketMovers();
                                         }
                                     }}
-                                    className={`group/tab relative flex-1 py-4 rounded-xl font-black text-lg transition-all duration-300 overflow-hidden ${
+                                    className={`group/tab relative flex-1 py-5 rounded-2xl font-black text-lg transition-all duration-500 overflow-hidden ${
                                         mainTab === 'movers'
-                                            ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
-                                            : 'text-gray-300 hover:text-white hover:bg-orange-500/20'
+                                            ? 'bg-gradient-to-br from-orange-500 via-orange-600 to-red-600 text-white scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-gradient-to-br hover:from-orange-500/30 hover:to-red-600/30 hover:scale-102'
                                     }`}
-                                    style={mainTab === 'movers' ? {boxShadow: '0 0 25px rgba(249, 115, 22, 0.5)'} : {}}
+                                    style={mainTab === 'movers' ? {boxShadow: '0 0 35px rgba(249, 115, 22, 0.7), 0 0 60px rgba(249, 115, 22, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1)'} : {}}
                                 >
-                                    {mainTab === 'movers' && <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>}
-                                    <span className="relative">🚀 Market Movers</span>
+                                    {mainTab === 'movers' && (
+                                        <>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/tab:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+                                            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-red-600/20 animate-pulse"></div>
+                                        </>
+                                    )}
+                                    <span className="relative drop-shadow-lg">🚀 Market Movers</span>
                                 </button>
                             </div>
                         </div>
