@@ -2678,6 +2678,82 @@
                             <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
                         </div>
 
+                        {/* Navigation Header */}
+                        <nav className="relative z-20 max-w-7xl mx-auto mb-8">
+                            <div className="bg-blue-900/40 backdrop-blur-xl border border-blue-500/30 rounded-2xl px-6 py-4 shadow-2xl">
+                                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                    {/* Logo */}
+                                    <div className="flex items-center gap-3">
+                                        <img
+                                            src="8c5470b9-7f6a-49f6-b4d9-d9128261158f.jpg"
+                                            alt="FinClash"
+                                            className="w-10 h-10 object-contain"
+                                            onError={(e) => { e.target.style.display = 'none'; }}
+                                        />
+                                        <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">
+                                            FinClash
+                                        </span>
+                                    </div>
+
+                                    {/* Navigation Links */}
+                                    <div className="flex flex-wrap items-center justify-center gap-2 md:gap-6">
+                                        <a
+                                            href="#pricing"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                            className="text-blue-200 hover:text-cyan-300 font-semibold transition-colors duration-300 px-3 py-2"
+                                        >
+                                            💰 Pricing
+                                        </a>
+                                        <a
+                                            href="#how-to-use"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                document.getElementById('how-to-use-section')?.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                            className="text-blue-200 hover:text-cyan-300 font-semibold transition-colors duration-300 px-3 py-2"
+                                        >
+                                            📚 How to Use
+                                        </a>
+                                        <a
+                                            href="#what-is-finclash"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                document.getElementById('what-is-finclash-section')?.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                            className="text-blue-200 hover:text-cyan-300 font-semibold transition-colors duration-300 px-3 py-2"
+                                        >
+                                            ℹ️ What is FinClash
+                                        </a>
+                                        <a
+                                            href="#features"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                            className="text-blue-200 hover:text-cyan-300 font-semibold transition-colors duration-300 px-3 py-2"
+                                        >
+                                            ⭐ Features
+                                        </a>
+                                    </div>
+
+                                    {/* CTA Buttons */}
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            onClick={() => {
+                                                document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-6 py-2 rounded-xl font-bold transition-all duration-300 hover:scale-105 shadow-lg"
+                                        >
+                                            Get Started
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </nav>
+
                         <div className="max-w-7xl mx-auto relative z-10">
                             {/* Hero Section with Enhanced Design */}
                             <div className="text-center mb-16 pt-8">
@@ -2746,7 +2822,8 @@
                             {/* Spacer */}
                             <div className="mb-12"></div>
 
-                            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                            {/* Pricing Section */}
+                            <div id="pricing-section" className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                                 {/* Personal Plan - FREE */}
                                 <div className="group relative bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 border-2 border-blue-500/50 hover:border-cyan-400 hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-500 hover:-translate-y-2 hover-glow will-change-transform gpu-accelerated animate-fade-in">
                                     {/* Glow Effect */}
@@ -2992,6 +3069,213 @@
                                     <div>
                                         <h3 className="text-white font-bold text-lg mb-1">Secure Payments with Stripe</h3>
                                         <p className="text-purple-200 text-sm">All plan payments are processed securely through Stripe. Trusted by millions of businesses worldwide with bank-level security.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* What is FinClash Section */}
+                            <div id="what-is-finclash-section" className="mt-20 max-w-6xl mx-auto">
+                                <div className="bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 md:p-12 border-2 border-blue-500/50 shadow-2xl">
+                                    <div className="text-center mb-8">
+                                        <h2 className="text-5xl md:text-6xl font-black mb-4">
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">What is FinClash?</span>
+                                        </h2>
+                                        <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto rounded-full"></div>
+                                    </div>
+
+                                    <div className="grid md:grid-cols-2 gap-8 text-blue-100">
+                                        <div className="space-y-4">
+                                            <p className="text-lg leading-relaxed">
+                                                <span className="text-cyan-300 font-bold">FinClash</span> is the ultimate stock trading simulator that combines the thrill of the stock market with competitive gameplay. Built with cutting-edge AI technology powered by <span className="text-purple-300 font-bold">UltraThink</span>, we provide real-time market data, intelligent analysis, and a platform where you can compete with friends and family for real money prizes.
+                                            </p>
+                                            <p className="text-lg leading-relaxed">
+                                                Whether you're a beginner learning to trade or an experienced investor looking to test strategies, FinClash offers a risk-free environment with <span className="text-green-300 font-bold">$100,000 virtual capital</span> to start trading immediately.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <p className="text-lg leading-relaxed">
+                                                Our platform features three account types to match your needs:
+                                            </p>
+                                            <ul className="space-y-3">
+                                                <li className="flex items-start gap-3">
+                                                    <span className="text-cyan-400 text-2xl flex-shrink-0">👤</span>
+                                                    <div>
+                                                        <span className="font-bold text-cyan-300">Personal</span> - Free forever, perfect for solo practice
+                                                    </div>
+                                                </li>
+                                                <li className="flex items-start gap-3">
+                                                    <span className="text-green-400 text-2xl flex-shrink-0">👥</span>
+                                                    <div>
+                                                        <span className="font-bold text-green-300">Public</span> - Compete with others, 1% fee per trade
+                                                    </div>
+                                                </li>
+                                                <li className="flex items-start gap-3">
+                                                    <span className="text-purple-400 text-2xl flex-shrink-0">👑</span>
+                                                    <div>
+                                                        <span className="font-bold text-purple-300">Private</span> - Premium competition, $0.05 flat fee
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-8 pt-8 border-t border-blue-500/30 text-center">
+                                        <p className="text-xl text-blue-200">
+                                            Created by <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">Reid Coleman</span> & <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">Cameron Dietzel</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* How to Use Section */}
+                            <div id="how-to-use-section" className="mt-20 max-w-6xl mx-auto">
+                                <div className="bg-gradient-to-br from-blue-900/60 to-purple-950/60 backdrop-blur-xl rounded-3xl p-8 md:p-12 border-2 border-purple-500/50 shadow-2xl">
+                                    <div className="text-center mb-12">
+                                        <h2 className="text-5xl md:text-6xl font-black mb-4">
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-400">How to Use FinClash</span>
+                                        </h2>
+                                        <div className="w-24 h-1 bg-gradient-to-r from-purple-400 to-pink-500 mx-auto rounded-full"></div>
+                                    </div>
+
+                                    <div className="grid md:grid-cols-3 gap-8">
+                                        {/* Step 1 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-center">
+                                                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full mb-4">
+                                                    <span className="text-3xl font-black text-white">1</span>
+                                                </div>
+                                                <h3 className="text-2xl font-black text-cyan-300 mb-4">Choose Your Plan</h3>
+                                                <p className="text-blue-100 leading-relaxed">
+                                                    Select from Personal (free), Public (1% fee), or Private ($0.05 fee) based on whether you want to trade solo or compete for real money.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Step 2 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-green-500/30 hover:border-green-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-center">
+                                                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full mb-4">
+                                                    <span className="text-3xl font-black text-white">2</span>
+                                                </div>
+                                                <h3 className="text-2xl font-black text-green-300 mb-4">Create Account</h3>
+                                                <p className="text-blue-100 leading-relaxed">
+                                                    Sign up with your email and create a secure password. You'll instantly receive $100,000 in virtual capital to start trading.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Step 3 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30 hover:border-purple-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-center">
+                                                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full mb-4">
+                                                    <span className="text-3xl font-black text-white">3</span>
+                                                </div>
+                                                <h3 className="text-2xl font-black text-purple-300 mb-4">Start Trading</h3>
+                                                <p className="text-blue-100 leading-relaxed">
+                                                    Use our AI-powered analysis to research stocks, execute trades, and compete on the leaderboard. The winner takes all!
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-12 bg-gradient-to-r from-blue-900/60 to-purple-900/60 rounded-2xl p-6 border border-blue-500/30">
+                                        <h3 className="text-2xl font-black text-cyan-300 mb-4 text-center">Pro Tips 💡</h3>
+                                        <ul className="grid md:grid-cols-2 gap-4 text-blue-100">
+                                            <li className="flex items-start gap-3">
+                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
+                                                <span>Use UltraThink AI analysis to make informed decisions</span>
+                                            </li>
+                                            <li className="flex items-start gap-3">
+                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
+                                                <span>Monitor real-time market news and trends</span>
+                                            </li>
+                                            <li className="flex items-start gap-3">
+                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
+                                                <span>Diversify your portfolio across multiple stocks</span>
+                                            </li>
+                                            <li className="flex items-start gap-3">
+                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
+                                                <span>Track your competition on the live leaderboard</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Features Section */}
+                            <div id="features-section" className="mt-20 max-w-6xl mx-auto">
+                                <div className="bg-gradient-to-br from-blue-900/60 to-cyan-950/60 backdrop-blur-xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/50 shadow-2xl">
+                                    <div className="text-center mb-12">
+                                        <h2 className="text-5xl md:text-6xl font-black mb-4">
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-green-400">Features</span>
+                                        </h2>
+                                        <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-green-500 mx-auto rounded-full"></div>
+                                        <p className="text-xl text-blue-200 mt-4">Everything you need to master the market</p>
+                                    </div>
+
+                                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {/* Feature 1 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-4xl mb-4">🧠</div>
+                                            <h3 className="text-xl font-black text-cyan-300 mb-2">UltraThink AI</h3>
+                                            <p className="text-blue-100">Advanced AI-powered stock analysis and recommendations</p>
+                                        </div>
+
+                                        {/* Feature 2 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-green-500/30 hover:border-green-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-4xl mb-4">📊</div>
+                                            <h3 className="text-xl font-black text-green-300 mb-2">Real-Time Data</h3>
+                                            <p className="text-blue-100">Live stock prices, charts, and market updates</p>
+                                        </div>
+
+                                        {/* Feature 3 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30 hover:border-purple-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-4xl mb-4">🏆</div>
+                                            <h3 className="text-xl font-black text-purple-300 mb-2">Leaderboards</h3>
+                                            <p className="text-blue-100">Compete and see rankings in real-time</p>
+                                        </div>
+
+                                        {/* Feature 4 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/30 hover:border-yellow-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-4xl mb-4">💰</div>
+                                            <h3 className="text-xl font-black text-yellow-300 mb-2">Real Money Prizes</h3>
+                                            <p className="text-blue-100">Winner-takes-all competitions with actual payouts</p>
+                                        </div>
+
+                                        {/* Feature 5 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-pink-500/30 hover:border-pink-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-4xl mb-4">📰</div>
+                                            <h3 className="text-xl font-black text-pink-300 mb-2">Live Market News</h3>
+                                            <p className="text-blue-100">Stay updated with breaking financial news</p>
+                                        </div>
+
+                                        {/* Feature 6 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-orange-500/30 hover:border-orange-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-4xl mb-4">🔐</div>
+                                            <h3 className="text-xl font-black text-orange-300 mb-2">Secure Payments</h3>
+                                            <p className="text-blue-100">Stripe integration for safe, encrypted transactions</p>
+                                        </div>
+
+                                        {/* Feature 7 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/30 hover:border-blue-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-4xl mb-4">📱</div>
+                                            <h3 className="text-xl font-black text-blue-300 mb-2">Mobile Responsive</h3>
+                                            <p className="text-blue-100">Trade anywhere on any device</p>
+                                        </div>
+
+                                        {/* Feature 8 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/30 hover:border-indigo-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-4xl mb-4">🎯</div>
+                                            <h3 className="text-xl font-black text-indigo-300 mb-2">Watchlists</h3>
+                                            <p className="text-blue-100">Track your favorite stocks and get alerts</p>
+                                        </div>
+
+                                        {/* Feature 9 */}
+                                        <div className="bg-blue-900/40 backdrop-blur-sm rounded-2xl p-6 border border-teal-500/30 hover:border-teal-400 transition-all duration-300 hover:scale-105">
+                                            <div className="text-4xl mb-4">📈</div>
+                                            <h3 className="text-xl font-black text-teal-300 mb-2">Portfolio Analytics</h3>
+                                            <p className="text-blue-100">Detailed performance metrics and insights</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
