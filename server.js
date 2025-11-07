@@ -21,7 +21,8 @@ const io = new Server(server, {
         origin: [
             'http://localhost:3000',
             'http://localhost:3001',
-            'https://reidwcoleman.github.io'
+            'https://reidwcoleman.github.io',
+            'https://trader-snowy.vercel.app'
         ],
         methods: ["GET", "POST"],
         credentials: true
@@ -114,7 +115,8 @@ app.use(cors({
     origin: [
         'http://localhost:3000',
         'http://localhost:3001',
-        'https://reidwcoleman.github.io'
+        'https://reidwcoleman.github.io',
+        'https://trader-snowy.vercel.app'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -130,7 +132,8 @@ app.use((req, res, next) => {
     const allowedOrigins = [
         'http://localhost:3000',
         'http://localhost:3001',
-        'https://reidwcoleman.github.io'
+        'https://reidwcoleman.github.io',
+        'https://trader-snowy.vercel.app'
     ];
 
     console.log(`📨 ${req.method} ${req.path} from origin: ${origin}`);
