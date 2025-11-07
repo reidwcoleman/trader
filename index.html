@@ -2865,8 +2865,16 @@
                                             }}
                                             className="group relative bg-gradient-to-br from-green-900/60 to-emerald-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-green-500/50 hover:border-green-400 hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-2 text-left"
                                         >
-                                            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                                                <span className="bg-green-500 text-white text-xs font-black px-3 py-1 rounded-full">POPULAR</span>
+                                            {/* POPULAR Badge - Enhanced */}
+                                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
+                                                <div className="relative">
+                                                    <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-black px-5 py-2 rounded-full shadow-2xl animate-pulse flex items-center gap-2" style={{boxShadow: '0 0 30px rgba(34, 197, 94, 0.6)'}}>
+                                                        <span className="text-yellow-300">⭐</span>
+                                                        POPULAR
+                                                        <span className="text-yellow-300">⭐</span>
+                                                    </span>
+                                                    <div className="absolute inset-0 bg-green-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                                                </div>
                                             </div>
                                             <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
 
@@ -2917,6 +2925,17 @@
                                             }}
                                             className="group relative bg-gradient-to-br from-purple-900/60 to-violet-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-2 text-left"
                                         >
+                                            {/* PREMIUM Badge - Enhanced */}
+                                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
+                                                <div className="relative">
+                                                    <span className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white text-sm font-black px-5 py-2 rounded-full shadow-2xl animate-pulse flex items-center gap-2" style={{boxShadow: '0 0 30px rgba(168, 85, 247, 0.6)'}}>
+                                                        <span className="text-yellow-300">👑</span>
+                                                        PREMIUM
+                                                        <span className="text-yellow-300">👑</span>
+                                                    </span>
+                                                    <div className="absolute inset-0 bg-purple-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                                                </div>
+                                            </div>
                                             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-violet-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
 
                                             <div className="relative z-10">
@@ -3432,13 +3451,27 @@
                                 </div>
                             </div>
 
-                            {/* Stripe Integration Notice */}
-                            <div className="mt-8 max-w-2xl mx-auto bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border border-indigo-500 rounded-2xl p-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="text-5xl">💳</div>
-                                    <div>
-                                        <h3 className="text-white font-bold text-lg mb-1">Secure Payments with Stripe</h3>
-                                        <p className="text-purple-200 text-sm">All plan payments are processed securely through Stripe. Trusted by millions of businesses worldwide with bank-level security.</p>
+                            {/* Stripe Integration Notice - Ultra-Modern */}
+                            <div className="mt-12 max-w-3xl mx-auto group">
+                                <div className="relative bg-black/80 backdrop-blur-2xl border-2 border-cyan-500/30 hover:border-cyan-400/60 rounded-2xl p-6 transition-all duration-500 overflow-hidden" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.15)'}}>
+                                    {/* Animated shine effect */}
+                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+
+                                    <div className="relative flex items-center gap-6">
+                                        <div className="relative flex-shrink-0">
+                                            <div className="absolute inset-0 bg-cyan-500/20 blur-2xl rounded-full"></div>
+                                            <div className="relative text-6xl transform group-hover:scale-110 transition-transform duration-300">💳</div>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-black mb-2">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300">
+                                                    Secure Payments with Stripe
+                                                </span>
+                                            </h3>
+                                            <p className="text-gray-300 text-base leading-relaxed">
+                                                All plan payments are processed securely through <span className="text-cyan-400 font-bold">Stripe</span>. Trusted by millions of businesses worldwide with <span className="text-green-400 font-bold">bank-level security</span>.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -3945,6 +3978,17 @@
                                             }}
                                             className="group relative bg-gradient-to-br from-purple-900/60 to-violet-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-2 text-left"
                                         >
+                                            {/* PREMIUM Badge - Enhanced */}
+                                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
+                                                <div className="relative">
+                                                    <span className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white text-sm font-black px-5 py-2 rounded-full shadow-2xl animate-pulse flex items-center gap-2" style={{boxShadow: '0 0 30px rgba(168, 85, 247, 0.6)'}}>
+                                                        <span className="text-yellow-300">👑</span>
+                                                        PREMIUM
+                                                        <span className="text-yellow-300">👑</span>
+                                                    </span>
+                                                    <div className="absolute inset-0 bg-purple-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                                                </div>
+                                            </div>
                                             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-violet-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
 
                                             <div className="relative z-10">
