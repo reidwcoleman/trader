@@ -5023,8 +5023,15 @@
 
                             {/* AI Stock Recommendations Engine */}
                             {(() => {
-                                // Generate AI stock recommendations based on current market conditions
+                                // Advanced AI Stock Analysis Engine - UltraThink Algorithm
                                 const recommendations = [];
+
+                                // Calculate market-wide metrics for context
+                                const marketAvgChange = stocks.reduce((sum, s) => sum + (s.change || 0), 0) / stocks.length;
+                                const marketVolatility = Math.sqrt(stocks.reduce((sum, s) => sum + Math.pow((s.change || 0) - marketAvgChange, 2), 0) / stocks.length);
+                                const bullishStocks = stocks.filter(s => (s.change || 0) > 0).length;
+                                const bearishStocks = stocks.filter(s => (s.change || 0) < 0).length;
+                                const marketSentiment = bullishStocks > bearishStocks ? 'BULLISH' : 'BEARISH';
 
                                 stocks.forEach(stock => {
                                     const change = stock.change || 0;
@@ -5032,123 +5039,219 @@
                                     const positionShares = portfolio.positions[stock.symbol] || 0;
                                     const hasPosition = positionShares > 0;
 
-                                    let score = 50; // Base score
+                                    let score = 0; // Start at 0 for more selective scoring
                                     let reasons = [];
                                     let type = 'HOLD';
+                                    let confidence = 0;
 
-                                    // Advanced Momentum Analysis
-                                    if (change > 8) {
-                                        score += 30;
-                                        reasons.push('🚀 Explosive momentum breakout');
+                                    // ===== 1. MOMENTUM STRENGTH ANALYSIS =====
+                                    const relativeStrength = change - marketAvgChange; // How much better than market
+
+                                    if (change > 10) {
+                                        score += 45;
+                                        confidence += 25;
+                                        reasons.push('🚀 Parabolic move - extreme momentum');
+                                        type = 'STRONG BUY';
+                                    } else if (change > 7) {
+                                        score += 40;
+                                        confidence += 22;
+                                        reasons.push('🔥 Breakout confirmed - riding trend');
                                         type = 'STRONG BUY';
                                     } else if (change > 5) {
-                                        score += 25;
-                                        reasons.push('📈 Strong upward trend confirmed');
+                                        score += 35;
+                                        confidence += 20;
+                                        reasons.push('📈 Strong uptrend - continuation likely');
                                         type = 'BUY';
-                                    } else if (change > 2) {
-                                        score += 15;
-                                        reasons.push('✅ Positive momentum building');
+                                    } else if (change > 3) {
+                                        score += 28;
+                                        confidence += 16;
+                                        reasons.push('✅ Solid momentum building');
                                         type = 'BUY';
-                                    } else if (change < -8) {
-                                        score += 30;
-                                        reasons.push('💎 Deep value - significant bounce potential');
+                                    } else if (change > 1.5) {
+                                        score += 20;
+                                        confidence += 12;
+                                        reasons.push('📊 Positive trend forming');
+                                        type = 'BUY';
+                                    }
+
+                                    // Value opportunity scoring (dip buying)
+                                    if (change < -10) {
+                                        score += 42;
+                                        confidence += 20;
+                                        reasons.push('💎 Extreme oversold - high rebound potential');
+                                        type = 'BUY DIP';
+                                    } else if (change < -7) {
+                                        score += 35;
+                                        confidence += 18;
+                                        reasons.push('🎯 Deep discount - capitulation signal');
                                         type = 'BUY DIP';
                                     } else if (change < -5) {
-                                        score += 20;
-                                        reasons.push('🎯 Oversold entry opportunity');
+                                        score += 28;
+                                        confidence += 15;
+                                        reasons.push('⚡ Oversold bounce setup');
                                         type = 'BUY DIP';
                                     } else if (change < -3) {
-                                        score += 12;
-                                        reasons.push('⬇️ Healthy pullback - good entry');
+                                        score += 22;
+                                        confidence += 12;
+                                        reasons.push('📉 Healthy correction - entry zone');
                                         type = 'BUY DIP';
                                     }
 
-                                    // Smart Value Analysis
-                                    if (price < 20 && change > 5) {
-                                        score += 15;
-                                        reasons.push('💰 Low-price momentum play');
-                                    } else if (price < 50 && change > 3) {
-                                        score += 12;
-                                        reasons.push('💵 Affordable growth stock');
-                                    } else if (price > 500 && change > 3) {
-                                        score += 8;
-                                        reasons.push('👑 Premium stock with strength');
-                                    } else if (price > 200 && change > 2) {
-                                        score += 6;
-                                        reasons.push('🏢 Large-cap gaining traction');
-                                    }
-
-                                    // Pattern & Trend Detection
-                                    if (change > 4 && change < 9) {
+                                    // ===== 2. RELATIVE STRENGTH vs MARKET =====
+                                    if (relativeStrength > 5) {
+                                        score += 25;
+                                        confidence += 15;
+                                        reasons.push('💪 Outperforming market significantly');
+                                    } else if (relativeStrength > 3) {
                                         score += 18;
-                                        reasons.push('📊 Ideal sustainable growth zone');
-                                    } else if (change > 2 && change < 4) {
-                                        score += 10;
-                                        reasons.push('📉 Steady controlled climb');
+                                        confidence += 10;
+                                        reasons.push('🏆 Leading the market');
+                                    } else if (relativeStrength > 1) {
+                                        score += 12;
+                                        confidence += 8;
+                                        reasons.push('📊 Above market performance');
                                     }
 
-                                    // Sector leadership bonus
-                                    if (change > 0 && price > 100) {
-                                        score += 5;
-                                        reasons.push('🏆 Market leader with momentum');
+                                    // Underperformance can be opportunity
+                                    if (relativeStrength < -5 && change < 0) {
+                                        score += 15;
+                                        confidence += 10;
+                                        reasons.push('🔄 Mean reversion candidate');
                                     }
 
-                                    // Volatility opportunities
-                                    if (Math.abs(change) > 10) {
-                                        score += 10;
-                                        reasons.push('⚡ High volatility - swing trade setup');
+                                    // ===== 3. PRICE ACTION & VOLUME ANALYSIS =====
+                                    const priceZone = price < 10 ? 'micro' : price < 50 ? 'small' : price < 150 ? 'mid' : price < 500 ? 'large' : 'mega';
+
+                                    if (priceZone === 'micro' && change > 8) {
+                                        score += 25;
+                                        confidence += 12;
+                                        reasons.push('🎲 Penny stock rocket - high risk/reward');
+                                    } else if (priceZone === 'small' && change > 5) {
+                                        score += 22;
+                                        confidence += 15;
+                                        reasons.push('💰 Small-cap growth momentum');
+                                    } else if (priceZone === 'mid' && change > 3) {
+                                        score += 20;
+                                        confidence += 18;
+                                        reasons.push('🏢 Mid-cap strength - sweet spot');
+                                    } else if (priceZone === 'large' && change > 2) {
+                                        score += 18;
+                                        confidence += 20;
+                                        reasons.push('🏛️ Blue-chip momentum - safer play');
+                                    } else if (priceZone === 'mega' && change > 1.5) {
+                                        score += 15;
+                                        confidence += 22;
+                                        reasons.push('👑 Mega-cap leader moving');
                                     }
 
-                                    if (Math.abs(change) < 1) {
-                                        score -= 15;
-                                        reasons.push('😴 Low activity - skip for now');
-                                        type = 'WATCH';
-                                    }
-
-                                    // Position analysis
-                                    // Note: avgPrice tracking not implemented yet
-                                    // if (hasPosition) {
-                                    //     const positionReturn = ((price - avgPrice) / avgPrice) * 100;
-                                    //     if (positionReturn > 15) {
-                                    //         score -= 20;
-                                    //         type = 'TAKE PROFIT';
-                                    //         reasons = ['Lock in strong gains'];
-                                    //     } else if (positionReturn < -10) {
-                                    //         score -= 15;
-                                    //         type = 'CUT LOSS';
-                                    //         reasons = ['Limit downside risk'];
-                                    //     }
-                                    // }
-
-                                    // Risk assessment
+                                    // ===== 4. VOLATILITY & RISK SCORING =====
+                                    const stockVolatility = Math.abs(change);
                                     let risk = 'MEDIUM';
-                                    if (Math.abs(change) > 8) {
+
+                                    if (stockVolatility > 15) {
+                                        risk = 'EXTREME';
+                                        score += 12; // High risk can mean high reward
+                                        confidence -= 5;
+                                        reasons.push('⚠️ Extreme volatility - trader\'s paradise');
+                                    } else if (stockVolatility > 10) {
                                         risk = 'HIGH';
-                                        score -= 5;
-                                    } else if (Math.abs(change) < 2) {
+                                        score += 10;
+                                        confidence -= 3;
+                                        reasons.push('⚡ High volatility - active trade');
+                                    } else if (stockVolatility > 5) {
+                                        risk = 'MEDIUM';
+                                        score += 8;
+                                        reasons.push('📊 Moderate volatility - good movement');
+                                    } else if (stockVolatility > 2) {
                                         risk = 'LOW';
-                                        score += 5;
+                                        score += 15;
+                                        confidence += 5;
+                                        reasons.push('🛡️ Stable growth - lower risk');
+                                    } else {
+                                        risk = 'VERY LOW';
+                                        score -= 10; // Too quiet
+                                        confidence -= 8;
+                                        reasons.push('😴 Low activity - skip');
                                     }
 
-                                    // Only add recommendations with score > 60 AND stocks not already owned
-                                    if (score > 60 && reasons.length > 0 && !hasPosition) {
+                                    // ===== 5. PATTERN RECOGNITION =====
+                                    // Golden zone (4-7% gains)
+                                    if (change >= 4 && change <= 7) {
+                                        score += 25;
+                                        confidence += 15;
+                                        reasons.push('🎯 In the golden zone - optimal entry');
+                                    }
+
+                                    // V-shaped recovery
+                                    if (change < -5 && Math.abs(change) > 5) {
+                                        score += 18;
+                                        confidence += 10;
+                                        reasons.push('🔄 V-recovery pattern forming');
+                                    }
+
+                                    // Breakout zone
+                                    if (change > 8 && change < 12) {
+                                        score += 20;
+                                        confidence += 12;
+                                        reasons.push('💥 Breakout zone - momentum play');
+                                    }
+
+                                    // ===== 6. MARKET CONTEXT BONUS =====
+                                    if (marketSentiment === 'BULLISH' && change > 3) {
+                                        score += 15;
+                                        confidence += 8;
+                                        reasons.push('🌊 Riding bullish market tide');
+                                    } else if (marketSentiment === 'BEARISH' && change > 5) {
+                                        score += 22;
+                                        confidence += 12;
+                                        reasons.push('🦅 Strong in weak market - leader');
+                                    } else if (marketSentiment === 'BEARISH' && change < -8) {
+                                        score += 18;
+                                        confidence += 10;
+                                        reasons.push('💰 Contrarian value play');
+                                    }
+
+                                    // ===== 7. PRICE LEVEL OPPORTUNITIES =====
+                                    if (price < 5 && change > 10) {
+                                        score += 20;
+                                        reasons.push('🚨 Micro-cap moonshot potential');
+                                    }
+                                    if (price > 1000 && change > 2) {
+                                        score += 12;
+                                        confidence += 10;
+                                        reasons.push('🏰 Mega-cap institutional strength');
+                                    }
+
+                                    // ===== 8. FINAL CONFIDENCE ADJUSTMENT =====
+                                    confidence = Math.min(100, Math.max(0, confidence));
+                                    score = score * (1 + confidence / 200); // Boost score by confidence
+
+                                    // Only recommend stocks with strong signals (score > 70) and not owned
+                                    if (score > 70 && reasons.length >= 2 && !hasPosition) {
                                         recommendations.push({
                                             symbol: stock.symbol,
                                             name: stock.name,
-                                            score,
+                                            score: Math.round(score),
                                             type,
-                                            reasons,
+                                            reasons: reasons.slice(0, 4), // Top 4 reasons
                                             risk,
                                             change,
                                             price,
-                                            hasPosition
+                                            hasPosition,
+                                            confidence: Math.round(confidence),
+                                            relativeStrength: relativeStrength.toFixed(2)
                                         });
                                     }
                                 });
 
-                                // Sort by score (descending)
-                                recommendations.sort((a, b) => b.score - a.score);
-                                const topPicks = recommendations.slice(0, 6);
+                                // Sort by score (descending), then by confidence
+                                recommendations.sort((a, b) => {
+                                    if (Math.abs(a.score - b.score) < 5) {
+                                        return b.confidence - a.confidence;
+                                    }
+                                    return b.score - a.score;
+                                });
+                                const topPicks = recommendations.slice(0, 8); // Show top 8 instead of 6
 
                                 if (topPicks.length === 0) return null;
 
@@ -5187,8 +5290,11 @@
                                                         'gray';
 
                                                     const riskColor =
+                                                        pick.risk === 'VERY LOW' ? 'text-green-400' :
                                                         pick.risk === 'LOW' ? 'text-green-300' :
                                                         pick.risk === 'MEDIUM' ? 'text-yellow-300' :
+                                                        pick.risk === 'HIGH' ? 'text-orange-300' :
+                                                        pick.risk === 'EXTREME' ? 'text-red-400' :
                                                         'text-red-300';
 
                                                     return (
@@ -5265,11 +5371,22 @@
                                                                 </div>
                                                             </div>
 
-                                                            {/* Risk & Action */}
+                                                            {/* Risk, Confidence & Action */}
                                                             <div className="flex items-center justify-between">
-                                                                <div className="text-[10px]">
-                                                                    <span className="text-gray-400">Risk: </span>
-                                                                    <span className={`font-bold ${riskColor}`}>{pick.risk}</span>
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="text-[10px]">
+                                                                        <span className="text-gray-400">Risk: </span>
+                                                                        <span className={`font-bold ${riskColor}`}>{pick.risk}</span>
+                                                                    </div>
+                                                                    <div className="text-[10px]">
+                                                                        <span className="text-gray-400">Confidence: </span>
+                                                                        <span className={`font-bold ${
+                                                                            pick.confidence >= 70 ? 'text-green-300' :
+                                                                            pick.confidence >= 50 ? 'text-cyan-300' :
+                                                                            pick.confidence >= 30 ? 'text-yellow-300' :
+                                                                            'text-orange-300'
+                                                                        }`}>{pick.confidence}%</span>
+                                                                    </div>
                                                                 </div>
                                                                 <div className="text-xs text-cyan-300 font-bold group-hover:scale-110 transition-transform">
                                                                     View Details →
