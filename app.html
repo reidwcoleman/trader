@@ -879,13 +879,10 @@
 
                 if (plan === 'personal') {
                     const portfolio = competition?.members[0]?.portfolio || defaultPortfolio;
-                    console.log('📂 getCurrentPortfolio (personal):', portfolio);
-                    console.log('📊 Current positions:', portfolio.positions);
                     return portfolio;
                 }
                 const member = competition?.members.find(m => m.id === currentUserId);
                 const portfolio = member?.portfolio || defaultPortfolio;
-                console.log('📂 getCurrentPortfolio (family):', portfolio);
                 return portfolio;
             };
 
