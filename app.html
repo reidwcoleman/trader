@@ -5036,43 +5036,72 @@
                                     let reasons = [];
                                     let type = 'HOLD';
 
-                                    // Momentum scoring
-                                    if (change > 5) {
-                                        score += 20;
-                                        reasons.push('Strong upward momentum');
+                                    // Advanced Momentum Analysis
+                                    if (change > 8) {
+                                        score += 30;
+                                        reasons.push('🚀 Explosive momentum breakout');
+                                        type = 'STRONG BUY';
+                                    } else if (change > 5) {
+                                        score += 25;
+                                        reasons.push('📈 Strong upward trend confirmed');
                                         type = 'BUY';
                                     } else if (change > 2) {
-                                        score += 10;
-                                        reasons.push('Positive momentum');
+                                        score += 15;
+                                        reasons.push('✅ Positive momentum building');
                                         type = 'BUY';
+                                    } else if (change < -8) {
+                                        score += 30;
+                                        reasons.push('💎 Deep value - significant bounce potential');
+                                        type = 'BUY DIP';
                                     } else if (change < -5) {
-                                        score += 25;
-                                        reasons.push('Oversold - bounce opportunity');
+                                        score += 20;
+                                        reasons.push('🎯 Oversold entry opportunity');
                                         type = 'BUY DIP';
                                     } else if (change < -3) {
-                                        score += 15;
-                                        reasons.push('Pullback entry point');
+                                        score += 12;
+                                        reasons.push('⬇️ Healthy pullback - good entry');
                                         type = 'BUY DIP';
                                     }
 
-                                    // Value scoring (simplified)
-                                    if (price < 50 && change > 3) {
-                                        score += 10;
-                                        reasons.push('Affordable with momentum');
-                                    }
-                                    if (price > 200 && change > 2) {
-                                        score += 5;
-                                        reasons.push('Premium stock gaining');
+                                    // Smart Value Analysis
+                                    if (price < 20 && change > 5) {
+                                        score += 15;
+                                        reasons.push('💰 Low-price momentum play');
+                                    } else if (price < 50 && change > 3) {
+                                        score += 12;
+                                        reasons.push('💵 Affordable growth stock');
+                                    } else if (price > 500 && change > 3) {
+                                        score += 8;
+                                        reasons.push('👑 Premium stock with strength');
+                                    } else if (price > 200 && change > 2) {
+                                        score += 6;
+                                        reasons.push('🏢 Large-cap gaining traction');
                                     }
 
-                                    // Pattern detection (simplified)
-                                    if (change > 3 && change < 7) {
-                                        score += 15;
-                                        reasons.push('Sustainable growth pattern');
+                                    // Pattern & Trend Detection
+                                    if (change > 4 && change < 9) {
+                                        score += 18;
+                                        reasons.push('📊 Ideal sustainable growth zone');
+                                    } else if (change > 2 && change < 4) {
+                                        score += 10;
+                                        reasons.push('📉 Steady controlled climb');
                                     }
+
+                                    // Sector leadership bonus
+                                    if (change > 0 && price > 100) {
+                                        score += 5;
+                                        reasons.push('🏆 Market leader with momentum');
+                                    }
+
+                                    // Volatility opportunities
+                                    if (Math.abs(change) > 10) {
+                                        score += 10;
+                                        reasons.push('⚡ High volatility - swing trade setup');
+                                    }
+
                                     if (Math.abs(change) < 1) {
-                                        score -= 10;
-                                        reasons.push('Consolidating');
+                                        score -= 15;
+                                        reasons.push('😴 Low activity - skip for now');
                                         type = 'WATCH';
                                     }
 
@@ -5101,8 +5130,8 @@
                                         score += 5;
                                     }
 
-                                    // Only add recommendations with score > 60
-                                    if (score > 60 && reasons.length > 0) {
+                                    // Only add recommendations with score > 60 AND stocks not already owned
+                                    if (score > 60 && reasons.length > 0 && !hasPosition) {
                                         recommendations.push({
                                             symbol: stock.symbol,
                                             name: stock.name,
@@ -5117,7 +5146,7 @@
                                     }
                                 });
 
-                                // Sort by score
+                                // Sort by score (descending)
                                 recommendations.sort((a, b) => b.score - a.score);
                                 const topPicks = recommendations.slice(0, 6);
 
@@ -5134,9 +5163,9 @@
                                                     <span className="text-4xl animate-pulse">🎯</span>
                                                     <div>
                                                         <h2 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
-                                                            AI Stock Picks
+                                                            Top Stocks to Buy
                                                         </h2>
-                                                        <p className="text-sm text-purple-300">UltraThink recommendations • Real-time analysis</p>
+                                                        <p className="text-sm text-purple-300">UltraThink AI recommendations • Excludes owned positions</p>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
@@ -5150,6 +5179,7 @@
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 {topPicks.map((pick, idx) => {
                                                     const typeColor =
+                                                        pick.type === 'STRONG BUY' ? 'emerald' :
                                                         pick.type === 'BUY' ? 'green' :
                                                         pick.type === 'BUY DIP' ? 'cyan' :
                                                         pick.type === 'TAKE PROFIT' ? 'yellow' :
@@ -5177,6 +5207,7 @@
                                                                         #{idx + 1}
                                                                     </div>
                                                                     <div className={`text-xs font-bold px-2 py-1 rounded-full ${
+                                                                        typeColor === 'emerald' ? 'bg-emerald-900/40 border border-emerald-400/70 text-emerald-300 animate-pulse' :
                                                                         typeColor === 'green' ? 'bg-green-900/40 border border-green-500/50 text-green-300' :
                                                                         typeColor === 'cyan' ? 'bg-cyan-900/40 border border-cyan-500/50 text-cyan-300' :
                                                                         typeColor === 'yellow' ? 'bg-yellow-900/40 border border-yellow-500/50 text-yellow-300' :
