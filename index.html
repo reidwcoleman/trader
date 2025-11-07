@@ -66,6 +66,7 @@
             const [resetStep, setResetStep] = useState(1); // 1: enter email, 2: enter code + new passcode
             const [showPasswordReset, setShowPasswordReset] = useState(false);
             const [accountMode, setAccountMode] = useState('create'); // 'create' or 'login'
+            const [authError, setAuthError] = useState(''); // Error message for auth forms
 
             const [competitionCode, setCompetitionCode] = useState('');
             const [joinCode, setJoinCode] = useState('');
@@ -3123,7 +3124,7 @@
                             </div>
 
                             {/* Pricing Section - Ultra-Modern Cards */}
-                            <div id="pricing-section" className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                            <div id="pricing-section" className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto pt-6">
                                 {/* Personal Plan - FREE */}
                                 <div className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-500 hover:-translate-y-3 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
                                     {/* Animated Background Gradient */}
@@ -3948,27 +3949,27 @@
                         })()}
                         {showAccountTypeModal && (
                             <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 z-[9999]">
-                                    <div className="relative bg-gradient-to-br from-blue-900/80 to-indigo-950/80 backdrop-blur-xl rounded-3xl p-8 max-w-4xl w-full border-2 border-cyan-500/40 shadow-2xl" style={{boxShadow: '0 0 60px rgba(6, 182, 212, 0.2)'}}>
+                                    <div className="relative bg-black/90 backdrop-blur-xl rounded-3xl p-8 max-w-6xl w-full border-2 border-cyan-500/40 shadow-2xl" style={{boxShadow: '0 0 60px rgba(6, 182, 212, 0.3)'}}>
                                         {/* Close Button */}
                                         <button
                                             onClick={() => setShowAccountTypeModal(false)}
-                                            className="absolute top-4 right-4 text-cyan-300 hover:text-cyan-400 text-3xl font-bold transition-colors"
+                                            className="absolute top-4 right-4 text-cyan-300 hover:text-cyan-400 text-3xl font-bold transition-colors z-50"
                                         >
                                             ×
                                         </button>
 
                                         {/* Header */}
                                         <div className="text-center mb-8">
-                                            <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-4">
+                                            <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-green-400 to-cyan-300 mb-4">
                                                 {accountMode === 'login' ? 'Sign In to Your Account' : 'Choose Your Account Type'}
                                             </h2>
-                                        <p className="text-blue-200 text-lg">
+                                        <p className="text-gray-300 text-lg">
                                             {accountMode === 'login' ? 'Select your account type to sign in' : 'Select the perfect plan for your trading journey'}
                                         </p>
                                     </div>
 
                                     {/* Account Type Cards */}
-                                    <div className="grid md:grid-cols-3 gap-6">
+                                    <div className="grid md:grid-cols-3 gap-6 pt-6">
                                         {/* Individual Account */}
                                         <button
                                             onClick={() => {
@@ -3976,33 +3977,63 @@
                                                 setShowAccountTypeModal(false);
                                                 setView('setup-family');
                                             }}
-                                            className="group relative bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-blue-500/50 hover:border-cyan-400 hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-300 hover:-translate-y-2 hover-glow text-left"
+                                            className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-500 hover:-translate-y-3 hover:scale-105 overflow-hidden text-left"
+                                            style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}
                                         >
-                                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                                            {/* Animated Background Gradient */}
+                                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition duration-700"></div>
+
+                                            {/* Shine Effect */}
+                                            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
 
                                             <div className="relative z-10">
-                                                <div className="bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-4 rounded-xl shadow-xl w-16 h-16 flex items-center justify-center mb-4 mx-auto">
-                                                    <span className="text-4xl">👤</span>
+                                                {/* Icon with Glow */}
+                                                <div className="flex items-center justify-center mb-6">
+                                                    <div className="relative">
+                                                        <div className="absolute inset-0 bg-cyan-500/30 blur-2xl rounded-full group-hover:bg-cyan-500/50 transition-all duration-500"></div>
+                                                        <div className="relative bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-5 rounded-2xl shadow-xl transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                                                            <span className="text-5xl">👤</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <h3 className="text-2xl font-black text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">
-                                                    Individual
+
+                                                {/* Title */}
+                                                <h3 className="text-3xl font-black text-center mb-3">
+                                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 group-hover:from-cyan-200 group-hover:via-blue-300 group-hover:to-cyan-200 transition-all duration-500">
+                                                        Individual
+                                                    </span>
                                                 </h3>
-                                                <p className="text-blue-300 text-center text-sm mb-4">Solo trading practice</p>
-                                                <div className="text-center mb-4">
-                                                    <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400">FREE</span>
+                                                <p className="text-center text-gray-400 group-hover:text-cyan-400 text-base mb-6 font-semibold transition-colors duration-300">Perfect for solo traders</p>
+
+                                                {/* Price */}
+                                                <div className="relative text-center mb-8 py-4 bg-gradient-to-br from-black/60 to-black/40 rounded-2xl border-2 border-green-500/30 group-hover:border-green-400/60 transition-all duration-500 overflow-hidden">
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 group-hover:from-green-500/10 group-hover:to-emerald-500/10 transition-all duration-500"></div>
+                                                    <div className="relative">
+                                                        <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-emerald-400 to-green-300" style={{textShadow: '0 0 40px rgba(74, 222, 128, 0.3)'}}>
+                                                            FREE
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <ul className="space-y-2 text-blue-100 text-sm">
-                                                    <li className="flex items-start gap-2">
-                                                        <span className="text-green-400">✓</span>
-                                                        <span>$100K virtual capital</span>
+
+                                                {/* Features */}
+                                                <ul className="space-y-3">
+                                                    <li className="flex items-start gap-3 group/item">
+                                                        <span className="relative text-xl text-green-400 font-bold">✓</span>
+                                                        <span className="text-sm text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                            <span className="font-black text-cyan-400">$100K</span> virtual capital
+                                                        </span>
                                                     </li>
-                                                    <li className="flex items-start gap-2">
-                                                        <span className="text-green-400">✓</span>
-                                                        <span>Trade any stock globally</span>
+                                                    <li className="flex items-start gap-3 group/item">
+                                                        <span className="relative text-xl text-green-400 font-bold">✓</span>
+                                                        <span className="text-sm text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                            Trade <span className="font-black text-cyan-400">any stock</span>
+                                                        </span>
                                                     </li>
-                                                    <li className="flex items-start gap-2">
-                                                        <span className="text-green-400">✓</span>
-                                                        <span>UltraThink AI analysis</span>
+                                                    <li className="flex items-start gap-3 group/item">
+                                                        <span className="relative text-xl text-green-400 font-bold">✓</span>
+                                                        <span className="text-sm text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                            <span className="font-black text-cyan-400">UltraThink AI</span> analysis
+                                                        </span>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -4024,37 +4055,74 @@
                                                     setView('setup-family');
                                                 }
                                             }}
-                                            className="group relative bg-gradient-to-br from-green-900/60 to-emerald-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-green-500/50 hover:border-green-400 hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-2 hover-glow-green text-left"
+                                            className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 border-2 border-green-500/40 hover:border-green-400 transition-all duration-500 hover:-translate-y-3 hover:scale-105 overflow-hidden text-left"
+                                            style={{boxShadow: '0 0 40px rgba(34, 197, 94, 0.25)'}}
                                         >
-                                            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                                                <span className="bg-green-500 text-white text-xs font-black px-3 py-1 rounded-full animate-pulse-glow-green">POPULAR</span>
+                                            {/* Animated Background Gradient */}
+                                            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-emerald-600/15 to-transparent opacity-0 group-hover:opacity-100 transition duration-700"></div>
+
+                                            {/* Shine Effect */}
+                                            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-green-400/15 to-transparent"></div>
+
+                                            {/* POPULAR Badge */}
+                                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
+                                                <div className="relative">
+                                                    <div className="absolute inset-0 bg-green-500/40 blur-xl rounded-full animate-pulse"></div>
+                                                    <span className="relative bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-black px-5 py-2 rounded-full shadow-2xl" style={{boxShadow: '0 0 30px rgba(34, 197, 94, 0.6)'}}>
+                                                        ⭐ POPULAR
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
 
                                             <div className="relative z-10">
-                                                <div className="bg-gradient-to-br from-green-400 via-emerald-500 to-green-600 p-4 rounded-xl shadow-xl w-16 h-16 flex items-center justify-center mb-4 mx-auto">
-                                                    <span className="text-4xl">👥</span>
+                                                {/* Icon with Glow */}
+                                                <div className="flex items-center justify-center mb-6 mt-2">
+                                                    <div className="relative">
+                                                        <div className="absolute inset-0 bg-green-500/30 blur-2xl rounded-full group-hover:bg-green-500/50 transition-all duration-500"></div>
+                                                        <div className="relative bg-gradient-to-br from-green-400 via-emerald-500 to-green-600 p-5 rounded-2xl shadow-xl transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                                                            <span className="text-5xl">👥</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <h3 className="text-2xl font-black text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400">
-                                                    Public
+
+                                                {/* Title */}
+                                                <h3 className="text-3xl font-black text-center mb-3">
+                                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-emerald-400 to-green-300 group-hover:from-green-200 group-hover:via-emerald-300 group-hover:to-green-200 transition-all duration-500">
+                                                        Public
+                                                    </span>
                                                 </h3>
-                                                <p className="text-green-300 text-center text-sm mb-4">Compete for prizes</p>
-                                                <div className="text-center mb-4">
-                                                    <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400">1%</span>
-                                                    <p className="text-xs text-green-300 font-bold">fee per trade</p>
+                                                <p className="text-center text-gray-400 group-hover:text-green-400 text-base mb-6 font-semibold transition-colors duration-300">Compete for prizes</p>
+
+                                                {/* Price */}
+                                                <div className="relative text-center mb-8 py-4 bg-gradient-to-br from-black/60 to-black/40 rounded-2xl border-2 border-yellow-500/30 group-hover:border-yellow-400/60 transition-all duration-500 overflow-hidden">
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-orange-500/5 group-hover:from-yellow-500/10 group-hover:to-orange-500/10 transition-all duration-500"></div>
+                                                    <div className="relative">
+                                                        <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-300" style={{textShadow: '0 0 40px rgba(251, 191, 36, 0.3)'}}>
+                                                            1%
+                                                        </span>
+                                                        <div className="text-xs text-yellow-400 font-bold mt-2">FEE PER TRADE</div>
+                                                    </div>
                                                 </div>
-                                                <ul className="space-y-2 text-blue-100 text-sm">
-                                                    <li className="flex items-start gap-2">
-                                                        <span className="text-green-400">✓</span>
-                                                        <span>Private competitions</span>
+
+                                                {/* Features */}
+                                                <ul className="space-y-3">
+                                                    <li className="flex items-start gap-3 group/item">
+                                                        <span className="relative text-xl text-green-400 font-bold">✓</span>
+                                                        <span className="text-sm text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                            <span className="font-black text-green-400">Private</span> competitions
+                                                        </span>
                                                     </li>
-                                                    <li className="flex items-start gap-2">
-                                                        <span className="text-green-400">✓</span>
-                                                        <span>Real money prizes</span>
+                                                    <li className="flex items-start gap-3 group/item">
+                                                        <span className="relative text-xl text-green-400 font-bold">✓</span>
+                                                        <span className="text-sm text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                            <span className="font-black text-green-400">Real money</span> prizes
+                                                        </span>
                                                     </li>
-                                                    <li className="flex items-start gap-2">
-                                                        <span className="text-green-400">✓</span>
-                                                        <span>Live leaderboards</span>
+                                                    <li className="flex items-start gap-3 group/item">
+                                                        <span className="relative text-xl text-green-400 font-bold">✓</span>
+                                                        <span className="text-sm text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                            <span className="font-black text-green-400">Live</span> leaderboards
+                                                        </span>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -4076,45 +4144,74 @@
                                                     setView('setup-family');
                                                 }
                                             }}
-                                            className="group relative bg-gradient-to-br from-purple-900/60 to-violet-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-2 text-left"
+                                            className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 border-2 border-purple-500/40 hover:border-purple-400 transition-all duration-500 hover:-translate-y-3 hover:scale-105 overflow-hidden text-left"
+                                            style={{boxShadow: '0 0 40px rgba(168, 85, 247, 0.25)'}}
                                         >
-                                            {/* PREMIUM Badge - Enhanced */}
+                                            {/* Animated Background Gradient */}
+                                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-600/15 to-transparent opacity-0 group-hover:opacity-100 transition duration-700"></div>
+
+                                            {/* Shine Effect */}
+                                            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-purple-400/15 to-transparent"></div>
+
+                                            {/* PREMIUM Badge */}
                                             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
                                                 <div className="relative">
-                                                    <span className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white text-sm font-black px-5 py-2 rounded-full shadow-2xl animate-pulse flex items-center gap-2" style={{boxShadow: '0 0 30px rgba(168, 85, 247, 0.6)'}}>
-                                                        <span className="text-yellow-300">👑</span>
-                                                        PREMIUM
-                                                        <span className="text-yellow-300">👑</span>
+                                                    <div className="absolute inset-0 bg-purple-500/40 blur-xl rounded-full animate-pulse"></div>
+                                                    <span className="relative bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 text-white text-xs font-black px-5 py-2 rounded-full shadow-2xl" style={{boxShadow: '0 0 30px rgba(168, 85, 247, 0.6)'}}>
+                                                        ✨ PREMIUM
                                                     </span>
-                                                    <div className="absolute inset-0 bg-purple-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
                                                 </div>
                                             </div>
-                                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-violet-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
 
                                             <div className="relative z-10">
-                                                <div className="bg-gradient-to-br from-purple-400 via-violet-500 to-purple-600 p-4 rounded-xl shadow-xl w-16 h-16 flex items-center justify-center mb-4 mx-auto">
-                                                    <span className="text-4xl">👑</span>
+                                                {/* Icon with Glow */}
+                                                <div className="flex items-center justify-center mb-6 mt-2">
+                                                    <div className="relative">
+                                                        <div className="absolute inset-0 bg-purple-500/30 blur-2xl rounded-full group-hover:bg-purple-500/50 transition-all duration-500"></div>
+                                                        <div className="relative bg-gradient-to-br from-purple-400 via-pink-500 to-purple-600 p-5 rounded-2xl shadow-xl transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                                                            <span className="text-5xl">👑</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <h3 className="text-2xl font-black text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-violet-400">
-                                                    Private
+
+                                                {/* Title */}
+                                                <h3 className="text-3xl font-black text-center mb-3">
+                                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-400 to-purple-300 group-hover:from-purple-200 group-hover:via-pink-300 group-hover:to-purple-200 transition-all duration-500">
+                                                        Private
+                                                    </span>
                                                 </h3>
-                                                <p className="text-purple-300 text-center text-sm mb-4">Premium competition</p>
-                                                <div className="text-center mb-4">
-                                                    <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">$0.05</span>
-                                                    <p className="text-xs text-purple-300 font-bold">flat fee per trade</p>
+                                                <p className="text-center text-gray-400 group-hover:text-purple-400 text-base mb-6 font-semibold transition-colors duration-300">Premium competition</p>
+
+                                                {/* Price */}
+                                                <div className="relative text-center mb-8 py-4 bg-gradient-to-br from-black/60 to-black/40 rounded-2xl border-2 border-purple-500/30 group-hover:border-purple-400/60 transition-all duration-500 overflow-hidden">
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 group-hover:from-purple-500/10 group-hover:to-pink-500/10 transition-all duration-500"></div>
+                                                    <div className="relative">
+                                                        <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-400 to-purple-300" style={{textShadow: '0 0 40px rgba(168, 85, 247, 0.3)'}}>
+                                                            $0.05
+                                                        </span>
+                                                        <div className="text-xs text-purple-400 font-bold mt-2">FLAT FEE PER TRADE</div>
+                                                    </div>
                                                 </div>
-                                                <ul className="space-y-2 text-blue-100 text-sm">
-                                                    <li className="flex items-start gap-2">
-                                                        <span className="text-green-400">✓</span>
-                                                        <span>Family-only competition</span>
+
+                                                {/* Features */}
+                                                <ul className="space-y-3">
+                                                    <li className="flex items-start gap-3 group/item">
+                                                        <span className="relative text-xl text-green-400 font-bold">✓</span>
+                                                        <span className="text-sm text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                            <span className="font-black text-purple-400">Family-only</span> competition
+                                                        </span>
                                                     </li>
-                                                    <li className="flex items-start gap-2">
-                                                        <span className="text-green-400">✓</span>
-                                                        <span>Real money prizes</span>
+                                                    <li className="flex items-start gap-3 group/item">
+                                                        <span className="relative text-xl text-green-400 font-bold">✓</span>
+                                                        <span className="text-sm text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                            <span className="font-black text-green-400">Real money</span> prizes
+                                                        </span>
                                                     </li>
-                                                    <li className="flex items-start gap-2">
-                                                        <span className="text-green-400">✓</span>
-                                                        <span>Secure & private</span>
+                                                    <li className="flex items-start gap-3 group/item">
+                                                        <span className="relative text-xl text-green-400 font-bold">✓</span>
+                                                        <span className="text-sm text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                            <span className="font-black text-purple-400">Secure & private</span>
+                                                        </span>
                                                     </li>
                                                 </ul>
                                             </div>
