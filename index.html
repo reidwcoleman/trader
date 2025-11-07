@@ -4252,6 +4252,13 @@
                                                 <p className="text-blue-200">Start trading with $100,000 virtual cash</p>
                                             </div>
 
+                                            {/* Error Message Display */}
+                                            {authError && (
+                                                <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 border-2 border-red-400/50 rounded-xl p-4 mb-4 backdrop-blur-sm">
+                                                    <p className="text-red-300 text-center font-semibold">{authError}</p>
+                                                </div>
+                                            )}
+
                                             <div>
                                                 <label className="block text-blue-300 font-bold mb-3 text-sm uppercase tracking-wide">Your Name</label>
                                                 <input
@@ -4380,6 +4387,13 @@
                                                 <p className="text-blue-200">Sign in to continue trading</p>
                                             </div>
 
+                                            {/* Error Message Display */}
+                                            {authError && (
+                                                <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 border-2 border-red-400/50 rounded-xl p-4 mb-4 backdrop-blur-sm">
+                                                    <p className="text-red-300 text-center font-semibold">{authError}</p>
+                                                </div>
+                                            )}
+
                                             <div>
                                                 <label className="block text-cyan-300 font-bold mb-3 text-sm uppercase tracking-wide">Email Address</label>
                                                 <input
@@ -4404,12 +4418,13 @@
 
                                             <button
                                                 onClick={async () => {
+                                                    setAuthError('');
                                                     if (!userEmail || !userEmail.includes('@')) {
-                                                        alert('Please enter a valid email address');
+                                                        setAuthError('Please enter a valid email address');
                                                         return;
                                                     }
                                                     if (!userPassword) {
-                                                        alert('Please enter your password');
+                                                        setAuthError('Please enter your password');
                                                         return;
                                                     }
 
@@ -4428,7 +4443,8 @@
                                                         const data = await response.json();
 
                                                         if (!response.ok) {
-                                                            alert(data.error || 'Invalid email or password');
+                                                            setAuthError(data.error || 'Invalid email or password');
+                                                            setLoading(false);
                                                             return;
                                                         }
 
@@ -4464,7 +4480,7 @@
                                                         console.log('🎯 Competition state:', newCompetition);
                                                     } catch (error) {
                                                         console.error('Sign in error:', error);
-                                                        alert('Failed to sign in. Please check that the server is running (npm start).');
+                                                        setAuthError('Failed to sign in. Please check your connection and try again.');
                                                     } finally {
                                                         setLoading(false);
                                                     }
