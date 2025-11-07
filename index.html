@@ -2697,14 +2697,34 @@
                                     </div>
 
                                     {/* Right Actions */}
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-4 md:gap-6">
+                                        <a
+                                            href="#what-is-finclash"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                document.getElementById('what-is-finclash-section')?.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                            className="hidden lg:block text-gray-400 hover:text-cyan-400 font-semibold transition-colors duration-300 text-sm"
+                                        >
+                                            What is FinClash
+                                        </a>
+                                        <a
+                                            href="#how-to-use"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                document.getElementById('how-to-use-section')?.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                            className="hidden lg:block text-gray-400 hover:text-cyan-400 font-semibold transition-colors duration-300 text-sm"
+                                        >
+                                            How to Use
+                                        </a>
                                         <a
                                             href="#pricing"
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
                                             }}
-                                            className="hidden md:block text-gray-400 hover:text-cyan-400 font-semibold transition-colors duration-300"
+                                            className="hidden md:block text-gray-400 hover:text-cyan-400 font-semibold transition-colors duration-300 text-sm"
                                         >
                                             Pricing
                                         </a>
@@ -2713,9 +2733,18 @@
                                                 setAccountMode('login');
                                                 setShowAccountTypeModal(true);
                                             }}
-                                            className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors duration-300"
+                                            className="text-gray-400 hover:text-cyan-400 font-semibold transition-colors duration-300 text-sm"
                                         >
                                             Sign In
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setAccountMode('create');
+                                                setShowAccountTypeModal(true);
+                                            }}
+                                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-5 py-2 rounded-xl font-bold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50 text-sm"
+                                        >
+                                            Create Account
                                         </button>
                                     </div>
                                 </div>
