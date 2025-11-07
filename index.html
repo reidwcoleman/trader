@@ -3790,87 +3790,103 @@
                             {/* Market Movers section removed - use dedicated Market Movers tab instead to avoid API rate limiting */}
 
                             {/* UltraThink Premium Footer */}
-                            <footer className="mt-20 border-t border-cyan-500/30 pt-12 bg-black/20">
-                                <div className="max-w-7xl mx-auto px-4">
-                                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                            <footer className="group/footer relative bg-black/90 backdrop-blur-2xl border-t-2 border-cyan-500/30 mt-20 overflow-hidden" style={{boxShadow: '0 -10px 40px rgba(6, 182, 212, 0.1)'}}>
+                                {/* Animated background gradient */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-blue-600/5 to-purple-600/5 opacity-50"></div>
+
+                                {/* Shine effect */}
+                                <div className="absolute inset-0 -translate-x-full group-hover/footer:translate-x-full transition-transform duration-[2000ms] bg-gradient-to-r from-transparent via-cyan-400/5 to-transparent"></div>
+
+                                <div className="relative max-w-7xl mx-auto px-4 py-12">
+                                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
                                         {/* About Section */}
-                                        <div className="group/footer relative bg-black/80 backdrop-blur-xl rounded-2xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 transform hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.1)'}}>
-                                            <div className="absolute inset-0 -translate-x-full group-hover/footer:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
-                                            <h3 className="relative text-xl font-black mb-4 flex items-center gap-2">
-                                                <span className="text-2xl transform group-hover/footer:scale-110 transition-transform duration-300">👨‍💻</span>
-                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400">About Us</span>
+                                        <div className="group/section">
+                                            <h3 className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 font-black text-xl mb-4 flex items-center gap-2">
+                                                <span className="text-2xl">👨‍💻</span>
+                                                About Us
                                             </h3>
-                                            <div className="relative space-y-2">
-                                                <a
-                                                    href="about.html"
-                                                    className="text-gray-300 hover:text-cyan-300 transition-all duration-300 font-bold block group/link"
-                                                >
-                                                    <span className="group-hover/link:translate-x-1 inline-block transition-transform duration-300">Meet Reid →</span>
-                                                </a>
-                                                <a
-                                                    href="about-cameron.html"
-                                                    className="text-gray-300 hover:text-purple-300 transition-all duration-300 font-bold block group/link"
-                                                >
-                                                    <span className="group-hover/link:translate-x-1 inline-block transition-transform duration-300">Meet Cameron →</span>
-                                                </a>
-                                            </div>
-                                            <p className="relative text-gray-400 text-sm leading-relaxed mt-3">The minds behind <span className="text-cyan-400 font-bold">FinClash</span></p>
+                                            <ul className="space-y-3">
+                                                <li>
+                                                    <a href="about.html" className="group/link relative text-gray-400 hover:text-cyan-300 text-sm transition-all font-semibold flex items-center gap-2">
+                                                        <span className="text-cyan-500/50 group-hover/link:text-cyan-400 transition-colors">→</span>
+                                                        <span>Meet Reid</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="about-cameron.html" className="group/link relative text-gray-400 hover:text-cyan-300 text-sm transition-all font-semibold flex items-center gap-2">
+                                                        <span className="text-cyan-500/50 group-hover/link:text-cyan-400 transition-colors">→</span>
+                                                        <span>Meet Cameron</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                            <p className="text-gray-400 text-sm leading-relaxed mt-4 font-medium">
+                                                The minds behind <span className="text-cyan-400 font-bold">FinClash</span>
+                                            </p>
                                         </div>
 
                                         {/* Contact Section */}
-                                        <div className="group/footer relative bg-black/80 backdrop-blur-xl rounded-2xl p-6 border-2 border-green-500/30 hover:border-green-400 transition-all duration-300 transform hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(34, 197, 94, 0.1)'}}>
-                                            <div className="absolute inset-0 -translate-x-full group-hover/footer:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-green-400/10 to-transparent"></div>
-                                            <h3 className="relative text-xl font-black mb-4 flex items-center gap-2">
-                                                <span className="text-2xl transform group-hover/footer:scale-110 transition-transform duration-300">📧</span>
-                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-400">Contact</span>
+                                        <div className="group/section">
+                                            <h3 className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400 font-black text-xl mb-4 flex items-center gap-2">
+                                                <span className="text-2xl">📧</span>
+                                                Contact
                                             </h3>
-                                            <a
-                                                href="mailto:finclash101@gmail.com"
-                                                className="relative text-gray-300 hover:text-green-300 transition-all duration-300 font-bold block mb-3 text-sm break-all"
-                                            >
-                                                finclash101@gmail.com
-                                            </a>
-                                            <p className="relative text-gray-400 text-sm leading-relaxed">Questions? We'd love to <span className="text-green-400 font-bold">hear from you!</span></p>
+                                            <ul className="space-y-3">
+                                                <li>
+                                                    <a href="mailto:finclash101@gmail.com" className="group/link relative text-gray-400 hover:text-cyan-300 text-sm transition-all font-semibold flex items-center gap-2 break-all">
+                                                        <span className="text-cyan-500/50 group-hover/link:text-cyan-400 transition-colors">→</span>
+                                                        <span>finclash101@gmail.com</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                            <p className="text-gray-400 text-sm leading-relaxed mt-4 font-medium">
+                                                Questions? We'd love to <span className="text-green-400 font-bold">hear from you!</span>
+                                            </p>
                                         </div>
 
                                         {/* Security Section */}
-                                        <div className="group/footer relative bg-black/80 backdrop-blur-xl rounded-2xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 transform hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.1)'}}>
-                                            <div className="absolute inset-0 -translate-x-full group-hover/footer:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
-                                            <h3 className="relative text-xl font-black mb-4 flex items-center gap-2">
-                                                <span className="text-2xl transform group-hover/footer:scale-110 transition-transform duration-300">🔒</span>
-                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400">Security</span>
+                                        <div className="group/section">
+                                            <h3 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-400 font-black text-xl mb-4 flex items-center gap-2">
+                                                <span className="text-2xl">🔒</span>
+                                                Security
                                             </h3>
-                                            <a
-                                                href="mailto:finclash101@gmail.com?subject=Security%20Issue%20Report"
-                                                className="relative text-gray-300 hover:text-cyan-300 transition-all duration-300 font-bold block mb-3"
-                                            >
-                                                Report Issues
-                                            </a>
-                                            <p className="relative text-gray-400 text-sm leading-relaxed">Help us keep FinClash <span className="text-cyan-400 font-bold">secure & safe</span></p>
+                                            <ul className="space-y-3">
+                                                <li>
+                                                    <a href="mailto:finclash101@gmail.com?subject=Security%20Issue%20Report" className="group/link relative text-gray-400 hover:text-cyan-300 text-sm transition-all font-semibold flex items-center gap-2">
+                                                        <span className="text-cyan-500/50 group-hover/link:text-cyan-400 transition-colors">→</span>
+                                                        <span>Report Issues</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                            <p className="text-gray-400 text-sm leading-relaxed mt-4 font-medium">
+                                                Help us keep FinClash <span className="text-cyan-400 font-bold">secure & safe</span>
+                                            </p>
                                         </div>
 
                                         {/* Feedback Section */}
-                                        <div className="group/footer relative bg-black/80 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/30 hover:border-purple-400 transition-all duration-300 transform hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(168, 85, 247, 0.1)'}}>
-                                            <div className="absolute inset-0 -translate-x-full group-hover/footer:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent"></div>
-                                            <h3 className="relative text-xl font-black mb-4 flex items-center gap-2">
-                                                <span className="text-2xl transform group-hover/footer:scale-110 transition-transform duration-300">💡</span>
-                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-purple-400">Feedback</span>
+                                        <div className="group/section">
+                                            <h3 className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400 font-black text-xl mb-4 flex items-center gap-2">
+                                                <span className="text-2xl">💡</span>
+                                                Feedback
                                             </h3>
-                                            <a
-                                                href="mailto:finclash101@gmail.com?subject=FinClash%20Feedback"
-                                                className="relative text-gray-300 hover:text-purple-300 transition-all duration-300 font-bold block mb-3"
-                                            >
-                                                Share Ideas
-                                            </a>
-                                            <p className="relative text-gray-400 text-sm leading-relaxed">Help us <span className="text-purple-400 font-bold">improve</span> your experience</p>
+                                            <ul className="space-y-3">
+                                                <li>
+                                                    <a href="mailto:finclash101@gmail.com?subject=FinClash%20Feedback" className="group/link relative text-gray-400 hover:text-cyan-300 text-sm transition-all font-semibold flex items-center gap-2">
+                                                        <span className="text-cyan-500/50 group-hover/link:text-cyan-400 transition-colors">→</span>
+                                                        <span>Share Ideas</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                            <p className="text-gray-400 text-sm leading-relaxed mt-4 font-medium">
+                                                Help us <span className="text-purple-400 font-bold">improve</span> your experience
+                                            </p>
                                         </div>
                                     </div>
 
                                     {/* UltraThink AI Badge */}
                                     <div className="flex justify-center mb-8">
-                                        <div className="group relative bg-black/80 backdrop-blur-xl rounded-full px-6 py-3 border-2 border-purple-500/30 hover:border-purple-400 flex items-center gap-3 transition-all duration-300 overflow-hidden" style={{boxShadow: '0 0 30px rgba(168, 85, 247, 0.2)'}}>
-                                            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent"></div>
-                                            <span className="relative text-2xl transform group-hover:scale-110 transition-transform duration-300">🧠</span>
+                                        <div className="group/badge relative bg-black/80 backdrop-blur-xl rounded-full px-6 py-3 border-2 border-purple-500/40 hover:border-purple-400 flex items-center gap-3 transition-all duration-300 overflow-hidden" style={{boxShadow: '0 0 30px rgba(168, 85, 247, 0.3)'}}>
+                                            <div className="absolute inset-0 -translate-x-full group-hover/badge:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-purple-400/20 to-transparent"></div>
+                                            <span className="relative text-2xl transform group-hover/badge:scale-110 transition-transform duration-300">🧠</span>
                                             <span className="relative text-gray-300 font-bold text-sm">Powered by</span>
                                             <span className="relative text-transparent bg-gradient-to-r from-cyan-300 via-purple-400 to-green-400 bg-clip-text font-black text-lg">UltraThink AI</span>
                                             <span className="relative flex h-2 w-2">
@@ -3880,29 +3896,30 @@
                                         </div>
                                     </div>
 
-                                    {/* Bottom Bar with Enhanced Typography */}
-                                    <div className="text-center py-8 border-t border-cyan-500/20">
+                                    {/* Bottom Bar */}
+                                    <div className="border-t-2 border-cyan-500/20 pt-8 text-center">
                                         <div className="flex flex-wrap justify-center items-center gap-2 mb-3">
-                                            <span className="text-gray-400 text-sm">© 2025</span>
-                                            <span className="text-transparent bg-gradient-to-r from-cyan-300 via-green-400 to-cyan-300 bg-clip-text font-black text-lg">FinClash</span>
+                                            <span className="text-gray-500 text-sm font-semibold">© 2025</span>
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 font-black text-lg">FinClash</span>
+                                            <span className="text-gray-500 text-sm font-semibold">. All rights reserved.</span>
                                         </div>
-                                        <p className="text-gray-300 text-sm mb-4">
-                                            Created by <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400 hover:from-cyan-200 hover:to-cyan-300 transition-all duration-300 cursor-pointer">Reid Coleman</span> and <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400 hover:from-cyan-200 hover:to-cyan-300 transition-all duration-300 cursor-pointer">Cameron Dietzel</span>
+                                        <p className="text-gray-500 text-sm mb-4 font-semibold">
+                                            Created by <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 font-black">Reid Coleman</span> & <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500 font-black">Cameron Dietzel</span>
                                         </p>
 
                                         {/* Legal Links */}
                                         <div className="flex flex-wrap justify-center items-center gap-4 mb-4">
-                                            <a href="privacy.html" className="text-cyan-300 hover:text-cyan-200 text-sm font-bold transition-colors duration-300 hover:underline">
+                                            <a href="privacy.html" className="text-cyan-400 hover:text-cyan-300 text-sm font-bold transition-colors duration-300 hover:underline">
                                                 Privacy Policy
                                             </a>
                                             <span className="text-cyan-500/50">•</span>
-                                            <a href="terms.html" className="text-cyan-300 hover:text-cyan-200 text-sm font-bold transition-colors duration-300 hover:underline">
+                                            <a href="terms.html" className="text-cyan-400 hover:text-cyan-300 text-sm font-bold transition-colors duration-300 hover:underline">
                                                 Terms of Service
                                             </a>
                                         </div>
 
-                                        <p className="text-gray-400 text-xs max-w-2xl mx-auto leading-relaxed">
-                                            Virtual trading simulator for <span className="text-cyan-400">educational purposes</span> only • Not financial advice • Trade <span className="text-green-400">responsibly</span>
+                                        <p className="text-gray-400 text-xs max-w-2xl mx-auto leading-relaxed font-medium">
+                                            Virtual trading simulator for <span className="text-cyan-400 font-bold">educational purposes</span> only • Not financial advice • Trade <span className="text-green-400 font-bold">responsibly</span>
                                         </p>
                                     </div>
                                 </div>
