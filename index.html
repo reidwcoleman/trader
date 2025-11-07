@@ -2989,64 +2989,120 @@
                             {/* Spacer */}
                             <div className="mb-16"></div>
 
-                            {/* Account Types Section Header */}
-                            <div className="text-center mb-12 animate-fade-in">
-                                <h2 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 mb-4">
-                                    Choose Your Path
-                                </h2>
-                                <p className="text-xl md:text-2xl text-blue-200 max-w-3xl mx-auto">
-                                    Explore our account types and select the perfect plan for your trading journey
-                                </p>
+                            {/* Account Types Section Header - Ultra-Modern */}
+                            <div className="text-center mb-16 animate-fade-in relative">
+                                {/* Background decorative elements */}
+                                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full pointer-events-none">
+                                    <div className="absolute top-0 left-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl animate-pulse" style={{animationDuration: '3s'}}></div>
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{animationDuration: '4s', animationDelay: '0.5s'}}></div>
+                                </div>
+
+                                <div className="relative">
+                                    <h2 className="text-5xl md:text-7xl font-black mb-6 leading-tight">
+                                        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">
+                                            Choose Your Path
+                                        </span>
+                                    </h2>
+                                    <div className="flex justify-center mb-6">
+                                        <div className="h-1 w-32 bg-gradient-to-r from-transparent via-cyan-500 to-transparent rounded-full"></div>
+                                    </div>
+                                    <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                                        Explore our <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 font-bold">account types</span> and select the perfect plan for your <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500 font-bold">trading journey</span>
+                                    </p>
+                                </div>
                             </div>
 
-                            {/* Pricing Section */}
+                            {/* Pricing Section - Ultra-Modern Cards */}
                             <div id="pricing-section" className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                                 {/* Personal Plan - FREE */}
-                                <div className="group relative bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-3xl p-8 border-2 border-blue-500/50 hover:border-cyan-400 hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-500 hover:-translate-y-2 hover-glow will-change-transform gpu-accelerated animate-fade-in">
-                                    {/* Glow Effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-3xl opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                                <div className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 border-2 border-cyan-500/30 hover:border-cyan-400 transition-all duration-500 hover:-translate-y-3 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
+                                    {/* Animated Background Gradient */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition duration-700"></div>
+
+                                    {/* Shine Effect */}
+                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
 
                                     <div className="relative z-10">
-                                        {/* Icon */}
+                                        {/* Icon with Glow */}
                                         <div className="flex items-center justify-center mb-6">
-                                            <div className="bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-4 rounded-2xl shadow-xl">
-                                                <span className="text-5xl">👤</span>
+                                            <div className="relative">
+                                                <div className="absolute inset-0 bg-cyan-500/30 blur-2xl rounded-full group-hover:bg-cyan-500/50 transition-all duration-500"></div>
+                                                <div className="relative bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-5 rounded-2xl shadow-xl transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                                                    <span className="text-5xl">👤</span>
+                                                </div>
                                             </div>
                                         </div>
 
                                         {/* Title */}
-                                        <h2 className="text-3xl font-black text-center mb-2">
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">Personal</span>
-                                        </h2>
-                                        <p className="text-center text-blue-300 text-sm mb-6">Perfect for solo traders</p>
+                                        <h3 className="text-4xl font-black text-center mb-3">
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 group-hover:from-cyan-200 group-hover:via-blue-300 group-hover:to-cyan-200 transition-all duration-500">
+                                                Individual
+                                            </span>
+                                        </h3>
+                                        <p className="text-center text-gray-400 group-hover:text-cyan-400 text-base mb-6 font-semibold transition-colors duration-300">Perfect for solo traders</p>
 
-                                        {/* Price */}
-                                        <div className="text-center mb-8 py-4 bg-blue-900/40 rounded-xl border border-blue-500/30">
-                                            <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400">FREE</span>
-                                            <div className="text-sm text-green-300 font-bold mt-2">Zero Trading Fees Forever</div>
+                                        {/* Price with Enhanced Styling */}
+                                        <div className="relative text-center mb-8 py-6 bg-gradient-to-br from-black/60 to-black/40 rounded-2xl border-2 border-green-500/30 group-hover:border-green-400/60 transition-all duration-500 overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 group-hover:from-green-500/10 group-hover:to-emerald-500/10 transition-all duration-500"></div>
+                                            <div className="relative">
+                                                <span className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-emerald-400 to-green-300" style={{textShadow: '0 0 40px rgba(74, 222, 128, 0.3)'}}>
+                                                    FREE
+                                                </span>
+                                                <div className="text-sm text-green-400 font-bold mt-3 tracking-wider">ZERO TRADING FEES FOREVER</div>
+                                            </div>
+                                            {/* Corner accents */}
+                                            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-green-400/50 rounded-tl-lg"></div>
+                                            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-green-400/50 rounded-tr-lg"></div>
+                                            <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-green-400/50 rounded-bl-lg"></div>
+                                            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-green-400/50 rounded-br-lg"></div>
                                         </div>
 
-                                        {/* Features */}
-                                        <ul className="space-y-3 mb-8 text-blue-100">
-                                            <li className="flex items-start gap-3">
-                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                                                <span className="text-base"><span className="font-bold">$100K</span> virtual capital</span>
+                                        {/* Features - Enhanced */}
+                                        <ul className="space-y-4">
+                                            <li className="flex items-start gap-4 group/item">
+                                                <div className="relative flex-shrink-0">
+                                                    <div className="absolute inset-0 bg-green-400/20 blur-lg rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+                                                    <span className="relative text-2xl text-green-400 font-bold">✓</span>
+                                                </div>
+                                                <span className="text-base text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                    <span className="font-black text-cyan-400">$100K</span> virtual capital
+                                                </span>
                                             </li>
-                                            <li className="flex items-start gap-3">
-                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                                                <span className="text-base">Trade <span className="font-bold">any stock</span> globally</span>
+                                            <li className="flex items-start gap-4 group/item">
+                                                <div className="relative flex-shrink-0">
+                                                    <div className="absolute inset-0 bg-green-400/20 blur-lg rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+                                                    <span className="relative text-2xl text-green-400 font-bold">✓</span>
+                                                </div>
+                                                <span className="text-base text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                    Trade <span className="font-black text-cyan-400">any stock</span> globally
+                                                </span>
                                             </li>
-                                            <li className="flex items-start gap-3">
-                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                                                <span className="text-base"><span className="font-bold">UltraThink AI</span> analysis</span>
+                                            <li className="flex items-start gap-4 group/item">
+                                                <div className="relative flex-shrink-0">
+                                                    <div className="absolute inset-0 bg-green-400/20 blur-lg rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+                                                    <span className="relative text-2xl text-green-400 font-bold">✓</span>
+                                                </div>
+                                                <span className="text-base text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                    <span className="font-black text-cyan-400">UltraThink AI</span> analysis
+                                                </span>
                                             </li>
-                                            <li className="flex items-start gap-3">
-                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                                                <span className="text-base"><span className="font-bold">Live</span> market news</span>
+                                            <li className="flex items-start gap-4 group/item">
+                                                <div className="relative flex-shrink-0">
+                                                    <div className="absolute inset-0 bg-green-400/20 blur-lg rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+                                                    <span className="relative text-2xl text-green-400 font-bold">✓</span>
+                                                </div>
+                                                <span className="text-base text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                    <span className="font-black text-cyan-400">Live</span> market news
+                                                </span>
                                             </li>
-                                            <li className="flex items-start gap-3">
-                                                <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                                                <span className="text-base"><span className="font-bold">Risk-free</span> practice</span>
+                                            <li className="flex items-start gap-4 group/item">
+                                                <div className="relative flex-shrink-0">
+                                                    <div className="absolute inset-0 bg-green-400/20 blur-lg rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+                                                    <span className="relative text-2xl text-green-400 font-bold">✓</span>
+                                                </div>
+                                                <span className="text-base text-gray-300 group-hover/item:text-white transition-colors duration-300">
+                                                    <span className="font-black text-cyan-400">Risk-free</span> practice
+                                                </span>
                                             </li>
                                         </ul>
                                     </div>
