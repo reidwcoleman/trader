@@ -3094,30 +3094,6 @@
                                     </button>
                                 </div>
 
-                                {/* Scroll Indicator - Ultra-Modern */}
-                                <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
-                                    <div className="group flex flex-col items-center gap-3 cursor-pointer">
-                                        <span className="text-gray-400 text-sm font-bold tracking-widest uppercase group-hover:text-cyan-400 transition-colors duration-300">
-                                            Explore More
-                                        </span>
-                                        <div className="relative">
-                                            {/* Outer ring */}
-                                            <div className="absolute inset-0 rounded-full border-2 border-cyan-500/30 w-12 h-12 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 group-hover:scale-150 group-hover:opacity-0 transition-all duration-500"></div>
-                                            {/* Inner glow */}
-                                            <div className="absolute inset-0 rounded-full bg-cyan-500/10 blur-xl w-12 h-12 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 group-hover:bg-cyan-500/20 transition-all duration-300"></div>
-                                            {/* Arrow icon */}
-                                            <svg className="w-8 h-8 text-cyan-500 relative z-10 group-hover:text-cyan-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                                            </svg>
-                                        </div>
-                                        {/* Animated dots */}
-                                        <div className="flex gap-1">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/50 animate-pulse" style={{animationDelay: '0s'}}></div>
-                                            <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/50 animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                                            <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/50 animate-pulse" style={{animationDelay: '0.4s'}}></div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
 
                             {/* Spacer */}
@@ -3478,64 +3454,119 @@
 
                             {/* What is FinClash Section */}
                             <div id="what-is-finclash-section" className="mt-20 max-w-6xl mx-auto">
-                                <div className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 md:p-12 border-2 border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
-                                    {/* Animated shine effect */}
-                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+                                <div className="text-center mb-12">
+                                    <h2 className="text-5xl md:text-6xl font-black mb-4">
+                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300">What is FinClash?</span>
+                                    </h2>
+                                    <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 mx-auto rounded-full" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.5)'}}></div>
+                                    <p className="text-xl text-gray-400 mt-6 max-w-3xl mx-auto">
+                                        The ultimate stock trading simulator powered by AI, offering competitive gameplay and real money prizes
+                                    </p>
+                                </div>
 
-                                    <div className="relative text-center mb-8">
-                                        <h2 className="text-5xl md:text-6xl font-black mb-4">
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300">What is FinClash?</span>
-                                        </h2>
-                                        <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 mx-auto rounded-full" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.5)'}}></div>
-                                    </div>
-
-                                    <div className="relative grid md:grid-cols-2 gap-8 text-gray-300">
-                                        <div className="space-y-4">
-                                            <p className="text-lg leading-relaxed">
-                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400 font-bold">FinClash</span> is the ultimate stock trading simulator that combines the thrill of the stock market with competitive gameplay. Built with cutting-edge AI technology powered by <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-purple-400 font-bold">UltraThink</span>, we provide real-time market data, intelligent analysis, and a platform where you can compete with friends and family for <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-400 font-bold">real money prizes</span>.
+                                {/* 6 Feature Boxes */}
+                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {/* Box 1: AI-Powered */}
+                                    <div className="group relative bg-gradient-to-br from-purple-900/60 to-violet-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-2">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-violet-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                                        <div className="relative z-10">
+                                            <div className="bg-gradient-to-br from-purple-400 via-violet-500 to-purple-600 p-4 rounded-xl shadow-xl w-16 h-16 flex items-center justify-center mb-4 mx-auto">
+                                                <span className="text-4xl">🧠</span>
+                                            </div>
+                                            <h3 className="text-2xl font-black text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-violet-400">
+                                                AI-Powered Analysis
+                                            </h3>
+                                            <p className="text-blue-100 text-center text-sm">
+                                                UltraThink AI provides intelligent stock analysis and real-time recommendations to help you make informed decisions
                                             </p>
-                                            <p className="text-lg leading-relaxed">
-                                                Whether you're a beginner learning to trade or an experienced investor looking to test strategies, FinClash offers a risk-free environment with <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400 font-bold" style={{textShadow: '0 0 20px rgba(74, 222, 128, 0.3)'}}>$100,000 virtual capital</span> to start trading immediately.
-                                            </p>
-                                        </div>
-                                        <div className="space-y-4">
-                                            <p className="text-lg leading-relaxed">
-                                                Our platform features three account types to match your needs:
-                                            </p>
-                                            <ul className="space-y-3">
-                                                <li className="group/item flex items-start gap-3 p-3 rounded-xl hover:bg-cyan-500/10 transition-all duration-300 cursor-pointer">
-                                                    <div className="relative">
-                                                        <div className="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
-                                                        <span className="relative text-cyan-400 text-2xl flex-shrink-0 transform group-hover/item:scale-110 transition-transform duration-300">👤</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-400">Personal</span> - Free forever, perfect for solo practice
-                                                    </div>
-                                                </li>
-                                                <li className="group/item flex items-start gap-3 p-3 rounded-xl hover:bg-green-500/10 transition-all duration-300 cursor-pointer">
-                                                    <div className="relative">
-                                                        <div className="absolute inset-0 bg-green-500/20 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
-                                                        <span className="relative text-green-400 text-2xl flex-shrink-0 transform group-hover/item:scale-110 transition-transform duration-300">👥</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-400">Public</span> - Compete with others, 1% fee per trade
-                                                    </div>
-                                                </li>
-                                                <li className="group/item flex items-start gap-3 p-3 rounded-xl hover:bg-purple-500/10 transition-all duration-300 cursor-pointer">
-                                                    <div className="relative">
-                                                        <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
-                                                        <span className="relative text-purple-400 text-2xl flex-shrink-0 transform group-hover/item:scale-110 transition-transform duration-300">👑</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-purple-400">Private</span> - Premium competition, $0.05 flat fee
-                                                    </div>
-                                                </li>
-                                            </ul>
                                         </div>
                                     </div>
 
-                                    <div className="relative mt-8 pt-8 border-t border-cyan-500/30 text-center">
-                                        <p className="text-xl text-gray-300">
+                                    {/* Box 2: Real-Time Data */}
+                                    <div className="group relative bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-blue-500/50 hover:border-cyan-400 hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-300 hover:-translate-y-2">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                                        <div className="relative z-10">
+                                            <div className="bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-4 rounded-xl shadow-xl w-16 h-16 flex items-center justify-center mb-4 mx-auto">
+                                                <span className="text-4xl">📊</span>
+                                            </div>
+                                            <h3 className="text-2xl font-black text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">
+                                                Real-Time Market Data
+                                            </h3>
+                                            <p className="text-blue-100 text-center text-sm">
+                                                Live stock prices, charts, and market updates keep you connected to the pulse of Wall Street
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Box 3: Competitive Trading */}
+                                    <div className="group relative bg-gradient-to-br from-orange-900/60 to-red-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-orange-500/50 hover:border-orange-400 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-300 hover:-translate-y-2">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-red-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                                        <div className="relative z-10">
+                                            <div className="bg-gradient-to-br from-orange-400 via-red-500 to-orange-600 p-4 rounded-xl shadow-xl w-16 h-16 flex items-center justify-center mb-4 mx-auto">
+                                                <span className="text-4xl">🏆</span>
+                                            </div>
+                                            <h3 className="text-2xl font-black text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-red-400">
+                                                Competitive Trading
+                                            </h3>
+                                            <p className="text-blue-100 text-center text-sm">
+                                                Compete with friends and family on live leaderboards. Winner takes all the prize pool!
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Box 4: $100K Virtual Capital */}
+                                    <div className="group relative bg-gradient-to-br from-green-900/60 to-emerald-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-green-500/50 hover:border-green-400 hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-2">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                                        <div className="relative z-10">
+                                            <div className="bg-gradient-to-br from-green-400 via-emerald-500 to-green-600 p-4 rounded-xl shadow-xl w-16 h-16 flex items-center justify-center mb-4 mx-auto">
+                                                <span className="text-4xl">💰</span>
+                                            </div>
+                                            <h3 className="text-2xl font-black text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400">
+                                                $100K Virtual Capital
+                                            </h3>
+                                            <p className="text-blue-100 text-center text-sm">
+                                                Start trading immediately with $100,000 in virtual capital. No risk, all reward!
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Box 5: Risk-Free Learning */}
+                                    <div className="group relative bg-gradient-to-br from-teal-900/60 to-cyan-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-teal-500/50 hover:border-teal-400 hover:shadow-2xl hover:shadow-teal-500/30 transition-all duration-300 hover:-translate-y-2">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-cyan-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                                        <div className="relative z-10">
+                                            <div className="bg-gradient-to-br from-teal-400 via-cyan-500 to-teal-600 p-4 rounded-xl shadow-xl w-16 h-16 flex items-center justify-center mb-4 mx-auto">
+                                                <span className="text-4xl">🎓</span>
+                                            </div>
+                                            <h3 className="text-2xl font-black text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-cyan-400">
+                                                Risk-Free Learning
+                                            </h3>
+                                            <p className="text-blue-100 text-center text-sm">
+                                                Perfect for beginners and pros alike. Learn trading strategies without risking real money
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Box 6: Real Money Prizes */}
+                                    <div className="group relative bg-gradient-to-br from-yellow-900/60 to-amber-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-yellow-500/50 hover:border-yellow-400 hover:shadow-2xl hover:shadow-yellow-500/30 transition-all duration-300 hover:-translate-y-2">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-amber-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                                        <div className="relative z-10">
+                                            <div className="bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 p-4 rounded-xl shadow-xl w-16 h-16 flex items-center justify-center mb-4 mx-auto">
+                                                <span className="text-4xl">💸</span>
+                                            </div>
+                                            <h3 className="text-2xl font-black text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-400">
+                                                Real Money Prizes
+                                            </h3>
+                                            <p className="text-blue-100 text-center text-sm">
+                                                Public and Private competitions offer real cash payouts. The best trader wins it all!
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Creators Footer */}
+                                <div className="mt-12 text-center">
+                                    <div className="inline-block bg-black/80 backdrop-blur-xl rounded-2xl px-8 py-4 border-2 border-cyan-500/30" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.2)'}}>
+                                        <p className="text-lg text-gray-300">
                                             Created by <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">Reid Coleman</span> & <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">Cameron Dietzel</span>
                                         </p>
                                     </div>
