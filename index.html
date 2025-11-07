@@ -989,11 +989,10 @@
                         if (!response.ok) {
                             console.error('❌ Account creation failed:', data.error);
                             if (response.status === 400 && data.error && data.error.includes('already exists')) {
-                                alert('An account with this email already exists. Please sign in instead or use a different email.');
+                                throw new Error('An account with this email already exists. Please sign in instead or use a different email.');
                             } else {
-                                alert(data.error || 'Failed to create account. Please try again.');
+                                throw new Error(data.error || 'Failed to create account. Please try again.');
                             }
-                            return;
                         }
 
                         setGeneratedPasscode(passcode);
@@ -1020,11 +1019,10 @@
                     }
 
                     // Family plans - not currently supported
-                    alert('Family plans are not currently available. Please use a Personal plan instead.');
-                    return;
+                    throw new Error('Family plans are not currently available. Please use a Personal plan instead.');
                 } catch (error) {
                     console.error('Error creating competition:', error);
-                    alert('Failed to create competition. Please try again.');
+                    throw error;
                 }
             };
 
@@ -4237,6 +4235,7 @@
                                         setView('plan-select');
                                         setAccountMode('create');
                                         setShowPasswordReset(false);
+                                        setAuthError('');
                                     }}
                                     className="mb-6 text-cyan-300 hover:text-cyan-200 font-semibold"
                                 >
@@ -4348,16 +4347,17 @@
 
                                             <button
                                                 onClick={async () => {
+                                                    setAuthError('');
                                                     if (!userName || userName.trim().length === 0) {
-                                                        alert('Please enter your name');
+                                                        setAuthError('Please enter your name');
                                                         return;
                                                     }
                                                     if (!userEmail || !userEmail.includes('@')) {
-                                                        alert('Please enter a valid email address');
+                                                        setAuthError('Please enter a valid email address');
                                                         return;
                                                     }
                                                     if (!userPassword || userPassword.length < 8) {
-                                                        alert('Password must be at least 8 characters long');
+                                                        setAuthError('Password must be at least 8 characters long');
                                                         return;
                                                     }
 
@@ -4366,7 +4366,7 @@
                                                         await createCompetition(userName.trim(), 0, userPassword);
                                                     } catch (error) {
                                                         console.error('Account creation error:', error);
-                                                        alert('Failed to create account. Please try again.');
+                                                        setAuthError(error.message || 'Failed to create account. Please try again.');
                                                     } finally {
                                                         setLoading(false);
                                                     }
