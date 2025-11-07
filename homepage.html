@@ -98,7 +98,7 @@
                         </nav>
 
                         {/* Account Type Selection Modal */}
-                        {showAccountTypeModal ? (
+                        {showAccountTypeModal && (
                             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[99999]">
                                 <div className="relative bg-gradient-to-br from-blue-900/95 to-indigo-950/95 backdrop-blur-xl rounded-3xl p-8 max-w-4xl w-full border-2 border-cyan-500/50 shadow-2xl">
                                     {/* Close Button */}
@@ -136,13 +136,13 @@
                                         </div>
                                     </button>
                                 </div>
-
                             </div>
+                        )}
 
-                            {/* Spacer */}
-                            <div className="mb-16"></div>
+                        {/* Spacer */}
+                        <div className="mb-16"></div>
 
-                            {/* Account Types Section Header - Ultra-Modern */}
+                        {/* Account Types Section Header - Ultra-Modern */}
                             <div className="text-center mb-16 animate-fade-in relative">
                                 {/* Background decorative elements */}
                                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full pointer-events-none">
