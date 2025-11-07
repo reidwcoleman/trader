@@ -2704,6 +2704,19 @@
                                     {/* Center Navigation Links */}
                                     <div className="hidden lg:flex items-center gap-1">
                                         <a
+                                            href="#pricing"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                            className="relative px-4 py-2 text-gray-300 hover:text-white font-semibold transition-all duration-300 group"
+                                        >
+                                            <span className="relative z-10">Pricing</span>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
+                                            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300"></div>
+                                        </a>
+
+                                        <a
                                             href="#what-is-finclash"
                                             onClick={(e) => {
                                                 e.preventDefault();
@@ -2725,19 +2738,6 @@
                                             className="relative px-4 py-2 text-gray-300 hover:text-white font-semibold transition-all duration-300 group"
                                         >
                                             <span className="relative z-10">How to Use</span>
-                                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
-                                            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300"></div>
-                                        </a>
-
-                                        <a
-                                            href="#pricing"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
-                                            }}
-                                            className="relative px-4 py-2 text-gray-300 hover:text-white font-semibold transition-all duration-300 group"
-                                        >
-                                            <span className="relative z-10">Pricing</span>
                                             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
                                             <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300"></div>
                                         </a>
