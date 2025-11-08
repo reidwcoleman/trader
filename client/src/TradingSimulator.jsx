@@ -3230,9 +3230,8 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  )}
 
  </div>
- </div>
- </div>
  );
+ }
  }
 
  // Family/Competition screens
@@ -7095,8 +7094,8 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  </div>
  </footer>
  </>
+ </div>
  );
- };
-
+};
 
 export default TradingSimulator;
