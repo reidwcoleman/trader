@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-        const Homepage = () => {
-            const [showAccountTypeModal, setShowAccountTypeModal] = useState(false);
+const Homepage = () => {
+    const [showAccountTypeModal, setShowAccountTypeModal] = useState(false);
+    const navigate = useNavigate();
 
-            // Navigate to app.html function
-            const navigate = useNavigate();
-        const navigateToApp = () => {
-                navigate('/app');
-            };
+    // Navigate to app.html function
+    const navigateToApp = () => {
+        navigate('/app');
+    };
 
-            return (
-                    <div className="min-h-screen bg-black">
+    return (
+        <div className="min-h-screen bg-black">
                         {/* Navigation Header */}
                         <nav className="fixed top-0 left-0 right-0 z-50 bg-black/95 border-b border-cyan-500/30">
                             <div className="max-w-7xl mx-auto px-4 md:px-6 py-3">
@@ -807,10 +807,7 @@ import { useNavigate } from 'react-router-dom';
                                 </div>
                             </footer>
                         </div>
-                    </div>
-            );
-        };
-
-
+    );
+};
 
 export default Homepage;

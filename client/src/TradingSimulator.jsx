@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 
-// Backend API Configuration
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3001'
     : 'https://trader-umh8.onrender.com';
@@ -7098,7 +7097,6 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  </>
  );
  };
-
 
 
 export default TradingSimulator;
