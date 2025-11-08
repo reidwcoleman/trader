@@ -38,6 +38,8 @@
         const { useState, useEffect, useRef } = React;
 
         const Homepage = () => {
+            const [showAccountTypeModal, setShowAccountTypeModal] = useState(false);
+
             // Navigate to app.html function
             const navigateToApp = () => {
                 window.location.href = 'app.html';
