@@ -3230,6 +3230,8 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  )}
 
  </div>
+ </div>
+ </div>
  );
  }
  }
@@ -7094,7 +7096,7 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  </div>
  </footer>
  </>
- </div>
+ )}
  );
 };
 
