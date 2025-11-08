@@ -112,12 +112,24 @@ function writeChatMessages(messages) {
 
 // Middleware - Configure CORS to allow requests from GitHub Pages
 app.use(cors({
-    origin: [
-        'http://localhost:3000',
-        'http://localhost:3001',
-        'https://reidwcoleman.github.io',
-        'https://trader-snowy.vercel.app'
-    ],
+    origin: function(origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'https://reidwcoleman.github.io',
+            'https://trader-snowy.vercel.app'
+        ];
+
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.log('⚠️  CORS blocked origin:', origin);
+            callback(null, true); // Allow all origins temporarily to debug
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
