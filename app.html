@@ -4757,47 +4757,80 @@
                                                     }`}
                                                     style={{boxShadow: isPositive ? '0 0 30px rgba(34, 197, 94, 0.25), inset 0 0 40px rgba(34, 197, 94, 0.05)' : '0 0 30px rgba(239, 68, 68, 0.25), inset 0 0 40px rgba(239, 68, 68, 0.05)'}}
                                                 >
+                                                    {/* Animated background glow */}
+                                                    <div className={`absolute inset-0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${
+                                                        isPositive ? 'from-green-500/10 to-emerald-500/5' : 'from-red-500/10 to-rose-500/5'
+                                                    }`}></div>
+
                                                     {/* Animated shine effect */}
                                                     <div className={`absolute inset-0 -translate-x-full group-hover/card:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent ${
-                                                        isPositive ? 'via-green-400/10' : 'via-red-400/10'
+                                                        isPositive ? 'via-green-400/20' : 'via-red-400/20'
                                                     } to-transparent`}></div>
 
-                                                    <div className="relative flex justify-between items-start mb-3">
-                                                        <div>
-                                                            <div className="font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 text-xl">{symbol}</div>
-                                                            <div className="text-sm text-gray-400 font-semibold">{qty} shares</div>
+                                                    {/* Header with stock symbol and percentage */}
+                                                    <div className="relative flex justify-between items-start mb-6">
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center gap-3 mb-2">
+                                                                <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 drop-shadow-lg">{symbol}</div>
+                                                                <div className={`text-2xl ${isPositive ? 'text-green-400 animate-pulse' : 'text-red-400'}`}>
+                                                                    {isPositive ? '📈' : '📉'}
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-sm text-gray-300 font-bold flex items-center gap-2 flex-wrap">
+                                                                <span className="bg-cyan-500/20 px-3 py-1 rounded-full border border-cyan-500/40 text-cyan-300">{qty} shares</span>
+                                                                <span className="text-gray-500">•</span>
+                                                                <span className="text-gray-400">{stock.name || symbol}</span>
+                                                            </div>
                                                         </div>
-                                                        <div className={`px-3 py-1 rounded-full font-bold text-sm transition-all ${
+
+                                                        {/* Large percentage display */}
+                                                        <div className={`px-5 py-3 rounded-2xl font-black text-2xl transition-all border-2 ${
                                                             isPositive
-                                                                ? 'bg-green-500/20 text-green-300 border border-green-500/50'
-                                                                : 'bg-red-500/20 text-red-300 border border-red-500/50'
+                                                                ? 'bg-gradient-to-br from-green-500/30 to-emerald-500/20 text-green-300 border-green-500/60'
+                                                                : 'bg-gradient-to-br from-red-500/30 to-rose-500/20 text-red-300 border-red-500/60'
+                                                        }`} style={{boxShadow: isPositive ? '0 0 25px rgba(34, 197, 94, 0.4), inset 0 0 20px rgba(34, 197, 94, 0.1)' : '0 0 25px rgba(239, 68, 68, 0.4), inset 0 0 20px rgba(239, 68, 68, 0.1)'}}>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-3xl">{isPositive ? '↗' : '↘'}</span>
+                                                                <span>{isPositive ? '+' : ''}{gainLossPercent.toFixed(2)}%</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Price info grid */}
+                                                    <div className="relative grid grid-cols-3 gap-3 mb-5">
+                                                        <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/10 border-2 border-cyan-500/40 rounded-xl p-4 backdrop-blur-sm" style={{boxShadow: '0 0 15px rgba(6, 182, 212, 0.2)'}}>
+                                                            <div className="text-cyan-300 text-xs font-bold mb-2 uppercase tracking-wider">Avg Cost</div>
+                                                            <div className="text-white font-black text-xl">${avgBuyPrice.toFixed(2)}</div>
+                                                        </div>
+                                                        <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/10 border-2 border-blue-500/40 rounded-xl p-4 backdrop-blur-sm" style={{boxShadow: '0 0 15px rgba(59, 130, 246, 0.2)'}}>
+                                                            <div className="text-blue-300 text-xs font-bold mb-2 uppercase tracking-wider">Current</div>
+                                                            <div className="text-white font-black text-xl">${stock.price.toFixed(2)}</div>
+                                                        </div>
+                                                        <div className={`bg-gradient-to-br border-2 rounded-xl p-4 backdrop-blur-sm ${
+                                                            isPositive
+                                                                ? 'from-green-500/20 to-emerald-500/10 border-green-500/40'
+                                                                : 'from-red-500/20 to-rose-500/10 border-red-500/40'
                                                         }`} style={{boxShadow: isPositive ? '0 0 15px rgba(34, 197, 94, 0.2)' : '0 0 15px rgba(239, 68, 68, 0.2)'}}>
-                                                            {isPositive ? '↗' : '↘'} {isPositive ? '+' : ''}{gainLossPercent.toFixed(2)}%
+                                                            <div className={`text-xs font-bold mb-2 uppercase tracking-wider ${isPositive ? 'text-green-300' : 'text-red-300'}`}>Daily</div>
+                                                            <div className={`font-black text-xl ${isPositive ? 'text-green-300' : 'text-red-300'}`}>
+                                                                {stock.change > 0 ? '+' : ''}{stock.change?.toFixed(2)}%
+                                                            </div>
                                                         </div>
                                                     </div>
 
-                                                    <div className="relative grid grid-cols-2 gap-3 mb-3 text-sm">
-                                                        <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-2">
-                                                            <div className="text-cyan-300 text-xs font-semibold mb-1">Avg Price</div>
-                                                            <div className="text-white font-bold">${avgBuyPrice.toFixed(2)}</div>
-                                                        </div>
-                                                        <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-2">
-                                                            <div className="text-cyan-300 text-xs font-semibold mb-1">Current</div>
-                                                            <div className="text-white font-bold">${stock.price.toFixed(2)}</div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className={`relative flex justify-between items-end pt-3 border-t ${
-                                                        isPositive ? 'border-green-500/30' : 'border-red-500/30'
+                                                    {/* Total value and gain/loss */}
+                                                    <div className={`relative flex justify-between items-center pt-5 border-t-2 ${
+                                                        isPositive ? 'border-green-500/40' : 'border-red-500/40'
                                                     }`}>
                                                         <div>
-                                                            <div className="text-xs text-gray-400 font-semibold">Total Value</div>
-                                                            <div className="text-white font-black text-lg">${currentValue.toFixed(2)}</div>
+                                                            <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Total Value</div>
+                                                            <div className="text-white font-black text-2xl">${currentValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
                                                         </div>
                                                         <div className="text-right">
-                                                            <div className="text-xs text-gray-400 font-semibold">Gain/Loss</div>
-                                                            <div className={`font-black text-lg ${isPositive ? 'text-green-300' : 'text-red-300'}`}>
-                                                                {isPositive ? '+' : ''}${gainLoss.toFixed(2)}
+                                                            <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">P&L</div>
+                                                            <div className={`font-black text-2xl flex items-center gap-2 ${isPositive ? 'text-green-300' : 'text-red-300'}`}>
+                                                                <span className="text-3xl">{isPositive ? '🚀' : '💔'}</span>
+                                                                <span>{isPositive ? '+' : ''}${gainLoss.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                                                             </div>
                                                         </div>
                                                     </div>
