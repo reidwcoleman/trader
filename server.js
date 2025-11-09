@@ -556,6 +556,57 @@ app.post('/api/accounts/update-portfolio', async (req, res) => {
     }
 });
 
+// Reset account endpoint (requires developer code)
+app.post('/api/accounts/reset', async (req, res) => {
+    try {
+        const { email, developerCode } = req.body;
+
+        console.log('🔄 Account reset request for:', email);
+
+        // Validate developer code
+        if (developerCode !== 'RWC#1') {
+            console.error('❌ Invalid developer code');
+            return res.status(403).json({ error: 'Invalid developer code' });
+        }
+
+        if (!email || !isValidEmail(email)) {
+            return res.status(400).json({ error: 'Valid email is required' });
+        }
+
+        const accounts = readAccounts();
+        const account = accounts.find(acc => acc.email.toLowerCase() === email.toLowerCase());
+
+        if (!account) {
+            console.error('❌ Account not found:', email);
+            return res.status(404).json({ error: 'Account not found' });
+        }
+
+        // Reset portfolio to initial state
+        account.portfolio = {
+            cash: 100000,
+            positions: {},
+            shortPositions: {},
+            history: [],
+            lastBuyTime: {},
+            watchlist: [],
+            performanceHistory: []
+        };
+        account.updatedAt = new Date().toISOString();
+
+        writeAccounts(accounts);
+        console.log('✅ Account reset successfully for:', email);
+
+        res.json({
+            success: true,
+            message: 'Account reset successfully',
+            portfolio: account.portfolio
+        });
+    } catch (error) {
+        console.error('Account reset error:', error);
+        res.status(500).json({ error: 'Failed to reset account' });
+    }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
