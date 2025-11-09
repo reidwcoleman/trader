@@ -4601,19 +4601,49 @@
                                         </div>
                                         <div className="p-2">
                                             <button
-                                                onClick={() => {
+                                                onClick={async () => {
+                                                    const developerCode = prompt('⚠️ Developer Access Required\n\nThis will reset your account to $100,000 and clear all positions and history.\n\nEnter developer code to continue:');
+
+                                                    if (!developerCode) {
+                                                        return;
+                                                    }
+
+                                                    if (developerCode !== 'RWC#1') {
+                                                        alert('❌ Invalid developer code. Access denied.');
+                                                        return;
+                                                    }
+
                                                     if (confirm('Are you sure you want to reset your account? This will:\n\n• Delete all your positions\n• Reset your cash to $100,000\n• Clear your trading history\n\nThis action cannot be undone!')) {
-                                                        const portfolio = getCurrentPortfolio();
-                                                        portfolio.cash = 100000;
-                                                        portfolio.positions = {};
-                                                        portfolio.shortPositions = {};
-                                                        portfolio.history = [];
-                                                        portfolio.lastBuyTime = {};
-                                                        portfolio.performanceHistory = [];
-                                                        savePortfolio(portfolio);
-                                                        setShowAccountMenu(false);
-                                                        showToast('Account reset successfully!', 'success');
-                                                        window.location.reload();
+                                                        try {
+                                                            setLoading(true);
+                                                            const response = await fetchWithTimeout(`${API_BASE_URL}/api/accounts/reset`, {
+                                                                method: 'POST',
+                                                                headers: { 'Content-Type': 'application/json' },
+                                                                body: JSON.stringify({
+                                                                    email: userEmail,
+                                                                    developerCode: developerCode
+                                                                })
+                                                            }, 30000);
+
+                                                            const data = await response.json();
+
+                                                            if (!response.ok) {
+                                                                throw new Error(data.error || 'Failed to reset account');
+                                                            }
+
+                                                            // Update local state
+                                                            const newCompetition = { ...competition };
+                                                            newCompetition.members[0].portfolio = data.portfolio;
+                                                            setCompetition(newCompetition);
+
+                                                            setShowAccountMenu(false);
+                                                            showToast('✅ Account reset successfully!', 'success');
+                                                            window.location.reload();
+                                                        } catch (error) {
+                                                            alert(`❌ ${error.message}`);
+                                                        } finally {
+                                                            setLoading(false);
+                                                        }
                                                     }
                                                 }}
                                                 className="w-full text-left px-4 py-3 text-yellow-300 hover:bg-yellow-500/20 rounded-lg transition-all duration-300 flex items-center gap-3 font-semibold"
@@ -7359,18 +7389,48 @@
                                     </h3>
                                     <div className="space-y-4">
                                         <button
-                                            onClick={() => {
+                                            onClick={async () => {
+                                                const developerCode = prompt('⚠️ Developer Access Required\n\nThis will reset your account to $100,000 and clear all positions and history.\n\nEnter developer code to continue:');
+
+                                                if (!developerCode) {
+                                                    return;
+                                                }
+
+                                                if (developerCode !== 'RWC#1') {
+                                                    alert('❌ Invalid developer code. Access denied.');
+                                                    return;
+                                                }
+
                                                 if (confirm('Are you sure you want to reset your account? This will:\n\n• Delete all your positions\n• Reset your cash to $100,000\n• Clear your trading history\n\nThis action cannot be undone!')) {
-                                                    const portfolio = getCurrentPortfolio();
-                                                    portfolio.cash = 100000;
-                                                    portfolio.positions = {};
-                                                    portfolio.shortPositions = {};
-                                                    portfolio.history = [];
-                                                    portfolio.lastBuyTime = {};
-                                                    portfolio.performanceHistory = [];
-                                                    savePortfolio(portfolio);
-                                                    showToast('Account reset successfully!', 'success');
-                                                    window.location.reload();
+                                                    try {
+                                                        setLoading(true);
+                                                        const response = await fetchWithTimeout(`${API_BASE_URL}/api/accounts/reset`, {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({
+                                                                email: userEmail,
+                                                                developerCode: developerCode
+                                                            })
+                                                        }, 30000);
+
+                                                        const data = await response.json();
+
+                                                        if (!response.ok) {
+                                                            throw new Error(data.error || 'Failed to reset account');
+                                                        }
+
+                                                        // Update local state
+                                                        const newCompetition = { ...competition };
+                                                        newCompetition.members[0].portfolio = data.portfolio;
+                                                        setCompetition(newCompetition);
+
+                                                        showToast('✅ Account reset successfully!', 'success');
+                                                        window.location.reload();
+                                                    } catch (error) {
+                                                        alert(`❌ ${error.message}`);
+                                                    } finally {
+                                                        setLoading(false);
+                                                    }
                                                 }
                                             }}
                                             className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl hover:scale-105"
