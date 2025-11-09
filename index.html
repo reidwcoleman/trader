@@ -620,7 +620,6 @@
                         };
                     } else {
                         // Fallback if API fails
-                        console.warn(`No data for ${symbol}, using fallback`);
                         const fallbackData = getFallbackStockData(symbol);
                         if (stockName) fallbackData.name = stockName;
                         return fallbackData;
@@ -780,8 +779,6 @@
                             portfolio: updatedPortfolio
                         })
                     })
-                    .then(() => console.log('✅ Watchlist synced to backend'))
-                    .catch(error => console.error('Error syncing watchlist to backend:', error));
                 }
 
                 const existingIndex = stocks.findIndex(s => s.symbol === symbol);
@@ -837,8 +834,6 @@
                             portfolio: updatedPortfolio
                         })
                     })
-                    .then(() => console.log('✅ Watchlist synced to backend'))
-                    .catch(error => console.error('Error syncing watchlist to backend:', error));
                 }
             };
 
@@ -1020,13 +1015,11 @@
 
             const signInWithEmailAndPasscode = async (email, passcode) => {
                 // This function is deprecated - use backend API login instead
-                console.warn('signInWithEmailAndPasscode is deprecated. Use backend API login.');
                 alert('Please use the Sign In button instead.');
             };
 
             const signInToPersonalAccount = async (accountCode) => {
                 // This function is deprecated - use backend API login instead
-                console.warn('signInToPersonalAccount is deprecated. Use backend API login.');
                 alert('Please use the Sign In button with your email and password.');
             };
 
@@ -2385,14 +2378,11 @@
 
                         return { labels, data: prices };
                     } else if (data.s === 'no_data') {
-                        console.warn(`⚠️ No historical data available for ${symbol} from Finnhub`);
                         return null;
                     } else {
-                        console.warn(`⚠️ Unexpected response from Finnhub for ${symbol}:`, data);
                         return null;
                     }
                 } catch (error) {
-                    console.error('❌ Error fetching historical data:', error);
                     return null;
                 }
             };
@@ -2434,8 +2424,6 @@
 
                     // Fallback to generated data if API fails
                     if (!historicalData) {
-                        console.warn(`⚠️ Finnhub API unavailable - using simulated data for ${selectedStock}`);
-                        console.warn('This could be due to API rate limiting or symbol not found');
                         historicalData = generateFallbackHistoricalData(stock.price);
                         setIsRealChartData(false);
                     } else {
@@ -6563,8 +6551,6 @@
                                                                     portfolio: updatedPortfolio
                                                                 })
                                                             })
-                                                            .then(() => console.log('✅ Watchlist synced to backend'))
-                                                            .catch(error => console.error('Error syncing watchlist to backend:', error));
                                                         }
                                                     }}
                                                     className="group/btn relative mt-4 w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white py-3 rounded-xl font-black text-lg transition-all flex items-center justify-center gap-2 overflow-hidden"
