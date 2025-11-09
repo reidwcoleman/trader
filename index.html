@@ -7402,18 +7402,64 @@
                                         Account Information
                                     </h3>
                                     <div className="space-y-4">
-                                        <div className="flex justify-between items-center py-3 border-b border-cyan-500/20">
+                                        {/* Name - Editable */}
+                                        <div className="flex justify-between items-center py-3 border-b border-cyan-500/20 group/field">
                                             <span className="text-cyan-300 font-semibold">Name</span>
-                                            <span className="text-white font-bold">{userName}</span>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-white font-bold">{userName}</span>
+                                                <button
+                                                    onClick={async () => {
+                                                        const newName = prompt('Enter your new name:', userName);
+                                                        if (newName && newName.trim() && newName !== userName) {
+                                                            try {
+                                                                setLoading(true);
+                                                                const response = await fetchWithTimeout(`${API_BASE_URL}/api/accounts/update-name`, {
+                                                                    method: 'POST',
+                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                    body: JSON.stringify({
+                                                                        email: userEmail,
+                                                                        name: newName.trim()
+                                                                    })
+                                                                }, 30000);
+
+                                                                const data = await response.json();
+
+                                                                if (!response.ok) {
+                                                                    throw new Error(data.error || 'Failed to update name');
+                                                                }
+
+                                                                setUserName(newName.trim());
+                                                                const newCompetition = { ...competition };
+                                                                newCompetition.members[0].name = newName.trim();
+                                                                setCompetition(newCompetition);
+                                                                showToast('✅ Name updated successfully!', 'success');
+                                                            } catch (error) {
+                                                                alert(`❌ ${error.message}`);
+                                                            } finally {
+                                                                setLoading(false);
+                                                            }
+                                                        }
+                                                    }}
+                                                    className="opacity-0 group-hover/field:opacity-100 transition-opacity duration-200 bg-cyan-600/50 hover:bg-cyan-500 text-white px-3 py-1 rounded-lg text-sm font-bold"
+                                                >
+                                                    ✏️ Edit
+                                                </button>
+                                            </div>
                                         </div>
+
+                                        {/* Email - Read Only */}
                                         <div className="flex justify-between items-center py-3 border-b border-cyan-500/20">
                                             <span className="text-cyan-300 font-semibold">Email</span>
                                             <span className="text-white font-bold">{userEmail}</span>
                                         </div>
+
+                                        {/* Account Code - Read Only */}
                                         <div className="flex justify-between items-center py-3 border-b border-cyan-500/20">
                                             <span className="text-cyan-300 font-semibold">Account Code</span>
                                             <span className="text-white font-bold font-mono">{competitionCode}</span>
                                         </div>
+
+                                        {/* Plan - Read Only */}
                                         <div className="flex justify-between items-center py-3">
                                             <span className="text-cyan-300 font-semibold">Plan</span>
                                             <span className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-4 py-1 rounded-full font-bold text-sm">Personal</span>

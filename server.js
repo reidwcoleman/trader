@@ -554,6 +554,51 @@ app.post('/api/accounts/update-portfolio', async (req, res) => {
     }
 });
 
+// Update account name endpoint
+app.post('/api/accounts/update-name', async (req, res) => {
+    try {
+        const { email, name } = req.body;
+
+        console.log('✏️ Name update request for:', email);
+
+        if (!email || !isValidEmail(email)) {
+            return res.status(400).json({ error: 'Valid email is required' });
+        }
+
+        if (!name || typeof name !== 'string' || name.trim().length === 0) {
+            return res.status(400).json({ error: 'Valid name is required' });
+        }
+
+        if (name.trim().length > 100) {
+            return res.status(400).json({ error: 'Name must be 100 characters or less' });
+        }
+
+        const accounts = readAccounts();
+        const account = accounts.find(acc => acc.email.toLowerCase() === email.toLowerCase());
+
+        if (!account) {
+            console.error('❌ Account not found:', email);
+            return res.status(404).json({ error: 'Account not found' });
+        }
+
+        const oldName = account.name;
+        account.name = name.trim();
+        account.updatedAt = new Date().toISOString();
+
+        writeAccounts(accounts);
+        console.log(`✅ Name updated successfully: "${oldName}" → "${name.trim()}"`);
+
+        res.json({
+            success: true,
+            message: 'Name updated successfully',
+            name: account.name
+        });
+    } catch (error) {
+        console.error('Name update error:', error);
+        res.status(500).json({ error: 'Failed to update name' });
+    }
+});
+
 // Reset account endpoint (requires developer code)
 // ⚠️ PERMANENT DELETION - This irreversibly erases all account trading data
 app.post('/api/accounts/reset', async (req, res) => {
