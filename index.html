@@ -7217,6 +7217,34 @@
                                                 </button>
                                             </div>
 
+                                            {/* Quick Percentage Buttons */}
+                                            <div className="grid grid-cols-4 gap-2 mb-3">
+                                                <button
+                                                    onClick={() => setQuantity(Math.max(1, Math.floor(getMaxBuyQuantity(selectedStock) * 0.25)))}
+                                                    className="bg-cyan-600/50 hover:bg-cyan-500/70 border border-cyan-400/50 text-cyan-200 py-2 rounded-lg font-bold text-xs transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30"
+                                                >
+                                                    25%
+                                                </button>
+                                                <button
+                                                    onClick={() => setQuantity(Math.max(1, Math.floor(getMaxBuyQuantity(selectedStock) * 0.5)))}
+                                                    className="bg-cyan-600/50 hover:bg-cyan-500/70 border border-cyan-400/50 text-cyan-200 py-2 rounded-lg font-bold text-xs transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30"
+                                                >
+                                                    50%
+                                                </button>
+                                                <button
+                                                    onClick={() => setQuantity(Math.max(1, Math.floor(getMaxBuyQuantity(selectedStock) * 0.75)))}
+                                                    className="bg-cyan-600/50 hover:bg-cyan-500/70 border border-cyan-400/50 text-cyan-200 py-2 rounded-lg font-bold text-xs transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30"
+                                                >
+                                                    75%
+                                                </button>
+                                                <button
+                                                    onClick={() => setQuantity(getMaxBuyQuantity(selectedStock))}
+                                                    className="bg-cyan-600/50 hover:bg-cyan-500/70 border border-cyan-400/50 text-cyan-200 py-2 rounded-lg font-bold text-xs transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30"
+                                                >
+                                                    100%
+                                                </button>
+                                            </div>
+
                                             {/* Error message */}
                                             {quantityError && (
                                                 <div className="bg-red-900/40 border-2 border-red-500 rounded-xl p-4 text-red-200 text-sm font-semibold animate-shake animate-pulse-glow-red">
