@@ -2342,9 +2342,7 @@
                         return null;
                     }
                 } catch (error) {
-                        message: error.message,
-                        type: error.name
-                    });
+                    console.error('❌ Error fetching historical data:', error);
                     return null;
                 }
             };
