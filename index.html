@@ -101,6 +101,9 @@
             const [lastStockNewsUpdate, setLastStockNewsUpdate] = useState(null);
             const [selectedNewsArticle, setSelectedNewsArticle] = useState(null);
             const [showNewsModal, setShowNewsModal] = useState(false);
+            const [scrapedArticle, setScrapedArticle] = useState(null);
+            const [scrapingArticle, setScrapingArticle] = useState(false);
+            const [scrapingError, setScrapingError] = useState(null);
             const [aiAnalysis, setAiAnalysis] = useState(null);
             const [loadingAnalysis, setLoadingAnalysis] = useState(false);
             const [analysisExpanded, setAnalysisExpanded] = useState(true);
@@ -1235,6 +1238,38 @@
                     setMarketNews([]);
                 }
                 setLoadingMarketNews(false);
+            };
+
+            // Scrape article content from URL
+            const scrapeArticle = async (article) => {
+                setScrapingArticle(true);
+                setScrapingError(null);
+                setScrapedArticle(null);
+
+                try {
+                    const response = await fetch('http://localhost:3001/api/scrape-article', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ url: article.url })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Failed to scrape article');
+                    }
+
+                    setScrapedArticle(data.article);
+                    setScrapingError(null);
+                } catch (error) {
+                    console.error('Error scraping article:', error);
+                    setScrapingError(error.message || 'Failed to load article content');
+                    setScrapedArticle(null);
+                } finally {
+                    setScrapingArticle(false);
+                }
             };
 
             // AI Trade Analysis with "UltraThink" deep reasoning - REAL DATA DRIVEN
@@ -6316,13 +6351,84 @@
                                             </div>
                                             <p className="text-cyan-300 text-lg mb-3 font-semibold">{stocks.find(s => s.symbol === selectedStock)?.name || selectedStock}</p>
 
-                                            {/* Quick AI Signal */}
+                                            {/* Quick AI Signal - UltraThink Enhanced */}
                                             {(() => {
                                                 const stock = stocks.find(s => s.symbol === selectedStock);
-                                                const change = stock?.change || 0;
-                                                const momentum = change > 3 ? 'Strong Bullish' : change > 1 ? 'Bullish' : change < -3 ? 'Strong Bearish' : change < -1 ? 'Bearish' : 'Neutral';
-                                                const signalColor = change > 1 ? 'green' : change < -1 ? 'red' : 'yellow';
-                                                const actionText = change > 2 ? 'Consider Buying' : change < -2 ? 'Caution Advised' : 'Monitor Closely';
+                                                if (!stock) return null;
+
+                                                // UltraThink AI Analysis - Multi-factor scoring
+                                                const price = stock.price || 0;
+                                                const high = stock.high || price;
+                                                const low = stock.low || price;
+                                                const open = stock.open || price;
+                                                const previousClose = stock.previousClose || price;
+                                                const change = stock.change || 0;
+
+                                                // 1. Price Position Analysis (where is price relative to range?)
+                                                const dayRange = high - low;
+                                                const pricePositionInRange = dayRange > 0 ? ((price - low) / dayRange) * 100 : 50;
+
+                                                // 2. Momentum Strength (multiple timeframes)
+                                                const intradayMomentum = open > 0 ? ((price - open) / open) * 100 : 0;
+                                                const dailyMomentum = change;
+
+                                                // 3. Volatility Index (normalized)
+                                                const volatility = previousClose > 0 ? (dayRange / previousClose) * 100 : 0;
+
+                                                // 4. RSI-like indicator (0-100 scale)
+                                                const rsiLike = pricePositionInRange;
+
+                                                // 5. Trend Strength Score
+                                                let trendScore = 0;
+                                                if (change > 0 && intradayMomentum > 0) trendScore += 30; // Consistent uptrend
+                                                if (change < 0 && intradayMomentum < 0) trendScore -= 30; // Consistent downtrend
+                                                if (Math.abs(dailyMomentum) > 2) trendScore += Math.sign(dailyMomentum) * 20; // Strong movement
+                                                if (pricePositionInRange > 80) trendScore += 15; // Near highs
+                                                if (pricePositionInRange < 20) trendScore -= 15; // Near lows
+                                                if (volatility > 5) trendScore += Math.sign(change) * 10; // High volatility amplifies
+
+                                                // 6. Determine Signal Strength (-100 to +100)
+                                                const signalStrength = Math.max(-100, Math.min(100, trendScore));
+
+                                                // 7. Generate Smart Labels
+                                                let momentum, signalColor, actionText, confidence;
+
+                                                if (signalStrength >= 60) {
+                                                    momentum = 'Strong Bullish';
+                                                    signalColor = 'green';
+                                                    actionText = 'High Conviction Buy';
+                                                    confidence = 'High';
+                                                } else if (signalStrength >= 30) {
+                                                    momentum = 'Bullish';
+                                                    signalColor = 'green';
+                                                    actionText = 'Consider Buying';
+                                                    confidence = 'Medium';
+                                                } else if (signalStrength >= 10) {
+                                                    momentum = 'Weak Bullish';
+                                                    signalColor = 'green';
+                                                    actionText = 'Slight Buy Signal';
+                                                    confidence = 'Low';
+                                                } else if (signalStrength <= -60) {
+                                                    momentum = 'Strong Bearish';
+                                                    signalColor = 'red';
+                                                    actionText = 'High Risk - Avoid';
+                                                    confidence = 'High';
+                                                } else if (signalStrength <= -30) {
+                                                    momentum = 'Bearish';
+                                                    signalColor = 'red';
+                                                    actionText = 'Caution Advised';
+                                                    confidence = 'Medium';
+                                                } else if (signalStrength <= -10) {
+                                                    momentum = 'Weak Bearish';
+                                                    signalColor = 'red';
+                                                    actionText = 'Slight Sell Signal';
+                                                    confidence = 'Low';
+                                                } else {
+                                                    momentum = 'Neutral';
+                                                    signalColor = 'yellow';
+                                                    actionText = 'Monitor Closely';
+                                                    confidence = 'Low';
+                                                }
 
                                                 return (
                                                     <div className={`relative bg-gradient-to-r ${
@@ -6924,6 +7030,7 @@
                                                         e.preventDefault();
                                                         setSelectedNewsArticle(article);
                                                         setShowNewsModal(true);
+                                                        scrapeArticle(article);
                                                     }}
                                                     className={`group/news relative block bg-black/60 hover:bg-black/70 backdrop-blur-xl rounded-xl p-5 transition-all border-2 border-cyan-500/30 hover:border-cyan-400 hover:-translate-y-1 cursor-pointer will-change-transform overflow-hidden animate-fade-in stagger-${Math.min(idx + 1, 6)}`}
                                                     style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.15)'}}
@@ -7763,6 +7870,9 @@
                                         onClick={() => {
                                             setShowNewsModal(false);
                                             setSelectedNewsArticle(null);
+                                            setScrapedArticle(null);
+                                            setScrapingError(null);
+                                            setScrapingArticle(false);
                                         }}
                                         className="flex-shrink-0 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white w-12 h-12 rounded-full flex items-center justify-center font-black text-2xl transition-all shadow-lg hover:shadow-xl hover:scale-110"
                                         title="Close article"
@@ -7770,7 +7880,7 @@
                                         ×
                                     </button>
                                 </div>
-                                <div className="relative mt-4 flex items-center gap-3">
+                                <div className="relative mt-4 flex items-center gap-3 flex-wrap">
                                     <a
                                         href={selectedNewsArticle.url}
                                         target="_blank"
@@ -7778,24 +7888,107 @@
                                         className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
                                     >
                                         <span>🔗</span>
-                                        <span>Open in New Tab</span>
+                                        <span>View Original Source</span>
                                     </a>
-                                    <span className="text-xs text-green-400 font-bold flex items-center gap-1 animate-pulse">
-                                        <span>●</span>
-                                        <span>LIVE CONTENT</span>
-                                    </span>
+                                    {scrapedArticle && !scrapingArticle && !scrapingError && (
+                                        <span className="text-xs text-green-400 font-bold flex items-center gap-1">
+                                            <span>✓</span>
+                                            <span>ARTICLE LOADED</span>
+                                        </span>
+                                    )}
+                                    {scrapingArticle && (
+                                        <span className="text-xs text-cyan-400 font-bold flex items-center gap-1 animate-pulse">
+                                            <span>●</span>
+                                            <span>LOADING...</span>
+                                        </span>
+                                    )}
                                 </div>
                             </div>
 
                             {/* Embedded Article Content */}
-                            <div className="relative w-full h-[calc(100%-200px)] bg-white">
-                                <iframe
-                                    src={selectedNewsArticle.url}
-                                    className="w-full h-full border-0"
-                                    title={selectedNewsArticle.headline}
-                                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-                                    loading="lazy"
-                                />
+                            <div className="relative w-full h-[calc(100%-200px)] bg-gradient-to-b from-gray-900 to-black overflow-y-auto">
+                                {scrapingArticle && (
+                                    <div className="flex flex-col items-center justify-center h-full gap-6">
+                                        <div className="relative w-20 h-20">
+                                            <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full"></div>
+                                            <div className="absolute inset-0 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+                                        </div>
+                                        <div className="text-center">
+                                            <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-2">
+                                                Loading Article...
+                                            </div>
+                                            <div className="text-gray-400 text-sm">
+                                                Scraping content from source
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {!scrapingArticle && scrapingError && (
+                                    <div className="flex flex-col items-center justify-center h-full gap-6 p-8">
+                                        <div className="text-6xl">⚠️</div>
+                                        <div className="text-center max-w-md">
+                                            <div className="text-2xl font-black text-red-400 mb-4">
+                                                Unable to Load Article
+                                            </div>
+                                            <div className="text-gray-300 mb-6 leading-relaxed">
+                                                {scrapingError}
+                                            </div>
+                                            <a
+                                                href={selectedNewsArticle.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white px-6 py-3 rounded-lg font-bold transition-all shadow-lg hover:shadow-xl"
+                                            >
+                                                <span>🔗</span>
+                                                <span>Read on Original Site</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {!scrapingArticle && !scrapingError && scrapedArticle && (
+                                    <div className="max-w-4xl mx-auto p-8 pb-16">
+                                        <article className="prose prose-invert prose-lg max-w-none">
+                                            {scrapedArticle.author && (
+                                                <div className="text-cyan-400 font-semibold mb-2 not-prose">
+                                                    By {scrapedArticle.author}
+                                                </div>
+                                            )}
+                                            {scrapedArticle.publishDate && (
+                                                <div className="text-gray-400 text-sm mb-6 not-prose">
+                                                    {new Date(scrapedArticle.publishDate).toLocaleDateString('en-US', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                    })}
+                                                </div>
+                                            )}
+                                            <div className="text-gray-200 leading-relaxed space-y-6" style={{
+                                                fontSize: '18px',
+                                                lineHeight: '1.8'
+                                            }}>
+                                                {scrapedArticle.text.split('\n\n').map((paragraph, idx) => (
+                                                    <p key={idx} className="mb-4">
+                                                        {paragraph}
+                                                    </p>
+                                                ))}
+                                            </div>
+                                            <div className="mt-12 pt-8 border-t border-cyan-500/30 not-prose">
+                                                <a
+                                                    href={scrapedArticle.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-semibold transition-colors"
+                                                >
+                                                    <span>📰</span>
+                                                    <span>Read full article on {selectedNewsArticle.source}</span>
+                                                    <span>→</span>
+                                                </a>
+                                            </div>
+                                        </article>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

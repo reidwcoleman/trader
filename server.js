@@ -11,6 +11,8 @@ const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 const app = express();
 const http = require('http');
@@ -732,9 +734,153 @@ io.on('connection', (socket) => {
     });
 });
 
+// Scrape article text from free news sources
+app.post('/api/scrape-article', async (req, res) => {
+    try {
+        const { url } = req.body;
+
+        if (!url) {
+            return res.status(400).json({ error: 'URL is required' });
+        }
+
+        console.log('📰 Scraping article from:', url);
+
+        // Fetch the article HTML
+        const response = await axios.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            },
+            timeout: 10000
+        });
+
+        const html = response.data;
+        const $ = cheerio.load(html);
+
+        // Remove unwanted elements
+        $('script, style, nav, header, footer, iframe, .advertisement, .ad, .sidebar, .social-share').remove();
+
+        // Try multiple common article selectors
+        let articleText = '';
+        let headline = '';
+        let publishDate = '';
+        let author = '';
+
+        // Extract headline
+        headline = $('h1').first().text().trim() ||
+                   $('article h1').first().text().trim() ||
+                   $('meta[property="og:title"]').attr('content') ||
+                   $('title').text().trim();
+
+        // Extract publish date
+        publishDate = $('time').first().attr('datetime') ||
+                     $('meta[property="article:published_time"]').attr('content') ||
+                     $('meta[name="publish-date"]').attr('content') ||
+                     '';
+
+        // Extract author
+        author = $('meta[name="author"]').attr('content') ||
+                $('meta[property="article:author"]').attr('content') ||
+                $('[rel="author"]').first().text().trim() ||
+                '';
+
+        // Try different article content selectors
+        const articleSelectors = [
+            'article p',
+            '.article-body p',
+            '.article-content p',
+            '.story-body p',
+            '.post-content p',
+            '.entry-content p',
+            'main p',
+            '[role="main"] p'
+        ];
+
+        for (const selector of articleSelectors) {
+            const paragraphs = $(selector);
+            if (paragraphs.length > 3) {
+                articleText = paragraphs
+                    .map((i, el) => $(el).text().trim())
+                    .get()
+                    .filter(text => text.length > 50) // Filter out short snippets
+                    .join('\n\n');
+                if (articleText.length > 200) {
+                    break;
+                }
+            }
+        }
+
+        // If still no content, try getting all paragraphs
+        if (!articleText || articleText.length < 200) {
+            articleText = $('p')
+                .map((i, el) => $(el).text().trim())
+                .get()
+                .filter(text => text.length > 50)
+                .join('\n\n');
+        }
+
+        // Check if we got meaningful content
+        if (!articleText || articleText.length < 200) {
+            return res.status(400).json({
+                error: 'Unable to extract article content. This site may be paywalled or use dynamic content loading.'
+            });
+        }
+
+        // Check for paywall indicators
+        const paywallIndicators = [
+            'subscribe to read',
+            'subscription required',
+            'paywall',
+            'premium content',
+            'sign in to continue',
+            'register to read'
+        ];
+
+        const lowerText = articleText.toLowerCase();
+        if (paywallIndicators.some(indicator => lowerText.includes(indicator))) {
+            return res.status(403).json({
+                error: 'This article appears to be behind a paywall.'
+            });
+        }
+
+        console.log(`✅ Successfully scraped article: ${headline.substring(0, 50)}...`);
+        console.log(`   Content length: ${articleText.length} characters`);
+
+        res.json({
+            success: true,
+            article: {
+                headline,
+                text: articleText,
+                publishDate,
+                author,
+                url
+            }
+        });
+
+    } catch (error) {
+        console.error('Article scraping error:', error.message);
+
+        if (error.response?.status === 403) {
+            return res.status(403).json({
+                error: 'Access denied. This site may block automated requests.'
+            });
+        }
+
+        if (error.response?.status === 404) {
+            return res.status(404).json({
+                error: 'Article not found.'
+            });
+        }
+
+        res.status(500).json({
+            error: 'Failed to scrape article. The site may be protected or require authentication.'
+        });
+    }
+});
+
 server.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`📧 Email service configured: ${process.env.EMAIL_USER || 'Not configured'}`);
     console.log(`💳 Stripe configured: ${!!process.env.STRIPE_SECRET_KEY}`);
     console.log(`💬 Chat server ready`);
+    console.log(`📰 Article scraper ready`);
 });
