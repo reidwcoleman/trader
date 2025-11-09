@@ -2751,20 +2751,9 @@
                                         {/* Public Account */}
                                         <button
                                             onClick={() => {
-                                                if (accountMode === 'create') {
-                                                    // Redirect to Stripe for public plan
-                                                    if (STRIPE_FAMILY_PUBLIC_LINK.includes('REPLACE_WITH_YOUR_LINK')) {
-                                                        alert('⚠️ Stripe payment link not configured yet!');
-                                                        return;
-                                                    }
-                                                    window.location.href = STRIPE_FAMILY_PUBLIC_LINK;
-                                                } else {
-                                                    setPlan('family-public');
-                                                    setShowAccountTypeModal(false);
-                                                    setView('setup-family');
-                                                }
+                                                alert('🚧 Public accounts are coming soon! Stay tuned.');
                                             }}
-                                            className="group relative bg-gradient-to-br from-green-900/60 to-emerald-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-green-500/50 hover:border-green-400 hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-2 text-left"
+                                            className="group relative bg-gradient-to-br from-green-900/60 to-emerald-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-green-500/50 hover:border-green-400 hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-2 text-left cursor-not-allowed opacity-60"
                                         >
                                             {/* POPULAR Badge - Enhanced */}
                                             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
@@ -2789,20 +2778,9 @@
                                         {/* Private Account */}
                                         <button
                                             onClick={() => {
-                                                if (accountMode === 'create') {
-                                                    // Redirect to Stripe for private plan
-                                                    if (STRIPE_FAMILY_PRIVATE_LINK.includes('REPLACE_WITH_YOUR_LINK')) {
-                                                        alert('⚠️ Stripe payment link not configured yet!');
-                                                        return;
-                                                    }
-                                                    window.location.href = STRIPE_FAMILY_PRIVATE_LINK;
-                                                } else {
-                                                    setPlan('family-private');
-                                                    setShowAccountTypeModal(false);
-                                                    setView('setup-family');
-                                                }
+                                                alert('🚧 Private accounts are coming soon! Stay tuned.');
                                             }}
-                                            className="group relative bg-gradient-to-br from-purple-900/60 to-violet-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-2 text-left"
+                                            className="group relative bg-gradient-to-br from-purple-900/60 to-violet-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-2 text-left cursor-not-allowed opacity-60"
                                         >
                                             {/* PREMIUM Badge - Enhanced */}
                                             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
@@ -3816,20 +3794,9 @@
                                         {/* Public Account */}
                                         <button
                                             onClick={() => {
-                                                if (accountMode === 'create') {
-                                                    // Redirect to Stripe for public plan
-                                                    if (STRIPE_FAMILY_PUBLIC_LINK.includes('REPLACE_WITH_YOUR_LINK')) {
-                                                        alert('⚠️ Stripe payment link not configured yet!');
-                                                        return;
-                                                    }
-                                                    window.location.href = STRIPE_FAMILY_PUBLIC_LINK;
-                                                } else {
-                                                    setPlan('family-public');
-                                                    setShowAccountTypeModal(false);
-                                                    setView('setup-family');
-                                                }
+                                                alert('🚧 Public accounts are coming soon! Stay tuned.');
                                             }}
-                                            className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 border-2 border-green-500/40 hover:border-green-400 transition-all duration-500 hover:-translate-y-3 hover:scale-105 overflow-hidden text-left"
+                                            className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 border-2 border-green-500/40 hover:border-green-400 transition-all duration-500 hover:-translate-y-3 hover:scale-105 overflow-hidden text-left cursor-not-allowed opacity-60"
                                             style={{boxShadow: '0 0 40px rgba(34, 197, 94, 0.25)'}}
                                         >
                                             {/* Animated Background Gradient */}
@@ -3905,20 +3872,9 @@
                                         {/* Private Account */}
                                         <button
                                             onClick={() => {
-                                                if (accountMode === 'create') {
-                                                    // Redirect to Stripe for private plan
-                                                    if (STRIPE_FAMILY_PRIVATE_LINK.includes('REPLACE_WITH_YOUR_LINK')) {
-                                                        alert('⚠️ Stripe payment link not configured yet!');
-                                                        return;
-                                                    }
-                                                    window.location.href = STRIPE_FAMILY_PRIVATE_LINK;
-                                                } else {
-                                                    setPlan('family-private');
-                                                    setShowAccountTypeModal(false);
-                                                    setView('setup-family');
-                                                }
+                                                alert('🚧 Private accounts are coming soon! Stay tuned.');
                                             }}
-                                            className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 border-2 border-purple-500/40 hover:border-purple-400 transition-all duration-500 hover:-translate-y-3 hover:scale-105 overflow-hidden text-left"
+                                            className="group relative bg-black/80 backdrop-blur-2xl rounded-3xl p-8 border-2 border-purple-500/40 hover:border-purple-400 transition-all duration-500 hover:-translate-y-3 hover:scale-105 overflow-hidden text-left cursor-not-allowed opacity-60"
                                             style={{boxShadow: '0 0 40px rgba(168, 85, 247, 0.25)'}}
                                         >
                                             {/* Animated Background Gradient */}
