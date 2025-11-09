@@ -4662,67 +4662,77 @@
                         {/* Market Movers section removed - use dedicated Market Movers tab to avoid API rate limiting */}
 
                         {/* Main Tab Navigation */}
-                        <nav className="sticky top-0 z-40 mb-6 bg-black/95 backdrop-blur-2xl border-b border-cyan-500/30" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.1)'}}>
-                            <div className="flex items-center gap-1 px-4 py-3">
+                        <nav className="sticky top-0 z-40 mb-6 bg-black/95 backdrop-blur-2xl border-b-2 border-cyan-500/30" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.1)'}}>
+                            <div className="flex items-center gap-2 px-4 py-2 overflow-x-auto">
                                 <button
                                     onClick={() => setMainTab('portfolio')}
-                                    className={`relative px-6 py-3 font-bold transition-all duration-300 group ${
+                                    title="Portfolio - View your holdings and performance"
+                                    className={`relative px-6 py-3.5 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap ${
                                         mainTab === 'portfolio'
-                                            ? 'text-white'
-                                            : 'text-gray-400 hover:text-white'
+                                            ? 'text-white bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20 scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent hover:scale-105'
                                     }`}
                                 >
-                                    <span className="relative z-10">💼 Portfolio</span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
-                                    <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 ${mainTab === 'portfolio' ? 'w-full' : 'w-0 group-hover:w-full'}`}></div>
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        <span className="text-lg">💼</span>
+                                        <span>Portfolio</span>
+                                    </span>
                                 </button>
                                 <button
                                     onClick={() => setMainTab('trading')}
-                                    className={`relative px-6 py-3 font-bold transition-all duration-300 group ${
+                                    title="Trading - Buy and sell stocks"
+                                    className={`relative px-6 py-3.5 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap ${
                                         mainTab === 'trading'
-                                            ? 'text-white'
-                                            : 'text-gray-400 hover:text-white'
+                                            ? 'text-white bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20 scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent hover:scale-105'
                                     }`}
                                 >
-                                    <span className="relative z-10">📈 Trading</span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
-                                    <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 ${mainTab === 'trading' ? 'w-full' : 'w-0 group-hover:w-full'}`}></div>
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        <span className="text-lg">📈</span>
+                                        <span>Trading</span>
+                                    </span>
                                 </button>
                                 <button
                                     onClick={() => setMainTab('watchlist')}
-                                    className={`relative px-6 py-3 font-bold transition-all duration-300 group ${
+                                    title="Watchlist - Track your favorite stocks"
+                                    className={`relative px-6 py-3.5 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap ${
                                         mainTab === 'watchlist'
-                                            ? 'text-white'
-                                            : 'text-gray-400 hover:text-white'
+                                            ? 'text-white bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20 scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent hover:scale-105'
                                     }`}
                                 >
-                                    <span className="relative z-10">⭐ Watchlist</span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
-                                    <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 ${mainTab === 'watchlist' ? 'w-full' : 'w-0 group-hover:w-full'}`}></div>
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        <span className="text-lg">⭐</span>
+                                        <span>Watchlist</span>
+                                    </span>
                                 </button>
                                 <button
                                     onClick={() => setMainTab('news')}
-                                    className={`relative px-6 py-3 font-bold transition-all duration-300 group ${
+                                    title="News - Latest market news"
+                                    className={`relative px-6 py-3.5 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap ${
                                         mainTab === 'news'
-                                            ? 'text-white'
-                                            : 'text-gray-400 hover:text-white'
+                                            ? 'text-white bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20 scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent hover:scale-105'
                                     }`}
                                 >
-                                    <span className="relative z-10">📰 News</span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
-                                    <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 ${mainTab === 'news' ? 'w-full' : 'w-0 group-hover:w-full'}`}></div>
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        <span className="text-lg">📰</span>
+                                        <span>News</span>
+                                    </span>
                                 </button>
                                 <button
                                     onClick={() => setMainTab('ai-analysis')}
-                                    className={`relative px-6 py-3 font-bold transition-all duration-300 group ${
+                                    title="AI Analysis - Get AI-powered stock insights"
+                                    className={`relative px-6 py-3.5 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap ${
                                         mainTab === 'ai-analysis'
-                                            ? 'text-white'
-                                            : 'text-gray-400 hover:text-white'
+                                            ? 'text-white bg-gradient-to-r from-purple-500/30 to-pink-500/30 border-2 border-purple-400/50 shadow-lg shadow-purple-500/20 scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-purple-500/10 border-2 border-transparent hover:scale-105'
                                     }`}
                                 >
-                                    <span className="relative z-10">🧠 AI Analysis</span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/10 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
-                                    <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-purple-400 to-pink-500 transition-all duration-300 ${mainTab === 'ai-analysis' ? 'w-full' : 'w-0 group-hover:w-full'}`}></div>
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        <span className="text-lg">🧠</span>
+                                        <span>AI Analysis</span>
+                                    </span>
                                 </button>
                                 <button
                                     onClick={() => {
@@ -4731,27 +4741,31 @@
                                             fetchMarketMovers();
                                         }
                                     }}
-                                    className={`relative px-6 py-3 font-bold transition-all duration-300 group ${
+                                    title="Market Movers - Top gainers and losers"
+                                    className={`relative px-6 py-3.5 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap ${
                                         mainTab === 'movers'
-                                            ? 'text-white'
-                                            : 'text-gray-400 hover:text-white'
+                                            ? 'text-white bg-gradient-to-r from-orange-500/30 to-red-500/30 border-2 border-orange-400/50 shadow-lg shadow-orange-500/20 scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-orange-500/10 border-2 border-transparent hover:scale-105'
                                     }`}
                                 >
-                                    <span className="relative z-10">🚀 Market Movers</span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/10 to-orange-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
-                                    <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-orange-400 to-red-500 transition-all duration-300 ${mainTab === 'movers' ? 'w-full' : 'w-0 group-hover:w-full'}`}></div>
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        <span className="text-lg">🚀</span>
+                                        <span>Movers</span>
+                                    </span>
                                 </button>
                                 <button
                                     onClick={() => setMainTab('account')}
-                                    className={`relative px-6 py-3 font-bold transition-all duration-300 group ${
+                                    title="Account - Manage your account settings"
+                                    className={`relative px-6 py-3.5 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap ${
                                         mainTab === 'account'
-                                            ? 'text-white'
-                                            : 'text-gray-400 hover:text-white'
+                                            ? 'text-white bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20 scale-105'
+                                            : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent hover:scale-105'
                                     }`}
                                 >
-                                    <span className="relative z-10">👤 Account</span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
-                                    <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 ${mainTab === 'account' ? 'w-full' : 'w-0 group-hover:w-full'}`}></div>
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        <span className="text-lg">👤</span>
+                                        <span>Account</span>
+                                    </span>
                                 </button>
                             </div>
                         </nav>
