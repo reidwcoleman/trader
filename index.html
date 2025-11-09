@@ -1240,28 +1240,125 @@
                 setLoadingMarketNews(false);
             };
 
-            // Scrape article content from URL
+            // Scrape article content from URL using ScraperAPI
             const scrapeArticle = async (article) => {
                 setScrapingArticle(true);
                 setScrapingError(null);
                 setScrapedArticle(null);
 
                 try {
-                    const response = await fetch('http://localhost:3001/api/scrape-article', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ url: article.url })
-                    });
+                    // Using ScraperAPI free tier (1000 requests/month)
+                    const SCRAPER_API_KEY = '09c226cad5f1dd6d11f5ed833d2e78d1';
+                    const targetUrl = encodeURIComponent(article.url);
 
-                    const data = await response.json();
+                    // Fetch HTML through ScraperAPI proxy
+                    const response = await fetch(`https://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${targetUrl}`);
 
                     if (!response.ok) {
-                        throw new Error(data.error || 'Failed to scrape article');
+                        throw new Error('Failed to fetch article');
                     }
 
-                    setScrapedArticle(data.article);
+                    const html = await response.text();
+
+                    // Parse HTML on client side
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Remove unwanted elements
+                    const unwantedSelectors = ['script', 'style', 'nav', 'header', 'footer', 'iframe', '.advertisement', '.ad', '.sidebar', '.social-share'];
+                    unwantedSelectors.forEach(selector => {
+                        doc.querySelectorAll(selector).forEach(el => el.remove());
+                    });
+
+                    // Extract headline
+                    let headline = '';
+                    const h1 = doc.querySelector('h1');
+                    const ogTitle = doc.querySelector('meta[property="og:title"]');
+                    const title = doc.querySelector('title');
+                    headline = h1?.textContent?.trim() ||
+                              ogTitle?.getAttribute('content') ||
+                              title?.textContent?.trim() ||
+                              article.headline;
+
+                    // Extract publish date
+                    const timeEl = doc.querySelector('time');
+                    const ogPublished = doc.querySelector('meta[property="article:published_time"]');
+                    const publishDate = timeEl?.getAttribute('datetime') ||
+                                       ogPublished?.getAttribute('content') ||
+                                       '';
+
+                    // Extract author
+                    const authorMeta = doc.querySelector('meta[name="author"]');
+                    const ogAuthor = doc.querySelector('meta[property="article:author"]');
+                    const authorLink = doc.querySelector('[rel="author"]');
+                    const author = authorMeta?.getAttribute('content') ||
+                                  ogAuthor?.getAttribute('content') ||
+                                  authorLink?.textContent?.trim() ||
+                                  '';
+
+                    // Extract article content
+                    let articleText = '';
+                    const articleSelectors = [
+                        'article p',
+                        '.article-body p',
+                        '.article-content p',
+                        '.story-body p',
+                        '.post-content p',
+                        '.entry-content p',
+                        'main p',
+                        '[role="main"] p'
+                    ];
+
+                    for (const selector of articleSelectors) {
+                        const paragraphs = doc.querySelectorAll(selector);
+                        if (paragraphs.length > 3) {
+                            const texts = Array.from(paragraphs)
+                                .map(p => p.textContent.trim())
+                                .filter(text => text.length > 50);
+                            articleText = texts.join('\n\n');
+                            if (articleText.length > 200) break;
+                        }
+                    }
+
+                    // Fallback to all paragraphs
+                    if (!articleText || articleText.length < 200) {
+                        const allParagraphs = doc.querySelectorAll('p');
+                        articleText = Array.from(allParagraphs)
+                            .map(p => p.textContent.trim())
+                            .filter(text => text.length > 50)
+                            .join('\n\n');
+                    }
+
+                    // Check if we got meaningful content
+                    if (!articleText || articleText.length < 200) {
+                        throw new Error('Unable to extract article content. This site may be paywalled or use dynamic content loading.');
+                    }
+
+                    // Check for paywall indicators
+                    const paywallIndicators = [
+                        'subscribe to read',
+                        'subscription required',
+                        'paywall',
+                        'premium content',
+                        'sign in to continue',
+                        'register to read'
+                    ];
+
+                    const lowerText = articleText.toLowerCase();
+                    if (paywallIndicators.some(indicator => lowerText.includes(indicator))) {
+                        throw new Error('This article appears to be behind a paywall.');
+                    }
+
+                    console.log(`✅ Successfully scraped article: ${headline.substring(0, 50)}...`);
+                    console.log(`   Content length: ${articleText.length} characters`);
+
+                    setScrapedArticle({
+                        headline,
+                        text: articleText,
+                        publishDate,
+                        author,
+                        url: article.url
+                    });
                     setScrapingError(null);
                 } catch (error) {
                     console.error('Error scraping article:', error);
