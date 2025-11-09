@@ -4757,6 +4757,50 @@
                             </div>
                         </nav>
 
+                        {/* Quick Tips Banner */}
+                        {portfolio.history?.length === 0 && (
+                            <div className="mb-6 bg-gradient-to-r from-purple-900/60 via-indigo-900/60 to-blue-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 shadow-2xl">
+                                <div className="flex items-start gap-4">
+                                    <div className="text-5xl">💡</div>
+                                    <div className="flex-1">
+                                        <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-cyan-300 mb-3">
+                                            Getting Started with FinClash
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                            <div className="flex items-start gap-2">
+                                                <span className="text-cyan-400 font-bold">🔍</span>
+                                                <div>
+                                                    <span className="text-white font-bold">Search Stocks:</span>
+                                                    <span className="text-purple-200"> Use the search in Trading tab or click popular stocks</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-start gap-2">
+                                                <span className="text-green-400 font-bold">💰</span>
+                                                <div>
+                                                    <span className="text-white font-bold">Quick Trade:</span>
+                                                    <span className="text-purple-200"> Use 25%, 50%, 75%, 100% buttons for fast trading</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-start gap-2">
+                                                <span className="text-blue-400 font-bold">⌨️</span>
+                                                <div>
+                                                    <span className="text-white font-bold">Keyboard:</span>
+                                                    <span className="text-purple-200"> Press Enter to select first search result, Esc to clear</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-start gap-2">
+                                                <span className="text-yellow-400 font-bold">📊</span>
+                                                <div>
+                                                    <span className="text-white font-bold">Portfolio:</span>
+                                                    <span className="text-purple-200"> Click any stock in your portfolio to trade it</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Header */}
                         <div className="group relative bg-black/80 backdrop-blur-2xl rounded-2xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400/60 mb-6 overflow-hidden transition-all duration-500" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
                             {/* Animated shine effect */}
@@ -6409,20 +6453,70 @@
 
                                 <h2 className="relative text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 mb-4">🔍 Stock Search</h2>
 
-                                <div className="relative mb-6">
+                                <div className="relative mb-4">
                                     <input
                                         type="text"
-                                        placeholder="Search stocks (e.g., AAPL, TSLA, NVDA)..."
+                                        placeholder="Search stocks by symbol or name..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full bg-black/60 border-2 border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-400 rounded-xl px-4 py-4 text-white text-lg placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-all focus:shadow-lg focus:shadow-cyan-500/30 focus:scale-[1.02]"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && searchResults.length > 0 && !searching) {
+                                                const firstResult = searchResults[0];
+                                                fetchSingleStock(firstResult.symbol, firstResult.name).then(stockData => {
+                                                    const existingIndex = stocks.findIndex(s => s.symbol === firstResult.symbol);
+                                                    if (existingIndex >= 0) {
+                                                        const updatedStocks = [...stocks];
+                                                        updatedStocks[existingIndex] = stockData;
+                                                        setStocks(updatedStocks);
+                                                    } else {
+                                                        setStocks([...stocks, stockData]);
+                                                    }
+                                                    setSelectedStock(firstResult.symbol);
+                                                    setActiveTab('market');
+                                                    setSearchQuery('');
+                                                    setShowSearchResults(false);
+                                                });
+                                            }
+                                            if (e.key === 'Escape') {
+                                                setSearchQuery('');
+                                                setShowSearchResults(false);
+                                            }
+                                        }}
+                                        className="w-full bg-black/60 border-2 border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-400 rounded-xl px-4 py-4 pr-24 text-white text-lg placeholder-gray-500 focus:outline-none transition-all focus:shadow-lg focus:shadow-cyan-500/30 focus:scale-[1.02]"
                                     />
-                                    {searching && (
-                                        <div className="absolute right-4 top-4">
-                                            <div className="text-cyan-300 animate-spin">🔍</div>
-                                        </div>
-                                    )}
+                                    <div className="absolute right-3 top-3 flex items-center gap-2">
+                                        {searching && (
+                                            <div className="text-cyan-300 animate-spin text-xl">🔍</div>
+                                        )}
+                                        {searchQuery && !searching && (
+                                            <button
+                                                onClick={() => {
+                                                    setSearchQuery('');
+                                                    setShowSearchResults(false);
+                                                }}
+                                                className="bg-cyan-600/50 hover:bg-cyan-500 text-white rounded-lg px-3 py-1 font-bold text-sm transition-all duration-200 hover:scale-110"
+                                            >
+                                                ✕
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
+
+                                {/* Quick access to popular stocks */}
+                                {!searchQuery && (
+                                    <div className="mb-6 flex flex-wrap gap-2">
+                                        <span className="text-cyan-300 text-sm font-semibold mr-2">Popular:</span>
+                                        {['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'NVDA', 'AMZN'].map(symbol => (
+                                            <button
+                                                key={symbol}
+                                                onClick={() => setSearchQuery(symbol)}
+                                                className="bg-cyan-600/30 hover:bg-cyan-500/50 border border-cyan-400/50 text-cyan-200 px-3 py-1 rounded-lg font-bold text-xs transition-all duration-200 hover:scale-110 hover:shadow-lg hover:shadow-cyan-500/30"
+                                            >
+                                                {symbol}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
 
                                 {/* Search Results */}
                                 {searchQuery && showSearchResults && (
