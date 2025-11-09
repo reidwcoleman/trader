@@ -138,7 +138,7 @@ app.use(cors({
     optionsSuccessStatus: 204
 }));
 
-// Add explicit CORS headers for all responses
+// Add explicit CORS headers for all responses - MUST be before routes
 app.use((req, res, next) => {
     const origin = req.headers.origin;
     const allowedOrigins = [
@@ -150,23 +150,21 @@ app.use((req, res, next) => {
 
     console.log(`📨 ${req.method} ${req.path} from origin: ${origin}`);
 
-    // Always set CORS headers for allowed origins or allow all temporarily
-    if (allowedOrigins.includes(origin) || origin) {
-        res.setHeader('Access-Control-Allow-Origin', origin || '*');
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
-        console.log(`✅ CORS headers set for ${origin}`);
-    }
+    // ALWAYS set CORS headers for ALL requests
+    const responseOrigin = (allowedOrigins.includes(origin) || !origin) ? (origin || '*') : '*';
+    res.setHeader('Access-Control-Allow-Origin', responseOrigin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Requested-With');
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Type, Authorization');
 
-    // Handle preflight requests
+    console.log(`✅ CORS headers set for ${origin} -> ${responseOrigin}`);
+
+    // Handle preflight requests IMMEDIATELY
     if (req.method === 'OPTIONS') {
-        console.log(`✈️  Preflight request handled for ${req.path}`);
-        res.setHeader('Access-Control-Allow-Origin', origin || '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+        console.log(`✈️  Preflight OPTIONS request for ${req.path} - responding with 200 OK`);
         res.setHeader('Access-Control-Max-Age', '86400');
-        return res.status(204).end();
+        return res.status(200).end();
     }
 
     next();
