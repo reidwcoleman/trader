@@ -2333,13 +2333,6 @@
 
                         const prices = closePrices.map(price => price.toFixed(2));
 
-                            dataPoints: prices.length,
-                            firstPrice: prices[0],
-                            lastPrice: prices[prices.length - 1],
-                            timeRange: `${labels[0]} to ${labels[labels.length - 1]}`,
-                            source: 'Finnhub API'
-                        });
-
                         return { labels, data: prices };
                     } else if (data.s === 'no_data') {
                         console.warn(`⚠️ No historical data available for ${symbol} from Finnhub`);
