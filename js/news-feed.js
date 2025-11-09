@@ -1,5 +1,39 @@
 // Real-time Stock News Feed using Finnhub API
 
+// List of paywalled/premium news sources that require accounts
+const PAYWALLED_SOURCES = [
+    'Wall Street Journal',
+    'WSJ',
+    'Financial Times',
+    'FT.com',
+    'The Information',
+    'Bloomberg',
+    'Barron\'s',
+    'Investor\'s Business Daily',
+    'IBD',
+    'Seeking Alpha Premium',
+    'The Athletic',
+    'New York Times',
+    'NYT',
+    'Washington Post',
+    'WaPo',
+    'The Economist',
+    'Fortune Premium',
+    'Harvard Business Review',
+    'MIT Technology Review'
+];
+
+// Check if a URL or source is from a paywalled site
+function isPaywalled(url, source) {
+    const lowerUrl = (url || '').toLowerCase();
+    const lowerSource = (source || '').toLowerCase();
+
+    return PAYWALLED_SOURCES.some(paywalledSource => {
+        const lower = paywalledSource.toLowerCase();
+        return lowerUrl.includes(lower) || lowerSource.includes(lower);
+    });
+}
+
 // Fetch news for a specific stock
 async function fetchStockNews(symbol, apiKey) {
     try {
@@ -22,6 +56,12 @@ async function fetchStockNews(symbol, apiKey) {
         const relevantNews = (data || []).filter(article => {
             // Must have headline and summary
             if (!article.headline || !article.summary) return false;
+
+            // Filter out paywalled sources
+            if (isPaywalled(article.url, article.source)) {
+                console.log(`🚫 Filtered out paywalled article from ${article.source}`);
+                return false;
+            }
 
             // Filter out very old articles (older than 60 days)
             const articleDate = new Date(article.datetime * 1000);
@@ -50,7 +90,7 @@ async function fetchStockNews(symbol, apiKey) {
             relevance: calculateRelevance(article, symbol)
         }));
 
-        console.log(`✅ Loaded ${articles.length} relevant news articles for ${symbol}`);
+        console.log(`✅ Loaded ${articles.length} free news articles for ${symbol}`);
         return articles;
     } catch (error) {
         console.error(`Error fetching news for ${symbol}:`, error);
@@ -133,9 +173,17 @@ async function fetchMarketNews(apiKey) {
         ];
 
         const tradingNews = (data || []).filter(article => {
+            // Filter out paywalled sources first
+            if (isPaywalled(article.url, article.source)) {
+                console.log(`🚫 Filtered out paywalled market article from ${article.source}`);
+                return false;
+            }
+
             const text = (article.headline + ' ' + article.summary).toLowerCase();
             return tradingKeywords.some(keyword => text.includes(keyword));
         });
+
+        console.log(`✅ Loaded ${tradingNews.length} free market news articles`);
 
         // Return up to 100 trading-related articles for comprehensive live coverage
         return tradingNews.slice(0, 100).map(article => ({
