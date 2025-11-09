@@ -6466,58 +6466,88 @@
                                                 const stock = stocks.find(s => s.symbol === selectedStock);
                                                 if (!stock) return null;
 
-                                                const change = stock.change || 0;
+                                                // UltraThink - Real stock data
                                                 const price = stock.price || 0;
+                                                const high = stock.high || price;
+                                                const low = stock.low || price;
+                                                const open = stock.open || price;
+                                                const previousClose = stock.previousClose || price;
+                                                const change = stock.change || 0;
 
-                                                // Analyze timing based on multiple factors
+                                                // Advanced metrics
+                                                const dayRange = high - low;
+                                                const pricePositionInRange = dayRange > 0 ? ((price - low) / dayRange) * 100 : 50;
+                                                const intradayMomentum = open > 0 ? ((price - open) / open) * 100 : 0;
+                                                const volatility = previousClose > 0 ? (dayRange / previousClose) * 100 : 0;
+
+                                                // Time factors
                                                 const currentHour = new Date().getHours();
                                                 const currentMinutes = new Date().getMinutes();
                                                 const isMarketOpening = marketOpen && currentHour === 9 && currentMinutes >= 30 && currentMinutes < 45;
                                                 const isMarketClosing = marketOpen && currentHour === 15 && currentMinutes >= 45;
                                                 const isMidDay = marketOpen && currentHour >= 11 && currentHour <= 14;
 
+                                                // Position data with REAL average price
                                                 const positionShares = portfolio.positions[selectedStock] || 0;
                                                 const hasPosition = positionShares > 0;
-                                                const positionReturn = 0; // avgPrice tracking not implemented yet
-
-                                                let buyTiming = { score: 50, label: 'Neutral', color: 'gray', reason: '' };
-                                                let sellTiming = { score: 50, label: 'Neutral', color: 'gray', reason: '' };
-
-                                                // Buy timing analysis
-                                                if (change < -3 && isMidDay) {
-                                                    buyTiming = { score: 85, label: 'Excellent', color: 'green', reason: 'Strong dip during stable hours' };
-                                                } else if (change < -1.5 && !isMarketOpening) {
-                                                    buyTiming = { score: 75, label: 'Good', color: 'green', reason: 'Pullback opportunity' };
-                                                } else if (change > 0 && change < 2 && isMidDay) {
-                                                    buyTiming = { score: 65, label: 'Fair', color: 'yellow', reason: 'Moderate momentum' };
-                                                } else if (change > 5) {
-                                                    buyTiming = { score: 25, label: 'Poor', color: 'red', reason: 'Overextended - wait for pullback' };
-                                                } else if (isMarketOpening || isMarketClosing) {
-                                                    buyTiming = { score: 40, label: 'Caution', color: 'yellow', reason: 'High volatility period' };
-                                                } else {
-                                                    buyTiming = { score: 50, label: 'Neutral', color: 'gray', reason: 'Standard market conditions' };
-                                                }
-
-                                                // Sell timing analysis
+                                                let positionReturn = 0;
                                                 if (hasPosition) {
-                                                    if (positionReturn > 15 && change > 0) {
-                                                        sellTiming = { score: 85, label: 'Excellent', color: 'green', reason: 'Strong gains with continued momentum' };
-                                                    } else if (positionReturn > 8 && change < -2) {
-                                                        sellTiming = { score: 90, label: 'Excellent', color: 'green', reason: 'Lock in profits before reversal' };
-                                                    } else if (positionReturn < -10) {
-                                                        sellTiming = { score: 80, label: 'Consider', color: 'yellow', reason: 'Cut losses or wait for recovery' };
-                                                    } else if (positionReturn > 0 && positionReturn < 5) {
-                                                        sellTiming = { score: 40, label: 'Hold', color: 'gray', reason: 'Let winners run' };
-                                                    } else if (isMarketClosing) {
-                                                        sellTiming = { score: 60, label: 'Fair', color: 'yellow', reason: 'End of day - reduce exposure' };
-                                                    }
-                                                } else {
-                                                    if (change > 10) {
-                                                        sellTiming = { score: 70, label: 'Good', color: 'green', reason: 'Consider shorting (advanced)' };
-                                                    } else {
-                                                        sellTiming = { score: 30, label: 'N/A', color: 'gray', reason: 'No position to sell' };
+                                                    const trades = portfolio.history?.filter(t => t.stock === selectedStock && t.type === 'buy') || [];
+                                                    if (trades.length > 0) {
+                                                        const totalCost = trades.reduce((sum, t) => sum + (t.price * t.quantity), 0);
+                                                        const totalShares = trades.reduce((sum, t) => sum + t.quantity, 0);
+                                                        const avgPrice = totalShares > 0 ? totalCost / totalShares : price;
+                                                        positionReturn = ((price - avgPrice) / avgPrice) * 100;
                                                     }
                                                 }
+
+                                                // === ULTRA BUY TIMING ===
+                                                let buyScore = 50;
+                                                let buyReasons = [];
+                                                if (pricePositionInRange < 20) { buyScore += 25; buyReasons.push('Near daily low'); }
+                                                else if (pricePositionInRange < 40) { buyScore += 15; buyReasons.push('Below midpoint'); }
+                                                else if (pricePositionInRange > 80) { buyScore -= 25; buyReasons.push('Overextended'); }
+                                                if (change > 0 && intradayMomentum > 0 && change < 3) { buyScore += 20; buyReasons.push('Building momentum'); }
+                                                else if (change < -2 && intradayMomentum < -1) { buyScore += 15; buyReasons.push('Dip opportunity'); }
+                                                else if (change > 5) { buyScore -= 30; buyReasons.push('Too hot'); }
+                                                if (volatility > 5 && pricePositionInRange < 40) { buyScore += 15; buyReasons.push('High vol + low price'); }
+                                                else if (volatility < 1) { buyScore -= 10; }
+                                                if (isMarketOpening) { buyScore -= 15; buyReasons.push('Opening volatility'); }
+                                                else if (isMidDay) { buyScore += 10; buyReasons.push('Stable hours'); }
+                                                else if (isMarketClosing) { buyScore -= 10; }
+                                                else if (!marketOpen) { buyScore -= 20; buyReasons.push('Market closed'); }
+                                                buyScore = Math.max(0, Math.min(100, buyScore));
+
+                                                // === ULTRA SELL TIMING ===
+                                                let sellScore = 30;
+                                                let sellReasons = [];
+                                                if (hasPosition) {
+                                                    if (positionReturn > 15) { sellScore += 35; sellReasons.push(`+${positionReturn.toFixed(1)}% gain`); }
+                                                    else if (positionReturn > 8) { sellScore += 25; sellReasons.push(`+${positionReturn.toFixed(1)}% profit`); }
+                                                    else if (positionReturn > 3) { sellScore += 10; sellReasons.push(`+${positionReturn.toFixed(1)}%`); }
+                                                    else if (positionReturn < -10) { sellScore += 30; sellReasons.push(`-${Math.abs(positionReturn).toFixed(1)}% stop loss`); }
+                                                    else if (positionReturn < -5) { sellScore += 15; sellReasons.push(`-${Math.abs(positionReturn).toFixed(1)}%`); }
+                                                    if (positionReturn > 5 && pricePositionInRange > 85) { sellScore += 25; sellReasons.push('At resistance'); }
+                                                    if (positionReturn > 5 && change < -2 && intradayMomentum < 0) { sellScore += 30; sellReasons.push('Momentum flip'); }
+                                                    if (volatility > 7 && positionReturn > 0) { sellScore += 15; }
+                                                    if (isMarketClosing && positionReturn > 3) { sellScore += 10; sellReasons.push('EOD profit lock'); }
+                                                } else {
+                                                    if (change > 10 && pricePositionInRange > 90) { sellScore = 65; sellReasons = ['Short opportunity']; }
+                                                    else { sellScore = 20; sellReasons = ['No position']; }
+                                                }
+                                                sellScore = Math.max(0, Math.min(100, sellScore));
+
+                                                // Labels
+                                                const getLabel = (s) => {
+                                                    if (s >= 80) return { label: 'Excellent', color: 'green' };
+                                                    if (s >= 65) return { label: 'Good', color: 'green' };
+                                                    if (s >= 50) return { label: 'Fair', color: 'yellow' };
+                                                    if (s >= 35) return { label: 'Neutral', color: 'gray' };
+                                                    if (s >= 20) return { label: 'Poor', color: 'red' };
+                                                    return { label: 'N/A', color: 'gray' };
+                                                };
+                                                let buyTiming = { score: Math.round(buyScore), ...getLabel(buyScore), reason: buyReasons.slice(0, 2).join(' • ') || 'Analyzing conditions' };
+                                                let sellTiming = { score: Math.round(sellScore), ...getLabel(sellScore), reason: sellReasons.slice(0, 2).join(' • ') || 'Analyzing conditions' };
 
                                                 const getBgColor = (color) => {
                                                     if (color === 'green') return 'from-green-900/40 to-emerald-900/40 border-green-500/50';
