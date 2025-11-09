@@ -2309,87 +2309,74 @@
 
             const fetchHistoricalData = async (symbol, period = '1M') => {
                 try {
-                    // Use ET timezone for market data
+                    // Use Yahoo Finance API v8 (free, no API key needed)
                     const now = new Date();
-                    const toDate = Math.floor(now.getTime() / 1000); // Current timestamp in seconds
-                    let fromDate;
-                    let resolution;
+                    let range, interval;
 
                     switch (period) {
                         case '1D':
-                            // Last trading day with 5-minute intervals
-                            // Go back 3 days to ensure we get data even on weekends
-                            fromDate = toDate - (3 * 24 * 60 * 60);
-                            resolution = '5';
+                            range = '1d';
+                            interval = '5m';
                             break;
                         case '1W':
-                            // Last 10 days with hourly intervals (to cover weekends)
-                            fromDate = toDate - (10 * 24 * 60 * 60);
-                            resolution = '60';
+                            range = '5d';
+                            interval = '60m';
                             break;
                         case '1M':
-                            // Last 35 days with daily intervals
-                            fromDate = toDate - (35 * 24 * 60 * 60);
-                            resolution = 'D';
+                            range = '1mo';
+                            interval = '1d';
                             break;
                         case '3M':
-                            // Last 100 days with daily intervals
-                            fromDate = toDate - (100 * 24 * 60 * 60);
-                            resolution = 'D';
+                            range = '3mo';
+                            interval = '1d';
                             break;
                         case 'ALL':
-                            // Last 400 days with daily intervals
-                            fromDate = toDate - (400 * 24 * 60 * 60);
-                            resolution = 'D';
+                            range = '1y';
+                            interval = '1d';
                             break;
                         default:
-                            // Default to 35 days
-                            fromDate = toDate - (35 * 24 * 60 * 60);
-                            resolution = 'D';
+                            range = '1mo';
+                            interval = '1d';
                     }
 
-                    // Finnhub Stock Candles API endpoint
-                    const url = `${FINNHUB_API_BASE}/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`;
-
-                    console.log(`📊 Fetching historical data for ${symbol} (${period}):`, url);
+                    // Yahoo Finance API v8 endpoint (via yfinance proxy)
+                    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=${interval}`;
 
                     const response = await fetch(url);
 
                     if (!response.ok) {
-                        console.error(`❌ Finnhub API error: ${response.status} ${response.statusText}`);
-                        throw new Error(`Finnhub API error: ${response.status} ${response.statusText}`);
+                        throw new Error(`Yahoo Finance API error: ${response.status}`);
                     }
 
                     const data = await response.json();
 
-                    console.log(`📈 API Response for ${symbol}:`, data);
+                    if (data.chart && data.chart.result && data.chart.result[0]) {
+                        const result = data.chart.result[0];
+                        const timestamps = result.timestamp;
+                        const closePrices = result.indicators.quote[0].close;
 
-                    if (data.s === 'ok' && data.t && data.c && data.t.length > 0) {
-                        const timestamps = data.t;
-                        const closePrices = data.c;
-
-                        console.log(`✅ Got ${timestamps.length} data points for ${symbol}`);
+                        if (!timestamps || !closePrices || timestamps.length === 0) {
+                            return null;
+                        }
 
                         const labels = timestamps.map(timestamp => {
-                            // Convert to ET timezone
                             const date = new Date(timestamp * 1000);
-                            const etDate = new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
 
                             if (period === '1D') {
-                                return etDate.toLocaleTimeString('en-US', {
+                                return date.toLocaleTimeString('en-US', {
                                     timeZone: 'America/New_York',
                                     hour: 'numeric',
                                     minute: '2-digit'
                                 });
                             } else if (period === '1W') {
-                                return etDate.toLocaleDateString('en-US', {
+                                return date.toLocaleDateString('en-US', {
                                     timeZone: 'America/New_York',
                                     month: 'short',
                                     day: 'numeric',
                                     hour: 'numeric'
                                 });
                             } else {
-                                return etDate.toLocaleDateString('en-US', {
+                                return date.toLocaleDateString('en-US', {
                                     timeZone: 'America/New_York',
                                     month: 'short',
                                     day: 'numeric'
@@ -2397,14 +2384,13 @@
                             }
                         });
 
-                        const prices = closePrices.map(price => price.toFixed(2));
+                        // Filter out null prices
+                        const prices = closePrices
+                            .map((price, idx) => price !== null ? price.toFixed(2) : null)
+                            .filter(price => price !== null);
 
-                        return { labels, data: prices };
-                    } else if (data.s === 'no_data') {
-                        console.warn(`⚠️ No data available for ${symbol} in period ${period}`);
-                        return null;
+                        return { labels: labels.slice(0, prices.length), data: prices };
                     } else {
-                        console.warn(`⚠️ Invalid data response for ${symbol}:`, data);
                         return null;
                     }
                 } catch (error) {
