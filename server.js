@@ -150,19 +150,22 @@ app.use((req, res, next) => {
 
     console.log(`📨 ${req.method} ${req.path} from origin: ${origin}`);
 
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
+    // Always set CORS headers for allowed origins or allow all temporarily
+    if (allowedOrigins.includes(origin) || origin) {
+        res.setHeader('Access-Control-Allow-Origin', origin || '*');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
         console.log(`✅ CORS headers set for ${origin}`);
-    } else if (origin) {
-        console.log(`❌ Origin not allowed: ${origin}`);
     }
 
     // Handle preflight requests
     if (req.method === 'OPTIONS') {
         console.log(`✈️  Preflight request handled for ${req.path}`);
+        res.setHeader('Access-Control-Allow-Origin', origin || '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+        res.setHeader('Access-Control-Max-Age', '86400');
         return res.status(204).end();
     }
 
