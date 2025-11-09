@@ -555,11 +555,12 @@ app.post('/api/accounts/update-portfolio', async (req, res) => {
 });
 
 // Reset account endpoint (requires developer code)
+// ⚠️ PERMANENT DELETION - This irreversibly erases all account trading data
 app.post('/api/accounts/reset', async (req, res) => {
     try {
         const { email, developerCode } = req.body;
 
-        console.log('🔄 Account reset request for:', email);
+        console.log('🔥 PERMANENT ACCOUNT RESET REQUEST for:', email);
 
         // Validate developer code
         if (developerCode !== 'RWC#1') {
@@ -579,7 +580,19 @@ app.post('/api/accounts/reset', async (req, res) => {
             return res.status(404).json({ error: 'Account not found' });
         }
 
-        // Reset portfolio to initial state
+        // Store old data for logging purposes
+        const oldPositionsCount = Object.keys(account.portfolio?.positions || {}).length;
+        const oldHistoryCount = account.portfolio?.history?.length || 0;
+        const oldWatchlistCount = account.portfolio?.watchlist?.length || 0;
+
+        console.log(`📊 Data being PERMANENTLY DELETED for ${email}:`);
+        console.log(`   - ${oldPositionsCount} stock positions`);
+        console.log(`   - ${oldHistoryCount} trading history records`);
+        console.log(`   - ${oldWatchlistCount} watchlist items`);
+        console.log(`   - All performance data`);
+
+        // PERMANENT RESET - Overwrites all portfolio data with fresh state
+        // ⚠️ OLD DATA IS PERMANENTLY LOST - NO RECOVERY POSSIBLE
         account.portfolio = {
             cash: 100000,
             positions: {},
@@ -589,15 +602,22 @@ app.post('/api/accounts/reset', async (req, res) => {
             watchlist: [],
             performanceHistory: []
         };
+        account.resetCount = (account.resetCount || 0) + 1;
+        account.lastResetAt = new Date().toISOString();
         account.updatedAt = new Date().toISOString();
 
+        // Write to file - OLD DATA IS NOW PERMANENTLY DELETED
         writeAccounts(accounts);
-        console.log('✅ Account reset successfully for:', email);
+
+        console.log('🔥 PERMANENT RESET COMPLETE for:', email);
+        console.log('   ⛔ All previous data has been IRREVERSIBLY DELETED');
+        console.log(`   ✅ Account reset to $100,000 (Reset #${account.resetCount})`);
 
         res.json({
             success: true,
-            message: 'Account reset successfully',
-            portfolio: account.portfolio
+            message: 'Account permanently reset - all data deleted forever',
+            portfolio: account.portfolio,
+            resetCount: account.resetCount
         });
     } catch (error) {
         console.error('Account reset error:', error);

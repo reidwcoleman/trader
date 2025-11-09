@@ -4591,7 +4591,7 @@
                                         <div className="p-2">
                                             <button
                                                 onClick={async () => {
-                                                    const developerCode = prompt('⚠️ Developer Access Required\n\nThis will reset your account to $100,000 and clear all positions and history.\n\nEnter developer code to continue:');
+                                                    const developerCode = prompt('⚠️ DEVELOPER ACCESS REQUIRED ⚠️\n\n🔥 PERMANENT ACCOUNT RESET 🔥\n\nThis will PERMANENTLY:\n• Delete ALL positions and stocks\n• Erase ALL trading history\n• Reset cash to $100,000\n• Clear watchlist and performance data\n\n⚠️ THIS CANNOT BE RECOVERED OR UNDONE ⚠️\n\nEnter developer code to continue:');
 
                                                     if (!developerCode) {
                                                         return;
@@ -4602,43 +4602,68 @@
                                                         return;
                                                     }
 
-                                                    if (confirm('Are you sure you want to reset your account? This will:\n\n• Delete all your positions\n• Reset your cash to $100,000\n• Clear your trading history\n\nThis action cannot be undone!')) {
-                                                        try {
-                                                            setLoading(true);
-                                                            const response = await fetchWithTimeout(`${API_BASE_URL}/api/accounts/reset`, {
-                                                                method: 'POST',
-                                                                headers: { 'Content-Type': 'application/json' },
-                                                                body: JSON.stringify({
-                                                                    email: userEmail,
-                                                                    developerCode: developerCode
-                                                                })
-                                                            }, 30000);
+                                                    // First confirmation
+                                                    const firstConfirm = confirm('⚠️ FINAL WARNING ⚠️\n\nYou are about to PERMANENTLY RESET your account.\n\nThis will IMMEDIATELY and IRREVERSIBLY:\n\n🔥 DELETE all your stock positions\n🔥 ERASE your entire trading history\n🔥 REMOVE all watchlist items\n🔥 DESTROY all performance data\n🔥 RESET your cash to $100,000\n\n⛔ THIS ACTION IS PERMANENT ⛔\n⛔ YOUR DATA CANNOT BE RECOVERED ⛔\n⛔ THERE IS NO UNDO BUTTON ⛔\n\nAre you ABSOLUTELY SURE you want to continue?');
 
-                                                            const data = await response.json();
+                                                    if (!firstConfirm) {
+                                                        return;
+                                                    }
 
-                                                            if (!response.ok) {
-                                                                throw new Error(data.error || 'Failed to reset account');
-                                                            }
+                                                    // Second confirmation - type confirmation
+                                                    const typeConfirm = prompt('⚠️ LAST CHANCE TO CANCEL ⚠️\n\nTo confirm this PERMANENT reset, type exactly:\n\nRESET FOREVER\n\n(This action will delete all your data immediately and cannot be undone)');
 
-                                                            // Update local state
-                                                            const newCompetition = { ...competition };
-                                                            newCompetition.members[0].portfolio = data.portfolio;
-                                                            setCompetition(newCompetition);
+                                                    if (typeConfirm !== 'RESET FOREVER') {
+                                                        alert('❌ Reset cancelled. Your account data is safe.');
+                                                        return;
+                                                    }
 
-                                                            setShowAccountMenu(false);
-                                                            showToast('✅ Account reset successfully!', 'success');
-                                                            window.location.reload();
-                                                        } catch (error) {
-                                                            alert(`❌ ${error.message}`);
-                                                        } finally {
-                                                            setLoading(false);
+                                                    // Final confirmation
+                                                    const finalConfirm = confirm('🔥 EXECUTING PERMANENT RESET 🔥\n\nThis is your LAST chance to cancel.\n\nClick OK to PERMANENTLY DELETE all your account data.\n\nClick Cancel to keep your account data safe.\n\nAre you 100% certain?');
+
+                                                    if (!finalConfirm) {
+                                                        alert('❌ Reset cancelled. Your account data is safe.');
+                                                        return;
+                                                    }
+
+                                                    try {
+                                                        setLoading(true);
+                                                        const response = await fetchWithTimeout(`${API_BASE_URL}/api/accounts/reset`, {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({
+                                                                email: userEmail,
+                                                                developerCode: developerCode
+                                                            })
+                                                        }, 30000);
+
+                                                        const data = await response.json();
+
+                                                        if (!response.ok) {
+                                                            throw new Error(data.error || 'Failed to reset account');
                                                         }
+
+                                                        // Update local state
+                                                        const newCompetition = { ...competition };
+                                                        newCompetition.members[0].portfolio = data.portfolio;
+                                                        setCompetition(newCompetition);
+
+                                                        setShowAccountMenu(false);
+                                                        showToast('🔥 Account permanently reset. All data has been deleted forever.', 'success');
+
+                                                        // Add a delay to show the toast before reload
+                                                        setTimeout(() => {
+                                                            window.location.reload();
+                                                        }, 2000);
+                                                    } catch (error) {
+                                                        alert(`❌ Reset failed: ${error.message}\n\nYour account data is still intact.`);
+                                                    } finally {
+                                                        setLoading(false);
                                                     }
                                                 }}
-                                                className="w-full text-left px-4 py-3 text-yellow-300 hover:bg-yellow-500/20 rounded-lg transition-all duration-300 flex items-center gap-3 font-semibold"
+                                                className="w-full text-left px-4 py-3 text-red-400 hover:bg-red-500/20 rounded-lg transition-all duration-300 flex items-center gap-3 font-semibold border-2 border-red-500/30"
                                             >
-                                                <span className="text-xl">🔄</span>
-                                                <span>Reset Account</span>
+                                                <span className="text-xl">🔥</span>
+                                                <span>Reset Account (PERMANENT)</span>
                                             </button>
                                             <button
                                                 onClick={() => {
