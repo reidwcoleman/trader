@@ -666,82 +666,59 @@
 
             const fetchMarketMovers = async () => {
                 setLoadingMovers(true);
-                setMoversProgress({ current: 0, total: STOCK_DATABASE.length });
+                setMoversProgress({ current: 0, total: 100 });
                 try {
+                    // Use Yahoo Finance API for real market movers data
+                    // This is much faster than fetching individual stocks
+                    const gainersResponse = await fetch('https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&scrIds=day_gainers&start=0&count=10');
+                    const losersResponse = await fetch('https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&scrIds=day_losers&start=0&count=10');
 
-                    const stocksData = [];
-                    const batchSize = 50; // Process in batches to respect API rate limits (60/min)
-                    const delayBetweenBatches = 60000; // 1 minute delay between batches
-                    const totalBatches = Math.ceil(STOCK_DATABASE.length / batchSize);
+                    setMoversProgress({ current: 50, total: 100 });
 
-                    // Process stocks in batches
-                    for (let i = 0; i < STOCK_DATABASE.length; i += batchSize) {
-                        const batch = STOCK_DATABASE.slice(i, i + batchSize);
-                        const currentBatch = Math.floor(i/batchSize) + 1;
+                    const gainersData = await gainersResponse.json();
+                    const losersData = await losersResponse.json();
 
-                        const batchPromises = batch.map(async (stockInfo) => {
-                            try {
-                                const response = await fetch(
-                                    `${FINNHUB_API_BASE}/quote?symbol=${stockInfo.symbol}&token=${FINNHUB_API_KEY}`
-                                );
-                                const data = await response.json();
+                    setMoversProgress({ current: 75, total: 100 });
 
-                                if (data.c && data.dp !== undefined && !isNaN(data.dp)) {
-                                    return {
-                                        symbol: stockInfo.symbol,
-                                        name: stockInfo.name,
-                                        price: data.c,
-                                        change: data.dp,
-                                        changeValue: data.d,
-                                        high: data.h,
-                                        low: data.l,
-                                        open: data.o,
-                                        previousClose: data.pc
-                                    };
-                                }
-                                return null;
-                            } catch (error) {
-                                return null;
-                            }
-                        });
+                    // Process gainers
+                    const gainers = gainersData.finance?.result?.[0]?.quotes?.map(quote => ({
+                        symbol: quote.symbol,
+                        name: quote.shortName || quote.longName || quote.symbol,
+                        price: quote.regularMarketPrice || 0,
+                        change: quote.regularMarketChangePercent || 0,
+                        changeValue: quote.regularMarketChange || 0,
+                        high: quote.regularMarketDayHigh || quote.regularMarketPrice || 0,
+                        low: quote.regularMarketDayLow || quote.regularMarketPrice || 0,
+                        open: quote.regularMarketOpen || quote.regularMarketPrice || 0,
+                        previousClose: quote.regularMarketPreviousClose || quote.regularMarketPrice || 0,
+                        volume: quote.regularMarketVolume || 0
+                    })) || [];
 
-                        const batchResults = await Promise.all(batchPromises);
-                        const validResults = batchResults.filter(stock => stock !== null);
-                        stocksData.push(...validResults);
+                    // Process losers
+                    const losers = losersData.finance?.result?.[0]?.quotes?.map(quote => ({
+                        symbol: quote.symbol,
+                        name: quote.shortName || quote.longName || quote.symbol,
+                        price: quote.regularMarketPrice || 0,
+                        change: quote.regularMarketChangePercent || 0,
+                        changeValue: quote.regularMarketChange || 0,
+                        high: quote.regularMarketDayHigh || quote.regularMarketPrice || 0,
+                        low: quote.regularMarketDayLow || quote.regularMarketPrice || 0,
+                        open: quote.regularMarketOpen || quote.regularMarketPrice || 0,
+                        previousClose: quote.regularMarketPreviousClose || quote.regularMarketPrice || 0,
+                        volume: quote.regularMarketVolume || 0
+                    })) || [];
 
-                        setMoversProgress({ current: i + batch.length, total: STOCK_DATABASE.length });
+                    setMoversProgress({ current: 100, total: 100 });
 
-                        const sorted = stocksData.sort((a, b) => b.change - a.change);
-                        const gainers = sorted.slice(0, 10).filter(s => s.change > 0);
-                        const losers = sorted.slice(-10).reverse().filter(s => s.change < 0);
-                        setTopGainers(gainers);
-                        setTopLosers(losers);
+                    setTopGainers(gainers.slice(0, 10));
+                    setTopLosers(losers.slice(0, 10));
 
-                        // If there are more batches, wait before proceeding (respect rate limits)
-                        if (i + batchSize < STOCK_DATABASE.length) {
-                            await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
-                        }
-                    }
-
-
-                    const sorted = stocksData.sort((a, b) => b.change - a.change);
-
-                    // Top 10 gainers (highest positive change)
-                    const gainers = sorted.slice(0, 10).filter(s => s.change > 0);
-
-                    // Top 10 losers (lowest negative change)
-                    const losers = sorted.slice(-10).reverse().filter(s => s.change < 0);
-
-                    setTopGainers(gainers);
-                    setTopLosers(losers);
-
-                    gainers.forEach((stock, i) => {
-                    });
-
-                    losers.forEach((stock, i) => {
-                    });
+                    console.log('✅ Market movers loaded successfully');
+                    console.log('📈 Gainers:', gainers.length);
+                    console.log('📉 Losers:', losers.length);
 
                 } catch (error) {
+                    console.error('❌ Failed to load market movers:', error);
                     showToast('Failed to load market movers. Please try again.', 'error');
                 } finally {
                     setLoadingMovers(false);
