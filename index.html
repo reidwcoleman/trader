@@ -7937,6 +7937,114 @@
                                 </div>
                             </>
                         )}
+
+                        {/* Account Tab */}
+                        {mainTab === 'account' && (
+                            <div className="bg-gradient-to-br from-cyan-900/60 via-blue-900/60 to-indigo-900/60 rounded-2xl p-8 border-2 border-cyan-500/50 shadow-2xl">
+                                <div className="text-center mb-8">
+                                    <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full mb-6 shadow-2xl">
+                                        <span className="text-5xl">👤</span>
+                                    </div>
+                                    <h2 className="text-4xl font-black text-white mb-3">Account Settings</h2>
+                                    <p className="text-xl text-cyan-200">Manage your account and preferences</p>
+                                </div>
+
+                                {/* Account Information */}
+                                <div className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-cyan-500/30 mb-6">
+                                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-6 flex items-center gap-2">
+                                        <span className="text-3xl">ℹ️</span>
+                                        Account Information
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center py-3 border-b border-cyan-500/20">
+                                            <span className="text-cyan-300 font-semibold">Name</span>
+                                            <span className="text-white font-bold">{userName}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center py-3 border-b border-cyan-500/20">
+                                            <span className="text-cyan-300 font-semibold">Email</span>
+                                            <span className="text-white font-bold">{userEmail}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center py-3 border-b border-cyan-500/20">
+                                            <span className="text-cyan-300 font-semibold">Account Code</span>
+                                            <span className="text-white font-bold font-mono">{competitionCode}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center py-3">
+                                            <span className="text-cyan-300 font-semibold">Plan</span>
+                                            <span className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-4 py-1 rounded-full font-bold text-sm">Personal</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Account Actions */}
+                                <div className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-yellow-500/30 mb-6">
+                                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400 mb-6 flex items-center gap-2">
+                                        <span className="text-3xl">⚙️</span>
+                                        Account Actions
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <button
+                                            onClick={() => {
+                                                if (confirm('Are you sure you want to reset your account? This will:\n\n• Delete all your positions\n• Reset your cash to $100,000\n• Clear your trading history\n\nThis action cannot be undone!')) {
+                                                    const portfolio = getCurrentPortfolio();
+                                                    portfolio.cash = 100000;
+                                                    portfolio.positions = {};
+                                                    portfolio.shortPositions = {};
+                                                    portfolio.history = [];
+                                                    portfolio.lastBuyTime = {};
+                                                    portfolio.performanceHistory = [];
+                                                    savePortfolio(portfolio);
+                                                    showToast('Account reset successfully!', 'success');
+                                                    window.location.reload();
+                                                }
+                                            }}
+                                            className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl hover:scale-105"
+                                        >
+                                            <span className="text-2xl">🔄</span>
+                                            <span>Reset Account</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (confirm('Are you sure you want to sign out?')) {
+                                                    setCompetition(null);
+                                                    setCompetitionCode('');
+                                                    setCurrentUserId(null);
+                                                    setUserName('');
+                                                    setUserEmail('');
+                                                    setView('plan-select');
+                                                    showToast('Signed out successfully', 'success');
+                                                }
+                                            }}
+                                            className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl hover:scale-105"
+                                        >
+                                            <span className="text-2xl">🚪</span>
+                                            <span>Sign Out</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Portfolio Summary */}
+                                <div className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-green-500/30">
+                                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400 mb-6 flex items-center gap-2">
+                                        <span className="text-3xl">💰</span>
+                                        Portfolio Summary
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="bg-gradient-to-br from-green-900/40 to-emerald-900/40 rounded-xl p-4 border border-green-500/30">
+                                            <div className="text-green-300 text-sm font-semibold mb-2">Total Value</div>
+                                            <div className="text-white font-black text-2xl">${getPortfolioValue().toLocaleString()}</div>
+                                        </div>
+                                        <div className="bg-gradient-to-br from-cyan-900/40 to-blue-900/40 rounded-xl p-4 border border-cyan-500/30">
+                                            <div className="text-cyan-300 text-sm font-semibold mb-2">Cash Balance</div>
+                                            <div className="text-white font-black text-2xl">${portfolio.cash.toLocaleString()}</div>
+                                        </div>
+                                        <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 rounded-xl p-4 border border-purple-500/30">
+                                            <div className="text-purple-300 text-sm font-semibold mb-2">Total Trades</div>
+                                            <div className="text-white font-black text-2xl">{portfolio.history?.length || 0}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
