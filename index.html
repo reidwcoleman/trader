@@ -127,6 +127,8 @@
             const [saveStatus, setSaveStatus] = useState('saved'); // 'saving', 'saved', 'error', 'offline'
             const [lastSaved, setLastSaved] = useState(null);
 
+            const [showAccountMenu, setShowAccountMenu] = useState(false);
+
             // Market hours state
             const [marketOpen, setMarketOpen] = useState(false);
             const [timeUntilChange, setTimeUntilChange] = useState('');
@@ -154,6 +156,16 @@
                     }
                 }
             }, [competition, currentUserId]);
+
+            useEffect(() => {
+                const handleClickOutside = (e) => {
+                    if (showAccountMenu && !e.target.closest('.relative')) {
+                        setShowAccountMenu(false);
+                    }
+                };
+                document.addEventListener('click', handleClickOutside);
+                return () => document.removeEventListener('click', handleClickOutside);
+            }, [showAccountMenu]);
 
             // Socket.io disabled - causing CORS errors
             // useEffect(() => {
@@ -4465,19 +4477,64 @@
                     <div id="main-content" className="max-w-7xl mx-auto">
                         {/* Navigation Bar */}
                         <div className="mb-4 flex gap-3">
-                            <button
-                                onClick={() => setView('plan-select')}
-                                className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2"
-                            >
-                                🏠 Home
-                            </button>
-                            <button
-                                onClick={() => window.history.back()}
-                                className="group relative bg-black/80 backdrop-blur-xl hover:bg-cyan-500/20 border-2 border-cyan-500/30 hover:border-cyan-400 text-gray-300 hover:text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 overflow-hidden"
-                            >
-                                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
-                                <span className="relative">← Back</span>
-                            </button>
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowAccountMenu(!showAccountMenu)}
+                                    className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2"
+                                >
+                                    👤 Account
+                                </button>
+                                {showAccountMenu && (
+                                    <div className="absolute top-full mt-2 left-0 w-72 bg-black/95 backdrop-blur-xl border-2 border-cyan-500/50 rounded-xl shadow-2xl z-50 overflow-hidden">
+                                        <div className="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 p-4 border-b border-cyan-500/30">
+                                            <div className="text-cyan-300 text-sm font-semibold">Signed in as</div>
+                                            <div className="text-white font-black text-lg">{userName}</div>
+                                            <div className="text-gray-400 text-xs">{userEmail}</div>
+                                        </div>
+                                        <div className="p-2">
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm('Are you sure you want to reset your account? This will:\n\n• Delete all your positions\n• Reset your cash to $100,000\n• Clear your trading history\n\nThis action cannot be undone!')) {
+                                                        const portfolio = getCurrentPortfolio();
+                                                        portfolio.cash = 100000;
+                                                        portfolio.positions = {};
+                                                        portfolio.shortPositions = {};
+                                                        portfolio.history = [];
+                                                        portfolio.lastBuyTime = {};
+                                                        portfolio.performanceHistory = [];
+                                                        savePortfolio(portfolio);
+                                                        setShowAccountMenu(false);
+                                                        showToast('Account reset successfully!', 'success');
+                                                        window.location.reload();
+                                                    }
+                                                }}
+                                                className="w-full text-left px-4 py-3 text-yellow-300 hover:bg-yellow-500/20 rounded-lg transition-all duration-300 flex items-center gap-3 font-semibold"
+                                            >
+                                                <span className="text-xl">🔄</span>
+                                                <span>Reset Account</span>
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm('Are you sure you want to sign out?')) {
+                                                        setCompetition(null);
+                                                        setCompetitionCode('');
+                                                        setCurrentUserId(null);
+                                                        setUserName('');
+                                                        setUserEmail('');
+                                                        setView('plan-select');
+                                                        setShowAccountMenu(false);
+                                                        showToast('Signed out successfully', 'success');
+                                                    }
+                                                }}
+                                                className="w-full text-left px-4 py-3 text-red-300 hover:bg-red-500/20 rounded-lg transition-all duration-300 flex items-center gap-3 font-semibold"
+                                            >
+                                                <span className="text-xl">🚪</span>
+                                                <span>Sign Out</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                             <button
                                 onClick={() => {
                                     const summary = generateDailySummary();
