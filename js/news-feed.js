@@ -137,8 +137,8 @@ async function fetchMarketNews(apiKey) {
             return tradingKeywords.some(keyword => text.includes(keyword));
         });
 
-        // Return up to 30 trading-related articles for comprehensive coverage
-        return tradingNews.slice(0, 30).map(article => ({
+        // Return up to 100 trading-related articles for comprehensive live coverage
+        return tradingNews.slice(0, 100).map(article => ({
             id: article.id,
             headline: article.headline,
             summary: article.summary,
