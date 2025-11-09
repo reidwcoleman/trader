@@ -4862,9 +4862,9 @@
                                             alerts.push({ symbol, type: 'breakout', text: `${symbol} +${change.toFixed(1)}% 🚀`, color: 'green' });
                                         } else if (change < -5) {
                                             alerts.push({ symbol, type: 'dip', text: `${symbol} ${change.toFixed(1)}% 📉`, color: 'red' });
-                                        } else if (change > 3 && !position) {
+                                        } else if (change > 3 && !positionShares) {
                                             alerts.push({ symbol, type: 'opportunity', text: `${symbol} gaining momentum`, color: 'yellow' });
-                                        } else if (change < -3 && !position) {
+                                        } else if (change < -3 && !positionShares) {
                                             alerts.push({ symbol, type: 'buy_dip', text: `${symbol} dip opportunity`, color: 'cyan' });
                                         }
                                     });
