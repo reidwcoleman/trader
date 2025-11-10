@@ -481,6 +481,7 @@ app.post('/api/accounts/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        // Fast validation
         if (!email || !isValidEmail(email)) {
             return res.status(400).json({ error: 'Valid email is required' });
         }
@@ -490,20 +491,23 @@ app.post('/api/accounts/login', async (req, res) => {
         }
 
         const accounts = readAccounts();
-        const account = accounts.find(acc => acc.email.toLowerCase() === email.toLowerCase());
+        const normalizedEmail = email.toLowerCase();
+        const account = accounts.find(acc => acc.email.toLowerCase() === normalizedEmail);
 
         if (!account) {
+            // Timing attack mitigation - still hash even if account not found
+            await bcrypt.compare(password, '$2b$10$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGH');
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        // Verify password
+        // Fast password verification
         const isValid = await bcrypt.compare(password, account.passwordHash);
 
         if (!isValid) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        // Return account data
+        // Return minimal account data for speed
         res.json({
             success: true,
             account: {

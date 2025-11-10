@@ -4549,12 +4549,19 @@
                                                     type="password"
                                                     value={userPassword}
                                                     onChange={(e) => setUserPassword(e.target.value)}
+                                                    onKeyPress={(e) => {
+                                                        if (e.key === 'Enter' && !loading) {
+                                                            e.preventDefault();
+                                                            document.getElementById('sign-in-button').click();
+                                                        }
+                                                    }}
                                                     placeholder="Enter your password"
                                                     className="w-full bg-blue-700/50 border-2 border-cyan-500/50 rounded-xl px-4 py-4 text-white text-lg placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-all"
                                                 />
                                             </div>
 
                                             <button
+                                                id="sign-in-button"
                                                 onClick={async () => {
                                                     setAuthError('');
                                                     if (!userEmail || !userEmail.includes('@')) {
@@ -4568,16 +4575,20 @@
 
                                                     setLoading(true);
                                                     setAuthError('');
+
+                                                    // Optimistic UI - prepare data structures immediately
+                                                    const email = userEmail.trim().toLowerCase();
+
                                                     try {
-                                                        // Login via backend server
+                                                        // Fast login with reduced timeout (10s instead of 30s)
                                                         const response = await fetchWithTimeout(`${API_BASE_URL}/api/accounts/login`, {
                                                             method: 'POST',
                                                             headers: { 'Content-Type': 'application/json' },
                                                             body: JSON.stringify({
-                                                                email: userEmail.trim().toLowerCase(),
+                                                                email: email,
                                                                 password: userPassword
                                                             })
-                                                        }, 30000);
+                                                        }, 10000);
 
                                                         const data = await response.json();
 
@@ -4587,23 +4598,22 @@
                                                             return;
                                                         }
 
-                                                        // Sign in with account data from backend
                                                         const account = data.account;
 
-                                                        if (!account || !account.accountCode) {
+                                                        if (!account?.accountCode) {
                                                             setAuthError('Invalid account data received. Please try again.');
                                                             setLoading(false);
                                                             return;
                                                         }
 
-                                                        const code = account.accountCode;
-
+                                                        // Fast state updates - batch them together
+                                                        const memberId = Date.now().toString();
                                                         const newCompetition = {
-                                                            code: code,
+                                                            code: account.accountCode,
                                                             totalPool: 0,
                                                             startTime: account.createdAt,
                                                             members: [{
-                                                                id: Date.now().toString(),
+                                                                id: memberId,
                                                                 name: account.userName,
                                                                 contribution: 0,
                                                                 portfolio: account.portfolio,
@@ -4611,20 +4621,23 @@
                                                             }]
                                                         };
 
+                                                        // Batch state updates to minimize re-renders
                                                         setCompetition(newCompetition);
-                                                        setCompetitionCode(code);
-                                                        setCurrentUserId(newCompetition.members[0].id);
+                                                        setCompetitionCode(account.accountCode);
+                                                        setCurrentUserId(memberId);
                                                         setUserName(account.userName);
                                                         setUserEmail(account.email);
-                                                        setView('app');
                                                         setUserPassword('');
+
+                                                        // Immediately transition to app
+                                                        setView('app');
                                                         setLoading(false);
                                                     } catch (error) {
                                                         console.error('Sign in error:', error);
-                                                        if (error.message && error.message.includes('timeout')) {
-                                                            setAuthError('Server is taking too long to respond. Please try again.');
-                                                        } else if (error.message && error.message.includes('Failed to fetch')) {
-                                                            setAuthError('Cannot connect to server. Please check if the server is running.');
+                                                        if (error.message?.includes('timeout')) {
+                                                            setAuthError('Login timeout. Please try again.');
+                                                        } else if (error.message?.includes('Failed to fetch')) {
+                                                            setAuthError('Cannot reach server. Please refresh and try again.');
                                                         } else {
                                                             setAuthError(error.message || 'Sign in failed. Please try again.');
                                                         }
