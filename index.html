@@ -5668,64 +5668,103 @@
 
                         {/* Top Stocks to Buy - UltraThink AI Analysis */}
                         {(() => {
-                            // UltraThink AI: Analyze all stocks and calculate buy scores
+                            // UltraThink AI: Advanced multi-factor analysis
                             const analyzedStocks = stocks.map(stock => {
-                                let buyScore = 50; // Base score
+                                let buyScore = 50;
                                 let signals = [];
                                 let reasoning = '';
 
-                                // Momentum Analysis (+/- 20 points)
+                                // 1. Momentum (+/- 20)
                                 if (stock.change > 5) {
                                     buyScore += 20;
-                                    signals.push('Strong momentum');
+                                    signals.push('🚀 Strong upward momentum');
                                 } else if (stock.change > 2) {
-                                    buyScore += 10;
-                                    signals.push('Positive momentum');
+                                    buyScore += 12;
+                                    signals.push('📈 Positive momentum');
+                                } else if (stock.change > 0) {
+                                    buyScore += 5;
                                 } else if (stock.change < -5) {
-                                    buyScore -= 20;
-                                    signals.push('Weak momentum');
+                                    buyScore -= 15;
+                                    signals.push('💎 Deep dip opportunity');
                                 } else if (stock.change < -2) {
-                                    buyScore -= 10;
-                                    signals.push('Negative momentum');
+                                    buyScore -= 5;
+                                    signals.push('⚠️ Pullback');
                                 }
 
-                                // Price Action Analysis (+/- 15 points)
+                                // 2. Price Position (+/- 18)
                                 const priceRange = stock.high - stock.low;
-                                const currentPosition = (stock.price - stock.low) / priceRange;
-                                if (currentPosition > 0.8) {
+                                const currentPosition = priceRange > 0 ? (stock.price - stock.low) / priceRange : 0.5;
+
+                                if (currentPosition > 0.85) {
+                                    buyScore += 18;
+                                    signals.push('💪 Breaking highs');
+                                } else if (currentPosition > 0.7) {
+                                    buyScore += 12;
+                                } else if (currentPosition < 0.25) {
                                     buyScore += 15;
-                                    signals.push('Trading near high');
-                                } else if (currentPosition < 0.3) {
-                                    buyScore += 10;
-                                    signals.push('Potential dip buy');
+                                    signals.push('🎯 Entry at support');
+                                } else if (currentPosition < 0.4) {
+                                    buyScore += 8;
                                 }
 
-                                // Volume Analysis (+/- 10 points)
-                                if (stock.volume && stock.volume > 1000000) {
-                                    buyScore += 10;
-                                    signals.push('High liquidity');
+                                // 3. Volume (+/- 12)
+                                if (stock.volume) {
+                                    if (stock.volume > 50000000) {
+                                        buyScore += 12;
+                                        signals.push('🌊 Exceptional volume');
+                                    } else if (stock.volume > 10000000) {
+                                        buyScore += 8;
+                                        signals.push('High liquidity');
+                                    } else if (stock.volume > 1000000) {
+                                        buyScore += 4;
+                                    }
                                 }
 
-                                // Relative Performance (+/- 15 points)
+                                // 4. Relative Strength (+/- 15)
                                 const avgMarketChange = stocks.reduce((sum, s) => sum + (s.change || 0), 0) / stocks.length;
-                                if (stock.change > avgMarketChange + 2) {
+                                const relativeStrength = stock.change - avgMarketChange;
+
+                                if (relativeStrength > 3) {
                                     buyScore += 15;
-                                    signals.push('Outperforming market');
-                                } else if (stock.change < avgMarketChange - 2) {
-                                    buyScore -= 10;
+                                    signals.push('⭐ Outperforming market');
+                                } else if (relativeStrength > 1) {
+                                    buyScore += 10;
+                                } else if (relativeStrength < -3) {
+                                    buyScore -= 8;
                                 }
 
-                                // Generate AI reasoning
-                                if (buyScore >= 80) {
-                                    reasoning = 'Strong buy signal with multiple bullish indicators';
-                                } else if (buyScore >= 70) {
-                                    reasoning = 'Buy opportunity with favorable momentum';
-                                } else if (buyScore >= 60) {
-                                    reasoning = 'Moderate buy with positive outlook';
-                                } else if (buyScore >= 50) {
-                                    reasoning = 'Neutral position, monitor for entry';
+                                // 5. Volatility (+/- 10)
+                                const volatility = priceRange / stock.previousClose;
+                                if (volatility > 0.05) {
+                                    buyScore += 10;
+                                    signals.push('⚡ High volatility');
+                                } else if (volatility > 0.02) {
+                                    buyScore += 5;
+                                }
+
+                                // 6. Intraday Trend (+/- 7)
+                                const openToCurrentMove = stock.price - stock.open;
+                                const dayRange = stock.high - stock.low;
+                                if (dayRange > 0) {
+                                    const intradayStrength = openToCurrentMove / dayRange;
+                                    if (intradayStrength > 0.5) {
+                                        buyScore += 7;
+                                    }
+                                }
+
+                                // Reasoning
+                                if (buyScore >= 85) {
+                                    reasoning = '🔥 EXCEPTIONAL - Multiple strong bullish signals';
+                                } else if (buyScore >= 75) {
+                                    reasoning = '✅ STRONG BUY - Favorable momentum & positioning';
+                                } else if (buyScore >= 65) {
+                                    reasoning = '👍 BUY - Solid opportunity with positive indicators';
+                                } else if (buyScore >= 55) {
+                                    reasoning = '🔍 MODERATE - Positive outlook, monitor entry';
+                                } else if (buyScore >= 45) {
+                                    reasoning = '⏸️ HOLD - Neutral signals, wait for clarity';
                                 } else {
-                                    reasoning = 'Cautious - wait for better signals';
+                                    reasoning = '⚠️ WAIT - Weak indicators, look elsewhere';
                                 }
 
                                 return {
