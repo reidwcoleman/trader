@@ -4567,6 +4567,7 @@
                                                     }
 
                                                     setLoading(true);
+                                                    setAuthError('');
                                                     try {
                                                         // Login via backend server
                                                         const response = await fetchWithTimeout(`${API_BASE_URL}/api/accounts/login`, {
@@ -4588,8 +4589,14 @@
 
                                                         // Sign in with account data from backend
                                                         const account = data.account;
-                                                        const code = account.accountCode;
 
+                                                        if (!account || !account.accountCode) {
+                                                            setAuthError('Invalid account data received. Please try again.');
+                                                            setLoading(false);
+                                                            return;
+                                                        }
+
+                                                        const code = account.accountCode;
 
                                                         const newCompetition = {
                                                             code: code,
@@ -4611,9 +4618,16 @@
                                                         setUserEmail(account.email);
                                                         setView('app');
                                                         setUserPassword('');
+                                                        setLoading(false);
                                                     } catch (error) {
-                                                        setAuthError('Failed to sign in. Please check your connection and try again.');
-                                                    } finally {
+                                                        console.error('Sign in error:', error);
+                                                        if (error.message && error.message.includes('timeout')) {
+                                                            setAuthError('Server is taking too long to respond. Please try again.');
+                                                        } else if (error.message && error.message.includes('Failed to fetch')) {
+                                                            setAuthError('Cannot connect to server. Please check if the server is running.');
+                                                        } else {
+                                                            setAuthError(error.message || 'Sign in failed. Please try again.');
+                                                        }
                                                         setLoading(false);
                                                     }
                                                 }}
