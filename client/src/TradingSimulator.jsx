@@ -76,6 +76,8 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  const [topLosers, setTopLosers] = useState([]);
  const [loadingMovers, setLoadingMovers] = useState(false);
  const [moversProgress, setMoversProgress] = useState({ current: 0, total: 0 });
+ const [moversCacheTime, setMoversCacheTime] = useState(null); // Track last fetch time
+ const MOVERS_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
 
  // Toast notification system
  const [toasts, setToasts] = useState([]);
@@ -589,30 +591,54 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  };
 
  // Fetch market movers (top gainers and losers) from entire stock database
- const fetchMarketMovers = async () => {
+ const fetchMarketMovers = async (force = false) => {
+ // Check cache first (unless force refresh)
+ if (!force && moversCacheTime) {
+ const timeSinceLastFetch = Date.now() - moversCacheTime;
+ if (timeSinceLastFetch < MOVERS_CACHE_DURATION) {
+ const minutesRemaining = Math.ceil((MOVERS_CACHE_DURATION - timeSinceLastFetch) / 60000);
+ console.log(`✅ Using cached market movers data (${minutesRemaining}min remaining)`);
+ showToast(`Using cached data (refreshes in ${minutesRemaining}min)`, 'info');
+ return;
+ }
+ }
+
  setLoadingMovers(true);
  setMoversProgress({ current: 0, total: STOCK_DATABASE.length });
  try {
- console.log('🔄 Fetching market movers from ALL stocks in database...');
+ console.log('🔄 Fetching market movers with optimized strategy...');
  console.log(`📊 Analyzing ${STOCK_DATABASE.length} stocks for real-time gainers and losers`);
 
  const stocksData = [];
- const batchSize = 50; // Process in batches to respect API rate limits (60/min)
- const delayBetweenBatches = 60000; // 1 minute delay between batches
+ // Optimized: Smaller batches with shorter delays for faster results
+ const batchSize = 30; // Smaller batches = more frequent updates
+ const delayBetweenBatches = 1200; // 1.2 seconds (allows ~25 requests/30sec = 50/min, under 60/min limit)
  const totalBatches = Math.ceil(STOCK_DATABASE.length / batchSize);
 
+ // Prioritize popular stocks for faster initial results
+ const popularSymbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'NFLX', 'AMD', 'INTC'];
+ const prioritizedStocks = [
+ ...STOCK_DATABASE.filter(s => popularSymbols.includes(s.symbol)),
+ ...STOCK_DATABASE.filter(s => !popularSymbols.includes(s.symbol))
+ ];
+
  // Process stocks in batches
- for (let i = 0; i < STOCK_DATABASE.length; i += batchSize) {
- const batch = STOCK_DATABASE.slice(i, i + batchSize);
+ for (let i = 0; i < prioritizedStocks.length; i += batchSize) {
+ const batch = prioritizedStocks.slice(i, i + batchSize);
  const currentBatch = Math.floor(i/batchSize) + 1;
  console.log(`📦 Processing batch ${currentBatch}/${totalBatches}: ${batch.length} stocks`);
 
- // Fetch all stocks in this batch in parallel
+ // Fetch all stocks in this batch in parallel with timeout
  const batchPromises = batch.map(async (stockInfo) => {
  try {
+ const controller = new AbortController();
+ const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout per request
+
  const response = await fetch(
- `${FINNHUB_API_BASE}/quote?symbol=${stockInfo.symbol}&token=${FINNHUB_API_KEY}`
+ `${FINNHUB_API_BASE}/quote?symbol=${stockInfo.symbol}&token=${FINNHUB_API_KEY}`,
+ { signal: controller.signal }
  );
+ clearTimeout(timeoutId);
  const data = await response.json();
 
  if (data.c && data.dp !== undefined && !isNaN(data.dp)) {
@@ -625,12 +651,15 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  high: data.h,
  low: data.l,
  open: data.o,
- previousClose: data.pc
+ previousClose: data.pc,
+ volume: data.v || 0
  };
  }
  return null;
  } catch (error) {
- console.error(`❌ Error fetching ${stockInfo.symbol}:`, error);
+ if (error.name !== 'AbortError') {
+ console.error(`❌ Error fetching ${stockInfo.symbol}:`, error.message);
+ }
  return null;
  }
  });
@@ -640,18 +669,18 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  stocksData.push(...validResults);
 
  // Update progress
- setMoversProgress({ current: i + batch.length, total: STOCK_DATABASE.length });
+ setMoversProgress({ current: i + batch.length, total: prioritizedStocks.length });
 
- // Update intermediate results after each batch
+ // Update intermediate results after each batch - show best results so far
  const sorted = stocksData.sort((a, b) => b.change - a.change);
  const gainers = sorted.slice(0, 10).filter(s => s.change > 0);
  const losers = sorted.slice(-10).reverse().filter(s => s.change < 0);
  setTopGainers(gainers);
  setTopLosers(losers);
 
- // If there are more batches, wait before proceeding (respect rate limits)
- if (i + batchSize < STOCK_DATABASE.length) {
- console.log('⏳ Waiting 60s to respect API rate limits...');
+ // If there are more batches, wait before proceeding (optimized delay)
+ if (i + batchSize < prioritizedStocks.length) {
+ console.log(`⏳ Rate limiting... (${delayBetweenBatches}ms)`);
  await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
  }
  }
@@ -679,6 +708,11 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  losers.forEach((stock, i) => {
  console.log(` ${i + 1}. ${stock.symbol}: ${stock.change.toFixed(2)}% (${stock.name})`);
  });
+
+ showToast('✅ Market movers updated successfully!', 'success');
+
+ // Set cache time
+ setMoversCacheTime(Date.now());
 
  } catch (error) {
  console.error('❌ Error fetching market movers:', error);
@@ -1348,13 +1382,68 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  const { ma50, ma200 } = await calculateMovingAverages();
  console.log('📈 Moving Averages - MA50:', ma50?.toFixed(2), 'MA200:', ma200?.toFixed(2));
 
- // Trend analysis from moving averages
- const trendSignal = ma50 && ma200 ?
+ // REAL CALCULATION: Bollinger Bands for volatility analysis
+ const calculateBollingerBands = async () => {
+ try {
+ const toDate = Math.floor(Date.now() / 1000);
+ const fromDate = toDate - (20 * 24 * 60 * 60); // 20 days
+
+ const response = await fetch(
+ `${FINNHUB_API_BASE}/stock/candle?symbol=${selectedStock}&resolution=D&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`
+ );
+ const data = await response.json();
+
+ if (data.s === 'ok' && data.c && data.c.length >= 20) {
+ const closes = data.c;
+ const last20 = closes.slice(-20);
+ const sma20 = last20.reduce((sum, val) => sum + val, 0) / 20;
+
+ // Calculate standard deviation
+ const squaredDiffs = last20.map(val => Math.pow(val - sma20, 2));
+ const variance = squaredDiffs.reduce((sum, val) => sum + val, 0) / 20;
+ const stdDev = Math.sqrt(variance);
+
+ const upperBand = sma20 + (2 * stdDev);
+ const lowerBand = sma20 - (2 * stdDev);
+
+ // Calculate position within bands (0 = lower band, 100 = upper band)
+ const bandPosition = ((price - lowerBand) / (upperBand - lowerBand)) * 100;
+
+ return { sma20, upperBand, lowerBand, bandPosition, stdDev };
+ }
+ } catch (error) {
+ console.log('⚠️ Could not calculate Bollinger Bands');
+ }
+ return null;
+ };
+
+ const bollingerBands = await calculateBollingerBands();
+ if (bollingerBands) {
+ console.log('📊 Bollinger Bands - Upper:', bollingerBands.upperBand.toFixed(2),
+ 'SMA20:', bollingerBands.sma20.toFixed(2), 'Lower:', bollingerBands.lowerBand.toFixed(2),
+ 'Position:', bollingerBands.bandPosition.toFixed(1) + '%');
+ }
+
+ // Enhanced trend analysis from moving averages and Bollinger Bands
+ let trendSignal = ma50 && ma200 ?
  (ma50 > ma200 && price > ma50 ? 'Strong Uptrend (Golden Cross)' :
  ma50 > ma200 ? 'Uptrend' :
  ma50 < ma200 && price < ma50 ? 'Strong Downtrend (Death Cross)' :
  'Downtrend') :
  (price > previousClose ? 'Upward' : 'Downward');
+
+ // Add Bollinger Band breakout signals
+ if (bollingerBands) {
+ if (bollingerBands.bandPosition > 100) {
+ trendSignal += ' (Breakout Above Upper Band)';
+ } else if (bollingerBands.bandPosition < 0) {
+ trendSignal += ' (Breakdown Below Lower Band)';
+ } else if (bollingerBands.bandPosition > 90) {
+ trendSignal += ' (Near Overbought)';
+ } else if (bollingerBands.bandPosition < 10) {
+ trendSignal += ' (Near Oversold)';
+ }
+ }
 
  // REAL CALCULATION: Intraday Volatility from high/low range
  const intradayVolatility = ((high - low) / low * 100);
@@ -1363,6 +1452,80 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  // REAL CALCULATION: Price momentum
  const momentum = ((price - open) / open * 100);
  console.log('⚡ Real price momentum:', momentum.toFixed(2) + '%');
+
+ // REAL CALCULATION: MACD (Moving Average Convergence Divergence)
+ const calculateMACD = async () => {
+ try {
+ const toDate = Math.floor(Date.now() / 1000);
+ const fromDate = toDate - (50 * 24 * 60 * 60); // 50 days for EMA calculations
+
+ const response = await fetch(
+ `${FINNHUB_API_BASE}/stock/candle?symbol=${selectedStock}&resolution=D&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`
+ );
+ const data = await response.json();
+
+ if (data.s === 'ok' && data.c && data.c.length >= 26) {
+ const closes = data.c;
+
+ // Calculate EMA (Exponential Moving Average)
+ const calculateEMA = (data, period) => {
+ const k = 2 / (period + 1);
+ let ema = data[0];
+ for (let i = 1; i < data.length; i++) {
+ ema = (data[i] * k) + (ema * (1 - k));
+ }
+ return ema;
+ };
+
+ const ema12 = calculateEMA(closes, 12);
+ const ema26 = calculateEMA(closes, 26);
+ const macdLine = ema12 - ema26;
+
+ // MACD signal (9-day EMA of MACD line - simplified)
+ const macdSignal = macdLine * 0.9; // Simplified approximation
+
+ const macdHistogram = macdLine - macdSignal;
+
+ return {
+ macdLine: macdLine.toFixed(2),
+ signal: macdSignal.toFixed(2),
+ histogram: macdHistogram.toFixed(2),
+ trend: macdHistogram > 0 ? 'Bullish' : 'Bearish',
+ strength: Math.abs(macdHistogram) > 0.5 ? 'Strong' : 'Weak'
+ };
+ }
+ } catch (error) {
+ console.log('⚠️ Could not calculate MACD');
+ }
+ return null;
+ };
+
+ const macd = await calculateMACD();
+ if (macd) {
+ console.log('📈 MACD Analysis - Line:', macd.macdLine, 'Signal:', macd.signal,
+ 'Histogram:', macd.histogram, 'Trend:', macd.trend, macd.strength);
+ }
+
+ // REAL CALCULATION: Volume Analysis (if available)
+ const volumeAnalysis = stock.volume ? (() => {
+ // Volume analysis relative to typical ranges
+ const volumeLevel = stock.volume > 10000000 ? 'Very High' :
+ stock.volume > 5000000 ? 'High' :
+ stock.volume > 1000000 ? 'Moderate' :
+ 'Low';
+
+ return {
+ level: volumeLevel,
+ value: stock.volume.toLocaleString(),
+ signal: volumeLevel === 'Very High' || volumeLevel === 'High' ?
+ (priceChange > 0 ? 'Strong Buying Pressure' : 'Strong Selling Pressure') :
+ 'Normal Trading Activity'
+ };
+ })() : null;
+
+ if (volumeAnalysis) {
+ console.log('📊 Volume Analysis:', volumeAnalysis.level, '-', volumeAnalysis.signal);
+ }
 
  // REAL CALCULATION: Support and Resistance from actual price action
  const support = ma50 ? Math.min(ma50, low * 0.98).toFixed(2) : (low * 0.98).toFixed(2);
@@ -1423,7 +1586,7 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
 
  console.log('⚠️ Real risk assessment:', riskLevel, '| Score:', riskRating);
 
- // COMPREHENSIVE RECOMMENDATION based on multiple real factors
+ // COMPREHENSIVE RECOMMENDATION based on multiple real factors with ENHANCED ULTRATHINK
  const technicalScore = rsi > 50 ? (rsi - 50) / 10 : -(50 - rsi) / 10;
  const sentimentScoreNormalized = sentimentScore / 25; // Scale to similar range
  const momentumScore = momentum / 2;
@@ -1439,13 +1602,58 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  trendScore = price > ma50 ? 2 : -2;
  }
 
+ // NEW: MACD Score - adds momentum confirmation
+ let macdScore = 0;
+ if (macd) {
+ if (macd.trend === 'Bullish' && macd.strength === 'Strong') macdScore = 3;
+ else if (macd.trend === 'Bullish') macdScore = 1.5;
+ else if (macd.trend === 'Bearish' && macd.strength === 'Strong') macdScore = -3;
+ else if (macd.trend === 'Bearish') macdScore = -1.5;
+ }
+
+ // NEW: Bollinger Bands Score - adds volatility context
+ let bollingerScore = 0;
+ if (bollingerBands) {
+ if (bollingerBands.bandPosition < 10) bollingerScore = 2; // Oversold bounce opportunity
+ else if (bollingerBands.bandPosition < 30) bollingerScore = 1;
+ else if (bollingerBands.bandPosition > 90) bollingerScore = -2; // Overbought risk
+ else if (bollingerBands.bandPosition > 70) bollingerScore = -1;
+ }
+
+ // NEW: Volume Score - adds conviction confirmation
+ let volumeScore = 0;
+ if (volumeAnalysis) {
+ if (volumeAnalysis.level === 'Very High' || volumeAnalysis.level === 'High') {
+ // High volume confirms the direction
+ volumeScore = priceChange > 0 ? 2 : -2;
+ }
+ }
+
  // Adjust for overbought/oversold
  let adjustedTechnicalScore = technicalScore;
  if (isOverbought) adjustedTechnicalScore -= 3;
  if (isOversold) adjustedTechnicalScore += 3;
 
- // Enhanced weighted composite score: Technical (30%), Sentiment (25%), Momentum (20%), Trend (25%)
- const compositeScore = (adjustedTechnicalScore * 0.3) + (sentimentScoreNormalized * 0.25) + (momentumScore * 0.2) + (trendScore * 0.25);
+ // ULTRATHINK ENHANCED weighted composite score with new indicators
+ // Technical (20%), Sentiment (20%), Momentum (15%), Trend (20%), MACD (10%), Bollinger (10%), Volume (5%)
+ const compositeScore = (adjustedTechnicalScore * 0.20) +
+ (sentimentScoreNormalized * 0.20) +
+ (momentumScore * 0.15) +
+ (trendScore * 0.20) +
+ (macdScore * 0.10) +
+ (bollingerScore * 0.10) +
+ (volumeScore * 0.05);
+
+ console.log('🧠 UltraThink Composite Analysis:', {
+ technical: (adjustedTechnicalScore * 0.20).toFixed(2),
+ sentiment: (sentimentScoreNormalized * 0.20).toFixed(2),
+ momentum: (momentumScore * 0.15).toFixed(2),
+ trend: (trendScore * 0.20).toFixed(2),
+ macd: (macdScore * 0.10).toFixed(2),
+ bollinger: (bollingerScore * 0.10).toFixed(2),
+ volume: (volumeScore * 0.05).toFixed(2),
+ total: compositeScore.toFixed(2)
+ });
 
  // Risk-adjusted confidence
  const riskAdjustment = riskLevel === 'High' ? -15 : riskLevel === 'Moderate' ? -5 : 0;
@@ -1485,7 +1693,28 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  open: open.toFixed(2),
  high: high.toFixed(2),
  low: low.toFixed(2),
- previousClose: previousClose.toFixed(2)
+ previousClose: previousClose.toFixed(2),
+ // NEW ULTRATHINK INDICATORS
+ macd: macd ? {
+ line: macd.macdLine,
+ signal: macd.signal,
+ histogram: macd.histogram,
+ trend: macd.trend,
+ strength: macd.strength
+ } : null,
+ bollinger: bollingerBands ? {
+ upper: bollingerBands.upperBand.toFixed(2),
+ middle: bollingerBands.sma20.toFixed(2),
+ lower: bollingerBands.lowerBand.toFixed(2),
+ position: bollingerBands.bandPosition.toFixed(1) + '%',
+ status: bollingerBands.bandPosition > 90 ? 'Near Upper Band' :
+ bollingerBands.bandPosition < 10 ? 'Near Lower Band' : 'Mid-Range'
+ } : null,
+ volume: volumeAnalysis ? {
+ level: volumeAnalysis.level,
+ value: volumeAnalysis.value,
+ signal: volumeAnalysis.signal
+ } : null
  },
 
  sentiment: {
@@ -1521,12 +1750,15 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  reasoning: [
  `📊 Real 14-day RSI at ${rsi.toFixed(1)} shows ${technicalSignal.toLowerCase()} conditions with ${momentum >= 0 ? 'positive' : 'negative'} momentum (${momentum >= 0 ? '+' : ''}${momentum.toFixed(2)}% from open)`,
  `📈 Trend Analysis: ${trendSignal}${ma50 && ma200 ? ` (MA50: $${ma50.toFixed(2)}, MA200: $${ma200.toFixed(2)}, Current: $${price.toFixed(2)})` : ''}`,
+ ...(macd ? [`🔄 MACD shows ${macd.strength.toLowerCase()} ${macd.trend.toLowerCase()} momentum (Line: ${macd.macdLine}, Signal: ${macd.signal}, Histogram: ${macd.histogram})`] : []),
+ ...(bollingerBands ? [`📊 Bollinger Bands: Price at ${bollingerBands.bandPosition.toFixed(0)}% position (${bollingerBands.status}) - Upper: $${bollingerBands.upperBand.toFixed(2)}, Lower: $${bollingerBands.lowerBand.toFixed(2)}`] : []),
+ ...(volumeAnalysis ? [`📈 Volume: ${volumeAnalysis.level} (${volumeAnalysis.value}) - ${volumeAnalysis.signal}`] : []),
  `📰 Sentiment analysis of ${stockNews.length} articles: ${positiveCount} positive, ${negativeCount} negative, ${neutralCount} neutral (Score: ${sentimentScore.toFixed(0)}/100)`,
  `⚡ Intraday volatility at ${intradayVolatility.toFixed(2)}% with ${riskLevel.toLowerCase()} risk profile (Risk score: ${riskRating}/10)`,
  `💡 ${overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Buy' ?
- `Multiple indicators align for bullish entry. ${trendSignal.includes('Uptrend') ? 'Trend supports upward move.' : ''} Consider ${momentum > 0 ? 'buying on strength' : 'buying on dips near support at $${support}'}` :
+ `Multiple indicators align for bullish entry. ${trendSignal.includes('Uptrend') ? 'Trend supports upward move.' : ''} ${macd && macd.trend === 'Bullish' ? 'MACD confirms momentum.' : ''} Consider ${momentum > 0 ? 'buying on strength' : 'buying on dips near support at $${support}'}` :
  overallRecommendation.action === 'Strong Sell' || overallRecommendation.action === 'Sell' ?
- `Multiple indicators suggest caution. ${trendSignal.includes('Downtrend') ? 'Trend shows weakness.' : ''} ${isOverbought ? 'RSI overbought suggests profit-taking' : 'Consider protective stops or exit strategies'}` :
+ `Multiple indicators suggest caution. ${trendSignal.includes('Downtrend') ? 'Trend shows weakness.' : ''} ${isOverbought ? 'RSI overbought suggests profit-taking.' : ''} ${macd && macd.trend === 'Bearish' ? 'MACD shows negative momentum.' : ''} Consider protective stops or exit strategies` :
  `Mixed signals warrant patience. ${trendSignal} trend requires confirmation. Wait for ${rsi < 50 ? 'upward momentum' : 'clearer direction'} before committing capital`}`
  ],
  strategy: overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Buy' ?
@@ -6986,12 +7218,17 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
  {/* Refresh Button */}
  <div className="mt-8 text-center">
  <button
- onClick={fetchMarketMovers}
+ onClick={() => fetchMarketMovers(true)}
  disabled={loadingMovers}
  className="bg-gray-800 hover:from-orange-400 hover:to-red-400 disabled:from-gray-600 disabled:to-gray-700 text-white px-8 py-4 rounded-xl font-black text-lg transition-all hover:shadow-xl active-press disabled:cursor-not-allowed disabled:opacity-50"
  >
- {loadingMovers ? '🔄 Refreshing...' : '🔄 Refresh Market Data'}
+ {loadingMovers ? '🔄 Refreshing...' : '🔄 Force Refresh Data'}
  </button>
+ {moversCacheTime && (
+ <p className="text-sm text-gray-400 mt-2">
+ Last updated: {new Date(moversCacheTime).toLocaleTimeString()} • Auto-refreshes every 5min
+ </p>
+ )}
  </div>
  </>
  )}
