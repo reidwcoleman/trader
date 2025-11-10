@@ -428,12 +428,12 @@
             submitBtn.textContent = 'Creating Account...';
 
             try {
-                const response = await fetch('/api/auth/register', {
+                const response = await fetch('/api/accounts/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ name, email, password })
+                    body: JSON.stringify({ userName: name, email, password })
                 });
 
                 const data = await response.json();
