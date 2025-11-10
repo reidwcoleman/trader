@@ -73,7 +73,30 @@
             const [copySuccess, setCopySuccess] = useState(false);
             const [competition, setCompetition] = useState(null);
 
-            const [watchlist, setWatchlist] = useState([]);
+            // Initialize with data-driven top stocks for analysis
+            // Based on: Growth potential, market cap, industry leaders, institutional interest
+            const [watchlist, setWatchlist] = useState([
+                'NVDA',  // NVIDIA - AI/GPU leader, strong growth
+                'MSFT',  // Microsoft - Cloud/AI, stable growth
+                'GOOGL', // Alphabet - Search/AI dominance
+                'AAPL',  // Apple - Strong ecosystem, buybacks
+                'META',  // Meta - AI investments, ad revenue growth
+                'AMZN',  // Amazon - Cloud & e-commerce leader
+                'TSLA',  // Tesla - EV leader, energy growth
+                'AMD',   // AMD - Semiconductor growth, AI chips
+                'TSM',   // TSMC - Chip manufacturing leader
+                'AVGO',  // Broadcom - AI infrastructure
+                'PLTR',  // Palantir - AI/Data analytics growth
+                'NOW',   // ServiceNow - Enterprise AI
+                'CRM',   // Salesforce - Enterprise software
+                'COIN',  // Coinbase - Crypto exposure
+                'SQ',    // Block - Fintech innovation
+                'SHOP',  // Shopify - E-commerce platform
+                'NET',   // Cloudflare - Network infrastructure
+                'DDOG',  // Datadog - Cloud monitoring
+                'SNOW',  // Snowflake - Data warehousing
+                'CRWD'   // CrowdStrike - Cybersecurity leader
+            ]);
             const [stocks, setStocks] = useState([]);
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState(null);
@@ -584,7 +607,19 @@
                     'META': 'Meta Platforms',
                     'NFLX': 'Netflix Inc.',
                     'AMD': 'Advanced Micro Devices',
-                    'DIS': 'Walt Disney Co.'
+                    'DIS': 'Walt Disney Co.',
+                    'TSM': 'Taiwan Semiconductor',
+                    'AVGO': 'Broadcom Inc.',
+                    'PLTR': 'Palantir Technologies',
+                    'NOW': 'ServiceNow Inc.',
+                    'CRM': 'Salesforce Inc.',
+                    'COIN': 'Coinbase Global',
+                    'SQ': 'Block Inc.',
+                    'SHOP': 'Shopify Inc.',
+                    'NET': 'Cloudflare Inc.',
+                    'DDOG': 'Datadog Inc.',
+                    'SNOW': 'Snowflake Inc.',
+                    'CRWD': 'CrowdStrike Holdings'
                 };
                 return names[symbol] || symbol;
             };
@@ -3934,6 +3969,12 @@
                                                     <a href="about-cameron.html" className="group/link relative text-gray-400 hover:text-cyan-300 text-sm transition-all font-semibold flex items-center gap-2">
                                                         <span className="text-cyan-500/50 group-hover/link:text-cyan-400 transition-colors">→</span>
                                                         <span>Meet Cameron</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="invest.html" className="group/link relative text-gray-400 hover:text-cyan-300 text-sm transition-all font-semibold flex items-center gap-2">
+                                                        <span className="text-cyan-500/50 group-hover/link:text-cyan-400 transition-colors">→</span>
+                                                        <span>Invest in UltraThink</span>
                                                     </a>
                                                 </li>
                                             </ul>
