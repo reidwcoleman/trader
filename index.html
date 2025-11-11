@@ -1630,10 +1630,256 @@
                 const stopLossDistance = atr * 1.5;
                 const takeProfitDistance = atr * 3; // 2:1 reward/risk ratio
 
+                // POSITION SIZING - Calculate based on portfolio and risk tolerance
+                const portfolioValue = balance || 100000; // Use current balance or default
+                const riskPercentage = riskLevel === 'High' ? 0.01 : riskLevel === 'Moderate' ? 0.02 : 0.03; // 1-3% risk per trade
+                const dollarRisk = portfolioValue * riskPercentage;
+                const stopLossPercentage = (stopLossDistance / price) * 100;
+                const suggestedShares = Math.floor(dollarRisk / stopLossDistance);
+                const positionValue = suggestedShares * price;
+                const positionSizePercent = ((positionValue / portfolioValue) * 100).toFixed(1);
+
+                // ACTION TIMELINE - Determine urgency
+                const now = new Date();
+                const marketOpen = new Date(now);
+                marketOpen.setHours(9, 30, 0, 0); // 9:30 AM
+                const marketClose = new Date(now);
+                marketClose.setHours(16, 0, 0, 0); // 4:00 PM
+                const isMarketHours = now >= marketOpen && now <= marketClose && now.getDay() !== 0 && now.getDay() !== 6;
+                const minutesToClose = isMarketHours ? Math.floor((marketClose - now) / 60000) : 0;
+
+                const actionTiming = (() => {
+                    if (overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Strong Sell') {
+                        return isMarketHours ?
+                            `EXECUTE NOW - High conviction signal. Act within next 30 minutes.` :
+                            `PREPARE ORDER - Set limit order for market open tomorrow.`;
+                    }
+                    if (overallRecommendation.action === 'Buy') {
+                        return isMarketHours ?
+                            `BUY TODAY - Execute before close (${minutesToClose} minutes remaining) if price ≤ $${(price * 1.01).toFixed(2)}` :
+                            `SET ALERT - Enter if price drops to support at $${support} during next session.`;
+                    }
+                    if (overallRecommendation.action === 'Sell') {
+                        return isMarketHours ?
+                            `SELL TODAY - Exit position before close (${minutesToClose} minutes remaining)` :
+                            `PREPARE EXIT - Set limit order to sell at market open.`;
+                    }
+                    return `WAIT - Monitor for price action confirmation. Set price alerts at $${support} (support) and $${resistance} (resistance).`;
+                })();
+
+                // SIGNAL STRENGTH - 0-100 scale combining all factors
+                const signalStrength = Math.round(Math.max(0, Math.min(100,
+                    50 + (compositeScore * 8) + (overallRecommendation.confidence - 50) / 2
+                )));
+
+                // MULTI-SCENARIO EXIT PLANS
+                const bullTarget = (price + takeProfitDistance).toFixed(2);
+                const baseTarget = (price + takeProfitDistance * 0.65).toFixed(2);
+                const stopLossPrice = Math.max(0, price - stopLossDistance).toFixed(2);
+                const emergencyStop = Math.max(0, price * 0.92).toFixed(2); // 8% hard stop
+
+                const exitPlan = {
+                    bull: {
+                        target: bullTarget,
+                        gain: ((bullTarget - price) / price * 100).toFixed(1),
+                        action: `Price reaches $${bullTarget} → Sell 50% of position, move stop-loss to breakeven ($${price.toFixed(2)}), let remaining 50% run with 5% trailing stop`
+                    },
+                    base: {
+                        target: baseTarget,
+                        gain: ((baseTarget - price) / price * 100).toFixed(1),
+                        action: `Price reaches $${baseTarget} → Sell 75% of position, keep 25% with stop at $${(price * 1.03).toFixed(2)}`
+                    },
+                    bear: {
+                        target: stopLossPrice,
+                        loss: ((stopLossPrice - price) / price * 100).toFixed(1),
+                        action: `Price drops to $${stopLossPrice} → Exit 100% immediately (planned stop-loss)`
+                    },
+                    emergency: {
+                        target: emergencyStop,
+                        loss: '-8.0',
+                        action: `Price drops to $${emergencyStop} → EMERGENCY EXIT 100% (hard stop, no exceptions)`
+                    }
+                };
+
+                // NATURAL LANGUAGE ACTION SUMMARY
+                const orderType = Math.abs(momentum) > 2 ? 'market order' : `limit order at $${(price * (overallRecommendation.action.includes('Buy') ? 1.005 : 0.995)).toFixed(2)}`;
+                const timeframe = overallRecommendation.action.includes('Strong') ? 'immediately' :
+                                 isMarketHours ? 'before market close today' : 'at market open tomorrow';
+
+                const actionSummary = (() => {
+                    if (overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Buy') {
+                        return `${overallRecommendation.action.toUpperCase()} ${suggestedShares} shares of ${selectedStock} ${timeframe} using ${orderType} ($${price.toFixed(2)} range), set stop-loss at $${stopLossPrice}, target $${bullTarget}, hold for ${Math.ceil(takeProfitDistance / (price * 0.02))} - ${Math.ceil(takeProfitDistance / (price * 0.01))} trading days. Position size: $${positionValue.toFixed(0)} (${positionSizePercent}% of portfolio).`;
+                    }
+                    if (overallRecommendation.action === 'Strong Sell' || overallRecommendation.action === 'Sell') {
+                        return `${overallRecommendation.action.toUpperCase()} your ${selectedStock} position ${timeframe} using ${orderType}. Current price: $${price.toFixed(2)}. ${isOverbought ? 'Stock is overbought (RSI: ' + rsi.toFixed(1) + ')' : 'Downward momentum detected'}. Set stop-buy at $${resistance} in case trend reverses.`;
+                    }
+                    return `HOLD - Do not enter ${selectedStock} position yet. Current price: $${price.toFixed(2)} shows mixed signals (confidence: ${overallRecommendation.confidence}%). Wait for confirmation. Set alerts: BUY if price breaks above $${resistance} with volume, or SELL if drops below $${support}.`;
+                })();
+
+                // EXECUTION CHECKLIST
+                const checklist = [
+                    { task: `Verify current ${selectedStock} price (target: $${price.toFixed(2)})`, checked: false },
+                    { task: `Confirm available cash: $${(portfolioValue * 0.1).toFixed(0)}+ available`, checked: false },
+                    { task: `Set stop-loss order at $${stopLossPrice} (-${stopLossPercentage.toFixed(1)}%)`, checked: false },
+                    { task: `Set take-profit alert at $${bullTarget} (+${((bullTarget - price) / price * 100).toFixed(1)}%)`, checked: false },
+                    { task: `Position size confirmed: ${suggestedShares} shares = ${positionSizePercent}% of portfolio`, checked: false },
+                    { task: `Review latest news (${stockNews.length} articles analyzed, sentiment: ${newsSignal})`, checked: false }
+                ];
+
+                // CATALYST-BASED TRIGGERS - Event-driven trading signals
+                const catalysts = [];
+
+                // Check for upcoming earnings (simulate - typically 45 days between earnings)
+                const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+                const daysUntilEarnings = 45 - (dayOfYear % 45);
+                if (daysUntilEarnings <= 14) {
+                    const earningsDate = new Date(now);
+                    earningsDate.setDate(earningsDate.getDate() + daysUntilEarnings);
+                    catalysts.push({
+                        type: 'earnings',
+                        title: 'Earnings Report',
+                        daysAway: daysUntilEarnings,
+                        date: earningsDate.toLocaleDateString(),
+                        impact: daysUntilEarnings <= 3 ? 'high' : daysUntilEarnings <= 7 ? 'medium' : 'low',
+                        recommendation: daysUntilEarnings <= 3 ?
+                            `⚠️ WAIT - Earnings in ${daysUntilEarnings} days. High volatility expected. Consider entering AFTER report if results beat expectations by 5%+` :
+                            `📅 WATCH - Earnings in ${daysUntilEarnings} days. ${overallRecommendation.action.includes('Buy') ? 'Can enter now but reduce position size by 50% due to earnings risk' : 'Monitor for post-earnings entry opportunity'}`
+                    });
+                }
+
+                // News-based catalysts
+                if (stockNews.length > 0) {
+                    const recentPositive = stockNews.filter(n => n.sentiment === 'positive').length;
+                    const recentNegative = stockNews.filter(n => n.sentiment === 'negative').length;
+
+                    if (recentPositive >= 5 && sentimentScore > 60) {
+                        catalysts.push({
+                            type: 'news',
+                            title: 'Strong Positive News Flow',
+                            daysAway: 0,
+                            date: 'Ongoing',
+                            impact: 'high',
+                            recommendation: `🚀 BUY NOW - ${recentPositive} positive articles in recent cycle creating momentum. Strike while sentiment is hot. Set alerts for sentiment reversal.`
+                        });
+                    } else if (recentNegative >= 5 && sentimentScore < -60) {
+                        catalysts.push({
+                            type: 'news',
+                            title: 'Negative News Cycle',
+                            daysAway: 0,
+                            date: 'Ongoing',
+                            impact: 'high',
+                            recommendation: `🛑 AVOID - ${recentNegative} negative articles indicate trouble. Wait 2-3 weeks for sentiment to stabilize before considering entry.`
+                        });
+                    }
+                }
+
+                // Technical breakout catalysts
+                if (price >= parseFloat(resistance) * 0.98) {
+                    catalysts.push({
+                        type: 'technical',
+                        title: 'Approaching Resistance Breakout',
+                        daysAway: 0,
+                        date: 'Imminent',
+                        impact: 'medium',
+                        recommendation: `📈 SET ALERT - Price near resistance ($${resistance}). If breaks above with volume, BUY immediately. Target +${((parseFloat(resistance) * 1.1 - price) / price * 100).toFixed(1)}% move.`
+                    });
+                } else if (price <= parseFloat(support) * 1.02) {
+                    catalysts.push({
+                        type: 'technical',
+                        title: 'Testing Support Level',
+                        daysAway: 0,
+                        date: 'Imminent',
+                        impact: 'medium',
+                        recommendation: `💎 BUYING OPPORTUNITY - Price testing support ($${support}). ${overallRecommendation.action.includes('Buy') ? 'Strong buy zone if support holds' : 'Wait for bounce confirmation before entering'}. Set stop below $${(parseFloat(support) * 0.97).toFixed(2)}.`
+                    });
+                }
+
+                // RSI extreme catalysts
+                if (rsi >= 75) {
+                    catalysts.push({
+                        type: 'technical',
+                        title: 'Extremely Overbought (RSI)',
+                        daysAway: 0,
+                        date: 'Current',
+                        impact: 'high',
+                        recommendation: `⚠️ TAKE PROFITS - RSI at ${rsi.toFixed(1)} indicates extreme overbought. If holding, sell 50-75% here. If not holding, wait for pullback to RSI 50-60 before entering.`
+                    });
+                } else if (rsi <= 25) {
+                    catalysts.push({
+                        type: 'technical',
+                        title: 'Extremely Oversold (RSI)',
+                        daysAway: 0,
+                        date: 'Current',
+                        impact: 'high',
+                        recommendation: `💰 STRONG BUY ZONE - RSI at ${rsi.toFixed(1)} indicates extreme oversold. High probability bounce incoming. Enter with 50% position now, add remaining 50% if RSI crosses above 30.`
+                    });
+                }
+
+                // Moving average catalysts
+                if (ma50 && ma200 && Math.abs(ma50 - ma200) / ma200 < 0.02 && price > ma50) {
+                    if (ma50 > ma200) {
+                        catalysts.push({
+                            type: 'technical',
+                            title: 'Potential Golden Cross',
+                            daysAway: 0,
+                            date: 'Forming',
+                            impact: 'high',
+                            recommendation: `🌟 STRONG BUY - 50-day MA ($${ma50.toFixed(2)}) crossing above 200-day MA ($${ma200.toFixed(2)}). Golden Cross pattern = strong bullish signal. Target +15-20% over next 2-3 months.`
+                        });
+                    }
+                } else if (ma50 && ma200 && Math.abs(ma50 - ma200) / ma200 < 0.02 && price < ma50) {
+                    if (ma50 < ma200) {
+                        catalysts.push({
+                            type: 'technical',
+                            title: 'Death Cross Warning',
+                            daysAway: 0,
+                            date: 'Forming',
+                            impact: 'high',
+                            recommendation: `☠️ EXIT NOW - 50-day MA ($${ma50.toFixed(2)}) crossing below 200-day MA ($${ma200.toFixed(2)}). Death Cross pattern = strong bearish signal. Exit all positions. Re-evaluate in 1-2 months.`
+                        });
+                    }
+                }
+
+                // Market hours catalyst
+                if (!isMarketHours && (overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Strong Sell')) {
+                    catalysts.push({
+                        type: 'timing',
+                        title: 'Market Closed - High Conviction Signal',
+                        daysAway: 0,
+                        date: 'Next Open',
+                        impact: 'medium',
+                        recommendation: `⏰ PREPARE ORDER - Market currently closed. ${overallRecommendation.action} signal with ${overallRecommendation.confidence}% confidence. Set limit order for market open at $${(price * (overallRecommendation.action.includes('Buy') ? 1.005 : 0.995)).toFixed(2)} to execute at open.`
+                    });
+                }
+
                 const analysis = {
                     symbol: selectedStock,
                     name: stock.name,
                     timestamp: new Date().toLocaleString(),
+
+                    // NEW: Action Summary (Top Priority)
+                    actionSummary,
+                    actionTiming,
+                    signalStrength,
+
+                    // NEW: Position Sizing
+                    positionSizing: {
+                        suggestedShares,
+                        positionValue: positionValue.toFixed(2),
+                        positionPercent: positionSizePercent,
+                        dollarRisk: dollarRisk.toFixed(2),
+                        riskPercent: (riskPercentage * 100).toFixed(1),
+                        stopLossPercent: stopLossPercentage.toFixed(2)
+                    },
+
+                    // NEW: Exit Plan
+                    exitPlan,
+
+                    // NEW: Execution Checklist
+                    checklist,
+
+                    // NEW: Catalyst-Based Triggers
+                    catalysts,
 
                     technical: {
                         signal: technicalSignal,
@@ -7545,6 +7791,244 @@
                                                     <div className="text-center text-sm text-purple-300">
                                                         Analysis generated: {aiAnalysis.timestamp}
                                                     </div>
+
+                                                    {/* SIGNAL STRENGTH METER */}
+                                                    <div className="bg-gradient-to-br from-purple-900/60 to-indigo-900/60 backdrop-blur-xl rounded-2xl p-8 border-2 border-purple-500/50 shadow-2xl">
+                                                        <h3 className="text-2xl font-black text-white mb-4 text-center">📡 Signal Strength</h3>
+                                                        <div className="relative">
+                                                            <div className="w-full bg-gray-800 rounded-full h-8 overflow-hidden border-2 border-gray-700">
+                                                                <div
+                                                                    className={`h-full rounded-full transition-all duration-1000 ${
+                                                                        aiAnalysis.signalStrength >= 80 ? 'bg-gradient-to-r from-green-500 via-green-400 to-emerald-500' :
+                                                                        aiAnalysis.signalStrength >= 60 ? 'bg-gradient-to-r from-lime-500 via-green-400 to-lime-500' :
+                                                                        aiAnalysis.signalStrength >= 40 ? 'bg-gradient-to-r from-yellow-500 via-yellow-400 to-amber-500' :
+                                                                        aiAnalysis.signalStrength >= 20 ? 'bg-gradient-to-r from-orange-500 via-orange-400 to-red-500' :
+                                                                        'bg-gradient-to-r from-red-500 via-red-600 to-red-700'
+                                                                    } flex items-center justify-center font-black text-white text-sm animate-pulse-glow-green`}
+                                                                    style={{ width: `${aiAnalysis.signalStrength}%` }}
+                                                                >
+                                                                    {aiAnalysis.signalStrength >= 15 && aiAnalysis.signalStrength + '/100'}
+                                                                </div>
+                                                            </div>
+                                                            {aiAnalysis.signalStrength < 15 && (
+                                                                <div className="absolute top-0 right-4 h-full flex items-center">
+                                                                    <span className="text-white font-black text-sm">{aiAnalysis.signalStrength}/100</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex justify-between text-xs text-gray-400 mt-2">
+                                                            <span>Strong Sell</span>
+                                                            <span>Neutral</span>
+                                                            <span>Strong Buy</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* ACTION SUMMARY - Natural Language */}
+                                                    <div className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 backdrop-blur-xl rounded-2xl p-8 border-4 border-cyan-500/50 shadow-2xl animate-pulse-glow-cyan">
+                                                        <div className="flex items-start gap-4">
+                                                            <div className="text-5xl">🚨</div>
+                                                            <div className="flex-1">
+                                                                <h3 className="text-2xl font-black text-cyan-300 mb-3">ACTION PLAN</h3>
+                                                                <p className="text-white text-lg leading-relaxed font-semibold">
+                                                                    {aiAnalysis.actionSummary}
+                                                                </p>
+                                                                <div className="mt-4 bg-black/30 rounded-xl p-4 border-2 border-cyan-500/30">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-2xl">⏰</span>
+                                                                        <span className="text-cyan-200 font-bold text-lg">{aiAnalysis.actionTiming}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* POSITION SIZING */}
+                                                    <div className="bg-gradient-to-br from-emerald-900/60 to-green-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-emerald-500/50 shadow-2xl">
+                                                        <h3 className="text-2xl font-black text-emerald-300 mb-4 flex items-center gap-2">
+                                                            💰 Position Sizing
+                                                        </h3>
+                                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
+                                                                <div className="text-sm text-emerald-300 mb-1">Suggested Shares</div>
+                                                                <div className="text-white font-black text-2xl">{aiAnalysis.positionSizing.suggestedShares}</div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
+                                                                <div className="text-sm text-emerald-300 mb-1">Position Value</div>
+                                                                <div className="text-white font-black text-2xl">${aiAnalysis.positionSizing.positionValue}</div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
+                                                                <div className="text-sm text-emerald-300 mb-1">Portfolio %</div>
+                                                                <div className="text-white font-black text-2xl">{aiAnalysis.positionSizing.positionPercent}%</div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
+                                                                <div className="text-sm text-emerald-300 mb-1">Risk Amount</div>
+                                                                <div className="text-white font-black text-xl">${aiAnalysis.positionSizing.dollarRisk}</div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
+                                                                <div className="text-sm text-emerald-300 mb-1">Risk %</div>
+                                                                <div className="text-white font-black text-xl">{aiAnalysis.positionSizing.riskPercent}%</div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
+                                                                <div className="text-sm text-emerald-300 mb-1">Stop Loss %</div>
+                                                                <div className="text-red-300 font-black text-xl">-{aiAnalysis.positionSizing.stopLossPercent}%</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* EXIT PLAN - Multi-Scenario */}
+                                                    <div className="bg-gradient-to-br from-orange-900/60 to-red-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-orange-500/50 shadow-2xl">
+                                                        <h3 className="text-2xl font-black text-orange-300 mb-4 flex items-center gap-2">
+                                                            🎯 Exit Strategy (4 Scenarios)
+                                                        </h3>
+                                                        <div className="space-y-4">
+                                                            {/* Bull Case */}
+                                                            <div className="bg-green-950/50 rounded-xl p-5 border-2 border-green-500/50">
+                                                                <div className="flex items-center justify-between mb-3">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-2xl">📈</span>
+                                                                        <span className="text-green-300 font-black text-lg">BULL CASE</span>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <div className="text-green-300 font-black text-xl">${aiAnalysis.exitPlan.bull.target}</div>
+                                                                        <div className="text-green-400 text-sm">+{aiAnalysis.exitPlan.bull.gain}%</div>
+                                                                    </div>
+                                                                </div>
+                                                                <p className="text-green-100 text-sm">{aiAnalysis.exitPlan.bull.action}</p>
+                                                            </div>
+
+                                                            {/* Base Case */}
+                                                            <div className="bg-blue-950/50 rounded-xl p-5 border-2 border-blue-500/50">
+                                                                <div className="flex items-center justify-between mb-3">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-2xl">📊</span>
+                                                                        <span className="text-blue-300 font-black text-lg">BASE CASE</span>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <div className="text-blue-300 font-black text-xl">${aiAnalysis.exitPlan.base.target}</div>
+                                                                        <div className="text-blue-400 text-sm">+{aiAnalysis.exitPlan.base.gain}%</div>
+                                                                    </div>
+                                                                </div>
+                                                                <p className="text-blue-100 text-sm">{aiAnalysis.exitPlan.base.action}</p>
+                                                            </div>
+
+                                                            {/* Bear Case */}
+                                                            <div className="bg-yellow-950/50 rounded-xl p-5 border-2 border-yellow-500/50">
+                                                                <div className="flex items-center justify-between mb-3">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-2xl">📉</span>
+                                                                        <span className="text-yellow-300 font-black text-lg">BEAR CASE</span>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <div className="text-yellow-300 font-black text-xl">${aiAnalysis.exitPlan.bear.target}</div>
+                                                                        <div className="text-red-400 text-sm">{aiAnalysis.exitPlan.bear.loss}%</div>
+                                                                    </div>
+                                                                </div>
+                                                                <p className="text-yellow-100 text-sm">{aiAnalysis.exitPlan.bear.action}</p>
+                                                            </div>
+
+                                                            {/* Emergency Stop */}
+                                                            <div className="bg-red-950/50 rounded-xl p-5 border-2 border-red-500/50 animate-pulse-glow-red">
+                                                                <div className="flex items-center justify-between mb-3">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-2xl">🚨</span>
+                                                                        <span className="text-red-300 font-black text-lg">EMERGENCY STOP</span>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <div className="text-red-300 font-black text-xl">${aiAnalysis.exitPlan.emergency.target}</div>
+                                                                        <div className="text-red-400 text-sm">{aiAnalysis.exitPlan.emergency.loss}%</div>
+                                                                    </div>
+                                                                </div>
+                                                                <p className="text-red-100 text-sm font-bold">{aiAnalysis.exitPlan.emergency.action}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* EXECUTION CHECKLIST */}
+                                                    <div className="bg-gradient-to-br from-indigo-900/60 to-purple-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-indigo-500/50 shadow-2xl">
+                                                        <h3 className="text-2xl font-black text-indigo-300 mb-4 flex items-center gap-2">
+                                                            ✅ Pre-Trade Checklist
+                                                        </h3>
+                                                        <div className="space-y-3">
+                                                            {aiAnalysis.checklist.map((item, idx) => (
+                                                                <div key={idx} className="flex items-start gap-3 bg-black/30 rounded-lg p-4 border border-indigo-500/30 hover:bg-indigo-900/20 transition-all">
+                                                                    <div className="flex-shrink-0 w-6 h-6 rounded border-2 border-indigo-400 flex items-center justify-center mt-0.5">
+                                                                        <span className="text-indigo-400 text-sm">□</span>
+                                                                    </div>
+                                                                    <span className="text-indigo-100 flex-1">{item.task}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                        <div className="mt-4 bg-yellow-900/30 border-2 border-yellow-500/50 rounded-xl p-4">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-2xl">⚠️</span>
+                                                                <span className="text-yellow-200 font-bold">Review all items before executing your trade!</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* CATALYST-BASED TRIGGERS */}
+                                                    {aiAnalysis.catalysts && aiAnalysis.catalysts.length > 0 && (
+                                                        <div className="bg-gradient-to-br from-pink-900/60 to-fuchsia-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-pink-500/50 shadow-2xl">
+                                                            <h3 className="text-2xl font-black text-pink-300 mb-4 flex items-center gap-2">
+                                                                ⚡ Event Catalysts & Triggers
+                                                            </h3>
+                                                            <div className="space-y-4">
+                                                                {aiAnalysis.catalysts.map((catalyst, idx) => (
+                                                                    <div
+                                                                        key={idx}
+                                                                        className={`rounded-xl p-5 border-2 ${
+                                                                            catalyst.impact === 'high' ? 'bg-red-950/50 border-red-500/50 animate-pulse-glow-red' :
+                                                                            catalyst.impact === 'medium' ? 'bg-yellow-950/50 border-yellow-500/50' :
+                                                                            'bg-blue-950/50 border-blue-500/50'
+                                                                        }`}
+                                                                    >
+                                                                        <div className="flex items-start justify-between mb-3">
+                                                                            <div className="flex-1">
+                                                                                <div className="flex items-center gap-2 mb-2">
+                                                                                    <span className={`font-black text-lg ${
+                                                                                        catalyst.impact === 'high' ? 'text-red-300' :
+                                                                                        catalyst.impact === 'medium' ? 'text-yellow-300' :
+                                                                                        'text-blue-300'
+                                                                                    }`}>
+                                                                                        {catalyst.title}
+                                                                                    </span>
+                                                                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                                                                        catalyst.impact === 'high' ? 'bg-red-500/30 text-red-200' :
+                                                                                        catalyst.impact === 'medium' ? 'bg-yellow-500/30 text-yellow-200' :
+                                                                                        'bg-blue-500/30 text-blue-200'
+                                                                                    }`}>
+                                                                                        {catalyst.impact.toUpperCase()} IMPACT
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="text-sm text-gray-300 mb-2">
+                                                                                    {catalyst.daysAway > 0 ? (
+                                                                                        <span>📅 {catalyst.daysAway} days away • {catalyst.date}</span>
+                                                                                    ) : (
+                                                                                        <span>🔴 {catalyst.date}</span>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className={`text-sm leading-relaxed ${
+                                                                            catalyst.impact === 'high' ? 'text-red-100' :
+                                                                            catalyst.impact === 'medium' ? 'text-yellow-100' :
+                                                                            'text-blue-100'
+                                                                        }`}>
+                                                                            {catalyst.recommendation}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                            <div className="mt-4 bg-pink-950/30 border-2 border-pink-500/50 rounded-xl p-4">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-2xl">💡</span>
+                                                                    <span className="text-pink-200 font-bold">
+                                                                        {aiAnalysis.catalysts.length} active {aiAnalysis.catalysts.length === 1 ? 'catalyst' : 'catalysts'} detected. Adjust your strategy accordingly.
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
 
                                                     {/* Main Recommendation */}
                                                     <div className={`bg-gradient-to-br ${
