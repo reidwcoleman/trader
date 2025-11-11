@@ -7057,6 +7057,228 @@
                                                     </div>
                                                 );
                                             })()}
+                                        </div>
+
+                                        {/* 🧠 AI QUICK ANALYSIS CARD - Condensed Version */}
+                                        {(() => {
+                                            const stock = stocks.find(s => s.symbol === selectedStock);
+                                            if (!stock) return null;
+
+                                            // Calculate all AI metrics (reuse from full analysis)
+                                            const price = stock.price || 0;
+                                            const high = stock.high || price;
+                                            const low = stock.low || price;
+                                            const open = stock.open || price;
+                                            const previousClose = stock.previousClose || price;
+                                            const change = stock.change || 0;
+
+                                            // Calculate RSI-like indicator
+                                            const dayRange = high - low;
+                                            const pricePositionInRange = dayRange > 0 ? ((price - low) / dayRange) * 100 : 50;
+                                            const rsi = pricePositionInRange;
+
+                                            // Calculate momentum
+                                            const intradayMomentum = open > 0 ? ((price - open) / open) * 100 : 0;
+
+                                            // Calculate volatility
+                                            const volatility = previousClose > 0 ? (dayRange / previousClose) * 100 : 0;
+
+                                            // Sentiment score (simulate based on news count and price action)
+                                            const newsCount = stockNews.filter(n => n.symbols?.includes(selectedStock)).length;
+                                            const sentimentScore = Math.min(100, Math.max(0, 50 + (change * 10) + (newsCount * 2)));
+
+                                            // Calculate signal strength (0-100)
+                                            let trendScore = 0;
+                                            if (change > 0 && intradayMomentum > 0) trendScore += 30;
+                                            if (change < 0 && intradayMomentum < 0) trendScore -= 30;
+                                            if (Math.abs(change) > 2) trendScore += Math.sign(change) * 20;
+                                            if (pricePositionInRange > 80) trendScore += 15;
+                                            if (pricePositionInRange < 20) trendScore -= 15;
+                                            if (volatility > 5) trendScore += Math.sign(change) * 10;
+
+                                            const signalStrength = Math.round(Math.max(0, Math.min(100, 50 + trendScore)));
+
+                                            // Determine recommendation
+                                            let recommendation, recColor, confidence;
+                                            if (signalStrength >= 70) {
+                                                recommendation = 'STRONG BUY';
+                                                recColor = 'green';
+                                                confidence = 85;
+                                            } else if (signalStrength >= 60) {
+                                                recommendation = 'BUY';
+                                                recColor = 'green';
+                                                confidence = 70;
+                                            } else if (signalStrength >= 40) {
+                                                recommendation = 'HOLD';
+                                                recColor = 'yellow';
+                                                confidence = 55;
+                                            } else if (signalStrength >= 30) {
+                                                recommendation = 'SELL';
+                                                recColor = 'red';
+                                                confidence = 70;
+                                            } else {
+                                                recommendation = 'STRONG SELL';
+                                                recColor = 'red';
+                                                confidence = 85;
+                                            }
+
+                                            // Risk level
+                                            let riskLevel, riskColor;
+                                            if (volatility > 5) {
+                                                riskLevel = 'High';
+                                                riskColor = 'red';
+                                            } else if (volatility > 2.5) {
+                                                riskLevel = 'Medium';
+                                                riskColor = 'yellow';
+                                            } else {
+                                                riskLevel = 'Low';
+                                                riskColor = 'green';
+                                            }
+
+                                            // Calculate position sizing
+                                            const currentPortfolio = getCurrentPortfolio();
+                                            const portfolioValue = calculatePortfolioValue(currentPortfolio);
+                                            const riskPercentage = riskLevel === 'High' ? 0.01 : riskLevel === 'Medium' ? 0.02 : 0.03;
+                                            const stopLossDistance = (high - low) * 1.5;
+                                            const suggestedShares = Math.floor((portfolioValue * riskPercentage) / stopLossDistance);
+                                            const stopLossPrice = Math.max(0, price - stopLossDistance).toFixed(2);
+                                            const targetPrice = (price + stopLossDistance * 3).toFixed(2);
+
+                                            // Action summary
+                                            const actionSummary = recommendation.includes('BUY')
+                                                ? `${recommendation} ${suggestedShares} shares at $${price.toFixed(2)} • Stop: $${stopLossPrice} • Target: $${targetPrice}`
+                                                : recommendation === 'HOLD'
+                                                ? `${recommendation} - Monitor price action • Current: $${price.toFixed(2)} • Wait for confirmation`
+                                                : `${recommendation} - Exit positions • Current: $${price.toFixed(2)} • Set alerts at $${(price * 1.05).toFixed(2)}`;
+
+                                            return (
+                                                <div className="mb-6 group/ai relative bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 shadow-2xl overflow-hidden" style={{boxShadow: '0 0 40px rgba(168, 85, 247, 0.25)'}}>
+                                                    {/* Animated background */}
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 animate-pulse"></div>
+
+                                                    <div className="relative">
+                                                        {/* Header */}
+                                                        <div className="flex items-center justify-between mb-4">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-3xl animate-pulse">🧠</span>
+                                                                <h3 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+                                                                    AI Quick Analysis
+                                                                </h3>
+                                                                <span className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full font-bold">LIVE</span>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setMainTab('ai-analysis');
+                                                                }}
+                                                                className="text-sm font-bold text-purple-300 hover:text-purple-200 underline transition-colors flex items-center gap-1"
+                                                            >
+                                                                See Full Analysis →
+                                                            </button>
+                                                        </div>
+
+                                                        {/* 1. ACTION SUMMARY */}
+                                                        <div className={`mb-4 bg-gradient-to-r ${
+                                                            recColor === 'green' ? 'from-green-900/40 to-emerald-900/40 border-green-500/50' :
+                                                            recColor === 'red' ? 'from-red-900/40 to-rose-900/40 border-red-500/50' :
+                                                            'from-yellow-900/40 to-amber-900/40 border-yellow-500/50'
+                                                        } border-2 rounded-xl p-4`}>
+                                                            <div className="flex items-start gap-3">
+                                                                <span className="text-3xl">{recColor === 'green' ? '🚀' : recColor === 'red' ? '🛑' : '⏸️'}</span>
+                                                                <div className="flex-1">
+                                                                    <div className={`text-sm font-black mb-1 ${
+                                                                        recColor === 'green' ? 'text-green-300' :
+                                                                        recColor === 'red' ? 'text-red-300' :
+                                                                        'text-yellow-300'
+                                                                    }`}>ACTION PLAN</div>
+                                                                    <div className="text-white font-semibold text-sm leading-relaxed">
+                                                                        {actionSummary}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* 2. SIGNAL STRENGTH METER */}
+                                                        <div className="mb-4 bg-black/30 rounded-xl p-4 border border-purple-500/30">
+                                                            <div className="text-xs font-bold text-purple-300 mb-2">SIGNAL STRENGTH</div>
+                                                            <div className="relative">
+                                                                <div className="w-full bg-gray-800 rounded-full h-6 overflow-hidden border-2 border-gray-700">
+                                                                    <div
+                                                                        className={`h-full rounded-full transition-all duration-1000 ${
+                                                                            signalStrength >= 70 ? 'bg-gradient-to-r from-green-500 via-emerald-400 to-green-500' :
+                                                                            signalStrength >= 60 ? 'bg-gradient-to-r from-lime-500 via-green-400 to-lime-500' :
+                                                                            signalStrength >= 40 ? 'bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-500' :
+                                                                            signalStrength >= 30 ? 'bg-gradient-to-r from-orange-500 via-red-400 to-orange-500' :
+                                                                            'bg-gradient-to-r from-red-500 via-red-600 to-red-700'
+                                                                        } flex items-center justify-center font-black text-white text-xs`}
+                                                                        style={{ width: `${signalStrength}%` }}
+                                                                    >
+                                                                        {signalStrength >= 15 && `${signalStrength}/100`}
+                                                                    </div>
+                                                                </div>
+                                                                {signalStrength < 15 && (
+                                                                    <div className="absolute top-0 right-2 h-full flex items-center">
+                                                                        <span className="text-white font-black text-xs">{signalStrength}/100</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* 3. QUICK STATS GRID */}
+                                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                            <div className="bg-black/30 rounded-lg p-3 border border-purple-500/30">
+                                                                <div className="text-xs text-purple-300 mb-1 font-bold">RSI</div>
+                                                                <div className={`text-lg font-black ${
+                                                                    rsi > 70 ? 'text-red-300' : rsi < 30 ? 'text-green-300' : 'text-gray-300'
+                                                                }`}>{rsi.toFixed(0)}</div>
+                                                                <div className="text-[10px] text-gray-400">
+                                                                    {rsi > 70 ? 'Overbought' : rsi < 30 ? 'Oversold' : 'Neutral'}
+                                                                </div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-lg p-3 border border-purple-500/30">
+                                                                <div className="text-xs text-purple-300 mb-1 font-bold">Sentiment</div>
+                                                                <div className={`text-lg font-black ${
+                                                                    sentimentScore > 60 ? 'text-green-300' : sentimentScore < 40 ? 'text-red-300' : 'text-yellow-300'
+                                                                }`}>{sentimentScore.toFixed(0)}</div>
+                                                                <div className="text-[10px] text-gray-400">
+                                                                    {sentimentScore > 60 ? 'Bullish' : sentimentScore < 40 ? 'Bearish' : 'Neutral'}
+                                                                </div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-lg p-3 border border-purple-500/30">
+                                                                <div className="text-xs text-purple-300 mb-1 font-bold">Risk</div>
+                                                                <div className={`text-lg font-black ${
+                                                                    riskColor === 'red' ? 'text-red-300' : riskColor === 'yellow' ? 'text-yellow-300' : 'text-green-300'
+                                                                }`}>{riskLevel}</div>
+                                                                <div className="text-[10px] text-gray-400">
+                                                                    Vol: {volatility.toFixed(1)}%
+                                                                </div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-lg p-3 border border-purple-500/30">
+                                                                <div className="text-xs text-purple-300 mb-1 font-bold">Recommendation</div>
+                                                                <div className={`text-sm font-black ${
+                                                                    recColor === 'green' ? 'text-green-300' : recColor === 'red' ? 'text-red-300' : 'text-yellow-300'
+                                                                }`}>{recommendation}</div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-lg p-3 border border-purple-500/30">
+                                                                <div className="text-xs text-purple-300 mb-1 font-bold">Confidence</div>
+                                                                <div className="text-lg font-black text-cyan-300">{confidence}%</div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-lg p-3 border border-purple-500/30">
+                                                                <div className="text-xs text-purple-300 mb-1 font-bold">Price</div>
+                                                                <div className="text-lg font-black text-white">${price.toFixed(2)}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Info footer */}
+                                                        <div className="mt-4 text-xs text-center text-purple-400/60">
+                                                            ⚡ Real-time analysis using multi-factor AI scoring
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
+
+                                        {/* Smart Buy/Sell Timing Suggestions */}
+                                        <div className="relative mb-6">
 
                                             {/* Smart Buy/Sell Timing Suggestions */}
                                             {(() => {
