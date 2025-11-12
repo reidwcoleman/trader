@@ -121,6 +121,12 @@
             const [loadingLiveExample, setLoadingLiveExample] = useState(false); // Loading state for live example
             const [practiceScenario, setPracticeScenario] = useState(null); // Practice trading scenario
             const [practiceChoice, setPracticeChoice] = useState(null); // User's choice in practice scenario
+            const [scenarioDifficulty, setScenarioDifficulty] = useState(null); // Selected difficulty level for practice scenarios
+            const [scenariosCompleted, setScenariosCompleted] = useState(() => {
+                // Track completed scenarios by difficulty
+                const saved = localStorage.getItem('scenariosCompleted');
+                return saved ? JSON.parse(saved) : { Easy: 0, Medium: 0, Hard: 0 };
+            });
             const [glossarySearch, setGlossarySearch] = useState(''); // Glossary search term
             const [showGlossary, setShowGlossary] = useState(false); // Show glossary modal
             const [learningProgress, setLearningProgress] = useState(() => {
@@ -11799,18 +11805,94 @@
                                                 <p className="text-cyan-200 text-lg">Make decisions and see the outcomes - learn without risking real money</p>
                                             </div>
 
-                                            {!practiceScenario ? (
+                                            {!scenarioDifficulty ? (
                                                 <div className="text-center">
-                                                    <p className="text-white text-lg mb-6">Test your knowledge with a realistic trading scenario. Make decisions and see if you profit or lose!</p>
+                                                    <p className="text-white text-lg mb-6">Choose your difficulty level and test your trading knowledge!</p>
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                                                        {/* Easy Button */}
+                                                        <button
+                                                            onClick={() => setScenarioDifficulty('Easy')}
+                                                            className="bg-gradient-to-br from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white p-8 rounded-2xl border-2 border-green-400 transition-all hover:scale-105 shadow-xl"
+                                                        >
+                                                            <div className="text-5xl mb-3">🌱</div>
+                                                            <div className="text-2xl font-black mb-2">EASY</div>
+                                                            <div className="text-green-100 text-sm mb-4">Basic trading concepts</div>
+                                                            <div className="text-xs text-green-200">
+                                                                • Clear right answers<br/>
+                                                                • Fundamental concepts<br/>
+                                                                • 4 scenarios available<br/>
+                                                                • Completed: {scenariosCompleted.Easy}
+                                                            </div>
+                                                        </button>
+
+                                                        {/* Medium Button */}
+                                                        <button
+                                                            onClick={() => setScenarioDifficulty('Medium')}
+                                                            className="bg-gradient-to-br from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white p-8 rounded-2xl border-2 border-yellow-400 transition-all hover:scale-105 shadow-xl"
+                                                        >
+                                                            <div className="text-5xl mb-3">⚡</div>
+                                                            <div className="text-2xl font-black mb-2">MEDIUM</div>
+                                                            <div className="text-yellow-100 text-sm mb-4">Moderate complexity</div>
+                                                            <div className="text-xs text-yellow-200">
+                                                                • Multiple valid strategies<br/>
+                                                                • Real-world scenarios<br/>
+                                                                • 4 scenarios available<br/>
+                                                                • Completed: {scenariosCompleted.Medium}
+                                                            </div>
+                                                        </button>
+
+                                                        {/* Hard Button */}
+                                                        <button
+                                                            onClick={() => setScenarioDifficulty('Hard')}
+                                                            className="bg-gradient-to-br from-red-600 to-purple-700 hover:from-red-500 hover:to-purple-600 text-white p-8 rounded-2xl border-2 border-red-400 transition-all hover:scale-105 shadow-xl"
+                                                        >
+                                                            <div className="text-5xl mb-3">🔥</div>
+                                                            <div className="text-2xl font-black mb-2">HARD</div>
+                                                            <div className="text-red-100 text-sm mb-4">Advanced trading</div>
+                                                            <div className="text-xs text-red-200">
+                                                                • Complex situations<br/>
+                                                                • Subtle differences<br/>
+                                                                • 4 scenarios available<br/>
+                                                                • Completed: {scenariosCompleted.Hard}
+                                                            </div>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : !practiceScenario ? (
+                                                <div className="text-center">
+                                                    <div className="flex items-center justify-center gap-3 mb-6">
+                                                        <button
+                                                            onClick={() => {
+                                                                setScenarioDifficulty(null);
+                                                                setPracticeScenario(null);
+                                                                setPracticeChoice(null);
+                                                            }}
+                                                            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all"
+                                                        >
+                                                            ← Change Difficulty
+                                                        </button>
+                                                        <div className={`px-6 py-3 rounded-xl font-bold text-lg ${
+                                                            scenarioDifficulty === 'Easy' ? 'bg-green-600 text-white border-2 border-green-400' :
+                                                            scenarioDifficulty === 'Medium' ? 'bg-yellow-600 text-white border-2 border-yellow-400' :
+                                                            'bg-red-600 text-white border-2 border-red-400'
+                                                        }`}>
+                                                            {scenarioDifficulty === 'Easy' ? '🌱' : scenarioDifficulty === 'Medium' ? '⚡' : '🔥'} {scenarioDifficulty} Level
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-white text-lg mb-6">Ready to test your skills? Click below to start a random {scenarioDifficulty.toLowerCase()} scenario!</p>
                                                     <button
                                                         onClick={() => {
-                                                            const scenarios = [
+                                                            const allScenarios = [
+                                                                // EASY SCENARIOS (4 total)
                                                                 {
                                                                     id: 1,
+                                                                    difficulty: 'Easy',
                                                                     stock: 'NVDA',
                                                                     price: 485,
                                                                     situation: 'NVIDIA just broke above $480 resistance after strong earnings. Volume is 3x average. RSI is at 68. The stock has been consolidating for 2 weeks in a bull flag pattern.',
                                                                     question: 'What do you do?',
+                                                                    tip: 'Volume confirmation is key when entering breakout trades. Always use stop-losses.',
                                                                     options: [
                                                                         { text: 'Buy immediately at market price', correct: false, outcome: 'Stock pulled back to $470 the next day (-3%). You should wait for confirmation or use limit orders.', profit: -15 },
                                                                         { text: 'Buy with stop-loss at $475', correct: true, outcome: 'Great choice! Stock rallied to $515 (+6%). Your risk management protected you.', profit: 30 },
@@ -11820,10 +11902,12 @@
                                                                 },
                                                                 {
                                                                     id: 2,
+                                                                    difficulty: 'Easy',
                                                                     stock: 'SPY',
                                                                     price: 450,
                                                                     situation: 'S&P 500 ETF just hit all-time high. Market has rallied 8 days straight. Volume declining each day. Your friend says "it only goes up!"',
                                                                     question: 'What do you do?',
+                                                                    tip: 'Declining volume on rallies signals exhaustion. Wait for pullbacks to support levels.',
                                                                     options: [
                                                                         { text: 'Buy now - ride the trend!', correct: false, outcome: 'Market corrected 5% the next week. Declining volume = exhaustion. Lost $22.50/share.', profit: -22.50 },
                                                                         { text: 'Wait for pullback to support', correct: true, outcome: 'Excellent! Market pulled back to $440, you bought there and rode it to $465.', profit: 25 },
@@ -11833,19 +11917,161 @@
                                                                 },
                                                                 {
                                                                     id: 3,
+                                                                    difficulty: 'Easy',
                                                                     stock: 'TSLA',
                                                                     price: 180,
                                                                     situation: 'You bought Tesla at $180. It dropped to $172. Your stop-loss is at $172. Stock is testing support. You\'re down $800.',
                                                                     question: 'What do you do?',
+                                                                    tip: 'Never move stop-losses down. Accept small losses to prevent large ones.',
                                                                     options: [
                                                                         { text: 'Move stop-loss lower to $165', correct: false, outcome: 'Bad idea! Stock fell to $160. Lost $2,000 instead of $800. Never move stops down.', profit: -20 },
                                                                         { text: 'Let stop-loss trigger at $172', correct: true, outcome: 'Disciplined! You took -$800 loss. Stock fell to $165 before recovering. Protected capital.', profit: -8 },
                                                                         { text: 'Average down - buy more at $172', correct: false, outcome: 'Risky! Stock fell to $165. Now you lost $1,500 on larger position. Don\'t average down losers.', profit: -15 },
                                                                         { text: 'Hold and hope it bounces', correct: false, outcome: 'Hope is not a strategy. Stock fell to $160 (-$2,000 loss) before recovering weeks later.', profit: -20 }
                                                                     ]
+                                                                },
+                                                                {
+                                                                    id: 4,
+                                                                    difficulty: 'Easy',
+                                                                    stock: 'AAPL',
+                                                                    price: 175,
+                                                                    situation: 'Apple announces a dividend of $0.50/share (ex-dividend date tomorrow). Stock is trading at $175. Your research shows the stock typically drops by the dividend amount on ex-div date.',
+                                                                    question: 'What\'s your dividend capture strategy?',
+                                                                    tip: 'Dividend capture requires buying before ex-date, but stocks often drop by the dividend amount.',
+                                                                    options: [
+                                                                        { text: 'Buy today, sell after dividend', correct: true, outcome: 'Good! Collected $0.50 dividend. Stock dropped to $174.60, but you netted $0.10/share profit.', profit: 0.10 },
+                                                                        { text: 'Wait and buy after ex-date drop', correct: true, outcome: 'Smart! Stock dropped to $174.50, you bought and rode recovery to $176.', profit: 1.50 },
+                                                                        { text: 'Ignore - dividends are too small', correct: false, outcome: 'Missed opportunity. Dividend strategies can provide steady income with proper execution.', profit: 0 },
+                                                                        { text: 'Short before ex-date', correct: false, outcome: 'Risky! Stock rallied before ex-date on dividend buyers. Lost $1/share.', profit: -1 }
+                                                                    ]
+                                                                },
+                                                                // MEDIUM SCENARIOS (4 total)
+                                                                {
+                                                                    id: 5,
+                                                                    difficulty: 'Medium',
+                                                                    stock: 'AMZN',
+                                                                    price: 145,
+                                                                    situation: 'Amazon reports earnings after market close today. Stock at $145. Analysts expect EPS of $1.20, revenue $140B. Options implied volatility is elevated (IV at 60%). Stock has been range-bound $140-$150 for 3 weeks.',
+                                                                    question: 'How do you play this earnings event?',
+                                                                    tip: 'High IV means expensive options. Earnings can move either direction. Consider risk/reward.',
+                                                                    options: [
+                                                                        { text: 'Buy stock before earnings', correct: false, outcome: 'Stock beat estimates but only moved to $147 (+1.4%). Could have been worse with a miss.', profit: 2 },
+                                                                        { text: 'Buy after earnings reaction settles', correct: true, outcome: 'Excellent! Stock beat, gapped to $152, then pulled back to $148. You bought the dip and rode to $155.', profit: 7 },
+                                                                        { text: 'Sell put options before earnings', correct: false, outcome: 'Stock beat but IV crushed your premium gains. Only made $0.50/share on risky position.', profit: 0.50 },
+                                                                        { text: 'Stay out - too much uncertainty', correct: true, outcome: 'Safe choice. Earnings plays are risky. Protecting capital is always smart.', profit: 0 }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    id: 6,
+                                                                    difficulty: 'Medium',
+                                                                    stock: 'GME',
+                                                                    price: 25,
+                                                                    situation: 'GameStop gaps up from $20 to $25 on high volume at market open. No news. Social media showing increased chatter. Gap from $20 to $25 left no trading in between.',
+                                                                    question: 'What\'s your gap fill strategy?',
+                                                                    tip: 'Gaps often fill (price returns to pre-gap level), but meme stocks can be unpredictable.',
+                                                                    options: [
+                                                                        { text: 'Short at $25 expecting gap fill to $20', correct: false, outcome: 'Dangerous! Stock squeezed to $30 on retail buying. Lost $5/share. Never short meme stocks.', profit: -5 },
+                                                                        { text: 'Buy the breakout at $25', correct: false, outcome: 'Stock faded back to $22 by noon. Gap fills are common. Lost $3/share.', profit: -3 },
+                                                                        { text: 'Wait for gap to fill, then buy at $20-21', correct: true, outcome: 'Patient! Stock filled gap to $21, you bought and rode bounce to $24.', profit: 3 },
+                                                                        { text: 'Stay away from meme stocks entirely', correct: true, outcome: 'Wise! Meme stocks are unpredictable and risky. Plenty of better setups available.', profit: 0 }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    id: 7,
+                                                                    difficulty: 'Medium',
+                                                                    stock: 'MSFT',
+                                                                    price: 380,
+                                                                    situation: 'Microsoft at $380, approaching resistance at $385 (tested 3 times in past month). You own 100 shares at $370 (+$1,000 unrealized profit). RSI at 72. Volume increasing.',
+                                                                    question: 'How do you manage this winning position?',
+                                                                    tip: 'Taking profits vs letting winners run is a key decision. Consider partial exits.',
+                                                                    options: [
+                                                                        { text: 'Sell all 100 shares at $380, lock in profit', correct: false, outcome: 'Stock broke through $385 resistance and ran to $400. Missed additional $2,000 profit.', profit: 10 },
+                                                                        { text: 'Sell 50 shares, let 50 ride with trailing stop', correct: true, outcome: 'Perfect! Locked in $500 profit, remaining 50 shares ran to $395. Total profit $1,750.', profit: 17.50 },
+                                                                        { text: 'Hold all shares - let winners run', correct: true, outcome: 'Gutsy! Stock broke to $395 before pulling back. You sold at $390. Great $2,000 profit!', profit: 20 },
+                                                                        { text: 'Add more shares at $380 - breakout coming', correct: false, outcome: 'Stock rejected at $385 resistance, fell to $375. Added shares at $380 lost money.', profit: 5 }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    id: 8,
+                                                                    difficulty: 'Medium',
+                                                                    stock: 'AMD',
+                                                                    price: 120,
+                                                                    situation: 'AMD at $120. You want exposure but unsure of direction. Strong support at $115, resistance at $125. Planning $5,000 position (41 shares at $120).',
+                                                                    question: 'How do you scale into this position?',
+                                                                    tip: 'Scaling in reduces risk by averaging your entry price across multiple purchases.',
+                                                                    options: [
+                                                                        { text: 'Buy all 41 shares at once at $120', correct: false, outcome: 'Stock dropped to $116. Full position underwater. Down $164. Should have scaled in.', profit: -4 },
+                                                                        { text: 'Buy 15 shares at $120, 13 at $118, 13 at $116', correct: true, outcome: 'Smart scaling! Average entry $118. Stock bounced to $125. Profit $287 vs $205 if bought at $120.', profit: 7 },
+                                                                        { text: 'Wait for dip to $115 support, buy all there', correct: true, outcome: 'Patient! Got entire position at $115. Stock bounced to $125. Maximum profit $410!', profit: 10 },
+                                                                        { text: 'Use market orders at open every day', correct: false, outcome: 'Bad fills at $121, $122, $120. Average entry $121. Stock at $123. Small profit $82.', profit: 2 }
+                                                                    ]
+                                                                },
+                                                                // HARD SCENARIOS (4 total)
+                                                                {
+                                                                    id: 9,
+                                                                    difficulty: 'Hard',
+                                                                    stock: 'QQQ',
+                                                                    price: 375,
+                                                                    situation: 'QQQ testing major support at $375 (held 4 times). Market news: Fed meeting tomorrow, potential rate hike. VIX spiking to 25. Your analysis: if support breaks, next support is $360.',
+                                                                    question: 'What\'s your strategy at this critical support level?',
+                                                                    tip: 'Major support + high uncertainty = difficult decision. Risk/reward and timing are crucial.',
+                                                                    options: [
+                                                                        { text: 'Buy here - 4th test of support should hold', correct: false, outcome: 'Fed hiked rates 0.50%, support broke. QQQ fell to $362. Lost $13/share. Wait for confirmation at major events.', profit: -13 },
+                                                                        { text: 'Short at $375 - expecting support break', correct: false, outcome: 'Support held! Fed paused hikes. QQQ rallied to $385. Lost $10/share. Don\'t short major support.', profit: -10 },
+                                                                        { text: 'Wait for Fed decision, buy on break above $378', correct: true, outcome: 'Disciplined! Fed paused, QQQ broke to $380 on volume. You bought breakout and rode to $390.', profit: 10 },
+                                                                        { text: 'Buy protective puts, take small long position', correct: true, outcome: 'Advanced! Bought shares at $375, puts protected downside. Support held, sold puts at small loss but stock rallied to $385. Net profit $8/share.', profit: 8 }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    id: 10,
+                                                                    difficulty: 'Hard',
+                                                                    stock: 'NFLX',
+                                                                    price: 425,
+                                                                    situation: 'Netflix at $425 forms a textbook cup & handle pattern. Handle shows low volume consolidation. Breakout level is $428. However, broader market (SPY) showing weakness, trending down.',
+                                                                    question: 'How do you handle this conflicting setup?',
+                                                                    tip: 'Individual stock setups vs market direction creates complexity. Market usually wins.',
+                                                                    options: [
+                                                                        { text: 'Buy the breakout at $428 - pattern is perfect', correct: false, outcome: 'Market sold off, dragging NFLX down despite good setup. Fell to $418. Lost $10/share. Market direction matters.', profit: -10 },
+                                                                        { text: 'Wait for market to confirm strength first', correct: true, outcome: 'Excellent patience! Market bottomed 2 days later, then NFLX broke to $435. Better entry at $430.', profit: 5 },
+                                                                        { text: 'Take smaller position, wider stop-loss', correct: true, outcome: 'Good risk management! Market dipped but NFLX held $423. Eventually broke to $438 after market recovered.', profit: 10 },
+                                                                        { text: 'Short NFLX - market will drag it down', correct: false, outcome: 'Wrong! NFLX showed relative strength, only dipped to $422 while market fell 3%. Covered at loss.', profit: -3 }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    id: 11,
+                                                                    difficulty: 'Hard',
+                                                                    stock: 'BA',
+                                                                    price: 185,
+                                                                    situation: 'Boeing at $185. Suddenly breaks news: major aircraft order from Delta Airlines worth $10B. Stock halted, reopens at $195 (+5.4%). No positions yet. High volume, but some resistance at $200.',
+                                                                    question: 'How do you react to this news catalyst?',
+                                                                    tip: 'News reactions can overshoot or undershoot. Initial moves are often emotional.',
+                                                                    options: [
+                                                                        { text: 'Chase it - buy immediately at $195', correct: false, outcome: 'Classic FOMO! Initial excitement faded. Stock pulled back to $190 over next 2 days. Down $5/share.', profit: -5 },
+                                                                        { text: 'Wait for pullback to $190, then buy', correct: true, outcome: 'Disciplined! Stock pulled back to $191 on profit-taking. You bought and rode to $202 over 2 weeks.', profit: 11 },
+                                                                        { text: 'Sell at $195 if you owned it already', correct: false, outcome: 'Premature! News was genuinely positive. Stock grinded to $205 over next month. Missed $10/share.', profit: 0 },
+                                                                        { text: 'Buy half position at $195, half on pullback', correct: true, outcome: 'Smart scaling! Half at $195, half at $191. Average $193. Stock reached $204. Profit $11/share.', profit: 11 }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    id: 12,
+                                                                    difficulty: 'Hard',
+                                                                    stock: 'XYZ',
+                                                                    price: 45,
+                                                                    situation: 'You sold 2 put options on XYZ stock at $45 strike (expiring tomorrow) and collected $200 premium. Stock now at $42. Options are in-the-money. You\'ll be assigned 200 shares at $45 = $9,000 commitment.',
+                                                                    question: 'How do you handle this options assignment risk?',
+                                                                    tip: 'Options assignment means obligation to buy shares. Consider your capital, outlook, and alternatives.',
+                                                                    options: [
+                                                                        { text: 'Let assignment happen, hold 200 shares at $45', correct: false, outcome: 'Stock continued falling to $40. Unrealized loss $1,000 (offset by $200 premium). Total loss $800.', profit: -4 },
+                                                                        { text: 'Buy back puts at loss, close position', correct: true, outcome: 'Smart risk management! Bought back puts for $600 loss ($400 net loss after premium). Stock fell to $40, avoided additional $1,000 loss.', profit: -2 },
+                                                                        { text: 'Take assignment, immediately sell covered calls', correct: true, outcome: 'Advanced! Accepted 200 shares at $45, sold $47 calls for $100. Stock recovered to $46. Sold shares at $47 on assignment. Net profit $300.', profit: 1.50 },
+                                                                        { text: 'Roll puts to next month, lower strike', correct: true, outcome: 'Sophisticated! Rolled $45 puts to next month $43 puts for $150 credit. Stock recovered to $44, puts expired worthless. Total profit $350.', profit: 1.75 }
+                                                                    ]
                                                                 }
                                                             ];
-                                                            const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+
+                                                            // Filter scenarios by selected difficulty
+                                                            const filteredScenarios = allScenarios.filter(s => s.difficulty === scenarioDifficulty);
+                                                            const randomScenario = filteredScenarios[Math.floor(Math.random() * filteredScenarios.length)];
                                                             setPracticeScenario(randomScenario);
                                                             setPracticeChoice(null);
                                                         }}
@@ -11856,6 +12082,20 @@
                                                 </div>
                                             ) : (
                                                 <div className="space-y-6">
+                                                    {/* Difficulty Badge and Counter */}
+                                                    <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
+                                                        <div className={`px-4 py-2 rounded-lg font-bold ${
+                                                            practiceScenario.difficulty === 'Easy' ? 'bg-green-600 text-white' :
+                                                            practiceScenario.difficulty === 'Medium' ? 'bg-yellow-600 text-white' :
+                                                            'bg-red-600 text-white'
+                                                        }`}>
+                                                            {practiceScenario.difficulty === 'Easy' ? '🌱' : practiceScenario.difficulty === 'Medium' ? '⚡' : '🔥'} {practiceScenario.difficulty} Level
+                                                        </div>
+                                                        <div className="text-cyan-300 font-bold">
+                                                            Scenario #{practiceScenario.id} of 12
+                                                        </div>
+                                                    </div>
+
                                                     {/* Scenario Setup */}
                                                     <div className="bg-black/60 rounded-xl p-6 border-2 border-cyan-400">
                                                         <div className="flex items-center gap-3 mb-4">
@@ -11907,15 +12147,59 @@
                                                             <div className="text-white text-lg bg-black/40 p-4 rounded-lg mb-4">
                                                                 {practiceScenario.options[practiceChoice].outcome}
                                                             </div>
-                                                            <div className="flex gap-4 justify-center">
+
+                                                            {/* Difficulty-Specific Tip */}
+                                                            {practiceScenario.tip && (
+                                                                <div className={`p-4 rounded-lg mb-4 border-2 ${
+                                                                    practiceScenario.difficulty === 'Easy' ? 'bg-green-900/30 border-green-500/50' :
+                                                                    practiceScenario.difficulty === 'Medium' ? 'bg-yellow-900/30 border-yellow-500/50' :
+                                                                    'bg-red-900/30 border-red-500/50'
+                                                                }`}>
+                                                                    <div className="flex items-start gap-3">
+                                                                        <div className="text-2xl">💡</div>
+                                                                        <div>
+                                                                            <div className="font-bold text-white mb-1">Key Takeaway:</div>
+                                                                            <div className="text-gray-200">{practiceScenario.tip}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            <div className="flex gap-4 justify-center flex-wrap">
                                                                 <button
                                                                     onClick={() => {
+                                                                        // Update completed scenarios count
+                                                                        const newCompleted = {
+                                                                            ...scenariosCompleted,
+                                                                            [practiceScenario.difficulty]: scenariosCompleted[practiceScenario.difficulty] + 1
+                                                                        };
+                                                                        setScenariosCompleted(newCompleted);
+                                                                        localStorage.setItem('scenariosCompleted', JSON.stringify(newCompleted));
+
                                                                         setPracticeScenario(null);
                                                                         setPracticeChoice(null);
                                                                     }}
                                                                     className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white px-6 py-3 rounded-xl font-bold transition-all"
                                                                 >
                                                                     Try Another Scenario
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        // Update completed scenarios count
+                                                                        const newCompleted = {
+                                                                            ...scenariosCompleted,
+                                                                            [practiceScenario.difficulty]: scenariosCompleted[practiceScenario.difficulty] + 1
+                                                                        };
+                                                                        setScenariosCompleted(newCompleted);
+                                                                        localStorage.setItem('scenariosCompleted', JSON.stringify(newCompleted));
+
+                                                                        setScenarioDifficulty(null);
+                                                                        setPracticeScenario(null);
+                                                                        setPracticeChoice(null);
+                                                                    }}
+                                                                    className="bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-500 hover:to-gray-400 text-white px-6 py-3 rounded-xl font-bold transition-all"
+                                                                >
+                                                                    Change Difficulty
                                                                 </button>
                                                             </div>
                                                         </div>
