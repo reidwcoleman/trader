@@ -1779,7 +1779,37 @@
                 return isNaN(totalValue) ? 100000 : totalValue;
             };
 
+            // Calculate position-level P/L
+            const calculatePositionPnL = (symbol, currentPrice) => {
+                const portfolio = getCurrentPortfolio();
+                const shares = portfolio.positions?.[symbol] || 0;
+                const costBasis = portfolio.costBasis?.[symbol] || 0;
 
+                if (shares === 0 || costBasis === 0) {
+                    return {
+                        shares: 0,
+                        avgCost: 0,
+                        currentValue: 0,
+                        totalCost: 0,
+                        unrealizedPnL: 0,
+                        unrealizedPnLPercent: 0
+                    };
+                }
+
+                const totalCost = shares * costBasis;
+                const currentValue = shares * currentPrice;
+                const unrealizedPnL = currentValue - totalCost;
+                const unrealizedPnLPercent = (unrealizedPnL / totalCost) * 100;
+
+                return {
+                    shares,
+                    avgCost: costBasis,
+                    currentValue,
+                    totalCost,
+                    unrealizedPnL,
+                    unrealizedPnLPercent
+                };
+            };
 
             const generateCompetitionCode = () => {
                 return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -3074,6 +3104,27 @@
                     }
                 }
 
+                // Calculate cost basis (Average method)
+                const costBasis = portfolio.costBasis || {};
+                let newCostBasis = {...costBasis};
+
+                if (type === 'buy') {
+                    // Update average cost basis on buy
+                    const currentShares = portfolio.positions[selectedStock] || 0;
+                    const currentAvgCost = costBasis[selectedStock] || 0;
+                    const currentTotalCost = currentShares * currentAvgCost;
+                    const newTotalCost = currentTotalCost + totalCost;
+                    const newTotalShares = currentShares + quantity;
+                    newCostBasis[selectedStock] = newTotalShares > 0 ? newTotalCost / newTotalShares : 0;
+                } else {
+                    // On sell, keep same average cost basis (don't change)
+                    // Cost basis remains until position fully closed
+                    const remainingShares = (portfolio.positions[selectedStock] || 0) - quantity;
+                    if (remainingShares <= 0) {
+                        delete newCostBasis[selectedStock]; // Position closed, remove cost basis
+                    }
+                }
+
                 const updatedPortfolio = {
                     ...portfolio,
                     cash: type === 'buy'
@@ -3085,6 +3136,7 @@
                             ? (portfolio.positions[selectedStock] || 0) + quantity
                             : (portfolio.positions[selectedStock] || 0) - quantity
                     },
+                    costBasis: newCostBasis,  // Track average cost basis per position
                     history: [...portfolio.history, {
                         type,
                         symbol: selectedStock,
