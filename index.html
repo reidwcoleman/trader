@@ -117,6 +117,8 @@
             const [learningLesson, setLearningLesson] = useState(null); // specific lesson within topic
             const [quizAnswers, setQuizAnswers] = useState({}); // Track quiz answers {topicName: {q1: answerIndex, q2: answerIndex}}
             const [quizSubmitted, setQuizSubmitted] = useState({}); // Track if quiz submitted {topicName: true/false}
+            const [liveExampleStock, setLiveExampleStock] = useState(null); // Live stock example data
+            const [loadingLiveExample, setLoadingLiveExample] = useState(false); // Loading state for live example
             const [learningProgress, setLearningProgress] = useState(() => {
                 // Load from localStorage or initialize
                 const saved = localStorage.getItem('learningProgress');
@@ -9072,6 +9074,45 @@
                                     </div>
                                 </div>
 
+                                {/* Daily Trading Tip */}
+                                <div className="bg-gradient-to-r from-yellow-900/60 via-orange-900/60 to-red-900/60 rounded-2xl p-6 border-2 border-yellow-500/50 shadow-2xl">
+                                    <div className="flex items-start gap-4">
+                                        <div className="text-5xl">💡</div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <h3 className="text-2xl font-black text-yellow-300">Daily Trading Tip</h3>
+                                                <span className="text-sm bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded-full font-bold">TODAY</span>
+                                            </div>
+                                            <p className="text-lg text-yellow-100 font-semibold mb-2">
+                                                {(() => {
+                                                    const tips = [
+                                                        "Always set a stop-loss before entering a trade. It's your safety net against unexpected losses.",
+                                                        "The first hour of trading (9:30-10:30 AM ET) is the most volatile. Wait for price stability if you're new.",
+                                                        "Volume confirms price moves. High volume breakouts are more reliable than low volume ones.",
+                                                        "Never risk more than 1-2% of your account on a single trade. This ensures you survive losing streaks.",
+                                                        "Target risk/reward ratios of 2:1 or better. If risking $100, aim to make $200+.",
+                                                        "Don't chase FOMO trades. Stocks up 20%+ in a day often pullback. Wait for better entries.",
+                                                        "Keep a trading journal. Document every trade: entry, exit, reasoning, and emotions.",
+                                                        "Paper trade for at least 3 months before risking real money. Master the strategy first.",
+                                                        "Support and resistance levels from higher timeframes (daily/weekly) are more significant.",
+                                                        "When support breaks, it becomes resistance. When resistance breaks, it becomes support.",
+                                                        "Cut losses quickly, let winners run. Most traders do the opposite and lose money.",
+                                                        "Avoid trading immediately after major news events. Wait 15-30 minutes for volatility to settle.",
+                                                        "The trend is your friend until it ends. Trade with the trend, not against it.",
+                                                        "Your psychology is 80% of trading success. Control fear, greed, and FOMO to succeed.",
+                                                        "Diversify your trades. Don't put all your capital into one stock or sector."
+                                                    ];
+                                                    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+                                                    return tips[dayOfYear % tips.length];
+                                                })()}
+                                            </p>
+                                            <div className="text-sm text-yellow-200/80 italic">
+                                                New tip every day to sharpen your trading skills!
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Progress Dashboard */}
                                 {learningProgress.completedLessons.length > 0 && (
                                     <div className="bg-gradient-to-br from-purple-900/60 via-blue-900/60 to-cyan-900/60 rounded-2xl p-8 border-2 border-purple-500/50 shadow-2xl">
@@ -9599,6 +9640,128 @@
                                                         <p className="text-sm">When support breaks, it becomes resistance. When resistance breaks, it becomes support!</p>
                                                     </div>
                                                 </div>
+                                            </div>
+
+                                            {/* Live Stock Example */}
+                                            <div className="bg-gradient-to-br from-orange-900/60 via-red-900/60 to-pink-900/60 rounded-xl p-6 border-2 border-orange-500/50">
+                                                <div className="flex items-center gap-3 mb-4">
+                                                    <span className="text-4xl">📊</span>
+                                                    <div>
+                                                        <h3 className="text-2xl font-black text-orange-300">Live Stock Example</h3>
+                                                        <p className="text-orange-200 text-sm">See these concepts in action with real market data</p>
+                                                    </div>
+                                                </div>
+
+                                                {!liveExampleStock ? (
+                                                    <button
+                                                        onClick={async () => {
+                                                            try {
+                                                                setLoadingLiveExample(true);
+                                                                // Fetch a popular stock (AAPL) for example
+                                                                const corsProxy = 'https://corsproxy.io/?';
+                                                                const symbol = 'AAPL';
+                                                                const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`;
+                                                                const response = await fetch(corsProxy + encodeURIComponent(url));
+                                                                const data = await response.json();
+
+                                                                const result = data.chart.result[0];
+                                                                const quote = result.indicators.quote[0];
+                                                                const lastIndex = quote.close.length - 1;
+
+                                                                const currentPrice = quote.close[lastIndex];
+                                                                const high = Math.max(...quote.high.filter(v => v !== null));
+                                                                const low = Math.min(...quote.low.filter(v => v !== null));
+                                                                const volume = quote.volume[lastIndex];
+                                                                const avgVolume = quote.volume.reduce((a, b) => a + b, 0) / quote.volume.length;
+
+                                                                setLiveExampleStock({
+                                                                    symbol,
+                                                                    price: currentPrice,
+                                                                    high,
+                                                                    low,
+                                                                    volume,
+                                                                    avgVolume,
+                                                                    open: quote.open[lastIndex],
+                                                                    close: quote.close[lastIndex - 1]
+                                                                });
+                                                                setLoadingLiveExample(false);
+                                                            } catch (error) {
+                                                                console.error('Error fetching live example:', error);
+                                                                setLoadingLiveExample(false);
+                                                                alert('Could not load live stock data. Please try again.');
+                                                            }
+                                                        }}
+                                                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 text-white px-6 py-4 rounded-xl font-bold transition-all shadow-lg"
+                                                    >
+                                                        {loadingLiveExample ? '🔄 Loading Real Stock Data...' : '🚀 Load Live Example'}
+                                                    </button>
+                                                ) : (
+                                                    <div className="space-y-4">
+                                                        <div className="bg-black/60 rounded-xl p-6 border-2 border-orange-400">
+                                                            <div className="flex justify-between items-center mb-4">
+                                                                <div>
+                                                                    <div className="text-3xl font-black text-white">{liveExampleStock.symbol}</div>
+                                                                    <div className="text-sm text-orange-300">Real-time market data</div>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <div className="text-4xl font-black text-orange-400">${liveExampleStock.price.toFixed(2)}</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                                                <div className="bg-green-900/20 p-3 rounded-lg border border-green-500/30">
+                                                                    <div className="text-xs text-green-300 mb-1">5-Day High</div>
+                                                                    <div className="text-2xl font-bold text-green-400">${liveExampleStock.high.toFixed(2)}</div>
+                                                                    <div className="text-xs text-green-200 mt-1">Resistance Level</div>
+                                                                </div>
+                                                                <div className="bg-red-900/20 p-3 rounded-lg border border-red-500/30">
+                                                                    <div className="text-xs text-red-300 mb-1">5-Day Low</div>
+                                                                    <div className="text-2xl font-bold text-red-400">${liveExampleStock.low.toFixed(2)}</div>
+                                                                    <div className="text-xs text-red-200 mt-1">Support Level</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="bg-blue-900/20 p-3 rounded-lg border border-blue-500/30 mb-4">
+                                                                <div className="flex justify-between items-center">
+                                                                    <div>
+                                                                        <div className="text-xs text-blue-300">Today's Candlestick</div>
+                                                                        <div className={`text-lg font-bold ${liveExampleStock.close > liveExampleStock.open ? 'text-green-400' : 'text-red-400'}`}>
+                                                                            {liveExampleStock.close > liveExampleStock.open ? '🟢 Bullish (Green)' : '🔴 Bearish (Red)'}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <div className="text-xs text-blue-300">Open → Close</div>
+                                                                        <div className="text-sm text-white font-mono">
+                                                                            ${liveExampleStock.open.toFixed(2)} → ${liveExampleStock.close.toFixed(2)}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="bg-purple-900/20 p-3 rounded-lg border border-purple-500/30">
+                                                                <div className="flex justify-between items-center">
+                                                                    <div>
+                                                                        <div className="text-xs text-purple-300">Volume Analysis</div>
+                                                                        <div className="text-lg font-bold text-purple-400">
+                                                                            {liveExampleStock.volume > liveExampleStock.avgVolume ? '📊 High Volume' : '📉 Low Volume'}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <div className="text-xs text-purple-300">Current: {(liveExampleStock.volume / 1000000).toFixed(1)}M</div>
+                                                                        <div className="text-xs text-purple-200">Avg: {(liveExampleStock.avgVolume / 1000000).toFixed(1)}M</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <button
+                                                            onClick={() => setLiveExampleStock(null)}
+                                                            className="w-full bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-500 hover:to-gray-400 text-white px-4 py-3 rounded-xl font-bold transition-all"
+                                                        >
+                                                            Load Different Stock
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* Quiz Section */}
