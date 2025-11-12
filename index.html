@@ -6484,19 +6484,87 @@
                                     }
                                 }
 
-                                // Reasoning
-                                if (buyScore >= 85) {
-                                    reasoning = '🔥 EXCEPTIONAL - Multiple strong bullish signals';
+                                // 7. Social Buzz / Volume Spike (+10)
+                                const avgVolume = 5000000; // Baseline average
+                                const volumeRatio = stock.volume / avgVolume;
+                                if (volumeRatio > 5) {
+                                    buyScore += 10;
+                                    signals.push('🔥 Viral momentum');
+                                } else if (volumeRatio > 3) {
+                                    buyScore += 7;
+                                    signals.push('📱 Social buzz');
+                                } else if (volumeRatio > 2) {
+                                    buyScore += 4;
+                                }
+
+                                // 8. News Sentiment (+8)
+                                // Positive momentum = positive news sentiment
+                                if (stock.change > 3 && stock.volume > 10000000) {
+                                    buyScore += 8;
+                                    signals.push('📰 Positive news');
+                                } else if (stock.change > 1.5 && stock.volume > 5000000) {
+                                    buyScore += 5;
+                                } else if (stock.change < -3 && stock.volume > 10000000) {
+                                    buyScore -= 6;
+                                    signals.push('⚠️ Negative headlines');
+                                }
+
+                                // 9. Technical Indicators - RSI Simulation (+10)
+                                // Simulate RSI using price position and momentum
+                                const priceVsHigh = (stock.high - stock.price) / (stock.high - stock.low || 1);
+                                const rsiSimulation = stock.change > 5 ? 75 : stock.change > 2 ? 60 : stock.change < -5 ? 25 : 50;
+
+                                if (rsiSimulation < 30) {
+                                    buyScore += 10;
+                                    signals.push('💎 Oversold - reversal');
+                                } else if (rsiSimulation > 70 && stock.change > 3) {
+                                    buyScore += 7;
+                                    signals.push('🚀 Momentum breakout');
+                                }
+
+                                // 10. Sector Rotation (+8)
+                                // Stocks outperforming by 2x+ = hot sector
+                                if (relativeStrength > avgMarketChange * 2) {
+                                    buyScore += 8;
+                                    signals.push('🔥 Hot sector leader');
+                                } else if (relativeStrength > avgMarketChange * 1.5) {
+                                    buyScore += 5;
+                                }
+
+                                // 11. Gap Analysis (+7)
+                                const gapSize = Math.abs(stock.open - stock.previousClose);
+                                const gapPercent = (gapSize / stock.previousClose) * 100;
+                                if (gapPercent > 3 && stock.price > stock.open) {
+                                    buyScore += 7;
+                                    signals.push('📊 Gap up + holding');
+                                } else if (gapPercent > 2 && stock.price > stock.open) {
+                                    buyScore += 4;
+                                }
+
+                                // 12. Consistency Score (+5)
+                                // Steady uptrend = consistent winner
+                                if (stock.change > 0 && stock.price > stock.low * 1.02) {
+                                    buyScore += 5;
+                                    signals.push('📈 Consistent uptrend');
+                                } else if (stock.change > 1 && volatility < 0.03) {
+                                    buyScore += 3;
+                                }
+
+                                // Enhanced Reasoning with new score ranges
+                                if (buyScore >= 95) {
+                                    reasoning = '🔥 MUST BUY - Rare exceptional opportunity with multiple catalysts';
+                                } else if (buyScore >= 85) {
+                                    reasoning = '✅ STRONG BUY - Outstanding setup with strong bullish signals';
                                 } else if (buyScore >= 75) {
-                                    reasoning = '✅ STRONG BUY - Favorable momentum & positioning';
+                                    reasoning = '👍 BUY - Solid opportunity with favorable momentum';
                                 } else if (buyScore >= 65) {
-                                    reasoning = '👍 BUY - Solid opportunity with positive indicators';
+                                    reasoning = '🔍 MODERATE BUY - Positive indicators, good entry point';
                                 } else if (buyScore >= 55) {
-                                    reasoning = '🔍 MODERATE - Positive outlook, monitor entry';
+                                    reasoning = '⏸️ HOLD - Mixed signals, wait for confirmation';
                                 } else if (buyScore >= 45) {
-                                    reasoning = '⏸️ HOLD - Neutral signals, wait for clarity';
+                                    reasoning = '⚠️ CAUTION - Weak signals, monitor closely';
                                 } else {
-                                    reasoning = '⚠️ WAIT - Weak indicators, look elsewhere';
+                                    reasoning = '❌ AVOID - Poor setup, look elsewhere';
                                 }
 
                                 return {
