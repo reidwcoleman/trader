@@ -3903,6 +3903,21 @@
                         ) : null}
 
                         <div className="max-w-7xl mx-auto relative z-10 px-4 md:px-8 pt-20">
+                            {/* Disclaimer Banner */}
+                            <div className="mb-8 animate-fade-in">
+                                <div className="bg-gradient-to-r from-red-900/40 via-orange-900/40 to-red-900/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-red-500/50 shadow-2xl shadow-red-500/20">
+                                    <div className="flex items-start gap-4">
+                                        <div className="text-4xl flex-shrink-0">⚠️</div>
+                                        <div className="text-left">
+                                            <h3 className="text-xl font-black text-red-300 mb-3">Virtual Trading Simulator - Educational Purposes Only</h3>
+                                            <p className="text-red-100 text-sm leading-relaxed">
+                                                <strong>FinClash is a trading simulator using virtual currency only.</strong> You <strong>CANNOT win or lose real money</strong> on this platform. All AI analysis, stock tips, recommendations, and strategies provided are <strong>NOT financial advice</strong> and are for educational purposes only. Always conduct your own research and consult with a licensed financial advisor before making any real investment decisions. Past performance does not guarantee future results.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Hero Section - Bold & Minimal */}
                             <div className="min-h-screen flex flex-col items-center justify-center text-center">
                                 {/* Massive Headline with Epic Styling */}
@@ -4729,7 +4744,7 @@
                                         </div>
 
                                         <p className="text-gray-400 text-xs max-w-2xl mx-auto leading-relaxed font-medium">
-                                            Virtual trading simulator for <span className="text-cyan-400 font-bold">educational purposes</span> only • Not financial advice • Trade <span className="text-green-400 font-bold">responsibly</span>
+                                            <strong className="text-red-400">⚠️ IMPORTANT DISCLAIMER:</strong> FinClash is a <span className="text-cyan-400 font-bold">virtual trading simulator</span> for educational purposes only. You <strong className="text-red-400">CANNOT win or lose real money</strong> on this platform. All trades use virtual currency. All AI analysis, tips, and strategies are <strong className="text-red-400">NOT financial advice</strong>. Always conduct your own research and consult a licensed financial advisor before making real investment decisions.
                                         </p>
                                     </div>
                                 </div>
@@ -8563,6 +8578,16 @@
 
                                             {!loadingAnalysis && aiAnalysis && (
                                                 <div className="space-y-6 animate-fade-in">
+                                                    {/* AI Disclaimer */}
+                                                    <div className="bg-gradient-to-r from-red-900/40 to-orange-900/40 backdrop-blur-xl rounded-xl p-4 border-2 border-red-500/50">
+                                                        <div className="flex items-start gap-3">
+                                                            <span className="text-2xl flex-shrink-0">⚠️</span>
+                                                            <p className="text-red-100 text-xs leading-relaxed">
+                                                                <strong>NOT Financial Advice:</strong> This AI analysis is for educational purposes only. These recommendations are simulated and should NOT be used for real trading decisions. Always conduct your own research and consult a licensed financial advisor.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
                                                     {/* Timestamp */}
                                                     <div className="text-center text-sm text-purple-300">
                                                         Analysis generated: {aiAnalysis.timestamp}
@@ -9160,6 +9185,19 @@
                         {/* Learning Tab */}
                         {mainTab === 'learning' && (
                             <div className="space-y-6">
+                                {/* Learning Disclaimer */}
+                                <div className="bg-gradient-to-r from-red-900/40 to-orange-900/40 backdrop-blur-xl rounded-xl p-5 border-2 border-red-500/50">
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-3xl flex-shrink-0">⚠️</span>
+                                        <div>
+                                            <h4 className="text-lg font-bold text-red-300 mb-2">Educational Content - Not Financial Advice</h4>
+                                            <p className="text-red-100 text-sm leading-relaxed">
+                                                All lessons, tips, strategies, and examples are for <strong>educational purposes only</strong> and do NOT constitute financial advice. FinClash is a virtual trading simulator using fake money. Trading real stocks carries significant risk. Always conduct your own research and consult a licensed financial advisor before making any investment decisions with real money.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Back Button (when viewing a topic) */}
                                 {learningTopic && (
                                     <button
@@ -11267,6 +11305,149 @@
                                             </div>
                                             <h2 className="text-4xl font-black text-white mb-2">Chart Patterns Guide</h2>
                                             <p className="text-lg text-blue-200">Recognize patterns to predict price movements</p>
+                                        </div>
+
+                                        {/* Interactive Chart Pattern Visualizations */}
+                                        <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 backdrop-blur-xl rounded-xl p-6 border-2 border-purple-500/50 mb-8">
+                                            <div className="text-center mb-6">
+                                                <div className="text-4xl mb-3">📈</div>
+                                                <h3 className="text-2xl font-black text-white mb-2">Interactive Pattern Charts</h3>
+                                                <p className="text-purple-200">Real examples showing exact entry/exit points</p>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                {/* Bull Flag Pattern */}
+                                                <div className="bg-black/60 rounded-xl p-6 border-2 border-green-500/30">
+                                                    <h4 className="text-xl font-bold text-green-300 mb-4 flex items-center gap-2">
+                                                        <span>🚩</span> Bull Flag Pattern
+                                                    </h4>
+                                                    <canvas id="chart-bull-flag" className="mb-4"></canvas>
+                                                    <div className="text-sm space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                                            <span className="text-green-300">BUY: Breakout above flag at $122</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                                            <span className="text-blue-300">TARGET: $135 (+10.7%)</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                                            <span className="text-red-300">STOP-LOSS: $117 (-4.1%)</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Head and Shoulders Pattern */}
+                                                <div className="bg-black/60 rounded-xl p-6 border-2 border-red-500/30">
+                                                    <h4 className="text-xl font-bold text-red-300 mb-4 flex items-center gap-2">
+                                                        <span>🎯</span> Head & Shoulders
+                                                    </h4>
+                                                    <canvas id="chart-head-shoulders" className="mb-4"></canvas>
+                                                    <div className="text-sm space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                                            <span className="text-red-300">SELL: Break below neckline at $145</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                                            <span className="text-blue-300">TARGET: $130 (-10.3%)</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                                            <span className="text-orange-300">STOP-LOSS: $152 (+4.8%)</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Double Bottom Pattern */}
+                                                <div className="bg-black/60 rounded-xl p-6 border-2 border-green-500/30">
+                                                    <h4 className="text-xl font-bold text-green-300 mb-4 flex items-center gap-2">
+                                                        <span>💎</span> Double Bottom
+                                                    </h4>
+                                                    <canvas id="chart-double-bottom" className="mb-4"></canvas>
+                                                    <div className="text-sm space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                                            <span className="text-green-300">BUY: Break above $108 neckline</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                                            <span className="text-blue-300">TARGET: $118 (+9.3%)</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                                            <span className="text-red-300">STOP-LOSS: $96 (-11.1%)</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Ascending Triangle Pattern */}
+                                                <div className="bg-black/60 rounded-xl p-6 border-2 border-green-500/30">
+                                                    <h4 className="text-xl font-bold text-green-300 mb-4 flex items-center gap-2">
+                                                        <span>🔺</span> Ascending Triangle
+                                                    </h4>
+                                                    <canvas id="chart-ascending-triangle" className="mb-4"></canvas>
+                                                    <div className="text-sm space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                                            <span className="text-green-300">BUY: Breakout above $88 resistance</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                                            <span className="text-blue-300">TARGET: $98 (+11.4%)</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                                            <span className="text-red-300">STOP-LOSS: $83 (-5.7%)</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Cup and Handle Pattern */}
+                                                <div className="bg-black/60 rounded-xl p-6 border-2 border-green-500/30">
+                                                    <h4 className="text-xl font-bold text-green-300 mb-4 flex items-center gap-2">
+                                                        <span>☕</span> Cup and Handle
+                                                    </h4>
+                                                    <canvas id="chart-cup-handle" className="mb-4"></canvas>
+                                                    <div className="text-sm space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                                            <span className="text-green-300">BUY: Break above handle at $195</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                                            <span className="text-blue-300">TARGET: $220 (+12.8%)</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                                            <span className="text-red-300">STOP-LOSS: $188 (-3.6%)</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Bear Flag Pattern */}
+                                                <div className="bg-black/60 rounded-xl p-6 border-2 border-red-500/30">
+                                                    <h4 className="text-xl font-bold text-red-300 mb-4 flex items-center gap-2">
+                                                        <span>🚩</span> Bear Flag Pattern
+                                                    </h4>
+                                                    <canvas id="chart-bear-flag" className="mb-4"></canvas>
+                                                    <div className="text-sm space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                                            <span className="text-red-300">SELL: Break below flag at $76</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                                            <span className="text-blue-300">TARGET: $62 (-18.4%)</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                                            <span className="text-orange-300">STOP-LOSS: $82 (+7.9%)</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div className="space-y-6">
