@@ -119,6 +119,8 @@
             const [quizSubmitted, setQuizSubmitted] = useState({}); // Track if quiz submitted {topicName: true/false}
             const [liveExampleStock, setLiveExampleStock] = useState(null); // Live stock example data
             const [loadingLiveExample, setLoadingLiveExample] = useState(false); // Loading state for live example
+            const [practiceScenario, setPracticeScenario] = useState(null); // Practice trading scenario
+            const [practiceChoice, setPracticeChoice] = useState(null); // User's choice in practice scenario
             const [learningProgress, setLearningProgress] = useState(() => {
                 // Load from localStorage or initialize
                 const saved = localStorage.getItem('learningProgress');
@@ -11475,6 +11477,139 @@
                                                     </ul>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        {/* Interactive Practice Scenario */}
+                                        <div className="bg-gradient-to-br from-cyan-900/60 via-blue-900/60 to-indigo-900/60 rounded-2xl p-8 border-2 border-cyan-500/50 shadow-2xl mt-6">
+                                            <div className="text-center mb-6">
+                                                <div className="text-5xl mb-4">🎮</div>
+                                                <h3 className="text-3xl font-black text-white mb-2">Practice Trading Scenario</h3>
+                                                <p className="text-cyan-200 text-lg">Make decisions and see the outcomes - learn without risking real money</p>
+                                            </div>
+
+                                            {!practiceScenario ? (
+                                                <div className="text-center">
+                                                    <p className="text-white text-lg mb-6">Test your knowledge with a realistic trading scenario. Make decisions and see if you profit or lose!</p>
+                                                    <button
+                                                        onClick={() => {
+                                                            const scenarios = [
+                                                                {
+                                                                    id: 1,
+                                                                    stock: 'NVDA',
+                                                                    price: 485,
+                                                                    situation: 'NVIDIA just broke above $480 resistance after strong earnings. Volume is 3x average. RSI is at 68. The stock has been consolidating for 2 weeks in a bull flag pattern.',
+                                                                    question: 'What do you do?',
+                                                                    options: [
+                                                                        { text: 'Buy immediately at market price', correct: false, outcome: 'Stock pulled back to $470 the next day (-3%). You should wait for confirmation or use limit orders.', profit: -15 },
+                                                                        { text: 'Buy with stop-loss at $475', correct: true, outcome: 'Great choice! Stock rallied to $515 (+6%). Your risk management protected you.', profit: 30 },
+                                                                        { text: 'Wait for pullback to $470', correct: true, outcome: 'Smart! You got a better entry. Stock rallied to $515 (+9%).', profit: 45 },
+                                                                        { text: 'Ignore - RSI too high', correct: false, outcome: 'Missed opportunity. Stock rallied 15% in 2 weeks. RSI at 68 is not extreme.', profit: 0 }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    id: 2,
+                                                                    stock: 'SPY',
+                                                                    price: 450,
+                                                                    situation: 'S&P 500 ETF just hit all-time high. Market has rallied 8 days straight. Volume declining each day. Your friend says "it only goes up!"',
+                                                                    question: 'What do you do?',
+                                                                    options: [
+                                                                        { text: 'Buy now - ride the trend!', correct: false, outcome: 'Market corrected 5% the next week. Declining volume = exhaustion. Lost $22.50/share.', profit: -22.50 },
+                                                                        { text: 'Wait for pullback to support', correct: true, outcome: 'Excellent! Market pulled back to $440, you bought there and rode it to $465.', profit: 25 },
+                                                                        { text: 'Short it - it\'s overextended', correct: false, outcome: 'Dangerous! Never short strong trends. It rallied another 2% before correcting.', profit: -9 },
+                                                                        { text: 'Stay in cash until clearer setup', correct: true, outcome: 'Safe choice. Avoiding bad setups is as important as finding good ones. No loss.', profit: 0 }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    id: 3,
+                                                                    stock: 'TSLA',
+                                                                    price: 180,
+                                                                    situation: 'You bought Tesla at $180. It dropped to $172. Your stop-loss is at $172. Stock is testing support. You\'re down $800.',
+                                                                    question: 'What do you do?',
+                                                                    options: [
+                                                                        { text: 'Move stop-loss lower to $165', correct: false, outcome: 'Bad idea! Stock fell to $160. Lost $2,000 instead of $800. Never move stops down.', profit: -20 },
+                                                                        { text: 'Let stop-loss trigger at $172', correct: true, outcome: 'Disciplined! You took -$800 loss. Stock fell to $165 before recovering. Protected capital.', profit: -8 },
+                                                                        { text: 'Average down - buy more at $172', correct: false, outcome: 'Risky! Stock fell to $165. Now you lost $1,500 on larger position. Don\'t average down losers.', profit: -15 },
+                                                                        { text: 'Hold and hope it bounces', correct: false, outcome: 'Hope is not a strategy. Stock fell to $160 (-$2,000 loss) before recovering weeks later.', profit: -20 }
+                                                                    ]
+                                                                }
+                                                            ];
+                                                            const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+                                                            setPracticeScenario(randomScenario);
+                                                            setPracticeChoice(null);
+                                                        }}
+                                                        className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:scale-105"
+                                                    >
+                                                        🚀 Start Practice Scenario
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-6">
+                                                    {/* Scenario Setup */}
+                                                    <div className="bg-black/60 rounded-xl p-6 border-2 border-cyan-400">
+                                                        <div className="flex items-center gap-3 mb-4">
+                                                            <div className="text-4xl">📈</div>
+                                                            <div>
+                                                                <div className="text-2xl font-black text-white">{practiceScenario.stock}</div>
+                                                                <div className="text-cyan-300">Current Price: ${practiceScenario.price}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-white text-lg leading-relaxed bg-blue-900/20 p-4 rounded-lg">
+                                                            {practiceScenario.situation}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Question and Choices */}
+                                                    {practiceChoice === null ? (
+                                                        <div>
+                                                            <h4 className="text-2xl font-bold text-white mb-4">{practiceScenario.question}</h4>
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                {practiceScenario.options.map((option, idx) => (
+                                                                    <button
+                                                                        key={idx}
+                                                                        onClick={() => setPracticeChoice(idx)}
+                                                                        className="bg-gray-800/60 hover:bg-cyan-900/40 border-2 border-gray-600 hover:border-cyan-400 text-white p-6 rounded-xl text-left transition-all hover:scale-105"
+                                                                    >
+                                                                        <div className="font-bold text-lg mb-2">{String.fromCharCode(65 + idx)}. {option.text}</div>
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className={`p-6 rounded-xl border-2 ${
+                                                            practiceScenario.options[practiceChoice].correct
+                                                                ? 'bg-green-900/40 border-green-400'
+                                                                : 'bg-red-900/40 border-red-400'
+                                                        }`}>
+                                                            <div className="text-center mb-4">
+                                                                <div className="text-6xl mb-3">
+                                                                    {practiceScenario.options[practiceChoice].profit > 0 ? '🎉' : practiceScenario.options[practiceChoice].profit < 0 ? '📉' : '🤷'}
+                                                                </div>
+                                                                <div className={`text-3xl font-black ${
+                                                                    practiceScenario.options[practiceChoice].profit > 0 ? 'text-green-400' :
+                                                                    practiceScenario.options[practiceChoice].profit < 0 ? 'text-red-400' : 'text-gray-400'
+                                                                }`}>
+                                                                    {practiceScenario.options[practiceChoice].profit > 0 ? '+' : ''}
+                                                                    ${practiceScenario.options[practiceChoice].profit.toFixed(2)} per share
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-white text-lg bg-black/40 p-4 rounded-lg mb-4">
+                                                                {practiceScenario.options[practiceChoice].outcome}
+                                                            </div>
+                                                            <div className="flex gap-4 justify-center">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setPracticeScenario(null);
+                                                                        setPracticeChoice(null);
+                                                                    }}
+                                                                    className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white px-6 py-3 rounded-xl font-bold transition-all"
+                                                                >
+                                                                    Try Another Scenario
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Quiz Section */}
