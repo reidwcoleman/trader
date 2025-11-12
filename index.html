@@ -100,11 +100,12 @@
             ]);
 
             // Curated universe for "Top Stocks to Buy" recommendations
-            // 60 quality stocks across all major sectors for analysis
+            // 150+ quality stocks across 15+ major sectors for ultra-enhanced analysis
             const curatedUniverse = [
-                // Technology & AI (12 stocks)
+                // Technology & AI (22 stocks)
                 'NVDA', 'MSFT', 'GOOGL', 'AAPL', 'META', 'AMZN',
                 'AMD', 'TSM', 'AVGO', 'INTC', 'QCOM', 'MU',
+                'ARM', 'SMCI', 'KLAC', 'LRCX', 'ASML', 'AMAT', 'MRVL', 'ON', 'TXN', 'NXPI',
 
                 // Cloud & Software (8 stocks)
                 'PLTR', 'NOW', 'CRM', 'SNOW', 'DDOG', 'NET',
@@ -113,17 +114,20 @@
                 // Financial Services (8 stocks)
                 'JPM', 'BAC', 'GS', 'MS', 'C', 'V', 'MA', 'BRK.B',
 
-                // Healthcare & Biotech (6 stocks)
+                // Healthcare & Biotech (14 stocks)
                 'UNH', 'JNJ', 'PFE', 'ABBV', 'LLY', 'TMO',
+                'MRNA', 'BNTX', 'REGN', 'VRTX', 'BIIB', 'GILD', 'AMGN', 'ISRG',
 
                 // Energy & Utilities (5 stocks)
                 'XOM', 'CVX', 'COP', 'SLB', 'OXY',
 
-                // Consumer & Retail (7 stocks)
+                // Consumer & Retail (12 stocks)
                 'TSLA', 'NKE', 'DIS', 'SBUX', 'MCD', 'HD', 'WMT',
+                'COST', 'TGT', 'LOW', 'CHWY', 'BBY',
 
-                // Fintech & Crypto (4 stocks)
+                // Fintech & Crypto (9 stocks)
                 'COIN', 'SQ', 'PYPL', 'HOOD',
+                'MARA', 'RIOT', 'CLSK', 'MSTR', 'HUT',
 
                 // E-commerce & Growth (5 stocks)
                 'SHOP', 'BABA', 'MELI', 'SE', 'ABNB',
@@ -131,8 +135,38 @@
                 // Cybersecurity & Defense (3 stocks)
                 'CRWD', 'PANW', 'LMT',
 
-                // Industrial & Transportation (2 stocks)
-                'CAT', 'UPS'
+                // Industrial & Transportation (7 stocks)
+                'CAT', 'UPS', 'DE', 'HON', 'GE', 'BA', 'FDX',
+
+                // EV & Clean Energy (8 stocks)
+                'RIVN', 'LCID', 'ENPH', 'SEDG', 'RUN', 'PLUG', 'BE', 'FCEL',
+
+                // Space & Aerospace (5 stocks)
+                'RKLB', 'SPCE', 'RTX', 'NOC', 'GD',
+
+                // Dividend Aristocrats (8 stocks)
+                'PG', 'KO', 'PEP', 'T', 'VZ', 'MMM', 'ABT', 'CVS',
+
+                // ETFs (8 stocks)
+                'SPY', 'QQQ', 'DIA', 'IWM', 'XLF', 'XLE', 'XLK', 'VTI',
+
+                // Small/Mid-Cap Growth (10 stocks)
+                'UPST', 'DKNG', 'PATH', 'U', 'RBLX', 'AFRM', 'SOFI', 'OPEN', 'ZI', 'BILL',
+
+                // Emerging Markets (8 stocks)
+                'NIO', 'XPEV', 'LI', 'PDD', 'JD', 'BIDU', 'GRAB', 'TME',
+
+                // Commodities & Materials (6 stocks)
+                'FCX', 'NEM', 'GOLD', 'BHP', 'VALE', 'ALB',
+
+                // Real Estate & REITs (5 stocks)
+                'AMT', 'PLD', 'EQIX', 'PSA', 'O',
+
+                // Media & Entertainment (5 stocks)
+                'NFLX', 'ROKU', 'PARA', 'WBD', 'SPOT',
+
+                // Trending/Meme Stocks (10 stocks)
+                'GME', 'AMC', 'BBBY', 'BB', 'WISH', 'CLOV', 'WKHS', 'RIDE', 'ATER', 'SNDL'
             ];
 
             const [stocks, setStocks] = useState([]);
@@ -6355,7 +6389,7 @@
                                     <div className="bg-gradient-to-br from-purple-900/60 via-indigo-900/60 to-purple-900/60 backdrop-blur-xl rounded-2xl p-8 border-2 border-purple-500/50 shadow-2xl mb-6 text-center">
                                         <span className="text-4xl mb-4 inline-block">🧠</span>
                                         <h2 className="text-2xl font-black text-white mb-4">Top Stocks to Buy Now</h2>
-                                        <p className="text-purple-200 mb-6">Analyzing 60 quality stocks across all sectors...</p>
+                                        <p className="text-purple-200 mb-6">Analyzing 150+ quality stocks across 15+ sectors...</p>
                                         <button
                                             onClick={fetchCuratedStocks}
                                             className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg"
@@ -6496,7 +6530,7 @@
                                                     <h2 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300">
                                                         Top Stocks to Buy Now
                                                     </h2>
-                                                    <p className="text-sm text-purple-300">Analyzing 60 curated stocks • Updated hourly</p>
+                                                    <p className="text-sm text-purple-300">Analyzing 150+ curated stocks • Updated hourly</p>
                                                     <p className="text-xs text-purple-400 mt-1">Top picks from Tech, Finance, Healthcare, Energy & more</p>
                                                 </div>
                                             </div>
@@ -7060,275 +7094,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        {/* Top Stocks to Buy - UltraThink AI Analysis */}
-                        {(() => {
-                            // Use curated universe for recommendations (not user's stocks)
-                            const stocksToAnalyze = curatedStocks.length > 0 ? curatedStocks : [];
-
-                            if (stocksToAnalyze.length === 0) {
-                                // Show loading state or button to fetch
-                                return (
-                                    <div className="bg-gradient-to-br from-purple-900/60 via-indigo-900/60 to-purple-900/60 backdrop-blur-xl rounded-2xl p-8 border-2 border-purple-500/50 shadow-2xl mb-6 text-center">
-                                        <span className="text-4xl mb-4 inline-block">🧠</span>
-                                        <h2 className="text-2xl font-black text-white mb-4">Top Stocks to Buy Now</h2>
-                                        <p className="text-purple-200 mb-6">Analyzing 60 quality stocks across all sectors...</p>
-                                        <button
-                                            onClick={fetchCuratedStocks}
-                                            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg"
-                                        >
-                                            Load Recommendations
-                                        </button>
-                                    </div>
-                                );
-                            }
-
-                            // UltraThink AI: Advanced multi-factor analysis
-                            const analyzedStocks = stocksToAnalyze.map(stock => {
-                                let buyScore = 50;
-                                let signals = [];
-                                let reasoning = '';
-
-                                // 1. Momentum (+/- 20)
-                                if (stock.change > 5) {
-                                    buyScore += 20;
-                                    signals.push('🚀 Strong upward momentum');
-                                } else if (stock.change > 2) {
-                                    buyScore += 12;
-                                    signals.push('📈 Positive momentum');
-                                } else if (stock.change > 0) {
-                                    buyScore += 5;
-                                } else if (stock.change < -5) {
-                                    buyScore -= 15;
-                                    signals.push('💎 Deep dip opportunity');
-                                } else if (stock.change < -2) {
-                                    buyScore -= 5;
-                                    signals.push('⚠️ Pullback');
-                                }
-
-                                // 2. Price Position (+/- 18)
-                                const priceRange = stock.high - stock.low;
-                                const currentPosition = priceRange > 0 ? (stock.price - stock.low) / priceRange : 0.5;
-
-                                if (currentPosition > 0.85) {
-                                    buyScore += 18;
-                                    signals.push('💪 Breaking highs');
-                                } else if (currentPosition > 0.7) {
-                                    buyScore += 12;
-                                } else if (currentPosition < 0.25) {
-                                    buyScore += 15;
-                                    signals.push('🎯 Entry at support');
-                                } else if (currentPosition < 0.4) {
-                                    buyScore += 8;
-                                }
-
-                                // 3. Volume (+/- 12)
-                                if (stock.volume) {
-                                    if (stock.volume > 50000000) {
-                                        buyScore += 12;
-                                        signals.push('🌊 Exceptional volume');
-                                    } else if (stock.volume > 10000000) {
-                                        buyScore += 8;
-                                        signals.push('High liquidity');
-                                    } else if (stock.volume > 1000000) {
-                                        buyScore += 4;
-                                    }
-                                }
-
-                                // 4. Relative Strength (+/- 15)
-                                const avgMarketChange = stocksToAnalyze.reduce((sum, s) => sum + (s.change || 0), 0) / stocksToAnalyze.length;
-                                const relativeStrength = stock.change - avgMarketChange;
-
-                                if (relativeStrength > 3) {
-                                    buyScore += 15;
-                                    signals.push('⭐ Outperforming market');
-                                } else if (relativeStrength > 1) {
-                                    buyScore += 10;
-                                } else if (relativeStrength < -3) {
-                                    buyScore -= 8;
-                                }
-
-                                // 5. Volatility (+/- 10)
-                                const volatility = priceRange / stock.previousClose;
-                                if (volatility > 0.05) {
-                                    buyScore += 10;
-                                    signals.push('⚡ High volatility');
-                                } else if (volatility > 0.02) {
-                                    buyScore += 5;
-                                }
-
-                                // 6. Intraday Trend (+/- 7)
-                                const openToCurrentMove = stock.price - stock.open;
-                                const dayRange = stock.high - stock.low;
-                                if (dayRange > 0) {
-                                    const intradayStrength = openToCurrentMove / dayRange;
-                                    if (intradayStrength > 0.5) {
-                                        buyScore += 7;
-                                    }
-                                }
-
-                                // Reasoning
-                                if (buyScore >= 85) {
-                                    reasoning = '🔥 EXCEPTIONAL - Multiple strong bullish signals';
-                                } else if (buyScore >= 75) {
-                                    reasoning = '✅ STRONG BUY - Favorable momentum & positioning';
-                                } else if (buyScore >= 65) {
-                                    reasoning = '👍 BUY - Solid opportunity with positive indicators';
-                                } else if (buyScore >= 55) {
-                                    reasoning = '🔍 MODERATE - Positive outlook, monitor entry';
-                                } else if (buyScore >= 45) {
-                                    reasoning = '⏸️ HOLD - Neutral signals, wait for clarity';
-                                } else {
-                                    reasoning = '⚠️ WAIT - Weak indicators, look elsewhere';
-                                }
-
-                                return {
-                                    ...stock,
-                                    buyScore: Math.min(100, Math.max(0, buyScore)),
-                                    signals,
-                                    reasoning,
-                                    recommendation: buyScore >= 70 ? 'STRONG BUY' :
-                                                  buyScore >= 60 ? 'BUY' :
-                                                  buyScore >= 50 ? 'HOLD' : 'AVOID'
-                                };
-                            });
-
-                            // Sort by buy score and get top 10
-                            const topBuys = analyzedStocks
-                                .sort((a, b) => b.buyScore - a.buyScore)
-                                .slice(0, 10);
-
-                            if (topBuys.length === 0) return null;
-
-                            return (
-                                <div className="bg-gradient-to-br from-purple-900/60 via-indigo-900/60 to-purple-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 shadow-2xl mb-6 relative overflow-hidden">
-                                    {/* Animated background */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 animate-pulse"></div>
-
-                                    <div className="relative">
-                                        <div className="flex items-center justify-between mb-6">
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-4xl animate-pulse">🧠</span>
-                                                <div>
-                                                    <h2 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300">
-                                                        Top Stocks to Buy Now
-                                                    </h2>
-                                                    <p className="text-sm text-purple-300">Analyzing 60 curated stocks • Updated hourly</p>
-                                                    <p className="text-xs text-purple-400 mt-1">Top picks from Tech, Finance, Healthcare, Energy & more</p>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    setCuratedStocksCache(null);
-                                                    fetchCuratedStocks();
-                                                }}
-                                                className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white px-4 py-2 rounded-full font-bold transition-all flex items-center gap-2"
-                                            >
-                                                🔄 Refresh
-                                            </button>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {topBuys.map((stock, idx) => {
-                                                const isStrongBuy = stock.buyScore >= 70;
-                                                const recommendationColor =
-                                                    stock.recommendation === 'STRONG BUY' ? 'from-green-500 to-emerald-500' :
-                                                    stock.recommendation === 'BUY' ? 'from-green-600 to-green-700' :
-                                                    stock.recommendation === 'HOLD' ? 'from-yellow-600 to-yellow-700' :
-                                                    'from-gray-600 to-gray-700';
-
-                                                return (
-                                                    <div
-                                                        key={idx}
-                                                        onClick={() => {
-                                                            addToWatchlist(stock.symbol);
-                                                            setMainTab('trading');
-                                                        }}
-                                                        className="group bg-gradient-to-br from-purple-900/40 to-indigo-900/40 rounded-xl p-5 border-2 border-purple-500/30 hover:border-purple-400 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 cursor-pointer"
-                                                    >
-                                                        {/* Header with Rank and Recommendation */}
-                                                        <div className="flex items-start justify-between mb-4">
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="bg-purple-500/30 text-purple-200 text-sm font-black px-3 py-1 rounded-full">
-                                                                    #{idx + 1}
-                                                                </div>
-                                                                <div className={`bg-gradient-to-r ${recommendationColor} text-white text-xs font-black px-3 py-1 rounded-full shadow-lg`}>
-                                                                    {stock.recommendation}
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-300">
-                                                                    {stock.buyScore}
-                                                                </div>
-                                                                <div className="text-[8px] text-gray-400">AI SCORE</div>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Stock Info */}
-                                                        <div className="mb-3">
-                                                            <h3 className="text-2xl font-black text-white group-hover:text-purple-300 transition-colors mb-1">
-                                                                {stock.symbol}
-                                                            </h3>
-                                                            <div className="text-xs text-gray-400 truncate">{stock.name}</div>
-                                                        </div>
-
-                                                        {/* Price and Change */}
-                                                        <div className="flex items-center justify-between mb-4 pb-3 border-b border-purple-500/20">
-                                                            <div>
-                                                                <div className="text-xs text-gray-400">Current Price</div>
-                                                                <div className="text-xl font-bold text-white">${stock.price.toFixed(2)}</div>
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <div className="text-xs text-gray-400">Change</div>
-                                                                <div className={`text-xl font-bold ${stock.change >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-                                                                    {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* AI Signals */}
-                                                        <div className="mb-3">
-                                                            <div className="text-[10px] text-purple-300 font-bold mb-2">AI SIGNALS:</div>
-                                                            <div className="space-y-1">
-                                                                {stock.signals.slice(0, 3).map((signal, i) => (
-                                                                    <div key={i} className="flex items-center gap-2 text-xs">
-                                                                        <span className="text-green-400">✓</span>
-                                                                        <span className="text-gray-300">{signal}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-
-                                                        {/* AI Reasoning */}
-                                                        <div className="mt-3 pt-3 border-t border-purple-500/20 bg-black/20 rounded-lg p-3">
-                                                            <div className="text-xs">
-                                                                <span className="text-purple-300 font-bold">🧠 UltraThink:</span>
-                                                                {' '}
-                                                                <span className="text-gray-300">{stock.reasoning}</span>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Click to Trade */}
-                                                        <div className="mt-3 text-center">
-                                                            <div className="text-[10px] text-purple-400 font-semibold group-hover:text-purple-300 transition-colors">
-                                                                Click to trade →
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-
-                                        {/* Disclaimer */}
-                                        <div className="mt-6 pt-4 border-t border-purple-500/30 text-center">
-                                            <div className="text-xs text-gray-400">
-                                                ⚠️ AI recommendations are for educational purposes only. Past performance does not guarantee future results. Always do your own research.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })()}
                             </>
                         )}
 
