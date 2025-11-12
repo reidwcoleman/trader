@@ -1,15 +1,15 @@
 # Stock Trading Simulator
 
-A browser-based stock trading simulator with personal accounts, family competitions, and real-time stock data.
+A browser-based stock trading simulator with personal accounts, global leaderboards, and real-time stock data.
 
 ## Features
 
 - **Personal Accounts**: Create your own trading account with email and secure passcode
-- **Family Competitions**: Create or join family trading pools with real money prizes
 - **Global Leaderboard**: Compete with traders worldwide (powered by Supabase)
 - **Password Reset**: Email-based passcode recovery system
 - **Real-time Data**: Live stock prices powered by Finnhub API
 - **Virtual Trading**: Start with $100,000 virtual cash
+- **Risk-Free Practice**: Learn trading strategies without risking real money
 
 ## 🌐 Live Demo
 
@@ -35,8 +35,6 @@ Deploy your own automated free website in 3 minutes:
    - Add these variables:
      - `EMAIL_USER`: Your Gmail address
      - `EMAIL_PASSWORD`: Your Gmail [App Password](https://support.google.com/accounts/answer/185833)
-     - `STRIPE_SECRET_KEY`: (Optional) For family competitions
-     - `STRIPE_PRICE_ID`: (Optional) For family competitions
 
 5. **Deploy!**
    - Click "Deploy"
@@ -95,12 +93,6 @@ The server will run on `http://localhost:3001`
 - **Login**: Use email + passcode to access your account from any device
 - **Reset**: Forgot your passcode? Get it sent to your email
 
-### Family Competitions
-
-- **Public Pools**: Join open competitions with entry fees
-- **Private Pools**: Create private competitions for family/friends
-- **Prize System**: Winner takes all! Integrated with Stripe for payments
-
 ## Tech Stack
 
 - **Frontend**: Pure HTML/CSS/JavaScript with React (via Babel standalone)
@@ -109,7 +101,6 @@ The server will run on `http://localhost:3001`
 - **API**: Vercel Serverless Functions
 - **Cloud Sync**: Supabase for global leaderboard
 - **Stock Data**: Finnhub API
-- **Payments**: Stripe
 - **Email**: Nodemailer + Gmail SMTP
 
 ## File Structure

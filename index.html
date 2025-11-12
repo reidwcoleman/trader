@@ -9199,8 +9199,17 @@
                                     {/* Strategies */}
                                     <button
                                         onClick={() => setLearningTopic('strategies')}
-                                        className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-emerald-500/30 hover:border-emerald-400/60 transition-all hover:transform hover:scale-105 text-left cursor-pointer"
+                                        className={`bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 transition-all hover:transform hover:scale-105 text-left cursor-pointer relative ${
+                                            learningProgress.completedLessons.includes('strategies')
+                                                ? 'border-emerald-400 bg-emerald-900/20'
+                                                : 'border-emerald-500/30 hover:border-emerald-400/60'
+                                        }`}
                                     >
+                                        {learningProgress.completedLessons.includes('strategies') && (
+                                            <div className="absolute top-4 right-4 bg-emerald-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                                                <span className="text-2xl">✓</span>
+                                            </div>
+                                        )}
                                         <div className="text-4xl mb-4">⚡</div>
                                         <h3 className="text-2xl font-black text-emerald-400 mb-3">Entry & Exit Strategies</h3>
                                         <p className="text-green-100 mb-4">Master when to buy and sell for maximum profit potential.</p>
@@ -9210,14 +9219,34 @@
                                             <li>• Day trading vs swing trading</li>
                                             <li>• Trend following techniques</li>
                                         </ul>
-                                        <div className="mt-4 text-emerald-400 font-bold">Click to Learn →</div>
+                                        {learningProgress.completedLessons.includes('strategies') ? (
+                                            <div className="mt-4">
+                                                <div className="text-emerald-400 font-bold mb-1">Completed! ✓</div>
+                                                {learningProgress.quizScores.strategies && (
+                                                    <div className="text-sm text-emerald-300">
+                                                        Quiz Score: {learningProgress.quizScores.strategies}%
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="mt-4 text-emerald-400 font-bold">Click to Learn →</div>
+                                        )}
                                     </button>
 
                                     {/* Risk Management */}
                                     <button
                                         onClick={() => setLearningTopic('risk')}
-                                        className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-teal-500/30 hover:border-teal-400/60 transition-all hover:transform hover:scale-105 text-left cursor-pointer"
+                                        className={`bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 transition-all hover:transform hover:scale-105 text-left cursor-pointer relative ${
+                                            learningProgress.completedLessons.includes('risk')
+                                                ? 'border-teal-400 bg-teal-900/20'
+                                                : 'border-teal-500/30 hover:border-teal-400/60'
+                                        }`}
                                     >
+                                        {learningProgress.completedLessons.includes('risk') && (
+                                            <div className="absolute top-4 right-4 bg-teal-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                                                <span className="text-2xl">✓</span>
+                                            </div>
+                                        )}
                                         <div className="text-4xl mb-4">🛡️</div>
                                         <h3 className="text-2xl font-black text-teal-400 mb-3">Risk Management</h3>
                                         <p className="text-green-100 mb-4">Protect your capital with proper position sizing and risk controls.</p>
@@ -9227,14 +9256,34 @@
                                             <li>• Stop-loss placement</li>
                                             <li>• Risk/reward ratios</li>
                                         </ul>
-                                        <div className="mt-4 text-teal-400 font-bold">Click to Learn →</div>
+                                        {learningProgress.completedLessons.includes('risk') ? (
+                                            <div className="mt-4">
+                                                <div className="text-teal-400 font-bold mb-1">Completed! ✓</div>
+                                                {learningProgress.quizScores.risk && (
+                                                    <div className="text-sm text-teal-300">
+                                                        Quiz Score: {learningProgress.quizScores.risk}%
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="mt-4 text-teal-400 font-bold">Click to Learn →</div>
+                                        )}
                                     </button>
 
                                     {/* Calculators */}
                                     <button
                                         onClick={() => setLearningTopic('calculators')}
-                                        className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400/60 transition-all hover:transform hover:scale-105 text-left cursor-pointer"
+                                        className={`bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 transition-all hover:transform hover:scale-105 text-left cursor-pointer relative ${
+                                            learningProgress.completedLessons.includes('calculators')
+                                                ? 'border-cyan-400 bg-cyan-900/20'
+                                                : 'border-cyan-500/30 hover:border-cyan-400/60'
+                                        }`}
                                     >
+                                        {learningProgress.completedLessons.includes('calculators') && (
+                                            <div className="absolute top-4 right-4 bg-cyan-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                                                <span className="text-2xl">✓</span>
+                                            </div>
+                                        )}
                                         <div className="text-4xl mb-4">🧮</div>
                                         <h3 className="text-2xl font-black text-cyan-400 mb-3">Trading Calculators</h3>
                                         <p className="text-green-100 mb-4">Essential tools to calculate position sizes, P&L, and risk metrics.</p>
@@ -9244,14 +9293,34 @@
                                             <li>• Risk/reward calculator</li>
                                             <li>• Interactive & instant results</li>
                                         </ul>
-                                        <div className="mt-4 text-cyan-400 font-bold">Click to Learn →</div>
+                                        {learningProgress.completedLessons.includes('calculators') ? (
+                                            <div className="mt-4">
+                                                <div className="text-cyan-400 font-bold mb-1">Completed! ✓</div>
+                                                {learningProgress.quizScores.calculators && (
+                                                    <div className="text-sm text-cyan-300">
+                                                        Quiz Score: {learningProgress.quizScores.calculators}%
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="mt-4 text-cyan-400 font-bold">Click to Learn →</div>
+                                        )}
                                     </button>
 
                                     {/* Chart Patterns */}
                                     <button
                                         onClick={() => setLearningTopic('patterns')}
-                                        className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-blue-500/30 hover:border-blue-400/60 transition-all hover:transform hover:scale-105 text-left cursor-pointer"
+                                        className={`bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 transition-all hover:transform hover:scale-105 text-left cursor-pointer relative ${
+                                            learningProgress.completedLessons.includes('patterns')
+                                                ? 'border-blue-400 bg-blue-900/20'
+                                                : 'border-blue-500/30 hover:border-blue-400/60'
+                                        }`}
                                     >
+                                        {learningProgress.completedLessons.includes('patterns') && (
+                                            <div className="absolute top-4 right-4 bg-blue-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                                                <span className="text-2xl">✓</span>
+                                            </div>
+                                        )}
                                         <div className="text-4xl mb-4">📊</div>
                                         <h3 className="text-2xl font-black text-blue-400 mb-3">Chart Patterns</h3>
                                         <p className="text-green-100 mb-4">Identify bullish and bearish patterns to predict price movements.</p>
@@ -9261,14 +9330,34 @@
                                             <li>• Head & shoulders</li>
                                             <li>• Cup & handle patterns</li>
                                         </ul>
-                                        <div className="mt-4 text-blue-400 font-bold">Click to Learn →</div>
+                                        {learningProgress.completedLessons.includes('patterns') ? (
+                                            <div className="mt-4">
+                                                <div className="text-blue-400 font-bold mb-1">Completed! ✓</div>
+                                                {learningProgress.quizScores.patterns && (
+                                                    <div className="text-sm text-blue-300">
+                                                        Quiz Score: {learningProgress.quizScores.patterns}%
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="mt-4 text-blue-400 font-bold">Click to Learn →</div>
+                                        )}
                                     </button>
 
                                     {/* Case Studies */}
                                     <button
                                         onClick={() => setLearningTopic('cases')}
-                                        className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-purple-500/30 hover:border-purple-400/60 transition-all hover:transform hover:scale-105 text-left cursor-pointer"
+                                        className={`bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 transition-all hover:transform hover:scale-105 text-left cursor-pointer relative ${
+                                            learningProgress.completedLessons.includes('cases')
+                                                ? 'border-purple-400 bg-purple-900/20'
+                                                : 'border-purple-500/30 hover:border-purple-400/60'
+                                        }`}
                                     >
+                                        {learningProgress.completedLessons.includes('cases') && (
+                                            <div className="absolute top-4 right-4 bg-purple-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                                                <span className="text-2xl">✓</span>
+                                            </div>
+                                        )}
                                         <div className="text-4xl mb-4">💼</div>
                                         <h3 className="text-2xl font-black text-purple-400 mb-3">Real Case Studies</h3>
                                         <p className="text-green-100 mb-4">Learn from real winning and losing trades with detailed analysis.</p>
@@ -9278,7 +9367,18 @@
                                             <li>• Disciplined stop-loss examples</li>
                                             <li>• Key lessons from each trade</li>
                                         </ul>
-                                        <div className="mt-4 text-purple-400 font-bold">Click to Learn →</div>
+                                        {learningProgress.completedLessons.includes('cases') ? (
+                                            <div className="mt-4">
+                                                <div className="text-purple-400 font-bold mb-1">Completed! ✓</div>
+                                                {learningProgress.quizScores.cases && (
+                                                    <div className="text-sm text-purple-300">
+                                                        Quiz Score: {learningProgress.quizScores.cases}%
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="mt-4 text-purple-400 font-bold">Click to Learn →</div>
+                                        )}
                                     </button>
                                 </div>
 
@@ -9699,12 +9799,48 @@
                                                                     return 'Keep learning! Review the material and practice more.';
                                                                 })()}
                                                             </p>
+
+                                                            {/* Explanations */}
+                                                            <div className="mt-6 space-y-4 text-left">
+                                                                <div className="text-sm font-bold text-cyan-300 mb-3">📖 Answer Explanations:</div>
+
+                                                                {quizData.basics.questions.map((q, idx) => {
+                                                                    const userAnswer = quizAnswers.basics?.[`q${idx + 1}`];
+                                                                    const isCorrect = userAnswer === q.correct;
+                                                                    return (
+                                                                        <div key={idx} className={`p-4 rounded-lg border-2 ${
+                                                                            isCorrect
+                                                                                ? 'bg-green-900/20 border-green-400/50'
+                                                                                : 'bg-red-900/20 border-red-400/50'
+                                                                        }`}>
+                                                                            <div className="flex items-start gap-2 mb-2">
+                                                                                <span className="text-lg">{isCorrect ? '✅' : '❌'}</span>
+                                                                                <div className="flex-1">
+                                                                                    <div className="font-bold text-white mb-1">Question {idx + 1}</div>
+                                                                                    <div className={`text-sm ${isCorrect ? 'text-green-200' : 'text-red-200'}`}>
+                                                                                        {isCorrect ? 'Correct!' : `Your answer: ${q.options[userAnswer]}`}
+                                                                                    </div>
+                                                                                    {!isCorrect && (
+                                                                                        <div className="text-sm text-green-300 mt-1">
+                                                                                            Correct answer: {q.options[q.correct]}
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="text-sm text-gray-300 ml-7 italic">
+                                                                                {q.explanation}
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+
                                                             <button
                                                                 onClick={() => {
                                                                     setQuizSubmitted({...quizSubmitted, basics: false});
                                                                     setQuizAnswers({...quizAnswers, basics: {}});
                                                                 }}
-                                                                className="mt-4 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-500 hover:to-gray-400 text-white px-6 py-3 rounded-xl font-bold transition-all"
+                                                                className="mt-6 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-500 hover:to-gray-400 text-white px-6 py-3 rounded-xl font-bold transition-all"
                                                             >
                                                                 Retake Quiz
                                                             </button>
