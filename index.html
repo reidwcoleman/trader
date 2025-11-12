@@ -117,6 +117,18 @@
             const [learningLesson, setLearningLesson] = useState(null); // specific lesson within topic
             const [quizAnswers, setQuizAnswers] = useState({}); // Track quiz answers {topicName: {q1: answerIndex, q2: answerIndex}}
             const [quizSubmitted, setQuizSubmitted] = useState({}); // Track if quiz submitted {topicName: true/false}
+            const [learningProgress, setLearningProgress] = useState(() => {
+                // Load from localStorage or initialize
+                const saved = localStorage.getItem('learningProgress');
+                return saved ? JSON.parse(saved) : {
+                    completedLessons: [], // ['basics', 'strategies', etc.]
+                    quizScores: {}, // {basics: 80, strategies: 100}
+                    totalXP: 0,
+                    achievements: [],
+                    lastVisit: null,
+                    streak: 0
+                };
+            });
             const [chartPeriod, setChartPeriod] = useState('1M');
             const [isRealChartData, setIsRealChartData] = useState(false);
             const [stockNews, setStockNews] = useState([]);
@@ -684,6 +696,338 @@
                     const fallbackData = getFallbackStockData(symbol);
                     if (stockName) fallbackData.name = stockName;
                     return fallbackData;
+                }
+            };
+
+            // Learning Progress Functions
+            const saveLearningProgress = (progress) => {
+                localStorage.setItem('learningProgress', JSON.stringify(progress));
+                setLearningProgress(progress);
+            };
+
+            const completeLesson = (topicName, quizScore) => {
+                const newProgress = { ...learningProgress };
+
+                // Add to completed if not already there
+                if (!newProgress.completedLessons.includes(topicName)) {
+                    newProgress.completedLessons.push(topicName);
+                    newProgress.totalXP += 100; // 100 XP per lesson
+                }
+
+                // Update quiz score (always update to best score)
+                if (!newProgress.quizScores[topicName] || quizScore > newProgress.quizScores[topicName]) {
+                    newProgress.quizScores[topicName] = quizScore;
+                    newProgress.totalXP += 50; // 50 XP for quiz
+                }
+
+                // Check for achievements
+                const achievementsToAdd = [];
+                if (newProgress.completedLessons.length === 1 && !newProgress.achievements.includes('first_lesson')) {
+                    achievementsToAdd.push('first_lesson');
+                }
+                if (newProgress.completedLessons.length === 6 && !newProgress.achievements.includes('all_complete')) {
+                    achievementsToAdd.push('all_complete');
+                }
+                if (quizScore === 100 && !newProgress.achievements.includes('perfect_score')) {
+                    achievementsToAdd.push('perfect_score');
+                }
+
+                newProgress.achievements = [...newProgress.achievements, ...achievementsToAdd];
+
+                // Update streak
+                const today = new Date().toDateString();
+                if (newProgress.lastVisit !== today) {
+                    const yesterday = new Date(Date.now() - 86400000).toDateString();
+                    if (newProgress.lastVisit === yesterday) {
+                        newProgress.streak += 1;
+                    } else {
+                        newProgress.streak = 1;
+                    }
+                    newProgress.lastVisit = today;
+                }
+
+                saveLearningProgress(newProgress);
+
+                // Show achievement notification
+                if (achievementsToAdd.length > 0) {
+                    achievementsToAdd.forEach(achievement => {
+                        const achievementNames = {
+                            'first_lesson': '🎉 First Lesson Complete!',
+                            'all_complete': '🏆 All Topics Mastered!',
+                            'perfect_score': '⭐ Perfect Quiz Score!'
+                        };
+                        showToast(achievementNames[achievement] || 'Achievement Unlocked!', 'success');
+                    });
+                }
+            };
+
+            // Quiz Data - Define quizzes for each topic
+            const quizData = {
+                basics: {
+                    questions: [
+                        {
+                            question: "What does owning a stock represent?",
+                            options: [
+                                "Lending money to a company",
+                                "Partial ownership in a company",
+                                "A guaranteed profit",
+                                "A fixed income payment"
+                            ],
+                            correct: 1,
+                            explanation: "When you buy a stock, you become a partial owner of that company. You own a small piece of the business and can benefit from its growth."
+                        },
+                        {
+                            question: "Which order type guarantees execution but NOT price?",
+                            options: [
+                                "Limit Order",
+                                "Market Order",
+                                "Stop-Loss Order",
+                                "Good-Till-Cancelled Order"
+                            ],
+                            correct: 1,
+                            explanation: "A Market Order executes immediately at the best available price. It guarantees your order will fill, but you won't know the exact price until after execution."
+                        },
+                        {
+                            question: "What does a green candlestick indicate?",
+                            options: [
+                                "Price closed lower than it opened",
+                                "Price closed higher than it opened",
+                                "High trading volume",
+                                "The stock is overvalued"
+                            ],
+                            correct: 1,
+                            explanation: "A green (or white) candlestick means the price closed higher than it opened during that period, showing bullish price action where buyers won the battle."
+                        },
+                        {
+                            question: "What is a support level?",
+                            options: [
+                                "The highest price a stock can reach",
+                                "A price level where selling pressure is strong",
+                                "A price level where buying pressure prevents further decline",
+                                "The average price over 50 days"
+                            ],
+                            correct: 2,
+                            explanation: "Support is a price level where buyers step in and prevent the stock from falling further. Think of it as a 'floor' that the price bounces off of."
+                        },
+                        {
+                            question: "During regular market hours, when can you trade stocks? (EST)",
+                            options: [
+                                "24 hours a day",
+                                "9:30 AM - 4:00 PM",
+                                "8:00 AM - 5:00 PM",
+                                "10:00 AM - 3:00 PM"
+                            ],
+                            correct: 1,
+                            explanation: "Regular market hours are 9:30 AM to 4:00 PM Eastern Time, Monday through Friday (except market holidays). Pre-market and after-hours trading are also available but with less liquidity."
+                        }
+                    ]
+                },
+                strategies: {
+                    questions: [
+                        {
+                            question: "What is a breakout entry strategy?",
+                            options: [
+                                "Buying when price falls below support",
+                                "Buying when price breaks above resistance with volume",
+                                "Selling when price is at its highest",
+                                "Buying at the lowest price of the day"
+                            ],
+                            correct: 1,
+                            explanation: "A breakout occurs when price breaks above a resistance level, especially with high volume. This often signals the start of a new uptrend and provides a good entry point."
+                        },
+                        {
+                            question: "What is the main difference between day trading and swing trading?",
+                            options: [
+                                "Day trading uses more money",
+                                "Day trading closes all positions by end of day; swing trading holds for days/weeks",
+                                "Swing trading is more risky",
+                                "Day trading only works with tech stocks"
+                            ],
+                            correct: 1,
+                            explanation: "Day traders close all positions before market close to avoid overnight risk. Swing traders hold positions for several days or weeks to capture larger price moves."
+                        },
+                        {
+                            question: "What is a good risk/reward ratio for most trades?",
+                            options: [
+                                "1:1 (equal risk and reward)",
+                                "2:1 or 3:1 (reward is 2-3x the risk)",
+                                "1:2 (risk is 2x the reward)",
+                                "Risk/reward doesn't matter"
+                            ],
+                            correct: 1,
+                            explanation: "Professional traders aim for at least 2:1 or 3:1 reward/risk ratios. This means if you risk $100, you should aim to make $200-300. This allows you to be profitable even with a 50% win rate."
+                        },
+                        {
+                            question: "When should you take profits?",
+                            options: [
+                                "Never, always hold forever",
+                                "When emotions tell you to",
+                                "At predetermined profit targets based on risk/reward",
+                                "Only when the stock doubles"
+                            ],
+                            correct: 2,
+                            explanation: "Set profit targets BEFORE entering the trade based on technical levels and your risk/reward ratio. Having a plan prevents emotional decisions and ensures disciplined trading."
+                        }
+                    ]
+                },
+                risk: {
+                    questions: [
+                        {
+                            question: "How much of your total portfolio should you risk on a single trade?",
+                            options: [
+                                "10-20%",
+                                "5-10%",
+                                "1-2%",
+                                "As much as possible"
+                            ],
+                            correct: 2,
+                            explanation: "The golden rule is to risk only 1-2% of your total account on any single trade. This ensures you can survive a losing streak without blowing up your account."
+                        },
+                        {
+                            question: "What is the purpose of a stop-loss order?",
+                            options: [
+                                "To guarantee profits",
+                                "To automatically exit at a loss to limit damage",
+                                "To buy more shares when price drops",
+                                "To lock in gains"
+                            ],
+                            correct: 1,
+                            explanation: "A stop-loss automatically sells your position when price hits your predetermined exit level, limiting your loss on the trade. It's essential risk management that protects your capital."
+                        },
+                        {
+                            question: "If you have a $10,000 account and risk 2% per trade, what's your maximum loss per trade?",
+                            options: [
+                                "$100",
+                                "$200",
+                                "$500",
+                                "$1,000"
+                            ],
+                            correct: 1,
+                            explanation: "$10,000 × 2% = $200. This means you should size your position so that if your stop-loss is hit, you only lose $200 maximum."
+                        },
+                        {
+                            question: "What should you do after experiencing several losing trades in a row?",
+                            options: [
+                                "Double position size to recover losses quickly",
+                                "Take a break, review your strategy, and reduce position size",
+                                "Switch to random stocks",
+                                "Ignore stop-losses to avoid being stopped out"
+                            ],
+                            correct: 1,
+                            explanation: "After a losing streak, take a step back. Review your trades, identify mistakes, and consider reducing position size until you regain confidence. Never try to 'revenge trade' to recover losses quickly."
+                        }
+                    ]
+                },
+                calculators: {
+                    questions: [
+                        {
+                            question: "You have $50,000 and want to risk 2% on a trade. Stock price is $100, stop-loss at $95. How many shares should you buy?",
+                            options: [
+                                "100 shares",
+                                "200 shares",
+                                "500 shares",
+                                "1,000 shares"
+                            ],
+                            correct: 1,
+                            explanation: "Risk amount: $50,000 × 2% = $1,000. Risk per share: $100 - $95 = $5. Shares to buy: $1,000 ÷ $5 = 200 shares. This ensures you only lose $1,000 if stopped out."
+                        },
+                        {
+                            question: "If you buy 100 shares at $50 and sell at $60, what's your profit?",
+                            options: [
+                                "$500",
+                                "$1,000",
+                                "$5,000",
+                                "$6,000"
+                            ],
+                            correct: 1,
+                            explanation: "Profit = (Sell Price - Buy Price) × Shares = ($60 - $50) × 100 = $10 × 100 = $1,000"
+                        },
+                        {
+                            question: "You risk $500 to make $1,500. What's your risk/reward ratio?",
+                            options: [
+                                "1:3",
+                                "3:1",
+                                "1:1",
+                                "2:1"
+                            ],
+                            correct: 0,
+                            explanation: "Risk/Reward = Risk : Reward = $500 : $1,500 = 1 : 3. This is excellent! For every $1 you risk, you're aiming to make $3."
+                        }
+                    ]
+                },
+                patterns: {
+                    questions: [
+                        {
+                            question: "What does a 'bull flag' pattern typically indicate?",
+                            options: [
+                                "Trend reversal downward",
+                                "Continuation of uptrend after brief consolidation",
+                                "Market crash imminent",
+                                "No predictable outcome"
+                            ],
+                            correct: 1,
+                            explanation: "A bull flag is a continuation pattern. After a strong upward move (flagpole), the stock consolidates sideways or slightly down (flag), then typically breaks out higher to continue the uptrend."
+                        },
+                        {
+                            question: "What is a 'double top' pattern?",
+                            options: [
+                                "A bullish reversal signal",
+                                "A bearish reversal signal showing price failed to break resistance twice",
+                                "A continuation pattern",
+                                "Two green candles in a row"
+                            ],
+                            correct: 1,
+                            explanation: "A double top forms when price tests a resistance level twice but fails to break through both times. This often signals the uptrend is weakening and a reversal downward may occur."
+                        },
+                        {
+                            question: "What should you look for to confirm a chart pattern breakout?",
+                            options: [
+                                "Low trading volume",
+                                "High trading volume",
+                                "Price moving sideways",
+                                "Social media hype"
+                            ],
+                            correct: 1,
+                            explanation: "High volume on a breakout confirms that many traders believe in the move. Low volume breakouts are often 'false breakouts' that quickly reverse."
+                        }
+                    ]
+                },
+                cases: {
+                    questions: [
+                        {
+                            question: "What is FOMO in trading?",
+                            options: [
+                                "Fear Of Missing Out - buying stocks that already moved significantly",
+                                "First Order Market Opening",
+                                "Fixed Option Moving Average",
+                                "Fundamental Overview Market Option"
+                            ],
+                            correct: 0,
+                            explanation: "FOMO (Fear Of Missing Out) causes traders to chase stocks that have already made large moves, often buying at the top. This emotional trap leads to losses when the stock pulls back."
+                        },
+                        {
+                            question: "Why do disciplined traders keep a trading journal?",
+                            options: [
+                                "For tax purposes only",
+                                "To review mistakes, identify patterns, and improve strategy",
+                                "Because it's required by law",
+                                "To show off to friends"
+                            ],
+                            correct: 1,
+                            explanation: "A trading journal helps you learn from both wins and losses. By documenting your reasoning, emotions, and outcomes, you can identify what works and improve your edge over time."
+                        },
+                        {
+                            question: "What's the biggest lesson from reviewing losing trades?",
+                            options: [
+                                "Trading is impossible",
+                                "Most losses come from not following your own trading plan",
+                                "You need more luck",
+                                "The market is rigged"
+                            ],
+                            correct: 1,
+                            explanation: "Studies show that most losses come from emotional decisions and not following predetermined rules. Having a plan is useless if you don't follow it with discipline."
+                        }
+                    ]
                 }
             };
 
@@ -2196,15 +2540,11 @@
                 const COOLDOWN_MINUTES = 15;
                 const COOLDOWN_MS = COOLDOWN_MINUTES * 60 * 1000;
 
-                let tradingFee = 0;
-                if (plan === 'family-public') {
-                    tradingFee = totalCost * 0.01; // 1% fee
-                } else if (plan === 'family-private') {
-                    tradingFee = 0.05; // $0.05 flat fee
-                }
+                // No trading fees
+                const tradingFee = 0;
 
                 if (type === 'buy') {
-                    const totalWithFee = totalCost + tradingFee;
+                    const totalWithFee = totalCost;
                     if (totalWithFee > portfolio.cash) {
                         showToast(`Insufficient funds! Total: $${totalWithFee.toFixed(2)} - You have $${portfolio.cash.toFixed(2)} available.`, 'error');
                         return;
@@ -2231,19 +2571,6 @@
                     }
                 }
 
-                // Show fee notification for family plans
-                if (tradingFee > 0) {
-                    const proceed = confirm(
-                        `💰 Trading Fee Notice\n\n` +
-                        `${type === 'buy' ? 'Buying' : 'Selling'} ${quantity} shares of ${selectedStock}\n` +
-                        `Trade Value: $${totalCost.toFixed(2)}\n` +
-                        `Trading Fee: $${tradingFee.toFixed(2)} ${plan === 'family-public' ? '(1%)' : '(flat)'}\n` +
-                        `Total ${type === 'buy' ? 'Cost' : 'Net Proceeds'}: $${(type === 'buy' ? totalCost + tradingFee : totalCost - tradingFee).toFixed(2)}\n\n` +
-                        `Continue with trade?`
-                    );
-                    if (!proceed) return;
-                }
-
                 // For sell trades, find the original buy price and timestamp
                 let buyPrice = stock.price;
                 let buyTimestamp = Date.now();
@@ -2266,8 +2593,8 @@
                 const updatedPortfolio = {
                     ...portfolio,
                     cash: type === 'buy'
-                        ? portfolio.cash - totalCost - tradingFee
-                        : portfolio.cash + totalCost - tradingFee,
+                        ? portfolio.cash - totalCost
+                        : portfolio.cash + totalCost,
                     positions: {
                         ...portfolio.positions,
                         [selectedStock]: type === 'buy'
@@ -3328,10 +3655,6 @@
                                                         <span className="text-green-400 text-xl">✓</span>
                                                         <span className="text-gray-300 text-sm">Global leaderboards</span>
                                                     </li>
-                                                    <li className="flex items-start gap-3">
-                                                        <span className="text-green-400 text-xl">✓</span>
-                                                        <span className="text-gray-300 text-sm">1% fee per trade</span>
-                                                    </li>
                                                 </ul>
                                             </div>
                                         </button>
@@ -3392,10 +3715,6 @@
                                                     <li className="flex items-start gap-3">
                                                         <span className="text-purple-400 text-xl">✓</span>
                                                         <span className="text-gray-300 text-sm">Private leaderboards</span>
-                                                    </li>
-                                                    <li className="flex items-start gap-3">
-                                                        <span className="text-purple-400 text-xl">✓</span>
-                                                        <span className="text-gray-300 text-sm">$0.05 flat fee per trade</span>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -4525,10 +4844,6 @@
                                                         <span className="text-green-400 text-xl flex-shrink-0">✓</span>
                                                         <span className="text-gray-300 text-base">Global leaderboards</span>
                                                     </li>
-                                                    <li className="flex items-start gap-3">
-                                                        <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                                                        <span className="text-gray-300 text-base">1% fee per trade</span>
-                                                    </li>
                                                 </ul>
                                             </div>
                                         </button>
@@ -4590,10 +4905,6 @@
                                                     <li className="flex items-start gap-3">
                                                         <span className="text-purple-400 text-xl flex-shrink-0">✓</span>
                                                         <span className="text-gray-300 text-base">Private leaderboards</span>
-                                                    </li>
-                                                    <li className="flex items-start gap-3">
-                                                        <span className="text-purple-400 text-xl flex-shrink-0">✓</span>
-                                                        <span className="text-gray-300 text-base">$0.05 flat fee per trade</span>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -6508,12 +6819,6 @@
                                         <span className="text-purple-200 font-semibold">💰 Total Prize Pool:</span>
                                         <span className="text-white font-black text-lg">${competition.totalPool?.toFixed(2) || '0.00'}</span>
                                     </div>
-                                    {plan === 'family-public' && (
-                                        <div className="text-xs text-purple-300 mt-2">1% fee per trade • Winner takes all</div>
-                                    )}
-                                    {plan === 'family-private' && (
-                                        <div className="text-xs text-purple-300 mt-2">$0.05 flat fee per trade • Winner takes all</div>
-                                    )}
                                 </div>
                             </div>
                         )}
@@ -8767,13 +9072,107 @@
                                     </div>
                                 </div>
 
+                                {/* Progress Dashboard */}
+                                {learningProgress.completedLessons.length > 0 && (
+                                    <div className="bg-gradient-to-br from-purple-900/60 via-blue-900/60 to-cyan-900/60 rounded-2xl p-8 border-2 border-purple-500/50 shadow-2xl">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="text-5xl">🏆</div>
+                                            <div>
+                                                <h3 className="text-3xl font-black text-white">Your Progress</h3>
+                                                <p className="text-purple-200">Keep learning and earning XP!</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Progress Stats Grid */}
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                            <div className="bg-black/40 rounded-xl p-4 border-2 border-cyan-500/30">
+                                                <div className="text-sm text-cyan-300 mb-1">Lessons Completed</div>
+                                                <div className="text-3xl font-black text-cyan-400">
+                                                    {learningProgress.completedLessons.length} / 6
+                                                </div>
+                                            </div>
+                                            <div className="bg-black/40 rounded-xl p-4 border-2 border-green-500/30">
+                                                <div className="text-sm text-green-300 mb-1">Total XP</div>
+                                                <div className="text-3xl font-black text-green-400">
+                                                    {learningProgress.totalXP}
+                                                </div>
+                                            </div>
+                                            <div className="bg-black/40 rounded-xl p-4 border-2 border-purple-500/30">
+                                                <div className="text-sm text-purple-300 mb-1">Achievements</div>
+                                                <div className="text-3xl font-black text-purple-400">
+                                                    {learningProgress.achievements.length}
+                                                </div>
+                                            </div>
+                                            <div className="bg-black/40 rounded-xl p-4 border-2 border-orange-500/30">
+                                                <div className="text-sm text-orange-300 mb-1">Current Streak</div>
+                                                <div className="text-3xl font-black text-orange-400">
+                                                    {learningProgress.streak} 🔥
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Progress Bar */}
+                                        <div className="mb-4">
+                                            <div className="flex justify-between text-sm text-purple-200 mb-2">
+                                                <span>Overall Progress</span>
+                                                <span>{Math.round((learningProgress.completedLessons.length / 6) * 100)}%</span>
+                                            </div>
+                                            <div className="w-full bg-black/40 rounded-full h-4 overflow-hidden border-2 border-purple-500/30">
+                                                <div
+                                                    className="bg-gradient-to-r from-purple-500 via-cyan-500 to-green-500 h-full rounded-full transition-all duration-500"
+                                                    style={{ width: `${(learningProgress.completedLessons.length / 6) * 100}%` }}
+                                                ></div>
+                                            </div>
+                                        </div>
+
+                                        {/* Achievements */}
+                                        {learningProgress.achievements.length > 0 && (
+                                            <div className="bg-black/40 rounded-xl p-4 border-2 border-yellow-500/30">
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <span className="text-2xl">🎖️</span>
+                                                    <span className="text-lg font-bold text-yellow-300">Achievements Unlocked</span>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {learningProgress.achievements.includes('first_lesson') && (
+                                                        <div className="bg-gradient-to-br from-green-900/40 to-emerald-900/40 border-2 border-green-400 rounded-lg px-4 py-2">
+                                                            <div className="text-2xl mb-1">🌱</div>
+                                                            <div className="text-xs font-bold text-green-300">First Lesson</div>
+                                                        </div>
+                                                    )}
+                                                    {learningProgress.achievements.includes('perfect_score') && (
+                                                        <div className="bg-gradient-to-br from-yellow-900/40 to-orange-900/40 border-2 border-yellow-400 rounded-lg px-4 py-2">
+                                                            <div className="text-2xl mb-1">💯</div>
+                                                            <div className="text-xs font-bold text-yellow-300">Perfect Score</div>
+                                                        </div>
+                                                    )}
+                                                    {learningProgress.achievements.includes('all_complete') && (
+                                                        <div className="bg-gradient-to-br from-purple-900/40 to-pink-900/40 border-2 border-purple-400 rounded-lg px-4 py-2">
+                                                            <div className="text-2xl mb-1">🎓</div>
+                                                            <div className="text-xs font-bold text-purple-300">All Complete</div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* Key Topics Grid */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {/* Basics */}
                                     <button
                                         onClick={() => setLearningTopic('basics')}
-                                        className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-green-500/30 hover:border-green-400/60 transition-all hover:transform hover:scale-105 text-left cursor-pointer"
+                                        className={`bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 transition-all hover:transform hover:scale-105 text-left cursor-pointer relative ${
+                                            learningProgress.completedLessons.includes('basics')
+                                                ? 'border-green-400 bg-green-900/20'
+                                                : 'border-green-500/30 hover:border-green-400/60'
+                                        }`}
                                     >
+                                        {learningProgress.completedLessons.includes('basics') && (
+                                            <div className="absolute top-4 right-4 bg-green-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                                                <span className="text-2xl">✓</span>
+                                            </div>
+                                        )}
                                         <div className="text-4xl mb-4">📚</div>
                                         <h3 className="text-2xl font-black text-green-400 mb-3">Trading Basics</h3>
                                         <p className="text-green-100 mb-4">Learn stock fundamentals, market hours, order types, and chart reading essentials.</p>
@@ -8783,7 +9182,18 @@
                                             <li>• Reading candlestick charts</li>
                                             <li>• Bids, asks, and spreads</li>
                                         </ul>
-                                        <div className="mt-4 text-green-400 font-bold">Click to Learn →</div>
+                                        {learningProgress.completedLessons.includes('basics') ? (
+                                            <div className="mt-4">
+                                                <div className="text-green-400 font-bold mb-1">Completed! ✓</div>
+                                                {learningProgress.quizScores.basics && (
+                                                    <div className="text-sm text-green-300">
+                                                        Quiz Score: {learningProgress.quizScores.basics}%
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="mt-4 text-green-400 font-bold">Click to Learn →</div>
+                                        )}
                                     </button>
 
                                     {/* Strategies */}
@@ -9233,6 +9643,15 @@
                                                                     (quizAnswers.basics?.q3 !== undefined) &&
                                                                     (quizAnswers.basics?.q4 !== undefined)) {
                                                                     setQuizSubmitted({...quizSubmitted, basics: true});
+                                                                    // Calculate score and update progress
+                                                                    const score = [
+                                                                        quizAnswers.basics?.q1 === 1,
+                                                                        quizAnswers.basics?.q2 === 1,
+                                                                        quizAnswers.basics?.q3 === 1,
+                                                                        quizAnswers.basics?.q4 === 1
+                                                                    ].filter(Boolean).length;
+                                                                    const percentage = Math.round((score / 4) * 100);
+                                                                    completeLesson('basics', percentage);
                                                                 } else {
                                                                     alert('Please answer all questions before submitting!');
                                                                 }
@@ -9729,35 +10148,455 @@
                                     </div>
                                 )}
 
+                                {/* LESSON CONTENT - Chart Patterns */}
                                 {learningTopic === 'patterns' && (
-                                    <div className="bg-gradient-to-br from-blue-900/60 via-indigo-900/60 to-purple-900/60 rounded-2xl p-8 border-2 border-blue-500/50 shadow-2xl text-center">
-                                        <div className="text-6xl mb-4">📊</div>
-                                        <h2 className="text-3xl font-black text-white mb-4">Chart Patterns Guide</h2>
-                                        <p className="text-blue-200 mb-6">Visual guide to 9 essential chart patterns including bull flags, double tops, cup & handle, and more.</p>
-                                        <a
-                                            href="/learning.html"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg text-lg"
-                                        >
-                                            View Full Pattern Library →
-                                        </a>
+                                    <div className="bg-gradient-to-br from-blue-900/60 via-indigo-900/60 to-purple-900/60 rounded-2xl p-8 border-2 border-blue-500/50 shadow-2xl">
+                                        <div className="text-center mb-8">
+                                            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full mb-4 shadow-2xl">
+                                                <span className="text-4xl">📊</span>
+                                            </div>
+                                            <h2 className="text-4xl font-black text-white mb-2">Chart Patterns Guide</h2>
+                                            <p className="text-lg text-blue-200">Recognize patterns to predict price movements</p>
+                                        </div>
+
+                                        <div className="space-y-6">
+                                            {/* Bullish Patterns */}
+                                            <div className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-green-500/30">
+                                                <h3 className="text-2xl font-black text-green-400 mb-6">📈 Bullish Patterns (Expect Price to Rise)</h3>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {/* Bull Flag */}
+                                                    <div className="bg-green-900/20 rounded-lg p-5 border-2 border-green-400/50 hover:border-green-400 transition-all">
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <span className="text-4xl">🚩</span>
+                                                            <h4 className="text-xl font-bold text-green-300">Bull Flag</h4>
+                                                        </div>
+                                                        <p className="text-green-100 text-sm mb-3">Strong upward move followed by tight consolidation (flag). Signals continuation upward.</p>
+                                                        <div className="bg-black/40 p-3 rounded text-xs">
+                                                            <div className="text-green-300 font-bold mb-1">How to Trade:</div>
+                                                            <div className="text-green-200">• Enter on breakout above flag</div>
+                                                            <div className="text-green-200">• Target: Add flag height to breakout</div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Ascending Triangle */}
+                                                    <div className="bg-green-900/20 rounded-lg p-5 border-2 border-green-400/50 hover:border-green-400 transition-all">
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <span className="text-4xl">🔺</span>
+                                                            <h4 className="text-xl font-bold text-green-300">Ascending Triangle</h4>
+                                                        </div>
+                                                        <p className="text-green-100 text-sm mb-3">Flat resistance with higher lows. Buyers gaining control before breakout.</p>
+                                                        <div className="bg-black/40 p-3 rounded text-xs">
+                                                            <div className="text-green-300 font-bold mb-1">How to Trade:</div>
+                                                            <div className="text-green-200">• Enter on breakout above resistance</div>
+                                                            <div className="text-green-200">• High probability of success</div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Double Bottom */}
+                                                    <div className="bg-green-900/20 rounded-lg p-5 border-2 border-green-400/50 hover:border-green-400 transition-all">
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <span className="text-4xl">💎</span>
+                                                            <h4 className="text-xl font-bold text-green-300">Double Bottom (W)</h4>
+                                                        </div>
+                                                        <p className="text-green-100 text-sm mb-3">Two lows at similar price forming "W" shape. Reversal from downtrend to uptrend.</p>
+                                                        <div className="bg-black/40 p-3 rounded text-xs">
+                                                            <div className="text-green-300 font-bold mb-1">How to Trade:</div>
+                                                            <div className="text-green-200">• Enter after breakout above neckline</div>
+                                                            <div className="text-green-200">• Strong reversal signal</div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Cup & Handle */}
+                                                    <div className="bg-green-900/20 rounded-lg p-5 border-2 border-green-400/50 hover:border-green-400 transition-all">
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <span className="text-4xl">☕</span>
+                                                            <h4 className="text-xl font-bold text-green-300">Cup & Handle</h4>
+                                                        </div>
+                                                        <p className="text-green-100 text-sm mb-3">Rounded bottom (cup) with small consolidation (handle). Very bullish continuation.</p>
+                                                        <div className="bg-black/40 p-3 rounded text-xs">
+                                                            <div className="text-green-300 font-bold mb-1">How to Trade:</div>
+                                                            <div className="text-green-200">• Enter on handle breakout</div>
+                                                            <div className="text-green-200">• One of the strongest patterns</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Bearish Patterns */}
+                                            <div className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-red-500/30">
+                                                <h3 className="text-2xl font-black text-red-400 mb-6">📉 Bearish Patterns (Expect Price to Fall)</h3>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {/* Bear Flag */}
+                                                    <div className="bg-red-900/20 rounded-lg p-5 border-2 border-red-400/50 hover:border-red-400 transition-all">
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <span className="text-4xl">🚩</span>
+                                                            <h4 className="text-xl font-bold text-red-300">Bear Flag</h4>
+                                                        </div>
+                                                        <p className="text-red-100 text-sm mb-3">Sharp decline followed by consolidation. Signals continuation downward.</p>
+                                                        <div className="bg-black/40 p-3 rounded text-xs">
+                                                            <div className="text-red-300 font-bold mb-1">How to Trade:</div>
+                                                            <div className="text-red-200">• Short on breakdown below flag</div>
+                                                            <div className="text-red-200">• Or avoid buying (wait for bottom)</div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Descending Triangle */}
+                                                    <div className="bg-red-900/20 rounded-lg p-5 border-2 border-red-400/50 hover:border-red-400 transition-all">
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <span className="text-4xl">🔻</span>
+                                                            <h4 className="text-xl font-bold text-red-300">Descending Triangle</h4>
+                                                        </div>
+                                                        <p className="text-red-100 text-sm mb-3">Flat support with lower highs. Sellers building pressure before breakdown.</p>
+                                                        <div className="bg-black/40 p-3 rounded text-xs">
+                                                            <div className="text-red-300 font-bold mb-1">How to Trade:</div>
+                                                            <div className="text-red-200">• Breakdown = strong sell signal</div>
+                                                            <div className="text-red-200">• Stay away until reverses</div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Double Top */}
+                                                    <div className="bg-red-900/20 rounded-lg p-5 border-2 border-red-400/50 hover:border-red-400 transition-all">
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <span className="text-4xl">🔴</span>
+                                                            <h4 className="text-xl font-bold text-red-300">Double Top (M)</h4>
+                                                        </div>
+                                                        <p className="text-red-100 text-sm mb-3">Two peaks at similar price forming "M" shape. Reversal from uptrend to downtrend.</p>
+                                                        <div className="bg-black/40 p-3 rounded text-xs">
+                                                            <div className="text-red-300 font-bold mb-1">How to Trade:</div>
+                                                            <div className="text-red-200">• Exit longs on neckline break</div>
+                                                            <div className="text-red-200">• Reliable reversal pattern</div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Head & Shoulders */}
+                                                    <div className="bg-red-900/20 rounded-lg p-5 border-2 border-red-400/50 hover:border-red-400 transition-all">
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <span className="text-4xl">🎯</span>
+                                                            <h4 className="text-xl font-bold text-red-300">Head & Shoulders</h4>
+                                                        </div>
+                                                        <p className="text-red-100 text-sm mb-3">Three peaks with middle one highest. Very reliable bearish reversal.</p>
+                                                        <div className="bg-black/40 p-3 rounded text-xs">
+                                                            <div className="text-red-300 font-bold mb-1">How to Trade:</div>
+                                                            <div className="text-red-200">• Sell when neckline breaks</div>
+                                                            <div className="text-red-200">• Classic top formation</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Key Takeaways */}
+                                            <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 backdrop-blur-xl rounded-xl p-6 border-2 border-purple-500/50">
+                                                <h3 className="text-2xl font-black text-purple-300 mb-4">💡 Pattern Trading Tips</h3>
+                                                <ul className="space-y-3 text-purple-100">
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-xl">✓</span>
+                                                        <div><strong className="text-purple-200">Wait for Confirmation:</strong> Don't trade the pattern until breakout/breakdown happens</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-xl">✓</span>
+                                                        <div><strong className="text-purple-200">Volume Matters:</strong> Breakouts with high volume are more reliable</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-xl">✓</span>
+                                                        <div><strong className="text-purple-200">Use Stop-Losses:</strong> Place stops below support (bullish) or above resistance (bearish)</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-xl">✓</span>
+                                                        <div><strong className="text-purple-200">Combine with Trend:</strong> Patterns work best when aligned with overall trend</div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
 
                                 {learningTopic === 'cases' && (
-                                    <div className="bg-gradient-to-br from-purple-900/60 via-pink-900/60 to-red-900/60 rounded-2xl p-8 border-2 border-purple-500/50 shadow-2xl text-center">
-                                        <div className="text-6xl mb-4">💼</div>
-                                        <h2 className="text-3xl font-black text-white mb-4">Real Case Studies</h2>
-                                        <p className="text-purple-200 mb-6">Learn from real winning and losing trades including Tesla +42% success, FOMO mistakes, and disciplined stop-loss examples.</p>
-                                        <a
-                                            href="/learning.html"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-block bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg text-lg"
-                                        >
-                                            Read Case Studies →
-                                        </a>
+                                    <div>
+                                        {/* Header */}
+                                        <div className="text-center mb-8">
+                                            <div className="text-6xl mb-4">💼</div>
+                                            <h2 className="text-4xl font-black text-white mb-3">Real Case Studies</h2>
+                                            <p className="text-xl text-purple-200">Learn from real winning and losing trades - see what worked and what didn't</p>
+                                        </div>
+
+                                        {/* Case Study 1: Tesla Success */}
+                                        <div className="bg-gradient-to-br from-green-900/60 via-emerald-900/60 to-teal-900/60 rounded-2xl p-8 border-2 border-green-500/50 shadow-2xl mb-6">
+                                            <div className="flex items-center gap-3 mb-6">
+                                                <div className="text-5xl">📈</div>
+                                                <div>
+                                                    <h3 className="text-3xl font-black text-white">Case Study #1: Tesla Breakout</h3>
+                                                    <div className="text-green-300 font-bold text-lg">✅ WINNING TRADE - +42% Profit</div>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid md:grid-cols-2 gap-6 mb-6">
+                                                <div className="bg-black/40 rounded-xl p-6 border border-green-500/30">
+                                                    <h4 className="text-xl font-bold text-green-300 mb-4 flex items-center gap-2">
+                                                        <span>📊</span> Trade Details
+                                                    </h4>
+                                                    <div className="space-y-3 text-white">
+                                                        <div><strong className="text-green-200">Stock:</strong> Tesla (TSLA)</div>
+                                                        <div><strong className="text-green-200">Entry:</strong> $180.00</div>
+                                                        <div><strong className="text-green-200">Stop-Loss:</strong> $172.00 (-4.4%)</div>
+                                                        <div><strong className="text-green-200">Target:</strong> $240.00 (+33%)</div>
+                                                        <div><strong className="text-green-200">Exit:</strong> $255.60 (+42%)</div>
+                                                        <div><strong className="text-green-200">Position Size:</strong> 100 shares</div>
+                                                        <div><strong className="text-green-200">Profit:</strong> $7,560 💰</div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-black/40 rounded-xl p-6 border border-green-500/30">
+                                                    <h4 className="text-xl font-bold text-green-300 mb-4 flex items-center gap-2">
+                                                        <span>🎯</span> Setup
+                                                    </h4>
+                                                    <div className="space-y-3 text-white">
+                                                        <div><strong className="text-green-200">Pattern:</strong> Bull Flag after earnings beat</div>
+                                                        <div><strong className="text-green-200">Volume:</strong> 2x average on breakout</div>
+                                                        <div><strong className="text-green-200">Trend:</strong> Strong uptrend on daily chart</div>
+                                                        <div><strong className="text-green-200">Catalyst:</strong> Q3 earnings exceeded estimates</div>
+                                                        <div><strong className="text-green-200">Confirmation:</strong> Broke above $178 resistance with volume</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="bg-black/40 rounded-xl p-6 border border-green-500/30">
+                                                <h4 className="text-xl font-bold text-green-300 mb-4 flex items-center gap-2">
+                                                    <span>✅</span> What Went Right
+                                                </h4>
+                                                <ul className="space-y-3 text-white">
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-green-400 text-xl">•</span>
+                                                        <div><strong>Waited for Confirmation:</strong> Didn't buy before the breakout - waited for price to close above $178 resistance</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-green-400 text-xl">•</span>
+                                                        <div><strong>Volume Confirmation:</strong> Entry coincided with 2x average volume spike - smart money was buying</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-green-400 text-xl">•</span>
+                                                        <div><strong>Risk Management:</strong> Stop-loss at $172 risked only $800 (1% of $80k account) for potential $6,000+ gain</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-green-400 text-xl">•</span>
+                                                        <div><strong>Trailed Profits:</strong> Moved stop-loss to breakeven at +10%, locked in profits at +25%, let winners run</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-green-400 text-xl">•</span>
+                                                        <div><strong>Took Partial Profits:</strong> Sold 50% at target ($240), let remaining 50% ride to $255.60</div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        {/* Case Study 2: AMC FOMO Mistake */}
+                                        <div className="bg-gradient-to-br from-red-900/60 via-rose-900/60 to-pink-900/60 rounded-2xl p-8 border-2 border-red-500/50 shadow-2xl mb-6">
+                                            <div className="flex items-center gap-3 mb-6">
+                                                <div className="text-5xl">📉</div>
+                                                <div>
+                                                    <h3 className="text-3xl font-black text-white">Case Study #2: AMC FOMO</h3>
+                                                    <div className="text-red-300 font-bold text-lg">❌ LOSING TRADE - -18% Loss</div>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid md:grid-cols-2 gap-6 mb-6">
+                                                <div className="bg-black/40 rounded-xl p-6 border border-red-500/30">
+                                                    <h4 className="text-xl font-bold text-red-300 mb-4 flex items-center gap-2">
+                                                        <span>📊</span> Trade Details
+                                                    </h4>
+                                                    <div className="space-y-3 text-white">
+                                                        <div><strong className="text-red-200">Stock:</strong> AMC Entertainment (AMC)</div>
+                                                        <div><strong className="text-red-200">Entry:</strong> $52.00</div>
+                                                        <div><strong className="text-red-200">Stop-Loss:</strong> None set ⚠️</div>
+                                                        <div><strong className="text-red-200">Target:</strong> $100.00 (unrealistic)</div>
+                                                        <div><strong className="text-red-200">Exit:</strong> $42.50 (-18%)</div>
+                                                        <div><strong className="text-red-200">Position Size:</strong> 200 shares (too large)</div>
+                                                        <div><strong className="text-red-200">Loss:</strong> -$1,900 💸</div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-black/40 rounded-xl p-6 border border-red-500/30">
+                                                    <h4 className="text-xl font-bold text-red-300 mb-4 flex items-center gap-2">
+                                                        <span>⚠️</span> Red Flags Ignored
+                                                    </h4>
+                                                    <div className="space-y-3 text-white">
+                                                        <div><strong className="text-red-200">Entry Point:</strong> Bought at all-time high during parabolic move</div>
+                                                        <div><strong className="text-red-200">Volume:</strong> Decreasing volume = exhaustion</div>
+                                                        <div><strong className="text-red-200">RSI:</strong> 87 (extremely overbought)</div>
+                                                        <div><strong className="text-red-200">Motivation:</strong> Social media hype, not technical analysis</div>
+                                                        <div><strong className="text-red-200">Fundamentals:</strong> Company losing money, no real catalyst</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="bg-black/40 rounded-xl p-6 border border-red-500/30">
+                                                <h4 className="text-xl font-bold text-red-300 mb-4 flex items-center gap-2">
+                                                    <span>❌</span> What Went Wrong
+                                                </h4>
+                                                <ul className="space-y-3 text-white">
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-red-400 text-xl">•</span>
+                                                        <div><strong>FOMO Entry:</strong> Bought at the top because "everyone was talking about it" - emotion-driven, not strategy-driven</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-red-400 text-xl">•</span>
+                                                        <div><strong>No Stop-Loss:</strong> Hoped it would "come back" instead of cutting losses - broke the #1 rule of risk management</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-red-400 text-xl">•</span>
+                                                        <div><strong>Oversized Position:</strong> Risked 13% of account ($10k) on one meme stock - way too much exposure</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-red-400 text-xl">•</span>
+                                                        <div><strong>Ignored Technicals:</strong> RSI at 87 screamed "overbought" - should have waited for pullback or avoided entirely</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-red-400 text-xl">•</span>
+                                                        <div><strong>No Exit Plan:</strong> Had vague target of $100 with no basis - should have had realistic profit target and stop-loss</div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        {/* Case Study 3: Disciplined Stop-Loss */}
+                                        <div className="bg-gradient-to-br from-blue-900/60 via-indigo-900/60 to-purple-900/60 rounded-2xl p-8 border-2 border-blue-500/50 shadow-2xl">
+                                            <div className="flex items-center gap-3 mb-6">
+                                                <div className="text-5xl">🛡️</div>
+                                                <div>
+                                                    <h3 className="text-3xl font-black text-white">Case Study #3: Apple Stop-Loss Save</h3>
+                                                    <div className="text-blue-300 font-bold text-lg">🛡️ PROTECTED CAPITAL - Small -3% Loss Avoided -22% Crash</div>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid md:grid-cols-2 gap-6 mb-6">
+                                                <div className="bg-black/40 rounded-xl p-6 border border-blue-500/30">
+                                                    <h4 className="text-xl font-bold text-blue-300 mb-4 flex items-center gap-2">
+                                                        <span>📊</span> Trade Details
+                                                    </h4>
+                                                    <div className="space-y-3 text-white">
+                                                        <div><strong className="text-blue-200">Stock:</strong> Apple (AAPL)</div>
+                                                        <div><strong className="text-blue-200">Entry:</strong> $185.00</div>
+                                                        <div><strong className="text-blue-200">Stop-Loss:</strong> $179.50 (-3%)</div>
+                                                        <div><strong className="text-blue-200">Target:</strong> $200.00 (+8%)</div>
+                                                        <div><strong className="text-blue-200">Stopped Out:</strong> $179.50 (-3%)</div>
+                                                        <div><strong className="text-blue-200">Stock Fell To:</strong> $144.00 (-22% from entry)</div>
+                                                        <div><strong className="text-blue-200">Loss Taken:</strong> -$275 (instead of -$2,050)</div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-black/40 rounded-xl p-6 border border-blue-500/30">
+                                                    <h4 className="text-xl font-bold text-blue-300 mb-4 flex items-center gap-2">
+                                                        <span>🎯</span> What Happened
+                                                    </h4>
+                                                    <div className="space-y-3 text-white">
+                                                        <div><strong className="text-blue-200">Setup:</strong> Bought breakout above $183 resistance</div>
+                                                        <div><strong className="text-blue-200">Initial Move:</strong> Rose to $187 (+1%) within 2 days</div>
+                                                        <div><strong className="text-blue-200">Reversal:</strong> Market-wide selloff on Fed news</div>
+                                                        <div><strong className="text-blue-200">Stop Triggered:</strong> Hit $179.50, order executed automatically</div>
+                                                        <div><strong className="text-blue-200">Aftermath:</strong> Stock crashed to $144 over next 3 weeks</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="bg-black/40 rounded-xl p-6 border border-blue-500/30">
+                                                <h4 className="text-xl font-bold text-blue-300 mb-4 flex items-center gap-2">
+                                                    <span>🎓</span> Key Lessons
+                                                </h4>
+                                                <ul className="space-y-3 text-white">
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-blue-400 text-xl">•</span>
+                                                        <div><strong>Stop-Losses Work:</strong> Lost only $275 instead of $2,050 - that's $1,775 saved for future trades</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-blue-400 text-xl">•</span>
+                                                        <div><strong>Emotion-Free Exit:</strong> Stop-loss order executed automatically - no hesitation, no "should I wait?"</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-blue-400 text-xl">•</span>
+                                                        <div><strong>Protected Capital:</strong> Small losses are acceptable - they keep you in the game for winning trades</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-blue-400 text-xl">•</span>
+                                                        <div><strong>No Regrets:</strong> Could have re-entered at $144 with $1,775 extra capital - being stopped out isn't "losing"</div>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="text-blue-400 text-xl">•</span>
+                                                        <div><strong>Set and Forget:</strong> Having a plan before entering = no stress, no panic, no hoping</div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        {/* Key Takeaways */}
+                                        <div className="bg-gradient-to-r from-purple-900/60 to-pink-900/60 backdrop-blur-xl rounded-xl p-8 border-2 border-purple-500/50 mt-8">
+                                            <div className="text-center mb-6">
+                                                <div className="text-5xl mb-4">🎯</div>
+                                                <h3 className="text-3xl font-black text-white mb-2">Universal Lessons from These Trades</h3>
+                                            </div>
+
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                <div className="bg-black/40 rounded-lg p-6 border border-green-500/30">
+                                                    <h4 className="text-xl font-bold text-green-300 mb-4">✅ Do This</h4>
+                                                    <ul className="space-y-3 text-white">
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-green-400">•</span>
+                                                            <span>Wait for volume confirmation before entering</span>
+                                                        </li>
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-green-400">•</span>
+                                                            <span>ALWAYS set stop-losses before buying</span>
+                                                        </li>
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-green-400">•</span>
+                                                            <span>Risk 1-2% max per trade</span>
+                                                        </li>
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-green-400">•</span>
+                                                            <span>Trail stop-losses as profits grow</span>
+                                                        </li>
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-green-400">•</span>
+                                                            <span>Take partial profits at targets</span>
+                                                        </li>
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-green-400">•</span>
+                                                            <span>Trade based on technicals, not hype</span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+                                                <div className="bg-black/40 rounded-lg p-6 border border-red-500/30">
+                                                    <h4 className="text-xl font-bold text-red-300 mb-4">❌ Avoid This</h4>
+                                                    <ul className="space-y-3 text-white">
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-red-400">•</span>
+                                                            <span>Chasing stocks after huge moves (FOMO)</span>
+                                                        </li>
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-red-400">•</span>
+                                                            <span>Trading without stop-losses</span>
+                                                        </li>
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-red-400">•</span>
+                                                            <span>Oversized positions (>5% of account)</span>
+                                                        </li>
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-red-400">•</span>
+                                                            <span>Buying when RSI > 70 without pullback</span>
+                                                        </li>
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-red-400">•</span>
+                                                            <span>Hoping losing trades will "come back"</span>
+                                                        </li>
+                                                        <li className="flex items-start gap-2">
+                                                            <span className="text-red-400">•</span>
+                                                            <span>Trading based on social media hype</span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>
