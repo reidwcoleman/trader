@@ -3917,6 +3917,21 @@
                             </div>
                         </nav>
 
+                        {/* Disclaimer Banner Below Header Buttons */}
+                        <div className="max-w-7xl mx-auto px-4 md:px-8 mt-6">
+                            <div className="bg-gradient-to-r from-red-900/40 via-orange-900/40 to-red-900/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-red-500/50 shadow-2xl shadow-red-500/20">
+                                <div className="flex items-start gap-4">
+                                    <div className="text-4xl flex-shrink-0">⚠️</div>
+                                    <div className="text-left">
+                                        <h3 className="text-xl font-black text-red-300 mb-3">Virtual Trading Simulator - Educational Purposes Only</h3>
+                                        <p className="text-red-100 text-sm leading-relaxed">
+                                            <strong>FinClash is a trading simulator using virtual currency only.</strong> You <strong>CANNOT win or lose real money</strong> on this platform. All AI analysis, stock tips, recommendations, and strategies provided are <strong>NOT financial advice</strong> and are for educational purposes only. Always conduct your own research and consult with a licensed financial advisor before making any real investment decisions. Past performance does not guarantee future results.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Account Type Selection Modal */}
                         {showAccountTypeModal ? (
                             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[99999]">
@@ -4108,21 +4123,6 @@
                         ) : null}
 
                         <div className="max-w-7xl mx-auto relative z-10 px-4 md:px-8 pt-20">
-                            {/* Disclaimer Banner */}
-                            <div className="mb-8 animate-fade-in">
-                                <div className="bg-gradient-to-r from-red-900/40 via-orange-900/40 to-red-900/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-red-500/50 shadow-2xl shadow-red-500/20">
-                                    <div className="flex items-start gap-4">
-                                        <div className="text-4xl flex-shrink-0">⚠️</div>
-                                        <div className="text-left">
-                                            <h3 className="text-xl font-black text-red-300 mb-3">Virtual Trading Simulator - Educational Purposes Only</h3>
-                                            <p className="text-red-100 text-sm leading-relaxed">
-                                                <strong>FinClash is a trading simulator using virtual currency only.</strong> You <strong>CANNOT win or lose real money</strong> on this platform. All AI analysis, stock tips, recommendations, and strategies provided are <strong>NOT financial advice</strong> and are for educational purposes only. Always conduct your own research and consult with a licensed financial advisor before making any real investment decisions. Past performance does not guarantee future results.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             {/* Hero Section - Bold & Minimal */}
                             <div className="min-h-screen flex flex-col items-center justify-center text-center">
                                 {/* Massive Headline with Epic Styling */}
@@ -9862,6 +9862,44 @@
                                         ) : (
                                             <div className="mt-4 text-purple-400 font-bold">Click to Learn →</div>
                                         )}
+                                    </button>
+                                </div>
+
+                                {/* Chart Pattern Preview */}
+                                <div className="bg-gradient-to-br from-blue-900/60 via-indigo-900/60 to-purple-900/60 rounded-2xl p-8 border-2 border-blue-500/50 shadow-2xl">
+                                    <div className="text-center mb-6">
+                                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full mb-4 shadow-2xl">
+                                            <span className="text-3xl">📈</span>
+                                        </div>
+                                        <h3 className="text-3xl font-black text-white mb-2">Master Chart Patterns</h3>
+                                        <p className="text-blue-200">Learn to identify patterns and predict price movements with precision</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                        <div className="bg-black/40 rounded-xl p-4 border-2 border-green-500/30 hover:border-green-400 transition-all">
+                                            <div className="text-3xl mb-2">🚩</div>
+                                            <div className="text-lg font-bold text-green-300 mb-1">Bull Flag</div>
+                                            <div className="text-sm text-green-200">Continuation pattern signaling upward breakout</div>
+                                        </div>
+                                        <div className="bg-black/40 rounded-xl p-4 border-2 border-red-500/30 hover:border-red-400 transition-all">
+                                            <div className="text-3xl mb-2">🎯</div>
+                                            <div className="text-lg font-bold text-red-300 mb-1">Head & Shoulders</div>
+                                            <div className="text-sm text-red-200">Bearish reversal with neckline break</div>
+                                        </div>
+                                        <div className="bg-black/40 rounded-xl p-4 border-2 border-green-500/30 hover:border-green-400 transition-all">
+                                            <div className="text-3xl mb-2">💎</div>
+                                            <div className="text-lg font-bold text-green-300 mb-1">Double Bottom</div>
+                                            <div className="text-sm text-green-200">W-pattern indicating trend reversal</div>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={() => setLearningTopic('patterns')}
+                                        className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white px-6 py-4 rounded-xl font-bold transition-all shadow-lg text-lg flex items-center justify-center gap-2"
+                                    >
+                                        <span>📊</span>
+                                        <span>View All 6 Patterns with Interactive Charts</span>
+                                        <span>→</span>
                                     </button>
                                 </div>
 
