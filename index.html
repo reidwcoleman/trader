@@ -121,6 +121,8 @@
             const [loadingLiveExample, setLoadingLiveExample] = useState(false); // Loading state for live example
             const [practiceScenario, setPracticeScenario] = useState(null); // Practice trading scenario
             const [practiceChoice, setPracticeChoice] = useState(null); // User's choice in practice scenario
+            const [glossarySearch, setGlossarySearch] = useState(''); // Glossary search term
+            const [showGlossary, setShowGlossary] = useState(false); // Show glossary modal
             const [learningProgress, setLearningProgress] = useState(() => {
                 // Load from localStorage or initialize
                 const saved = localStorage.getItem('learningProgress');
@@ -1034,6 +1036,64 @@
                     ]
                 }
             };
+
+            // Glossary Data - Trading terms dictionary
+            const glossaryTerms = [
+                // Market Terms
+                { term: "Stock", definition: "A share representing partial ownership in a company. When you buy stock, you own a piece of that business and can benefit from its growth and profits.", category: "Market" },
+                { term: "Share", definition: "A single unit of ownership in a company. If a company has 1,000 shares and you own 100, you own 10% of the company.", category: "Market" },
+                { term: "Bull Market", definition: "A market condition where prices are rising or expected to rise over an extended period. Investors are optimistic and buying activity increases.", category: "Market" },
+                { term: "Bear Market", definition: "A market condition where prices are falling or expected to fall, typically 20% or more from recent highs. Investor sentiment is pessimistic.", category: "Market" },
+                { term: "Volatility", definition: "The rate and magnitude of price changes in a stock or market. High volatility means large price swings, while low volatility means stable prices.", category: "Market" },
+                { term: "Liquidity", definition: "How easily an asset can be bought or sold without affecting its price. High liquidity means you can enter/exit positions quickly at fair prices.", category: "Market" },
+                { term: "Volume", definition: "The total number of shares traded during a specific period. High volume confirms the strength of price moves and indicates strong interest.", category: "Market" },
+                { term: "Market Cap", definition: "Market Capitalization - the total value of a company's outstanding shares. Calculated by multiplying share price by total shares outstanding.", category: "Market" },
+                { term: "Bid-Ask Spread", definition: "The difference between the highest price a buyer is willing to pay (bid) and the lowest price a seller will accept (ask). Tighter spreads indicate better liquidity.", category: "Market" },
+                { term: "Gap", definition: "A price level where no trading occurs, creating a 'gap' on the chart. Often happens at market open when news moves price sharply from previous close.", category: "Market" },
+
+                // Order Types
+                { term: "Market Order", definition: "An order to buy or sell immediately at the best available current price. Guarantees execution but not the exact price you'll get.", category: "Orders" },
+                { term: "Limit Order", definition: "An order to buy or sell at a specific price or better. Guarantees your price but not that the order will execute. Used to control entry/exit prices.", category: "Orders" },
+                { term: "Stop-Loss Order", definition: "An order that automatically sells your position when price reaches a predetermined level, limiting your loss. Essential for risk management.", category: "Orders" },
+                { term: "Trailing Stop", definition: "A dynamic stop-loss that moves with the stock price, locking in profits while protecting against reversals. Trails the price by a set percentage or dollar amount.", category: "Orders" },
+                { term: "Stop-Limit Order", definition: "Combines a stop order and limit order. When stop price is reached, it becomes a limit order at your specified price. More control but risks not executing.", category: "Orders" },
+                { term: "Day Order", definition: "An order that expires at the end of the trading day if not executed. Default order type for most brokers.", category: "Orders" },
+                { term: "GTC Order", definition: "Good-Till-Cancelled order that remains active until executed or manually cancelled. Can stay open for weeks or months depending on broker.", category: "Orders" },
+                { term: "Fill or Kill", definition: "An order that must be executed immediately in its entirety or cancelled. Used when you need the full position size immediately.", category: "Orders" },
+
+                // Technical Analysis
+                { term: "RSI", definition: "Relative Strength Index - momentum oscillator measuring speed and magnitude of price changes on a 0-100 scale. Above 70 suggests overbought, below 30 suggests oversold.", category: "Technical" },
+                { term: "MACD", definition: "Moving Average Convergence Divergence - trend-following momentum indicator showing relationship between two moving averages. Crossovers signal potential buy/sell opportunities.", category: "Technical" },
+                { term: "Moving Average", definition: "Average price over a specific period (20-day, 50-day, 200-day). Used to smooth price action and identify trend direction. Price above MA = uptrend, below = downtrend.", category: "Technical" },
+                { term: "Support", definition: "A price level where buying pressure prevents further decline, acting as a 'floor'. Price often bounces off support levels. Break below support can signal weakness.", category: "Technical" },
+                { term: "Resistance", definition: "A price level where selling pressure prevents further advance, acting as a 'ceiling'. Price struggles to break through resistance. Break above resistance signals strength.", category: "Technical" },
+                { term: "Breakout", definition: "When price moves above resistance or below support with strong volume, potentially starting a new trend. Most reliable with high volume confirmation.", category: "Technical" },
+                { term: "Trend Line", definition: "A line connecting two or more price points to show trend direction. Uptrend connects higher lows, downtrend connects lower highs. Used to identify support/resistance.", category: "Technical" },
+                { term: "Candlestick", definition: "A chart type showing open, high, low, and close prices for a period. Green/white candles = price closed higher, red/black = closed lower. Reveals buying/selling pressure.", category: "Technical" },
+                { term: "Chart Pattern", definition: "Recognizable formations in price action that often lead to predictable moves. Examples: head and shoulders, double top, bull flag, cup and handle.", category: "Technical" },
+                { term: "Fibonacci Retracement", definition: "Technical tool using horizontal lines at key Fibonacci ratios (23.6%, 38.2%, 50%, 61.8%) to identify potential support/resistance levels during pullbacks.", category: "Technical" },
+
+                // Risk Management
+                { term: "Position Sizing", definition: "Calculating how many shares to buy based on your risk tolerance and stop-loss distance. Ensures you only risk 1-2% of account per trade.", category: "Risk" },
+                { term: "Risk/Reward Ratio", definition: "The ratio of potential profit to potential loss on a trade. Professional traders target 2:1 or 3:1, meaning they risk $1 to make $2-3.", category: "Risk" },
+                { term: "Drawdown", definition: "The decline from peak to trough in your account balance, expressed as percentage. A $10,000 account dropping to $8,000 has a 20% drawdown.", category: "Risk" },
+                { term: "Diversification", definition: "Spreading capital across multiple stocks or sectors to reduce risk. Don't put all eggs in one basket - if one trade fails, others may succeed.", category: "Risk" },
+                { term: "Risk Capital", definition: "Money you can afford to lose without affecting your lifestyle. Only trade with risk capital, never mortgage money, rent money, or emergency funds.", category: "Risk" },
+                { term: "Max Loss Per Trade", definition: "The maximum amount you're willing to lose on a single trade, typically 1-2% of total account. This prevents one bad trade from destroying your account.", category: "Risk" },
+                { term: "Correlation", definition: "How two stocks move in relation to each other. Positive correlation = move together, negative = move opposite. Avoid buying highly correlated stocks (reduces diversification).", category: "Risk" },
+                { term: "Leverage", definition: "Using borrowed money to increase position size. Amplifies both gains and losses. Dangerous for beginners - can lose more than initial investment.", category: "Risk" },
+
+                // Trading Psychology
+                { term: "FOMO", definition: "Fear Of Missing Out - the emotional urge to chase stocks that have already made large moves. Often leads to buying at tops and significant losses.", category: "Psychology" },
+                { term: "Fear", definition: "Emotion causing traders to exit winners too early or avoid good setups. Fear of loss is stronger than desire for gain. Combat with proper risk management.", category: "Psychology" },
+                { term: "Greed", definition: "Emotion causing traders to hold losers too long or over-trade. Leads to ignoring stop-losses and taking excessive risk. Stick to your plan to overcome.", category: "Psychology" },
+                { term: "Discipline", definition: "The ability to follow your trading plan consistently without emotional deviation. Most important trait for success - rules without discipline are useless.", category: "Psychology" },
+                { term: "Revenge Trading", definition: "Impulsively taking trades to recover losses from a previous losing trade. Driven by emotion rather than strategy. Almost always leads to bigger losses.", category: "Psychology" },
+                { term: "Overtrading", definition: "Taking too many trades, often out of boredom or greed. Reduces win rate, increases commission costs, and leads to poor decisions. Quality over quantity.", category: "Psychology" },
+                { term: "Trading Journal", definition: "A log documenting every trade including entry/exit, reasoning, emotions, and lessons learned. Critical tool for identifying mistakes and improving over time.", category: "Psychology" },
+                { term: "Confirmation Bias", definition: "The tendency to seek information that confirms your existing beliefs while ignoring contrary evidence. Leads to holding losing trades too long.", category: "Psychology" },
+                { term: "Patience", definition: "Waiting for high-probability setups that meet your criteria rather than forcing trades. Warren Buffett: 'The stock market is a device for transferring money from the impatient to the patient.'", category: "Psychology" }
+            ];
 
             // Chat functions
             const sendChatMessage = () => {
@@ -9535,6 +9595,25 @@
                                     </div>
                                 </div>
 
+                                {/* Trading Glossary Button */}
+                                <div className="bg-gradient-to-r from-cyan-900/60 via-blue-900/60 to-indigo-900/60 backdrop-blur-xl rounded-xl p-6 border-2 border-cyan-500/30">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-start gap-4">
+                                            <div className="text-4xl">📖</div>
+                                            <div>
+                                                <h3 className="text-xl font-black text-cyan-300 mb-2">Trading Glossary</h3>
+                                                <p className="text-cyan-100 text-sm">Access our comprehensive dictionary of 45+ trading terms covering market concepts, order types, technical analysis, risk management, and trading psychology.</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowGlossary(true)}
+                                            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-cyan-500/30 whitespace-nowrap"
+                                        >
+                                            Open Glossary
+                                        </button>
+                                    </div>
+                                </div>
+
                                 {/* External Resource Link */}
                                 <div className="bg-gradient-to-r from-green-900/60 via-emerald-900/60 to-teal-900/60 backdrop-blur-xl rounded-xl p-6 border-2 border-green-500/30">
                                     <div className="flex items-center justify-between">
@@ -12344,6 +12423,157 @@
                                         </article>
                                     </div>
                                 )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Trading Glossary Modal */}
+                {showGlossary && (
+                    <div className="fixed inset-0 bg-black/95 backdrop-blur-xl z-[9999] flex items-center justify-center p-4 animate-fade-in">
+                        <div className="relative w-full max-w-7xl h-[90vh] bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 rounded-3xl border-2 border-cyan-500/50 overflow-hidden shadow-2xl" style={{boxShadow: '0 0 60px rgba(6, 182, 212, 0.4)'}}>
+                            {/* Modal Header */}
+                            <div className="relative bg-gradient-to-r from-cyan-900/80 via-blue-900/80 to-indigo-900/80 backdrop-blur-xl p-6 border-b-2 border-cyan-500/50">
+                                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10"></div>
+                                <div className="relative flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-5xl">📖</span>
+                                        <div>
+                                            <h2 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300">
+                                                Trading Glossary
+                                            </h2>
+                                            <p className="text-cyan-200 text-sm mt-1">
+                                                {glossaryTerms.length} essential trading terms to master
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            setShowGlossary(false);
+                                            setGlossarySearch('');
+                                        }}
+                                        className="text-white hover:text-red-400 transition-colors p-2 hover:bg-red-500/20 rounded-xl"
+                                    >
+                                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                {/* Search Bar */}
+                                <div className="relative mt-6">
+                                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                                        <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Search terms or definitions..."
+                                        value={glossarySearch}
+                                        onChange={(e) => setGlossarySearch(e.target.value)}
+                                        className="w-full pl-12 pr-4 py-3 bg-black/50 border-2 border-cyan-500/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition-colors"
+                                    />
+                                    {glossarySearch && (
+                                        <button
+                                            onClick={() => setGlossarySearch('')}
+                                            className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-white"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Modal Content - Scrollable Terms */}
+                            <div className="overflow-y-auto h-[calc(90vh-200px)] p-6">
+                                {(() => {
+                                    // Filter terms based on search
+                                    const searchLower = glossarySearch.toLowerCase();
+                                    const filteredTerms = glossarySearch
+                                        ? glossaryTerms.filter(term =>
+                                            term.term.toLowerCase().includes(searchLower) ||
+                                            term.definition.toLowerCase().includes(searchLower)
+                                        )
+                                        : glossaryTerms;
+
+                                    // Group filtered terms by category
+                                    const groupedTerms = filteredTerms.reduce((acc, term) => {
+                                        if (!acc[term.category]) {
+                                            acc[term.category] = [];
+                                        }
+                                        acc[term.category].push(term);
+                                        return acc;
+                                    }, {});
+
+                                    const categories = Object.keys(groupedTerms).sort();
+
+                                    if (filteredTerms.length === 0) {
+                                        return (
+                                            <div className="flex flex-col items-center justify-center h-full text-center py-20">
+                                                <svg className="w-20 h-20 text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <p className="text-gray-400 text-xl font-bold mb-2">No terms found</p>
+                                                <p className="text-gray-500">Try a different search term</p>
+                                            </div>
+                                        );
+                                    }
+
+                                    return categories.map(category => (
+                                        <div key={category} className="mb-8">
+                                            {/* Category Header */}
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <span className={`px-4 py-2 rounded-xl font-black text-sm border-2 ${
+                                                    category === 'Market' ? 'bg-green-500/20 text-green-300 border-green-500/50' :
+                                                    category === 'Orders' ? 'bg-blue-500/20 text-blue-300 border-blue-500/50' :
+                                                    category === 'Technical' ? 'bg-purple-500/20 text-purple-300 border-purple-500/50' :
+                                                    category === 'Risk' ? 'bg-orange-500/20 text-orange-300 border-orange-500/50' :
+                                                    'bg-pink-500/20 text-pink-300 border-pink-500/50'
+                                                }`}>
+                                                    {category === 'Market' ? '📊' : category === 'Orders' ? '📝' : category === 'Technical' ? '📈' : category === 'Risk' ? '🛡️' : '🧠'} {category}
+                                                </span>
+                                                <div className="flex-1 h-px bg-gradient-to-r from-cyan-500/50 to-transparent"></div>
+                                            </div>
+
+                                            {/* Terms Grid */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {groupedTerms[category].map((term, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className={`group relative bg-gradient-to-br backdrop-blur-xl rounded-xl p-5 border-2 transition-all hover:scale-105 hover:shadow-2xl ${
+                                                            category === 'Market' ? 'from-green-900/40 to-emerald-900/40 border-green-500/30 hover:border-green-500/60 hover:shadow-green-500/20' :
+                                                            category === 'Orders' ? 'from-blue-900/40 to-cyan-900/40 border-blue-500/30 hover:border-blue-500/60 hover:shadow-blue-500/20' :
+                                                            category === 'Technical' ? 'from-purple-900/40 to-indigo-900/40 border-purple-500/30 hover:border-purple-500/60 hover:shadow-purple-500/20' :
+                                                            category === 'Risk' ? 'from-orange-900/40 to-red-900/40 border-orange-500/30 hover:border-orange-500/60 hover:shadow-orange-500/20' :
+                                                            'from-pink-900/40 to-rose-900/40 border-pink-500/30 hover:border-pink-500/60 hover:shadow-pink-500/20'
+                                                        }`}
+                                                    >
+                                                        {/* Glossy overlay effect */}
+                                                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+
+                                                        <div className="relative">
+                                                            <h3 className={`font-black text-lg mb-3 ${
+                                                                category === 'Market' ? 'text-green-300' :
+                                                                category === 'Orders' ? 'text-blue-300' :
+                                                                category === 'Technical' ? 'text-purple-300' :
+                                                                category === 'Risk' ? 'text-orange-300' :
+                                                                'text-pink-300'
+                                                            }`}>
+                                                                {term.term}
+                                                            </h3>
+                                                            <p className="text-gray-300 text-sm leading-relaxed">
+                                                                {term.definition}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ));
+                                })()}
                             </div>
                         </div>
                     </div>
