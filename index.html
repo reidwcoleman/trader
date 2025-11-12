@@ -9118,11 +9118,65 @@
                                 {/* Progress Dashboard */}
                                 {learningProgress.completedLessons.length > 0 && (
                                     <div className="bg-gradient-to-br from-purple-900/60 via-blue-900/60 to-cyan-900/60 rounded-2xl p-8 border-2 border-purple-500/50 shadow-2xl">
-                                        <div className="flex items-center gap-4 mb-6">
-                                            <div className="text-5xl">🏆</div>
-                                            <div>
-                                                <h3 className="text-3xl font-black text-white">Your Progress</h3>
-                                                <p className="text-purple-200">Keep learning and earning XP!</p>
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-5xl">🏆</div>
+                                                <div>
+                                                    <h3 className="text-3xl font-black text-white">Your Progress</h3>
+                                                    <p className="text-purple-200">Keep learning and earning XP!</p>
+                                                </div>
+                                            </div>
+                                            {/* Level Badge */}
+                                            <div className="flex flex-col items-center">
+                                                {(() => {
+                                                    const level = Math.floor(learningProgress.totalXP / 100) + 1;
+                                                    const xpForNextLevel = level * 100;
+                                                    const xpProgress = ((learningProgress.totalXP % 100) / 100) * 100;
+                                                    const levelTitles = {
+                                                        1: 'Beginner',
+                                                        2: 'Learner',
+                                                        3: 'Student',
+                                                        4: 'Trader',
+                                                        5: 'Skilled',
+                                                        6: 'Advanced',
+                                                        7: 'Expert',
+                                                        8: 'Master',
+                                                        9: 'Elite',
+                                                        10: 'Legend'
+                                                    };
+                                                    const levelColors = {
+                                                        1: 'from-gray-500 to-gray-600',
+                                                        2: 'from-green-500 to-green-600',
+                                                        3: 'from-blue-500 to-blue-600',
+                                                        4: 'from-purple-500 to-purple-600',
+                                                        5: 'from-pink-500 to-pink-600',
+                                                        6: 'from-orange-500 to-red-600',
+                                                        7: 'from-yellow-500 to-orange-600',
+                                                        8: 'from-cyan-500 to-blue-600',
+                                                        9: 'from-purple-600 to-pink-600',
+                                                        10: 'from-yellow-400 to-yellow-600'
+                                                    };
+                                                    return (
+                                                        <div className="relative">
+                                                            <div className={`bg-gradient-to-br ${levelColors[Math.min(level, 10)]} rounded-2xl p-4 border-4 border-yellow-400/50 shadow-2xl min-w-[120px] text-center`}>
+                                                                <div className="text-xs font-bold text-yellow-200 mb-1">LEVEL</div>
+                                                                <div className="text-4xl font-black text-white mb-1">{level}</div>
+                                                                <div className="text-xs font-bold text-yellow-100">{levelTitles[Math.min(level, 10)] || 'Legend'}</div>
+                                                            </div>
+                                                            {level < 10 && (
+                                                                <div className="mt-2">
+                                                                    <div className="text-xs text-center text-cyan-300 mb-1">{learningProgress.totalXP % 100} / 100 XP</div>
+                                                                    <div className="w-full bg-black/60 rounded-full h-2 overflow-hidden border border-cyan-500/30">
+                                                                        <div
+                                                                            className="bg-gradient-to-r from-cyan-400 to-blue-500 h-full rounded-full transition-all duration-500"
+                                                                            style={{ width: `${xpProgress}%` }}
+                                                                        ></div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })()}
                                             </div>
                                         </div>
 
@@ -9766,208 +9820,387 @@
                                                 )}
                                             </div>
 
-                                            {/* Quiz Section */}
+                                            {/* Quiz Section - ENHANCED VERSION */}
                                             <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 backdrop-blur-xl rounded-xl p-8 border-2 border-purple-500/50 mt-8">
+                                                <style>{`
+                                                    @keyframes confetti {
+                                                        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                                                        100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+                                                    }
+                                                    @keyframes pulse-glow {
+                                                        0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+                                                        50% { box-shadow: 0 0 40px rgba(168, 85, 247, 0.8); }
+                                                    }
+                                                    @keyframes slide-in {
+                                                        from { opacity: 0; transform: translateY(20px); }
+                                                        to { opacity: 1; transform: translateY(0); }
+                                                    }
+                                                    @keyframes bounce-in {
+                                                        0% { transform: scale(0.3); opacity: 0; }
+                                                        50% { transform: scale(1.05); }
+                                                        70% { transform: scale(0.9); }
+                                                        100% { transform: scale(1); opacity: 1; }
+                                                    }
+                                                    .quiz-option-hover {
+                                                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                                                    }
+                                                    .quiz-option-hover:hover:not(:disabled) {
+                                                        transform: translateX(8px);
+                                                        box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+                                                    }
+                                                    .quiz-option-selected {
+                                                        animation: pulse-glow 1s ease-in-out;
+                                                    }
+                                                    .quiz-question-enter {
+                                                        animation: slide-in 0.5s ease-out;
+                                                    }
+                                                    .confetti-piece {
+                                                        position: fixed;
+                                                        width: 10px;
+                                                        height: 10px;
+                                                        background: var(--color);
+                                                        animation: confetti 3s ease-out forwards;
+                                                        z-index: 9999;
+                                                    }
+                                                    .score-animation {
+                                                        animation: bounce-in 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                                                    }
+                                                    .grade-badge {
+                                                        display: inline-block;
+                                                        padding: 8px 24px;
+                                                        border-radius: 50px;
+                                                        font-size: 2rem;
+                                                        font-weight: 900;
+                                                        animation: bounce-in 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s backwards;
+                                                    }
+                                                `}</style>
+
                                                 <div className="text-center mb-6">
                                                     <div className="text-5xl mb-4">🎓</div>
                                                     <h3 className="text-3xl font-black text-white mb-2">Test Your Knowledge</h3>
                                                     <p className="text-purple-200">Complete this quiz to check your understanding of Trading Basics</p>
                                                 </div>
 
-                                                <div className="space-y-6">
-                                                    {/* Question 1 */}
-                                                    <div className="bg-black/40 rounded-xl p-6">
-                                                        <p className="text-xl font-bold text-white mb-4">1. What does owning a stock mean?</p>
-                                                        <div className="space-y-3">
-                                                            {['You own a loan to the company', 'You own a fractional share of the company', 'You are lending money to investors', 'You have no ownership rights'].map((option, idx) => (
-                                                                <button
-                                                                    key={idx}
-                                                                    onClick={() => {
-                                                                        setQuizAnswers({...quizAnswers, basics: {...(quizAnswers.basics || {}), q1: idx}});
-                                                                    }}
-                                                                    disabled={quizSubmitted.basics}
-                                                                    className={`w-full text-left p-4 rounded-lg transition-all ${
-                                                                        quizSubmitted.basics
-                                                                            ? idx === 1
-                                                                                ? 'bg-green-900/40 border-2 border-green-400 text-green-100'
-                                                                                : quizAnswers.basics?.q1 === idx
-                                                                                    ? 'bg-red-900/40 border-2 border-red-400 text-red-100'
-                                                                                    : 'bg-gray-800/40 border-2 border-gray-600 text-gray-400'
-                                                                            : quizAnswers.basics?.q1 === idx
-                                                                                ? 'bg-purple-900/40 border-2 border-purple-400 text-white'
-                                                                                : 'bg-gray-800/40 border-2 border-gray-600 hover:border-purple-400 text-gray-200'
-                                                                    }`}
-                                                                >
-                                                                    {option}
-                                                                    {quizSubmitted.basics && idx === 1 && <span className="ml-2">✓</span>}
-                                                                    {quizSubmitted.basics && quizAnswers.basics?.q1 === idx && idx !== 1 && <span className="ml-2">✗</span>}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    </div>
+                                                {!quizSubmitted.basics && (
+                                                    <>
+                                                        {/* Progress Indicator */}
+                                                        <div className="mb-8 bg-black/40 rounded-xl p-6 border-2 border-purple-400/30">
+                                                            <div className="flex justify-between items-center mb-3">
+                                                                <span className="text-white font-bold text-lg">Quiz Progress</span>
+                                                                <span className="text-purple-300 font-mono">
+                                                                    {Object.keys(quizAnswers.basics || {}).length} / 4 answered
+                                                                </span>
+                                                            </div>
 
-                                                    {/* Question 2 */}
-                                                    <div className="bg-black/40 rounded-xl p-6">
-                                                        <p className="text-xl font-bold text-white mb-4">2. What type of order guarantees execution but not price?</p>
-                                                        <div className="space-y-3">
-                                                            {['Limit Order', 'Market Order', 'Stop-Loss Order', 'Trailing Stop'].map((option, idx) => (
-                                                                <button
-                                                                    key={idx}
-                                                                    onClick={() => {
-                                                                        setQuizAnswers({...quizAnswers, basics: {...(quizAnswers.basics || {}), q2: idx}});
-                                                                    }}
-                                                                    disabled={quizSubmitted.basics}
-                                                                    className={`w-full text-left p-4 rounded-lg transition-all ${
-                                                                        quizSubmitted.basics
-                                                                            ? idx === 1
-                                                                                ? 'bg-green-900/40 border-2 border-green-400 text-green-100'
-                                                                                : quizAnswers.basics?.q2 === idx
-                                                                                    ? 'bg-red-900/40 border-2 border-red-400 text-red-100'
-                                                                                    : 'bg-gray-800/40 border-2 border-gray-600 text-gray-400'
-                                                                            : quizAnswers.basics?.q2 === idx
-                                                                                ? 'bg-purple-900/40 border-2 border-purple-400 text-white'
-                                                                                : 'bg-gray-800/40 border-2 border-gray-600 hover:border-purple-400 text-gray-200'
-                                                                    }`}
-                                                                >
-                                                                    {option}
-                                                                    {quizSubmitted.basics && idx === 1 && <span className="ml-2">✓</span>}
-                                                                    {quizSubmitted.basics && quizAnswers.basics?.q2 === idx && idx !== 1 && <span className="ml-2">✗</span>}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    </div>
+                                                            {/* Progress Bar */}
+                                                            <div className="relative w-full h-4 bg-gray-800 rounded-full overflow-hidden mb-4">
+                                                                <div
+                                                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500 ease-out"
+                                                                    style={{width: `${(Object.keys(quizAnswers.basics || {}).length / 4) * 100}%`}}
+                                                                />
+                                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                                    <span className="text-xs font-bold text-white drop-shadow-lg">
+                                                                        {Math.round((Object.keys(quizAnswers.basics || {}).length / 4) * 100)}%
+                                                                    </span>
+                                                                </div>
+                                                            </div>
 
-                                                    {/* Question 3 */}
-                                                    <div className="bg-black/40 rounded-xl p-6">
-                                                        <p className="text-xl font-bold text-white mb-4">3. A green candlestick means:</p>
-                                                        <div className="space-y-3">
-                                                            {['Price closed lower than it opened', 'Price closed higher than it opened', 'Volume was high', 'The stock is a good buy'].map((option, idx) => (
-                                                                <button
-                                                                    key={idx}
-                                                                    onClick={() => {
-                                                                        setQuizAnswers({...quizAnswers, basics: {...(quizAnswers.basics || {}), q3: idx}});
-                                                                    }}
-                                                                    disabled={quizSubmitted.basics}
-                                                                    className={`w-full text-left p-4 rounded-lg transition-all ${
-                                                                        quizSubmitted.basics
-                                                                            ? idx === 1
-                                                                                ? 'bg-green-900/40 border-2 border-green-400 text-green-100'
-                                                                                : quizAnswers.basics?.q3 === idx
-                                                                                    ? 'bg-red-900/40 border-2 border-red-400 text-red-100'
-                                                                                    : 'bg-gray-800/40 border-2 border-gray-600 text-gray-400'
-                                                                            : quizAnswers.basics?.q3 === idx
-                                                                                ? 'bg-purple-900/40 border-2 border-purple-400 text-white'
-                                                                                : 'bg-gray-800/40 border-2 border-gray-600 hover:border-purple-400 text-gray-200'
-                                                                    }`}
-                                                                >
-                                                                    {option}
-                                                                    {quizSubmitted.basics && idx === 1 && <span className="ml-2">✓</span>}
-                                                                    {quizSubmitted.basics && quizAnswers.basics?.q3 === idx && idx !== 1 && <span className="ml-2">✗</span>}
-                                                                </button>
-                                                            ))}
+                                                            {/* Question Status Dots */}
+                                                            <div className="flex gap-3 justify-center">
+                                                                {[1, 2, 3, 4].map(num => (
+                                                                    <div key={num} className="flex flex-col items-center gap-2">
+                                                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                                                                            quizAnswers.basics?.[`q${num}`] !== undefined
+                                                                                ? 'bg-gradient-to-br from-purple-500 to-blue-500 text-white scale-110 shadow-lg'
+                                                                                : 'bg-gray-700 text-gray-400'
+                                                                        }`}>
+                                                                            {quizAnswers.basics?.[`q${num}`] !== undefined ? '✓' : num}
+                                                                        </div>
+                                                                        <span className="text-xs text-gray-400">Q{num}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    {/* Question 4 */}
-                                                    <div className="bg-black/40 rounded-xl p-6">
-                                                        <p className="text-xl font-bold text-white mb-4">4. What happens when a support level breaks?</p>
-                                                        <div className="space-y-3">
-                                                            {['It disappears completely', 'It becomes a new resistance level', 'Price always bounces back immediately', 'Volume decreases'].map((option, idx) => (
-                                                                <button
-                                                                    key={idx}
-                                                                    onClick={() => {
-                                                                        setQuizAnswers({...quizAnswers, basics: {...(quizAnswers.basics || {}), q4: idx}});
-                                                                    }}
-                                                                    disabled={quizSubmitted.basics}
-                                                                    className={`w-full text-left p-4 rounded-lg transition-all ${
-                                                                        quizSubmitted.basics
-                                                                            ? idx === 1
-                                                                                ? 'bg-green-900/40 border-2 border-green-400 text-green-100'
-                                                                                : quizAnswers.basics?.q4 === idx
-                                                                                    ? 'bg-red-900/40 border-2 border-red-400 text-red-100'
-                                                                                    : 'bg-gray-800/40 border-2 border-gray-600 text-gray-400'
-                                                                            : quizAnswers.basics?.q4 === idx
-                                                                                ? 'bg-purple-900/40 border-2 border-purple-400 text-white'
-                                                                                : 'bg-gray-800/40 border-2 border-gray-600 hover:border-purple-400 text-gray-200'
-                                                                    }`}
-                                                                >
-                                                                    {option}
-                                                                    {quizSubmitted.basics && idx === 1 && <span className="ml-2">✓</span>}
-                                                                    {quizSubmitted.basics && quizAnswers.basics?.q4 === idx && idx !== 1 && <span className="ml-2">✗</span>}
-                                                                </button>
-                                                            ))}
+                                                        <div className="space-y-6">
+                                                            {/* Question 1 */}
+                                                            <div className="bg-black/40 rounded-xl p-6 border-2 border-purple-400/30 quiz-question-enter">
+                                                                <div className="flex items-start gap-3 mb-4">
+                                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center font-black text-white">
+                                                                        1
+                                                                    </div>
+                                                                    <p className="text-xl font-bold text-white flex-1">What does owning a stock mean?</p>
+                                                                </div>
+                                                                <div className="space-y-3">
+                                                                    {['You own a loan to the company', 'You own a fractional share of the company', 'You are lending money to investors', 'You have no ownership rights'].map((option, idx) => (
+                                                                        <button
+                                                                            key={idx}
+                                                                            onClick={() => {
+                                                                                setQuizAnswers({...quizAnswers, basics: {...(quizAnswers.basics || {}), q1: idx}});
+                                                                            }}
+                                                                            className={`quiz-option-hover w-full text-left p-4 rounded-lg transition-all ${
+                                                                                quizAnswers.basics?.q1 === idx
+                                                                                    ? 'bg-purple-900/60 border-2 border-purple-400 text-white quiz-option-selected'
+                                                                                    : 'bg-gray-800/40 border-2 border-gray-600 hover:border-purple-400 text-gray-200'
+                                                                            }`}
+                                                                        >
+                                                                            <div className="flex items-center gap-3">
+                                                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                                                                    quizAnswers.basics?.q1 === idx
+                                                                                        ? 'border-purple-400 bg-purple-500'
+                                                                                        : 'border-gray-500'
+                                                                                }`}>
+                                                                                    {quizAnswers.basics?.q1 === idx && <div className="w-3 h-3 bg-white rounded-full"></div>}
+                                                                                </div>
+                                                                                <span>{option}</span>
+                                                                            </div>
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Question 2 */}
+                                                            <div className="bg-black/40 rounded-xl p-6 border-2 border-purple-400/30 quiz-question-enter" style={{animationDelay: '0.1s'}}>
+                                                                <div className="flex items-start gap-3 mb-4">
+                                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center font-black text-white">
+                                                                        2
+                                                                    </div>
+                                                                    <p className="text-xl font-bold text-white flex-1">What type of order guarantees execution but not price?</p>
+                                                                </div>
+                                                                <div className="space-y-3">
+                                                                    {['Limit Order', 'Market Order', 'Stop-Loss Order', 'Trailing Stop'].map((option, idx) => (
+                                                                        <button
+                                                                            key={idx}
+                                                                            onClick={() => {
+                                                                                setQuizAnswers({...quizAnswers, basics: {...(quizAnswers.basics || {}), q2: idx}});
+                                                                            }}
+                                                                            className={`quiz-option-hover w-full text-left p-4 rounded-lg transition-all ${
+                                                                                quizAnswers.basics?.q2 === idx
+                                                                                    ? 'bg-purple-900/60 border-2 border-purple-400 text-white quiz-option-selected'
+                                                                                    : 'bg-gray-800/40 border-2 border-gray-600 hover:border-purple-400 text-gray-200'
+                                                                            }`}
+                                                                        >
+                                                                            <div className="flex items-center gap-3">
+                                                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                                                                    quizAnswers.basics?.q2 === idx
+                                                                                        ? 'border-purple-400 bg-purple-500'
+                                                                                        : 'border-gray-500'
+                                                                                }`}>
+                                                                                    {quizAnswers.basics?.q2 === idx && <div className="w-3 h-3 bg-white rounded-full"></div>}
+                                                                                </div>
+                                                                                <span>{option}</span>
+                                                                            </div>
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Question 3 */}
+                                                            <div className="bg-black/40 rounded-xl p-6 border-2 border-purple-400/30 quiz-question-enter" style={{animationDelay: '0.2s'}}>
+                                                                <div className="flex items-start gap-3 mb-4">
+                                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center font-black text-white">
+                                                                        3
+                                                                    </div>
+                                                                    <p className="text-xl font-bold text-white flex-1">A green candlestick means:</p>
+                                                                </div>
+                                                                <div className="space-y-3">
+                                                                    {['Price closed lower than it opened', 'Price closed higher than it opened', 'Volume was high', 'The stock is a good buy'].map((option, idx) => (
+                                                                        <button
+                                                                            key={idx}
+                                                                            onClick={() => {
+                                                                                setQuizAnswers({...quizAnswers, basics: {...(quizAnswers.basics || {}), q3: idx}});
+                                                                            }}
+                                                                            className={`quiz-option-hover w-full text-left p-4 rounded-lg transition-all ${
+                                                                                quizAnswers.basics?.q3 === idx
+                                                                                    ? 'bg-purple-900/60 border-2 border-purple-400 text-white quiz-option-selected'
+                                                                                    : 'bg-gray-800/40 border-2 border-gray-600 hover:border-purple-400 text-gray-200'
+                                                                            }`}
+                                                                        >
+                                                                            <div className="flex items-center gap-3">
+                                                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                                                                    quizAnswers.basics?.q3 === idx
+                                                                                        ? 'border-purple-400 bg-purple-500'
+                                                                                        : 'border-gray-500'
+                                                                                }`}>
+                                                                                    {quizAnswers.basics?.q3 === idx && <div className="w-3 h-3 bg-white rounded-full"></div>}
+                                                                                </div>
+                                                                                <span>{option}</span>
+                                                                            </div>
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Question 4 */}
+                                                            <div className="bg-black/40 rounded-xl p-6 border-2 border-purple-400/30 quiz-question-enter" style={{animationDelay: '0.3s'}}>
+                                                                <div className="flex items-start gap-3 mb-4">
+                                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center font-black text-white">
+                                                                        4
+                                                                    </div>
+                                                                    <p className="text-xl font-bold text-white flex-1">What happens when a support level breaks?</p>
+                                                                </div>
+                                                                <div className="space-y-3">
+                                                                    {['It disappears completely', 'It becomes a new resistance level', 'Price always bounces back immediately', 'Volume decreases'].map((option, idx) => (
+                                                                        <button
+                                                                            key={idx}
+                                                                            onClick={() => {
+                                                                                setQuizAnswers({...quizAnswers, basics: {...(quizAnswers.basics || {}), q4: idx}});
+                                                                            }}
+                                                                            className={`quiz-option-hover w-full text-left p-4 rounded-lg transition-all ${
+                                                                                quizAnswers.basics?.q4 === idx
+                                                                                    ? 'bg-purple-900/60 border-2 border-purple-400 text-white quiz-option-selected'
+                                                                                    : 'bg-gray-800/40 border-2 border-gray-600 hover:border-purple-400 text-gray-200'
+                                                                            }`}
+                                                                        >
+                                                                            <div className="flex items-center gap-3">
+                                                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                                                                    quizAnswers.basics?.q4 === idx
+                                                                                        ? 'border-purple-400 bg-purple-500'
+                                                                                        : 'border-gray-500'
+                                                                                }`}>
+                                                                                    {quizAnswers.basics?.q4 === idx && <div className="w-3 h-3 bg-white rounded-full"></div>}
+                                                                                </div>
+                                                                                <span>{option}</span>
+                                                                            </div>
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    {/* Submit Button */}
-                                                    {!quizSubmitted.basics && (
-                                                        <button
-                                                            onClick={() => {
-                                                                if ((quizAnswers.basics?.q1 !== undefined) &&
+                                                        {/* Enhanced Submit Button */}
+                                                        <div className="mt-8">
+                                                            {(() => {
+                                                                const allAnswered = (quizAnswers.basics?.q1 !== undefined) &&
                                                                     (quizAnswers.basics?.q2 !== undefined) &&
                                                                     (quizAnswers.basics?.q3 !== undefined) &&
-                                                                    (quizAnswers.basics?.q4 !== undefined)) {
-                                                                    setQuizSubmitted({...quizSubmitted, basics: true});
-                                                                    // Calculate score and update progress
-                                                                    const score = [
-                                                                        quizAnswers.basics?.q1 === 1,
-                                                                        quizAnswers.basics?.q2 === 1,
-                                                                        quizAnswers.basics?.q3 === 1,
-                                                                        quizAnswers.basics?.q4 === 1
-                                                                    ].filter(Boolean).length;
-                                                                    const percentage = Math.round((score / 4) * 100);
-                                                                    completeLesson('basics', percentage);
-                                                                } else {
-                                                                    alert('Please answer all questions before submitting!');
-                                                                }
-                                                            }}
-                                                            className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg text-lg"
-                                                        >
-                                                            Submit Quiz
-                                                        </button>
-                                                    )}
+                                                                    (quizAnswers.basics?.q4 !== undefined);
 
-                                                    {/* Results */}
-                                                    {quizSubmitted.basics && (
-                                                        <div className="bg-gradient-to-r from-green-900/40 to-emerald-900/40 border-2 border-green-400 rounded-xl p-6 text-center">
-                                                            <div className="text-5xl mb-4">
-                                                                {(() => {
-                                                                    const score = [
-                                                                        quizAnswers.basics?.q1 === 1,
-                                                                        quizAnswers.basics?.q2 === 1,
-                                                                        quizAnswers.basics?.q3 === 1,
-                                                                        quizAnswers.basics?.q4 === 1
-                                                                    ].filter(Boolean).length;
-                                                                    return score === 4 ? '🎉' : score >= 3 ? '👍' : score >= 2 ? '📚' : '💪';
-                                                                })()}
+                                                                return (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            if (allAnswered) {
+                                                                                // Create confetti effect
+                                                                                const colors = ['#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+                                                                                for (let i = 0; i < 50; i++) {
+                                                                                    setTimeout(() => {
+                                                                                        const confetti = document.createElement('div');
+                                                                                        confetti.className = 'confetti-piece';
+                                                                                        confetti.style.left = Math.random() * window.innerWidth + 'px';
+                                                                                        confetti.style.top = '0px';
+                                                                                        confetti.style.setProperty('--color', colors[Math.floor(Math.random() * colors.length)]);
+                                                                                        document.body.appendChild(confetti);
+                                                                                        setTimeout(() => confetti.remove(), 3000);
+                                                                                    }, i * 30);
+                                                                                }
+
+                                                                                setQuizSubmitted({...quizSubmitted, basics: true});
+                                                                                const score = [
+                                                                                    quizAnswers.basics?.q1 === 1,
+                                                                                    quizAnswers.basics?.q2 === 1,
+                                                                                    quizAnswers.basics?.q3 === 1,
+                                                                                    quizAnswers.basics?.q4 === 1
+                                                                                ].filter(Boolean).length;
+                                                                                const percentage = Math.round((score / 4) * 100);
+                                                                                completeLesson('basics', percentage);
+                                                                            } else {
+                                                                                alert('Please answer all questions before submitting!');
+                                                                            }
+                                                                        }}
+                                                                        disabled={!allAnswered}
+                                                                        className={`w-full px-8 py-5 rounded-xl font-bold transition-all shadow-lg text-lg ${
+                                                                            allAnswered
+                                                                                ? 'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white cursor-pointer transform hover:scale-105 hover:shadow-2xl'
+                                                                                : 'bg-gray-700 text-gray-400 cursor-not-allowed opacity-50'
+                                                                        }`}
+                                                                    >
+                                                                        {allAnswered ? '🎯 Submit Quiz' : '⏳ Answer all questions to submit'}
+                                                                    </button>
+                                                                );
+                                                            })()}
+                                                        </div>
+                                                    </>
+                                                )}
+
+                                                {/* Enhanced Results */}
+                                                {quizSubmitted.basics && (() => {
+                                                    const score = [
+                                                        quizAnswers.basics?.q1 === 1,
+                                                        quizAnswers.basics?.q2 === 1,
+                                                        quizAnswers.basics?.q3 === 1,
+                                                        quizAnswers.basics?.q4 === 1
+                                                    ].filter(Boolean).length;
+                                                    const percentage = (score / 4) * 100;
+                                                    let grade = 'F';
+                                                    let gradeColor = 'from-red-500 to-red-600';
+
+                                                    if (percentage === 100) { grade = 'A+'; gradeColor = 'from-yellow-400 to-yellow-500'; }
+                                                    else if (percentage >= 90) { grade = 'A'; gradeColor = 'from-green-400 to-green-500'; }
+                                                    else if (percentage >= 80) { grade = 'B'; gradeColor = 'from-blue-400 to-blue-500'; }
+                                                    else if (percentage >= 70) { grade = 'C'; gradeColor = 'from-purple-400 to-purple-500'; }
+                                                    else if (percentage >= 60) { grade = 'D'; gradeColor = 'from-orange-400 to-orange-500'; }
+
+                                                    return (
+                                                        <div className="bg-gradient-to-r from-green-900/40 to-emerald-900/40 border-2 border-green-400 rounded-xl p-8 text-center">
+                                                            <div className="text-7xl mb-6 score-animation">
+                                                                {score === 4 ? '🎉' : score >= 3 ? '🌟' : score >= 2 ? '📚' : '💪'}
                                                             </div>
-                                                            <h4 className="text-2xl font-black text-white mb-2">Quiz Complete!</h4>
-                                                            <p className="text-xl text-green-200 mb-4">
-                                                                Score: {[
-                                                                    quizAnswers.basics?.q1 === 1,
-                                                                    quizAnswers.basics?.q2 === 1,
-                                                                    quizAnswers.basics?.q3 === 1,
-                                                                    quizAnswers.basics?.q4 === 1
-                                                                ].filter(Boolean).length} / 4
-                                                            </p>
-                                                            <p className="text-green-100">
-                                                                {(() => {
-                                                                    const score = [
-                                                                        quizAnswers.basics?.q1 === 1,
-                                                                        quizAnswers.basics?.q2 === 1,
-                                                                        quizAnswers.basics?.q3 === 1,
-                                                                        quizAnswers.basics?.q4 === 1
-                                                                    ].filter(Boolean).length;
-                                                                    if (score === 4) return 'Perfect! You have mastered the basics! 🎓';
-                                                                    if (score >= 3) return 'Great job! You understand the fundamentals well!';
-                                                                    if (score >= 2) return 'Good start! Review the lessons and try again.';
-                                                                    return 'Keep learning! Review the material and practice more.';
-                                                                })()}
-                                                            </p>
+
+                                                            <h4 className="text-3xl font-black text-white mb-4 score-animation">Quiz Complete!</h4>
+
+                                                            {/* Grade Badge */}
+                                                            <div className={`grade-badge bg-gradient-to-r ${gradeColor} text-white mb-6 shadow-2xl`}>
+                                                                {grade}
+                                                            </div>
+
+                                                            {/* Animated Score Counter */}
+                                                            <div className="mb-6">
+                                                                <div className="text-6xl font-black text-white mb-2 score-animation">
+                                                                    {score} / 4
+                                                                </div>
+                                                                <div className="text-2xl font-bold text-green-300 score-animation" style={{animationDelay: '0.2s'}}>
+                                                                    {percentage}% Correct
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Performance Visual */}
+                                                            <div className="mb-6 bg-black/40 rounded-xl p-6">
+                                                                <div className="grid grid-cols-4 gap-2 mb-4">
+                                                                    {[1, 2, 3, 4].map(num => {
+                                                                        const isCorrect = quizAnswers.basics?.[`q${num}`] === 1;
+                                                                        return (
+                                                                            <div key={num} className="text-center">
+                                                                                <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl mb-2 ${
+                                                                                    isCorrect ? 'bg-green-500' : 'bg-red-500'
+                                                                                }`} style={{animation: `bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) ${num * 0.1}s backwards`}}>
+                                                                                    {isCorrect ? '✓' : '✗'}
+                                                                                </div>
+                                                                                <div className="text-xs text-gray-400">Q{num}</div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Motivational Message */}
+                                                            <div className="bg-purple-900/40 border-2 border-purple-400/50 rounded-xl p-6 mb-6">
+                                                                <p className="text-xl font-bold text-white mb-2">
+                                                                    {score === 4 && '🏆 Perfect Score! You\'re a Trading Master!'}
+                                                                    {score === 3 && '🌟 Excellent Work! You\'ve got this!'}
+                                                                    {score === 2 && '📚 Good Progress! Keep studying!'}
+                                                                    {score < 2 && '💪 Keep Learning! Practice makes perfect!'}
+                                                                </p>
+                                                                <p className="text-purple-200">
+                                                                    {score === 4 && 'You have mastered the basics of trading. Ready for advanced topics!'}
+                                                                    {score === 3 && 'You understand the fundamentals well. Review the missed question and you\'ll be perfect!'}
+                                                                    {score === 2 && 'You\'re on the right track. Review the lessons and try again for a higher score.'}
+                                                                    {score < 2 && 'Trading takes time to master. Review the material carefully and retake the quiz.'}
+                                                                </p>
+                                                            </div>
 
                                                             {/* Explanations */}
                                                             <div className="mt-6 space-y-4 text-left">
-                                                                <div className="text-sm font-bold text-cyan-300 mb-3">📖 Answer Explanations:</div>
+                                                                <div className="text-lg font-bold text-cyan-300 mb-3">📖 Answer Explanations:</div>
 
                                                                 {quizData.basics.questions.map((q, idx) => {
                                                                     const userAnswer = quizAnswers.basics?.[`q${idx + 1}`];
@@ -9977,22 +10210,22 @@
                                                                             isCorrect
                                                                                 ? 'bg-green-900/20 border-green-400/50'
                                                                                 : 'bg-red-900/20 border-red-400/50'
-                                                                        }`}>
+                                                                        }`} style={{animation: `slide-in 0.5s ease-out ${idx * 0.1}s backwards`}}>
                                                                             <div className="flex items-start gap-2 mb-2">
-                                                                                <span className="text-lg">{isCorrect ? '✅' : '❌'}</span>
+                                                                                <span className="text-2xl">{isCorrect ? '✅' : '❌'}</span>
                                                                                 <div className="flex-1">
-                                                                                    <div className="font-bold text-white mb-1">Question {idx + 1}</div>
+                                                                                    <div className="font-bold text-white mb-1 text-lg">Question {idx + 1}</div>
                                                                                     <div className={`text-sm ${isCorrect ? 'text-green-200' : 'text-red-200'}`}>
-                                                                                        {isCorrect ? 'Correct!' : `Your answer: ${q.options[userAnswer]}`}
+                                                                                        {isCorrect ? '✓ Correct!' : `✗ Your answer: ${q.options[userAnswer]}`}
                                                                                     </div>
                                                                                     {!isCorrect && (
-                                                                                        <div className="text-sm text-green-300 mt-1">
-                                                                                            Correct answer: {q.options[q.correct]}
+                                                                                        <div className="text-sm text-green-300 mt-1 font-semibold">
+                                                                                            ✓ Correct answer: {q.options[q.correct]}
                                                                                         </div>
                                                                                     )}
                                                                                 </div>
                                                                             </div>
-                                                                            <div className="text-sm text-gray-300 ml-7 italic">
+                                                                            <div className="text-sm text-gray-300 ml-9 italic bg-black/30 p-3 rounded">
                                                                                 {q.explanation}
                                                                             </div>
                                                                         </div>
@@ -10005,13 +10238,13 @@
                                                                     setQuizSubmitted({...quizSubmitted, basics: false});
                                                                     setQuizAnswers({...quizAnswers, basics: {}});
                                                                 }}
-                                                                className="mt-6 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-500 hover:to-gray-400 text-white px-6 py-3 rounded-xl font-bold transition-all"
+                                                                className="mt-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-8 py-4 rounded-xl font-bold transition-all transform hover:scale-105 shadow-lg"
                                                             >
-                                                                Retake Quiz
+                                                                🔄 Retake Quiz
                                                             </button>
                                                         </div>
-                                                    )}
-                                                </div>
+                                                    );
+                                                })()}
                                             </div>
                                         </div>
                                     </div>
