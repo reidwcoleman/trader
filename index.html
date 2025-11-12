@@ -978,10 +978,27 @@
                         const low = data.l; // Low
                         const open = data.o; // Open
 
+                        // Calculate realistic bid-ask spread based on volatility
+                        const volatility = Math.abs(changePercent || 0);
+                        // Base spread: 0.01% for stable stocks, up to 0.15% for volatile stocks
+                        const baseSpread = 0.0001; // 0.01%
+                        const volatilitySpread = volatility * 0.0005; // Scale with volatility
+                        const spreadPercent = Math.min(0.0015, baseSpread + volatilitySpread); // Cap at 0.15%
+
+                        const halfSpread = currentPrice * spreadPercent / 2;
+                        const bid = parseFloat((currentPrice - halfSpread).toFixed(2));
+                        const ask = parseFloat((currentPrice + halfSpread).toFixed(2));
+                        const spread = parseFloat((ask - bid).toFixed(2));
+                        const spreadPct = parseFloat(((spread / currentPrice) * 100).toFixed(3));
+
                         return {
                             symbol: symbol,
                             name: stockName || getStockName(symbol),
                             price: parseFloat((currentPrice || 0).toFixed(2)),
+                            bid: bid,  // SELL at bid (what buyers will pay you)
+                            ask: ask,  // BUY at ask (what sellers want from you)
+                            spread: spread,  // Spread in dollars
+                            spreadPct: spreadPct,  // Spread as percentage
                             change: parseFloat((changePercent || 0).toFixed(2)),
                             volume: 'N/A',
                             previousClose: previousClose || 0,
@@ -2925,7 +2942,11 @@
                     return;
                 }
 
-                const totalCost = stock.price * quantity;
+                // Use bid/ask spread for realistic execution
+                // BUY at ASK price (you pay what sellers want)
+                // SELL at BID price (you receive what buyers will pay)
+                const executionPrice = type === 'buy' ? (stock.ask || stock.price) : (stock.bid || stock.price);
+                const totalCost = executionPrice * quantity;
                 const portfolio = getCurrentPortfolio();
                 const COOLDOWN_MINUTES = 15;
                 const COOLDOWN_MS = COOLDOWN_MINUTES * 60 * 1000;
@@ -2995,12 +3016,12 @@
                         type,
                         symbol: selectedStock,
                         quantity,
-                        price: stock.price,
+                        price: executionPrice,  // Use actual execution price (bid/ask)
                         total: totalCost,
                         fee: tradingFee,
                         timestamp: new Date().toISOString(),
                         // Store buy price and timestamp for analysis
-                        buyPrice: type === 'sell' ? buyPrice : stock.price,
+                        buyPrice: type === 'sell' ? buyPrice : executionPrice,
                         buyTimestamp: type === 'sell' ? buyTimestamp : Date.now()
                     }],
                     lastBuyTime: type === 'buy'
@@ -3021,7 +3042,8 @@
                 // Show success toast
                 const tradeIcon = type === 'buy' ? '✅' : '💰';
                 const tradeAction = type === 'buy' ? 'Bought' : 'Sold';
-                showToast(`${tradeIcon} ${tradeAction} ${quantity} shares of ${selectedStock} at $${stock.price.toFixed(2)}`, 'success');
+                const priceType = type === 'buy' ? 'ASK' : 'BID';
+                showToast(`${tradeIcon} ${tradeAction} ${quantity} shares of ${selectedStock} at $${executionPrice.toFixed(2)} (${priceType})`, 'success');
 
                 if (type === 'sell') {
                     const analysis = generateTradeAnalysis(stock, buyPrice, stock.price, quantity, buyTimestamp);
