@@ -6532,7 +6532,7 @@
                         )}
 
                         {/* Top Stocks to Buy - UltraThink AI Analysis */}
-                        {(() => {
+                        {mainTab === 'portfolio' && (() => {
                             // Use curated universe for recommendations (not user's stocks)
                             const stocksToAnalyze = curatedStocks.length > 0 ? curatedStocks : [];
 
