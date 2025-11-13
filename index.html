@@ -37,6 +37,7 @@
     <script src="js/advanced-orders.js"></script>
     <script src="js/margin-trading.js"></script>
     <script src="js/stock-education.js"></script>
+    <script src="js/enhanced-ai-analysis.js"></script>
 
     <!-- Database initialization removed - using backend server only -->
 
@@ -2296,40 +2297,26 @@
                 const previousClose = stock.previousClose || price;
                 const priceChange = stock.change || 0;
 
-                // REAL CALCULATION: Enhanced RSI (Relative Strength Index) using historical data
+                // REAL CALCULATION: Enhanced RSI using Wilder's Smoothing (Industry Standard)
                 const calculateEnhancedRSI = async () => {
                     try {
                         const toDate = Math.floor(Date.now() / 1000);
-                        const fromDate = toDate - (14 * 24 * 60 * 60); // 14 days
+                        const fromDate = toDate - (30 * 24 * 60 * 60); // 30 days for accurate RSI
 
                         const response = await fetch(
                             `${FINNHUB_API_BASE}/stock/candle?symbol=${selectedStock}&resolution=D&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`
                         );
                         const data = await response.json();
 
-                        if (data.s === 'ok' && data.c && data.c.length >= 14) {
-                            const closes = data.c;
-
-                            let gains = 0;
-                            let losses = 0;
-
-                            for (let i = 1; i < closes.length; i++) {
-                                const change = closes[i] - closes[i - 1];
-                                if (change > 0) {
-                                    gains += change;
-                                } else {
-                                    losses += Math.abs(change);
-                                }
+                        if (data.s === 'ok' && data.c && data.c.length >= 15) {
+                            // Use enhanced AI module for TRUE RSI calculation with Wilder's smoothing
+                            const rsi = window.enhancedAI.calculateRealRSI(data.c, 14);
+                            if (rsi !== null) {
+                                return rsi;
                             }
-
-                            const avgGain = gains / (closes.length - 1);
-                            const avgLoss = (losses / (closes.length - 1)) + 0.0001; // Prevent division by zero
-                            const rs = avgGain / avgLoss;
-                            const rsi = 100 - (100 / (1 + rs));
-
-                            return Math.max(0, Math.min(100, rsi));
                         }
                     } catch (error) {
+                        console.error('RSI calculation error:', error);
                     }
 
                     // Fallback to simplified RSI if API fails
@@ -2385,6 +2372,30 @@
                 };
 
                 const { ma50, ma200 } = await calculateMovingAverages();
+
+                // ENHANCED: Calculate MACD and Bollinger Bands
+                const calculateAdvancedIndicators = async () => {
+                    try {
+                        const toDate = Math.floor(Date.now() / 1000);
+                        const fromDate = toDate - (60 * 24 * 60 * 60); // 60 days for MACD
+
+                        const response = await fetch(
+                            `${FINNHUB_API_BASE}/stock/candle?symbol=${selectedStock}&resolution=D&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`
+                        );
+                        const data = await response.json();
+
+                        if (data.s === 'ok' && data.c && data.c.length >= 26) {
+                            const macd = window.enhancedAI.calculateMACD(data.c, 12, 26, 9);
+                            const bb = window.enhancedAI.calculateBollingerBands(data.c, 20, 2);
+                            return { macd, bb };
+                        }
+                    } catch (error) {
+                        console.error('Advanced indicators error:', error);
+                    }
+                    return { macd: null, bb: null };
+                };
+
+                const { macd, bb } = await calculateAdvancedIndicators();
 
                 // Trend analysis from moving averages
                 const trendSignal = ma50 && ma200 ?
@@ -2473,13 +2484,43 @@
                     trendScore = price > ma50 ? 2 : -2;
                 }
 
+                // MACD score
+                let macdScore = 0;
+                if (macd) {
+                    if (macd.interpretation === 'bullish' && macd.histogram > 0) {
+                        macdScore = 3; // Strong bullish
+                    } else if (macd.interpretation === 'bullish') {
+                        macdScore = 1.5; // Moderate bullish
+                    } else if (macd.interpretation === 'bearish' && macd.histogram < 0) {
+                        macdScore = -3; // Strong bearish
+                    } else {
+                        macdScore = -1.5; // Moderate bearish
+                    }
+                }
+
+                // Bollinger Bands score
+                let bbScore = 0;
+                if (bb) {
+                    if (bb.interpretation === 'oversold') {
+                        bbScore = 2; // At lower band - buy signal
+                    } else if (bb.interpretation === 'overbought') {
+                        bbScore = -2; // At upper band - sell signal
+                    }
+                    if (bb.squeeze) {
+                        bbScore += 1; // Volatility squeeze - potential breakout
+                    }
+                }
+
                 // Adjust for overbought/oversold
                 let adjustedTechnicalScore = technicalScore;
                 if (isOverbought) adjustedTechnicalScore -= 3;
                 if (isOversold) adjustedTechnicalScore += 3;
 
-                // Enhanced weighted composite score: Technical (30%), Sentiment (25%), Momentum (20%), Trend (25%)
-                const compositeScore = (adjustedTechnicalScore * 0.3) + (sentimentScoreNormalized * 0.25) + (momentumScore * 0.2) + (trendScore * 0.25);
+                // ULTRA ENHANCED weighted composite score with MACD & Bollinger Bands
+                // Technical (25%), Sentiment (20%), Momentum (15%), Trend (20%), MACD (12%), BB (8%)
+                const compositeScore = (adjustedTechnicalScore * 0.25) + (sentimentScoreNormalized * 0.20) +
+                                      (momentumScore * 0.15) + (trendScore * 0.20) +
+                                      (macdScore * 0.12) + (bbScore * 0.08);
 
                 // Risk-adjusted confidence
                 const riskAdjustment = riskLevel === 'High' ? -15 : riskLevel === 'Moderate' ? -5 : 0;
@@ -2800,6 +2841,8 @@
                         reasoning: [
                             `📊 Real 14-day RSI at ${rsi.toFixed(1)} shows ${technicalSignal.toLowerCase()} conditions with ${momentum >= 0 ? 'positive' : 'negative'} momentum (${momentum >= 0 ? '+' : ''}${momentum.toFixed(2)}% from open)`,
                             `📈 Trend Analysis: ${trendSignal}${ma50 && ma200 ? ` (MA50: $${ma50.toFixed(2)}, MA200: $${ma200.toFixed(2)}, Current: $${price.toFixed(2)})` : ''}`,
+                            macd ? `🔄 MACD: ${macd.interpretation} signal (Histogram: ${macd.histogram > 0 ? '+' : ''}${macd.histogram.toFixed(2)})` : null,
+                            bb ? `📊 Bollinger Bands: ${bb.interpretation} (Price at ${(bb.percentB * 100).toFixed(0)}% of bands${bb.squeeze ? ', volatility squeeze detected' : ''})` : null,
                             `📰 Sentiment analysis of ${stockNews.length} articles: ${positiveCount} positive, ${negativeCount} negative, ${neutralCount} neutral (Score: ${sentimentScore.toFixed(0)}/100)`,
                             `⚡ Intraday volatility at ${intradayVolatility.toFixed(2)}% with ${riskLevel.toLowerCase()} risk profile (Risk score: ${riskRating}/10)`,
                             `💡 ${overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Buy' ?
@@ -2807,7 +2850,7 @@
                                 overallRecommendation.action === 'Strong Sell' || overallRecommendation.action === 'Sell' ?
                                 `Multiple indicators suggest caution. ${trendSignal.includes('Downtrend') ? 'Trend shows weakness.' : ''} ${isOverbought ? 'RSI overbought suggests profit-taking' : 'Consider protective stops or exit strategies'}` :
                                 `Mixed signals warrant patience. ${trendSignal} trend requires confirmation. Wait for ${rsi < 50 ? 'upward momentum' : 'clearer direction'} before committing capital`}`
-                        ],
+                        ].filter(r => r !== null),
                         strategy: overallRecommendation.action === 'Strong Buy' || overallRecommendation.action === 'Buy' ?
                                 'Long position with tight stops' :
                                 overallRecommendation.action === 'Strong Sell' || overallRecommendation.action === 'Sell' ?
