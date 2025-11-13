@@ -224,6 +224,9 @@
             const [quantityError, setQuantityError] = useState('');
             const [mainTab, setMainTab] = useState('portfolio');
             const [portfolioSubTab, setPortfolioSubTab] = useState('overview'); // 'overview', 'holdings', 'performance', 'insights'
+            const [expandedHolding, setExpandedHolding] = useState(null); // Track which holding is expanded
+            const [holdingsSortBy, setHoldingsSortBy] = useState('value'); // 'value', 'gainPercent', 'symbol'
+            const [showOnlyProfitable, setShowOnlyProfitable] = useState(false);
             const [learningTopic, setLearningTopic] = useState(null); // null = overview, or topic name
             const [learningLesson, setLearningLesson] = useState(null); // specific lesson within topic
             const [quizAnswers, setQuizAnswers] = useState({}); // Track quiz answers {topicName: {q1: answerIndex, q2: answerIndex}}
