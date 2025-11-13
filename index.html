@@ -178,6 +178,7 @@
 
             const [stocks, setStocks] = useState([]);
             const [loading, setLoading] = useState(false);
+            const [loginCountdown, setLoginCountdown] = useState(null);
             const [error, setError] = useState(null);
             const [lastUpdate, setLastUpdate] = useState(null);
 
@@ -1896,7 +1897,7 @@
                                 accountCode: code,
                                 portfolio: initialPortfolio
                             })
-                        }, 30000);
+                        }, 60000);
 
                         const data = await response.json();
 
@@ -5567,9 +5568,26 @@
                                                     }
 
                                                     setLoading(true);
+                                                    setLoginCountdown(60);
+
+                                                    // Start countdown timer
+                                                    const countdownInterval = setInterval(() => {
+                                                        setLoginCountdown(prev => {
+                                                            if (prev <= 1) {
+                                                                clearInterval(countdownInterval);
+                                                                return null;
+                                                            }
+                                                            return prev - 1;
+                                                        });
+                                                    }, 1000);
+
                                                     try {
                                                         await createCompetition(userName.trim(), 0, userPassword);
+                                                        clearInterval(countdownInterval);
+                                                        setLoginCountdown(null);
                                                     } catch (error) {
+                                                        clearInterval(countdownInterval);
+                                                        setLoginCountdown(null);
                                                         setAuthError(error.message || 'Failed to create account. Please try again.');
                                                     } finally {
                                                         setLoading(false);
@@ -5578,7 +5596,7 @@
                                                 disabled={loading}
                                                 className={`w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
-                                                {loading ? '⏳ Creating Account...' : '✨ Create Account & Start Trading'}
+                                                {loading ? (loginCountdown ? `⏳ Creating Account... (${loginCountdown}s)` : '⏳ Creating Account...') : '✨ Create Account & Start Trading'}
                                             </button>
                                         </div>
                                     )}
@@ -5641,12 +5659,24 @@
 
                                                     setLoading(true);
                                                     setAuthError('');
+                                                    setLoginCountdown(60);
+
+                                                    // Start countdown timer
+                                                    const countdownInterval = setInterval(() => {
+                                                        setLoginCountdown(prev => {
+                                                            if (prev <= 1) {
+                                                                clearInterval(countdownInterval);
+                                                                return null;
+                                                            }
+                                                            return prev - 1;
+                                                        });
+                                                    }, 1000);
 
                                                     // Optimistic UI - prepare data structures immediately
                                                     const email = userEmail.trim().toLowerCase();
 
                                                     try {
-                                                        // Fast login with reduced timeout (10s instead of 30s)
+                                                        // Login with 60s timeout for better reliability
                                                         const response = await fetchWithTimeout(`${API_BASE_URL}/api/accounts/login`, {
                                                             method: 'POST',
                                                             headers: { 'Content-Type': 'application/json' },
@@ -5654,11 +5684,13 @@
                                                                 email: email,
                                                                 password: userPassword
                                                             })
-                                                        }, 10000);
+                                                        }, 60000);
 
                                                         const data = await response.json();
 
                                                         if (!response.ok) {
+                                                            clearInterval(countdownInterval);
+                                                            setLoginCountdown(null);
                                                             setAuthError(data.error || 'Invalid email or password');
                                                             setLoading(false);
                                                             return;
@@ -5667,10 +5699,16 @@
                                                         const account = data.account;
 
                                                         if (!account?.accountCode) {
+                                                            clearInterval(countdownInterval);
+                                                            setLoginCountdown(null);
                                                             setAuthError('Invalid account data received. Please try again.');
                                                             setLoading(false);
                                                             return;
                                                         }
+
+                                                        // Clear countdown on success
+                                                        clearInterval(countdownInterval);
+                                                        setLoginCountdown(null);
 
                                                         // Fast state updates - batch them together
                                                         const memberId = Date.now().toString();
@@ -5699,11 +5737,13 @@
                                                         setView('app');
                                                         setLoading(false);
                                                     } catch (error) {
+                                                        clearInterval(countdownInterval);
+                                                        setLoginCountdown(null);
                                                         console.error('Sign in error:', error);
                                                         if (error.message?.includes('timeout')) {
-                                                            setAuthError('Login timeout. Please try again.');
+                                                            setAuthError('Login timeout after 60 seconds. Server may be starting up. Please wait 30 seconds and try again.');
                                                         } else if (error.message?.includes('Failed to fetch')) {
-                                                            setAuthError('Cannot reach server. Please refresh and try again.');
+                                                            setAuthError('Cannot reach server. Please check your connection and try again.');
                                                         } else {
                                                             setAuthError(error.message || 'Sign in failed. Please try again.');
                                                         }
@@ -5713,7 +5753,7 @@
                                                 disabled={loading}
                                                 className={`w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-4 rounded-xl font-black text-lg transition-all duration-300 shadow-xl hover:shadow-2xl ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
-                                                {loading ? '⏳ Signing In...' : '🚀 Sign In'}
+                                                {loading ? (loginCountdown ? `⏳ Signing In... (${loginCountdown}s)` : '⏳ Signing In...') : '🚀 Sign In'}
                                             </button>
                                         </div>
                                     )}
