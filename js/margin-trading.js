@@ -107,7 +107,7 @@ function getMarginAccountStatus(portfolio, stocks, marginSettings = {}) {
 /**
  * Execute margin purchase (buying on margin)
  */
-function executemarginBuy(portfolio, symbol, quantity, price, stocks) {
+function executeMarginBuy(portfolio, symbol, quantity, price, stocks) {
     const totalCost = price * quantity;
     const marginRequired = totalCost * INITIAL_MARGIN_REQUIREMENT; // 50% down payment
     const borrowAmount = totalCost - marginRequired; // 50% borrowed
