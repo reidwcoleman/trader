@@ -6536,6 +6536,94 @@
                                     </div>
                                 )}
 
+                                {/* Portfolio Analytics Dashboard */}
+                                <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500 mb-6 shadow-xl">
+                                    <h2 className="text-2xl font-black text-white mb-6">📊 Portfolio Analytics</h2>
+
+                                    {(() => {
+                                        const metrics = window.analytics.calculatePortfolioMetrics(
+                                            portfolio,
+                                            stocks,
+                                            performanceHistory.map(p => p.value)
+                                        );
+
+                                        return (
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                {/* Total Return */}
+                                                <div className="bg-blue-800/50 rounded-xl p-4 border border-blue-600/50">
+                                                    <div className="text-blue-300 text-xs font-bold mb-2">Total Return</div>
+                                                    <div className={`text-2xl font-black ${metrics.totalReturn >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                                                        {metrics.totalReturn >= 0 ? '+' : ''}${metrics.totalReturn.toFixed(2)}
+                                                    </div>
+                                                    <div className={`text-sm font-bold ${metrics.totalReturnPercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                        {metrics.totalReturnPercent >= 0 ? '+' : ''}{metrics.totalReturnPercent.toFixed(2)}%
+                                                    </div>
+                                                </div>
+
+                                                {/* Volatility */}
+                                                <div className="bg-blue-800/50 rounded-xl p-4 border border-blue-600/50">
+                                                    <div className="text-blue-300 text-xs font-bold mb-2">Volatility</div>
+                                                    <div className="text-2xl font-black text-white">{metrics.volatility.toFixed(2)}%</div>
+                                                    <div className="text-xs text-blue-400">Daily std dev</div>
+                                                </div>
+
+                                                {/* Sharpe Ratio */}
+                                                <div className="bg-blue-800/50 rounded-xl p-4 border border-blue-600/50">
+                                                    <div className="text-blue-300 text-xs font-bold mb-2">Sharpe Ratio</div>
+                                                    <div className="text-2xl font-black text-white">{metrics.sharpeRatio.toFixed(2)}</div>
+                                                    <div className="text-xs text-blue-400">Risk-adjusted</div>
+                                                </div>
+
+                                                {/* Win Rate */}
+                                                <div className="bg-blue-800/50 rounded-xl p-4 border border-blue-600/50">
+                                                    <div className="text-blue-300 text-xs font-bold mb-2">Win Rate</div>
+                                                    <div className="text-2xl font-black text-green-300">{metrics.winRate.toFixed(0)}%</div>
+                                                    <div className="text-xs text-blue-400">{metrics.numberOfTrades} trades</div>
+                                                </div>
+
+                                                {/* Max Drawdown */}
+                                                <div className="bg-blue-800/50 rounded-xl p-4 border border-blue-600/50">
+                                                    <div className="text-blue-300 text-xs font-bold mb-2">Max Drawdown</div>
+                                                    <div className="text-2xl font-black text-red-300">{metrics.maxDrawdown.toFixed(2)}%</div>
+                                                    <div className="text-xs text-blue-400">Peak to trough</div>
+                                                </div>
+
+                                                {/* Current Value */}
+                                                <div className="bg-blue-800/50 rounded-xl p-4 border border-blue-600/50">
+                                                    <div className="text-blue-300 text-xs font-bold mb-2">Current Value</div>
+                                                    <div className="text-2xl font-black text-white">${metrics.currentValue.toLocaleString()}</div>
+                                                    <div className="text-xs text-blue-400">Total portfolio</div>
+                                                </div>
+
+                                                {/* Sector Allocation Preview */}
+                                                <div className="bg-blue-800/50 rounded-xl p-4 border border-blue-600/50 col-span-2">
+                                                    <div className="text-blue-300 text-xs font-bold mb-2">Top Sectors</div>
+                                                    <div className="space-y-1">
+                                                        {(() => {
+                                                            const sectors = window.analytics.getSectorAllocation(portfolio, stocks);
+                                                            const sortedSectors = Object.entries(sectors)
+                                                                .filter(([_, value]) => value > 0)
+                                                                .sort((a, b) => b[1] - a[1])
+                                                                .slice(0, 3);
+
+                                                            if (sortedSectors.length === 0) {
+                                                                return <div className="text-sm text-blue-400">No positions yet</div>;
+                                                            }
+
+                                                            return sortedSectors.map(([sector, value]) => (
+                                                                <div key={sector} className="flex justify-between items-center">
+                                                                    <span className="text-sm text-white font-semibold">{sector}</span>
+                                                                    <span className="text-sm text-blue-300">${value.toLocaleString()}</span>
+                                                                </div>
+                                                            ));
+                                                        })()}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
+
                                 {/* Top 3 Holdings Preview */}
                                 <div className="bg-gradient-to-br from-cyan-900/40 to-blue-950/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-cyan-500/40 mb-6 shadow-xl">
                                     <div className="flex items-center justify-between mb-4">

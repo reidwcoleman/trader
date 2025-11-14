@@ -339,9 +339,9 @@ const executeCoverShort = () => {
 1. ✅ Three JavaScript modules created and loaded
 2. ✅ Portfolio structure updated (added `shortPositions` and `performanceHistory`)
 3. ✅ State variables added (`stockNews`, `loadingNews`, `tradeType`)
-4. ⏳ **TODO**: Add Analytics Dashboard UI to Portfolio tab
-5. ⏳ **TODO**: Add News Feed UI to Trading tab
-6. ⏳ **TODO**: Add Short/Cover buttons and logic
+4. ✅ Add Analytics Dashboard UI to Portfolio tab
+5. ✅ Add News Feed UI to Trading tab
+6. ✅ Add Short/Cover buttons and logic
 
 All the backend logic is ready! Just copy the UI code above into the appropriate sections of your `index.html`.
 
