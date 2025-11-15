@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 3: Pro Features - Live WebSocket Charts | FinClash Trading</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+            color: #e8e8e8;
+            font-family: 'Inter', sans-serif;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1600px; margin: 0 auto; }
+
+        h1 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .subtitle {
+            color: #b0b0b0;
+            font-size: 18px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .feature-highlight {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .feature-highlight h3 {
+            color: #8b5cf6;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            list-style: none;
+        }
+
+        .feature-item {
+            padding: 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #d0d0d0;
+        }
+
+        .feature-item::before {
+            content: "⚡ ";
+            color: #8b5cf6;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .chart-section {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .chart-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f5f5f5;
+            margin-bottom: 12px;
+        }
+
+        .chart-desc {
+            color: #b0b0b0;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .chart-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 450px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn.btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .btn.btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin: 32px 0;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #8b5cf6;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+
+        .news-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .news-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .news-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+        }
+
+        .news-container::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.5);
+            border-radius: 3px;
+        }
+
+        .indicator-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .indicator-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .indicator-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #d0d0d0;
+        }
+
+        .indicator-value {
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .code-example {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #10b981;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        .live-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+            margin-right: 8px;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="version-badge">🚀 PHASE 3 - PRO FEATURES</span>
+        <h1>Live WebSocket Trading Charts</h1>
+        <p class="subtitle">
+            Real-time market data via WebSocket, technical indicators (RSI, MACD, Bollinger Bands),
+            <br>live news feed, pattern recognition, and support/resistance detection.
+        </p>
+
+        <!-- Feature Highlight -->
+        <div class="feature-highlight">
+            <h3>⚡ Phase 3 Pro Features</h3>
+            <ul class="feature-grid">
+                <li class="feature-item"><strong>WebSocket Live Updates:</strong> Alpaca (FREE stocks) & Binance (crypto)</li>
+                <li class="feature-item"><strong>Technical Indicators:</strong> RSI, MACD, Bollinger Bands, EMA, SMA</li>
+                <li class="feature-item"><strong>Pattern Recognition:</strong> H&S, Double Top/Bottom, Trends</li>
+                <li class="feature-item"><strong>Support/Resistance:</strong> Auto-detected price levels</li>
+                <li class="feature-item"><strong>Live News Feed:</strong> Real-time market news with sentiment</li>
+                <li class="feature-item"><strong>Volume Analysis:</strong> OBV, ATR volatility metrics</li>
+            </ul>
+        </div>
+
+        <!-- Live Stats Dashboard -->
+        <div class="stats-grid" id="stats-container">
+            <div class="stat-card">
+                <div class="stat-value"><span class="live-indicator"></span><span id="ws-status">Disconnected</span></div>
+                <div class="stat-label">WebSocket Status</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="update-count">0</div>
+                <div class="stat-label">Live Updates</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="last-price">---</div>
+                <div class="stat-label">Last Price</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="news-count">0</div>
+                <div class="stat-label">News Articles</div>
+            </div>
+        </div>
+
+        <!-- Main Demo: Crypto Live Chart -->
+        <div class="chart-section">
+            <h2 class="chart-title">📊 Live Crypto Chart (Binance WebSocket)</h2>
+            <p class="chart-desc">
+                <strong>100% FREE unlimited real-time crypto data from Binance.</strong>
+                Watch live 1-minute candles update in real-time. No API key required!
+            </p>
+
+            <div class="controls">
+                <select id="crypto-symbol" style="padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #e8e8e8; font-size: 14px;">
+                    <option value="btcusdt">BTC/USDT</option>
+                    <option value="ethusdt">ETH/USDT</option>
+                    <option value="bnbusdt">BNB/USDT</option>
+                    <option value="solusdt">SOL/USDT</option>
+                    <option value="adausdt">ADA/USDT</option>
+                </select>
+                <button class="btn btn-success" onclick="connectCryptoLive()">🔌 Connect Live</button>
+                <button class="btn btn-danger" onclick="disconnectCrypto()">⏹️ Disconnect</button>
+                <button class="btn" onclick="showIndicators()">📈 Show Indicators</button>
+            </div>
+
+            <div class="chart-container">
+                <div id="crypto-chart"></div>
+            </div>
+
+            <div class="indicator-panel" id="indicator-panel" style="display: none;">
+                <h3 style="color: #8b5cf6; font-size: 18px; margin-bottom: 16px;">Technical Indicators</h3>
+                <div id="indicators-list"></div>
+            </div>
+        </div>
+
+        <!-- Stock Chart with Indicators -->
+        <div class="chart-section">
+            <h2 class="chart-title">📈 Stock Chart with Technical Analysis</h2>
+            <p class="chart-desc">
+                Load historical stock data and overlay RSI, MACD, Bollinger Bands, and other indicators.
+                Includes automatic pattern recognition and support/resistance detection.
+            </p>
+
+            <div class="controls">
+                <input type="text" id="stock-symbol" placeholder="Enter symbol (e.g., AAPL)"
+                       style="padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #e8e8e8; font-size: 14px; width: 200px;">
+                <button class="btn" onclick="loadStockWithIndicators()">📊 Load Chart</button>
+                <button class="btn" onclick="addRSI()">Add RSI</button>
+                <button class="btn" onclick="addMACD()">Add MACD</button>
+                <button class="btn" onclick="addBB()">Add Bollinger Bands</button>
+            </div>
+
+            <div class="chart-container">
+                <div id="stock-chart"></div>
+            </div>
+
+            <div id="pattern-detection" style="margin-top: 20px; padding: 16px; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; display: none;">
+                <h4 style="color: #8b5cf6; margin-bottom: 8px;">Pattern Detected</h4>
+                <p id="pattern-info" style="color: #d0d0d0; font-size: 14px;"></p>
+            </div>
+        </div>
+
+        <!-- Live News Feed -->
+        <div class="chart-section">
+            <h2 class="chart-title">📰 Live Market News Feed</h2>
+            <p class="chart-desc">
+                Real-time financial news from Finnhub API with sentiment analysis.
+                Filtered to show only trading and market-related articles.
+            </p>
+
+            <div class="controls">
+                <button class="btn" onclick="loadMarketNews()">📰 Load Market News</button>
+                <button class="btn" onclick="loadStockNews()">🏢 Company News</button>
+            </div>
+
+            <div class="news-container" id="news-feed">
+                <div style="text-align: center; color: #888; padding: 60px 20px;">
+                    Click "Load Market News" to fetch latest financial news
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Examples -->
+        <div class="chart-section">
+            <h2 class="chart-title">💻 Phase 3 Code Examples</h2>
+
+            <h3 style="color: #f5f5f5; font-size: 18px; margin: 20px 0 12px;">Connect to Binance Live (Crypto):</h3>
+            <div class="code-example">// Create live chart updater
+const liveChart = new LiveChartUpdater(chartInstance, 'BTCUSDT', 'binance');
+
+// Set up event callbacks
+liveChart.on('bar', (bar) => {
+    console.log('New candle:', bar);
+});
+
+// Connect
+await liveChart.connect();</div>
+
+            <h3 style="color: #f5f5f5; font-size: 18px; margin: 20px 0 12px;">Calculate Technical Indicators:</h3>
+            <div class="code-example">// RSI
+const rsi = TechnicalIndicators.RSI(data, 14);
+
+// MACD
+const macd = TechnicalIndicators.MACD(data, 12, 26, 9);
+
+// Bollinger Bands
+const bb = TechnicalIndicators.BollingerBands(data, 20, 2);
+
+// Add to chart
+window.TradingViewCharts.addIndicatorOverlay(chart, 'BB', bb);</div>
+
+            <h3 style="color: #f5f5f5; font-size: 18px; margin: 20px 0 12px;">Detect Patterns:</h3>
+            <div class="code-example">// Identify chart pattern
+const pattern = TechnicalIndicators.identifyPattern(data, 50);
+console.log(pattern); // { pattern: 'Head and Shoulders', signal: 'bearish' }
+
+// Find support/resistance
+const levels = TechnicalIndicators.findSupportResistance(data);
+levels.forEach(level => {
+    addSupportResistanceLine(chart, level.price, level.type === 'support' ? '#26a69a' : '#ef5350');
+});</div>
+        </div>
+    </div>
+
+    <!-- Load Scripts -->
+    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/tradingview-charts.js"></script>
+    <script src="./js/websocket-live-data.js"></script>
+    <script src="./js/technical-indicators.js"></script>
+    <script src="./js/news-feed.js"></script>
+
+    <script>
+        let cryptoLiveUpdater = null;
+        let stockChart = null;
+        let currentStockData = null;
+
+        // Connect to Binance live crypto
+        async function connectCryptoLive() {
+            const symbol = document.getElementById('crypto-symbol').value;
+
+            // First load historical data
+            const historicalData = window.TradingViewCharts.generateSampleChartData('uptrend', 60);
+
+            const chartInstance = window.TradingViewCharts.createInteractiveCandlestickChart(
+                'crypto-chart',
+                historicalData,
+                { height: 400 }
+            );
+
+            // Create live updater
+            cryptoLiveUpdater = new LiveChartUpdater(chartInstance, symbol, 'binance');
+
+            cryptoLiveUpdater.on('connect', () => {
+                document.getElementById('ws-status').textContent = 'Connected';
+                console.log('✅ Connected to Binance WebSocket');
+            });
+
+            cryptoLiveUpdater.on('bar', (bar) => {
+                document.getElementById('update-count').textContent = cryptoLiveUpdater.updateCount;
+                document.getElementById('last-price').textContent = '$' + bar.close.toFixed(2);
+            });
+
+            cryptoLiveUpdater.on('disconnect', () => {
+                document.getElementById('ws-status').textContent = 'Disconnected';
+            });
+
+            await cryptoLiveUpdater.connect();
+        }
+
+        // Disconnect crypto
+        function disconnectCrypto() {
+            if (cryptoLiveUpdater) {
+                cryptoLiveUpdater.disconnect();
+            }
+        }
+
+        // Load stock with indicators
+        async function loadStockWithIndicators() {
+            const symbol = document.getElementById('stock-symbol').value.toUpperCase() || 'AAPL';
+
+            const result = await window.TradingViewCharts.getChartData(symbol, 90, true);
+            currentStockData = result.data;
+
+            stockChart = window.TradingViewCharts.createInteractiveCandlestickChart(
+                'stock-chart',
+                currentStockData,
+                { height: 400 }
+            );
+
+            // Detect pattern
+            const pattern = TechnicalIndicators.identifyPattern(currentStockData);
+            if (pattern) {
+                document.getElementById('pattern-detection').style.display = 'block';
+                document.getElementById('pattern-info').textContent =
+                    `${pattern.pattern} pattern detected - Signal: ${pattern.signal.toUpperCase()}`;
+            }
+        }
+
+        // Add RSI indicator
+        function addRSI() {
+            if (!currentStockData) {
+                alert('Load a stock chart first!');
+                return;
+            }
+
+            const rsi = TechnicalIndicators.RSI(currentStockData, 14);
+            console.log('RSI calculated:', rsi.slice(-5));
+            alert('RSI indicator calculated! Check console for values.');
+        }
+
+        // Add MACD
+        function addMACD() {
+            if (!currentStockData) {
+                alert('Load a stock chart first!');
+                return;
+            }
+
+            const macd = TechnicalIndicators.MACD(currentStockData);
+            console.log('MACD calculated:', macd);
+            alert('MACD indicator calculated! Check console for values.');
+        }
+
+        // Add Bollinger Bands
+        function addBB() {
+            if (!currentStockData && stockChart) {
+                alert('Load a stock chart first!');
+                return;
+            }
+
+            const bb = TechnicalIndicators.BollingerBands(currentStockData, 20, 2);
+            window.TradingViewCharts.addIndicatorOverlay(stockChart, 'BB', bb);
+            alert('Bollinger Bands added to chart!');
+        }
+
+        // Show indicators panel
+        function showIndicators() {
+            if (!currentStockData) {
+                alert('Load a stock chart first!');
+                return;
+            }
+
+            const panel = document.getElementById('indicator-panel');
+            panel.style.display = 'block';
+
+            const rsi = TechnicalIndicators.RSI(currentStockData, 14);
+            const sma20 = TechnicalIndicators.SMA(currentStockData, 20);
+            const ema20 = TechnicalIndicators.EMA(currentStockData, 20);
+
+            const html = `
+                <div class="indicator-row">
+                    <span class="indicator-name">RSI (14)</span>
+                    <span class="indicator-value" style="color: ${rsi[rsi.length-1].value > 70 ? '#ef5350' : rsi[rsi.length-1].value < 30 ? '#26a69a' : '#3b82f6'}">${rsi[rsi.length-1].value.toFixed(2)}</span>
+                </div>
+                <div class="indicator-row">
+                    <span class="indicator-name">SMA (20)</span>
+                    <span class="indicator-value" style="color: #10b981">$${sma20[sma20.length-1].value.toFixed(2)}</span>
+                </div>
+                <div class="indicator-row">
+                    <span class="indicator-name">EMA (20)</span>
+                    <span class="indicator-value" style="color: #3b82f6">$${ema20[ema20.length-1].value.toFixed(2)}</span>
+                </div>
+            `;
+
+            document.getElementById('indicators-list').innerHTML = html;
+        }
+
+        // Load market news
+        async function loadMarketNews() {
+            const news = await window.newsFeed.fetchMarketNews(FINNHUB_API_KEY);
+            document.getElementById('news-count').textContent = news.length;
+            renderNews(news);
+        }
+
+        // Load stock-specific news
+        async function loadStockNews() {
+            const symbol = document.getElementById('stock-symbol').value.toUpperCase() || 'AAPL';
+            const news = await window.newsFeed.fetchStockNews(symbol, FINNHUB_API_KEY);
+            document.getElementById('news-count').textContent = news.length;
+            renderNews(news);
+        }
+
+        // Render news to feed
+        function renderNews(news) {
+            const container = document.getElementById('news-feed');
+            container.innerHTML = '';
+
+            news.slice(0, 20).forEach(article => {
+                const item = document.createElement('div');
+                item.style.cssText = 'background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.3s ease;';
+
+                item.addEventListener('click', () => window.open(article.url, '_blank'));
+
+                const sentimentColor = article.sentiment === 'positive' ? '#26a69a' :
+                                      article.sentiment === 'negative' ? '#ef5350' : '#888';
+
+                item.innerHTML = `
+                    <h4 style="font-size: 15px; font-weight: 600; color: #f5f5f5; margin-bottom: 8px; line-height: 1.4;">${article.headline}</h4>
+                    <p style="font-size: 13px; color: #b0b0b0; margin-bottom: 12px;">${(article.summary || '').substring(0, 120)}...</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; color: #888;">${article.source} • ${window.newsFeed.formatNewsDate(article.datetime)}</span>
+                        <span style="font-size: 11px; color: ${sentimentColor}; font-weight: 600; text-transform: uppercase;">${article.sentiment}</span>
+                    </div>
+                `;
+
+                container.appendChild(item);
+            });
+        }
+
+        // Log Phase 3 info
+        console.log('%c🚀 Phase 3: Pro Features Loaded', 'color: #8b5cf6; font-size: 18px; font-weight: bold');
+        console.log('Features:', ['WebSocket Live', 'Technical Indicators', 'Pattern Recognition', 'News Feed']);
+    </script>
+</body>
+</html>
