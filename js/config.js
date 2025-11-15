@@ -22,6 +22,21 @@ const TOP_12_STOCKS = [
 const FINNHUB_API_KEY = 'd3sop19r01qpdd5kkpsgd3sop19r01qpdd5kkpt0';
 const FINNHUB_API_BASE = 'https://finnhub.io/api/v1';
 
+// Alpha Vantage API as backup (free tier: 500 calls/day, 5 calls/minute)
+// Get your free key at: https://www.alphavantage.co/support/#api-key
+const ALPHA_VANTAGE_API_KEY = 'demo'; // Replace with your key
+const ALPHA_VANTAGE_API_BASE = 'https://www.alphavantage.co/query';
+
+// Market hours configuration (US stock market)
+const MARKET_CONFIG = {
+    timezone: 'America/New_York',
+    openHour: 9,
+    openMinute: 30,
+    closeHour: 16,
+    closeMinute: 0,
+    weekdays: [1, 2, 3, 4, 5] // Monday-Friday
+};
+
 // Trading configuration
 const COMMISSION_RATE = 0.03;
 const COOLDOWN_MINUTES = 15;

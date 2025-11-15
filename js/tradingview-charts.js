@@ -329,18 +329,133 @@ function generateSampleChartData(pattern = 'uptrend', days = 30) {
 const dataCache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
+// LocalStorage cache configuration
+const LS_CACHE_PREFIX = 'finclash_chart_';
+const LS_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours for localStorage
+
 /**
- * Fetch real stock data from Finnhub API with caching
+ * LocalStorage cache utilities
+ */
+const LocalStorageCache = {
+    /**
+     * Save data to localStorage with timestamp
+     */
+    set: function(key, data) {
+        try {
+            const cacheObj = {
+                data: data,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(LS_CACHE_PREFIX + key, JSON.stringify(cacheObj));
+            return true;
+        } catch (error) {
+            console.warn('LocalStorage save failed:', error);
+            return false;
+        }
+    },
+
+    /**
+     * Get data from localStorage if not expired
+     */
+    get: function(key, maxAge = LS_CACHE_DURATION) {
+        try {
+            const cached = localStorage.getItem(LS_CACHE_PREFIX + key);
+            if (!cached) return null;
+
+            const cacheObj = JSON.parse(cached);
+            const age = Date.now() - cacheObj.timestamp;
+
+            if (age > maxAge) {
+                // Expired, remove it
+                this.remove(key);
+                return null;
+            }
+
+            return cacheObj.data;
+        } catch (error) {
+            console.warn('LocalStorage read failed:', error);
+            return null;
+        }
+    },
+
+    /**
+     * Remove specific cache entry
+     */
+    remove: function(key) {
+        try {
+            localStorage.removeItem(LS_CACHE_PREFIX + key);
+        } catch (error) {
+            console.warn('LocalStorage remove failed:', error);
+        }
+    },
+
+    /**
+     * Clear all chart cache entries
+     */
+    clearAll: function() {
+        try {
+            const keys = Object.keys(localStorage);
+            keys.forEach(key => {
+                if (key.startsWith(LS_CACHE_PREFIX)) {
+                    localStorage.removeItem(key);
+                }
+            });
+            console.log('LocalStorage cache cleared');
+        } catch (error) {
+            console.warn('LocalStorage clear failed:', error);
+        }
+    },
+
+    /**
+     * Get cache stats
+     */
+    getStats: function() {
+        try {
+            const keys = Object.keys(localStorage);
+            const chartKeys = keys.filter(k => k.startsWith(LS_CACHE_PREFIX));
+            let totalSize = 0;
+
+            chartKeys.forEach(key => {
+                totalSize += localStorage.getItem(key).length;
+            });
+
+            return {
+                entries: chartKeys.length,
+                sizeKB: (totalSize / 1024).toFixed(2),
+                keys: chartKeys.map(k => k.replace(LS_CACHE_PREFIX, ''))
+            };
+        } catch (error) {
+            return { entries: 0, sizeKB: 0, keys: [] };
+        }
+    }
+};
+
+/**
+ * Fetch real stock data from Finnhub API with multi-level caching
  */
 async function fetchRealStockData(symbol, days = 30, resolution = 'D') {
     const cacheKey = `${symbol}_${resolution}_${days}`;
     const now = Date.now();
 
-    // Check cache first
-    const cached = dataCache.get(cacheKey);
-    if (cached && (now - cached.timestamp) < CACHE_DURATION) {
-        console.log(`Using cached data for ${symbol}`);
-        return cached.data;
+    // Level 1: Check memory cache first (fastest)
+    const memCached = dataCache.get(cacheKey);
+    if (memCached && (now - memCached.timestamp) < CACHE_DURATION) {
+        console.log(`✓ Memory cache hit for ${symbol}`);
+        return memCached.data;
+    }
+
+    // Level 2: Check localStorage cache (persistent, 24hr)
+    const lsCached = LocalStorageCache.get(cacheKey, LS_CACHE_DURATION);
+    if (lsCached) {
+        console.log(`✓ LocalStorage cache hit for ${symbol}`);
+
+        // Promote to memory cache
+        dataCache.set(cacheKey, {
+            data: lsCached,
+            timestamp: now
+        });
+
+        return lsCached;
     }
 
     try {
@@ -381,11 +496,13 @@ async function fetchRealStockData(symbol, days = 30, resolution = 'D') {
             volume: data.v[idx]
         }));
 
-        // Cache the result
+        // Cache the result in both memory and localStorage
         dataCache.set(cacheKey, {
             data: chartData,
             timestamp: now
         });
+
+        LocalStorageCache.set(cacheKey, chartData);
 
         console.log(`Successfully fetched ${chartData.length} candles for ${symbol}`);
         return chartData;
@@ -410,6 +527,183 @@ function clearOldCache() {
 
 // Run cache cleanup every 10 minutes
 setInterval(clearOldCache, 10 * 60 * 1000);
+
+/**
+ * Market hours utility functions
+ */
+function isMarketOpen() {
+    try {
+        const now = new Date();
+        const config = typeof MARKET_CONFIG !== 'undefined' ? MARKET_CONFIG : {
+            openHour: 9, openMinute: 30, closeHour: 16, closeMinute: 0, weekdays: [1,2,3,4,5]
+        };
+
+        // Get ET time (market timezone)
+        const etTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+        const day = etTime.getDay();
+        const hour = etTime.getHours();
+        const minute = etTime.getMinutes();
+
+        // Check if weekday
+        if (!config.weekdays.includes(day)) {
+            return false;
+        }
+
+        // Check if within market hours
+        const currentMinutes = hour * 60 + minute;
+        const openMinutes = config.openHour * 60 + config.openMinute;
+        const closeMinutes = config.closeHour * 60 + config.closeMinute;
+
+        return currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+    } catch (error) {
+        console.warn('Market hours check failed:', error);
+        return true; // Assume open if check fails
+    }
+}
+
+function getMarketStatus() {
+    const isOpen = isMarketOpen();
+    const now = new Date();
+    const etTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+
+    return {
+        isOpen,
+        message: isOpen ? '🟢 Market Open' : '🔴 Market Closed',
+        localTime: now.toLocaleTimeString(),
+        etTime: etTime.toLocaleTimeString('en-US', { timeZone: 'America/New_York' }),
+        nextOpen: isOpen ? null : getNextMarketOpen()
+    };
+}
+
+function getNextMarketOpen() {
+    const now = new Date();
+    const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    const day = etNow.getDay();
+
+    // If Friday after close or Saturday, next is Monday
+    if (day === 5 && etNow.getHours() >= 16) {
+        return 'Monday 9:30 AM ET';
+    } else if (day === 6) {
+        return 'Monday 9:30 AM ET';
+    } else if (day === 0) {
+        return 'Monday 9:30 AM ET';
+    } else {
+        // Weekday - next is tomorrow or later today
+        if (etNow.getHours() >= 16) {
+            return 'Tomorrow 9:30 AM ET';
+        } else if (etNow.getHours() < 9 || (etNow.getHours() === 9 && etNow.getMinutes() < 30)) {
+            return 'Today 9:30 AM ET';
+        } else {
+            return 'Tomorrow 9:30 AM ET';
+        }
+    }
+}
+
+/**
+ * Fetch stock data from Alpha Vantage API (backup)
+ */
+async function fetchAlphaVantageData(symbol, days = 30) {
+    const cacheKey = `av_${symbol}_${days}`;
+    const now = Date.now();
+
+    // Check cache first
+    const cached = dataCache.get(cacheKey);
+    if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+        console.log(`Using cached Alpha Vantage data for ${symbol}`);
+        return cached.data;
+    }
+
+    try {
+        const apiKey = typeof ALPHA_VANTAGE_API_KEY !== 'undefined' ? ALPHA_VANTAGE_API_KEY : 'demo';
+        const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${apiKey}&outputsize=compact`;
+
+        console.log(`Fetching data for ${symbol} from Alpha Vantage (backup)...`);
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Check for API errors
+        if (data['Error Message']) {
+            console.error('Alpha Vantage error:', data['Error Message']);
+            return null;
+        }
+
+        if (data['Note']) {
+            console.warn('Alpha Vantage rate limit:', data['Note']);
+            return null;
+        }
+
+        const timeSeries = data['Time Series (Daily)'];
+        if (!timeSeries) {
+            console.error('No time series data from Alpha Vantage');
+            return null;
+        }
+
+        // Transform to chart format
+        const chartData = [];
+        const dates = Object.keys(timeSeries).slice(0, days).reverse();
+
+        dates.forEach(date => {
+            const dayData = timeSeries[date];
+            chartData.push({
+                time: Math.floor(new Date(date).getTime() / 1000),
+                open: parseFloat(dayData['1. open']),
+                high: parseFloat(dayData['2. high']),
+                low: parseFloat(dayData['3. low']),
+                close: parseFloat(dayData['4. close']),
+                volume: parseInt(dayData['5. volume'])
+            });
+        });
+
+        // Cache the result
+        dataCache.set(cacheKey, {
+            data: chartData,
+            timestamp: now
+        });
+
+        console.log(`Successfully fetched ${chartData.length} candles from Alpha Vantage`);
+        return chartData;
+
+    } catch (error) {
+        console.error(`Alpha Vantage fetch error for ${symbol}:`, error);
+        return null;
+    }
+}
+
+/**
+ * Smart multi-source data fetcher with fallback chain
+ * Tries: Finnhub -> Alpha Vantage -> Sample Data
+ */
+async function fetchStockDataWithFallback(symbol, days = 30) {
+    // Try Finnhub first
+    console.log(`Attempting Finnhub for ${symbol}...`);
+    let data = await fetchRealStockData(symbol, days);
+
+    if (data && data.length > 0) {
+        console.log(`✓ Finnhub succeeded for ${symbol}`);
+        return { data, source: 'Finnhub' };
+    }
+
+    // Try Alpha Vantage as backup
+    console.log(`Finnhub failed, trying Alpha Vantage for ${symbol}...`);
+    data = await fetchAlphaVantageData(symbol, days);
+
+    if (data && data.length > 0) {
+        console.log(`✓ Alpha Vantage succeeded for ${symbol}`);
+        return { data, source: 'Alpha Vantage' };
+    }
+
+    // Final fallback to sample data
+    console.warn(`All APIs failed for ${symbol}, using sample data`);
+    return {
+        data: generateSampleChartData('uptrend', days),
+        source: 'Sample Data'
+    };
+}
 
 /**
  * Calculate Simple Moving Average
@@ -446,38 +740,32 @@ function destroyChart(chartInstance) {
 }
 
 /**
- * Smart data fetcher - tries real data, falls back to sample data
+ * Smart data fetcher - tries real data with fallback chain
  * @param {string} symbol - Stock symbol (e.g., 'AAPL') or pattern for sample data
  * @param {number} days - Number of days of historical data
  * @param {boolean} useRealData - Force real data (true) or sample data (false)
- * @returns {Promise<Array>} Chart data array
+ * @returns {Promise<Object>} { data: Array, source: string }
  */
 async function getChartData(symbol, days = 30, useRealData = true) {
     if (!useRealData) {
         // Use sample data - symbol is treated as pattern name
         console.log(`Generating sample ${symbol} pattern data`);
-        return generateSampleChartData(symbol, days);
+        return {
+            data: generateSampleChartData(symbol, days),
+            source: 'Sample Data'
+        };
     }
 
-    // Try to fetch real data
-    console.log(`Attempting to fetch real data for ${symbol}...`);
-    const realData = await fetchRealStockData(symbol, days);
-
-    if (realData && realData.length > 0) {
-        return realData;
-    }
-
-    // Fallback to sample uptrend data
-    console.warn(`Real data unavailable for ${symbol}, falling back to sample data`);
-    return generateSampleChartData('uptrend', days);
+    // Use fallback chain: Finnhub -> Alpha Vantage -> Sample
+    return await fetchStockDataWithFallback(symbol, days);
 }
 
 /**
- * Create chart with loading state
+ * Create chart with loading state, market status, and auto-refresh
  * @param {string} containerId - DOM container ID
  * @param {string} symbol - Stock symbol or pattern
- * @param {Object} options - Chart options + { useRealData: boolean }
- * @returns {Promise<Object>} Chart instance
+ * @param {Object} options - Chart options + { useRealData: boolean, autoRefresh: boolean }
+ * @returns {Promise<Object>} Chart instance with refresh controls
  */
 async function createChartWithData(containerId, symbol, options = {}) {
     const container = document.getElementById(containerId);
@@ -492,27 +780,88 @@ async function createChartWithData(containerId, symbol, options = {}) {
     try {
         const useRealData = options.useRealData !== false; // Default to true
         const days = options.days || 30;
+        const autoRefresh = options.autoRefresh !== false; // Default to true
 
-        // Fetch data
-        const data = await getChartData(symbol, days, useRealData);
+        // Fetch data with fallback chain
+        const result = await getChartData(symbol, days, useRealData);
 
-        if (!data || data.length === 0) {
+        if (!result || !result.data || result.data.length === 0) {
             container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 400px; color: #ef4444; font-size: 16px;">⚠️ No data available</div>';
             return null;
         }
 
+        const { data, source } = result;
+
         // Create chart
         const chartInstance = createInteractiveCandlestickChart(containerId, data, options);
 
-        // Add data source label
-        const label = useRealData ? '📊 Real Market Data (15-min delayed)' : '🎓 Sample Educational Data';
-        const labelDiv = document.createElement('div');
-        labelDiv.style.cssText = 'position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #10b981; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; z-index: 10;';
-        labelDiv.textContent = label;
-        container.style.position = 'relative';
-        container.insertBefore(labelDiv, container.firstChild);
+        // Get market status
+        const marketStatus = getMarketStatus();
 
-        return chartInstance;
+        // Add status badges container
+        const badgesContainer = document.createElement('div');
+        badgesContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; display: flex; gap: 8px; z-index: 10;';
+
+        // Data source badge
+        const sourceBadge = document.createElement('div');
+        const sourceColor = source === 'Finnhub' ? '#10b981' :
+                           source === 'Alpha Vantage' ? '#3b82f6' : '#888';
+        sourceBadge.style.cssText = `background: rgba(0,0,0,0.7); color: ${sourceColor}; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600;`;
+        sourceBadge.textContent = `📊 ${source}`;
+
+        // Market status badge
+        const statusBadge = document.createElement('div');
+        const statusColor = marketStatus.isOpen ? '#10b981' : '#ef4444';
+        statusBadge.style.cssText = `background: rgba(0,0,0,0.7); color: ${statusColor}; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600;`;
+        statusBadge.textContent = marketStatus.message;
+        statusBadge.title = `ET: ${marketStatus.etTime}${marketStatus.nextOpen ? ' - Next open: ' + marketStatus.nextOpen : ''}`;
+
+        badgesContainer.appendChild(sourceBadge);
+        badgesContainer.appendChild(statusBadge);
+
+        container.style.position = 'relative';
+        container.insertBefore(badgesContainer, container.firstChild);
+
+        // Setup auto-refresh during market hours
+        let refreshInterval = null;
+        if (autoRefresh && useRealData) {
+            const refreshMinutes = 15;
+            refreshInterval = setInterval(async () => {
+                if (isMarketOpen()) {
+                    console.log(`Auto-refreshing ${symbol} chart...`);
+                    // Clear memory cache to force fresh fetch
+                    const cacheKey = `${symbol}_D_${days}`;
+                    dataCache.delete(cacheKey);
+
+                    // Fetch fresh data
+                    const freshResult = await getChartData(symbol, days, true);
+                    if (freshResult && freshResult.data) {
+                        // Update chart
+                        chartInstance.candlestickSeries.setData(freshResult.data);
+
+                        // Update source badge
+                        sourceBadge.textContent = `📊 ${freshResult.source} (Updated)`;
+                        setTimeout(() => {
+                            sourceBadge.textContent = `📊 ${freshResult.source}`;
+                        }, 3000);
+                    }
+                }
+            }, refreshMinutes * 60 * 1000);
+        }
+
+        return {
+            ...chartInstance,
+            symbol,
+            source,
+            marketStatus,
+            refreshInterval,
+            stopRefresh: () => {
+                if (refreshInterval) {
+                    clearInterval(refreshInterval);
+                    console.log(`Stopped auto-refresh for ${symbol}`);
+                }
+            }
+        };
 
     } catch (error) {
         console.error('Error creating chart:', error);
@@ -624,16 +973,37 @@ function createDataSourceToggle(config) {
 // Export functions
 if (typeof window !== 'undefined') {
     window.TradingViewCharts = {
+        // Chart creation
         createInteractiveCandlestickChart,
-        addSupportResistanceLine,
-        addIndicatorOverlay,
-        generateSampleChartData,
-        fetchRealStockData,
-        getChartData,
         createChartWithData,
         createDataSourceToggle,
-        calculateSMA,
         destroyChart,
-        clearOldCache
+
+        // Data fetching
+        fetchRealStockData,
+        fetchAlphaVantageData,
+        fetchStockDataWithFallback,
+        getChartData,
+
+        // Chart overlays
+        addSupportResistanceLine,
+        addIndicatorOverlay,
+        calculateSMA,
+
+        // Sample data generation
+        generateSampleChartData,
+
+        // Market utilities
+        isMarketOpen,
+        getMarketStatus,
+        getNextMarketOpen,
+
+        // Cache management
+        clearOldCache,
+        LocalStorageCache,
+
+        // Version info
+        version: '2.0.0',
+        features: ['Multi-level caching', 'API fallback chain', 'Market hours detection', 'Auto-refresh']
     };
 }
