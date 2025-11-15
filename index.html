@@ -6832,72 +6832,103 @@
                             </div>
                         </div>
 
-                        {/* Stats - Consolidated 3-Card Layout */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
-                            {/* Card 1: Portfolio Overview */}
-                            <div className="bg-gradient-to-br from-green-900/40 to-emerald-900/40 rounded-2xl p-6 border-2 border-green-400 relative overflow-hidden shadow-2xl shadow-green-500/20">
-                                <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 animate-pulse"></div>
+                        {/* Stats - Premium Compact 3-Card Layout */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                            {/* Card 1: Portfolio Overview - Compact UltraThink */}
+                            <div className="group relative bg-black/90 backdrop-blur-2xl rounded-xl p-4 border-2 border-green-500/40 hover:border-green-400 overflow-hidden transition-all duration-300 hover:scale-105" style={{boxShadow: '0 0 20px rgba(34, 197, 94, 0.2)'}}>
+                                {/* Animated glow */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                 <div className="relative">
-                                    <div className="text-green-200 text-xs font-bold mb-2 uppercase tracking-wide flex items-center gap-2">
-                                        📊 <span>Portfolio Overview</span>
-                                        {lastUpdate && <span className="text-[10px] text-green-400 normal-case tracking-normal">(Live)</span>}
+                                    {/* Header with UltraThink Badge */}
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="text-[10px] text-green-300 font-black uppercase tracking-wider flex items-center gap-1">
+                                            <span className="text-xs">📊</span>
+                                            <span>Portfolio</span>
+                                        </div>
+                                        {lastUpdate && <div className="flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-1.5 w-1.5 rounded-full bg-green-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span></div>}
                                     </div>
-                                    <div className="text-5xl font-black text-white mb-3">${portfolioValue.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
-                                    <div className="text-xs text-green-300 font-semibold mb-4">Total Portfolio Value</div>
-                                    <div className="bg-black/30 rounded-lg p-3 mb-4 border border-green-500/30">
-                                        <div className="flex items-center justify-between">
-                                            <div className="text-green-200 text-xs font-semibold">💵 Cash Available</div>
-                                            <div className="text-white text-lg font-black">${portfolio.cash.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                                    {/* Value - Larger and bold */}
+                                    <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-emerald-300 to-green-300 mb-2">${portfolioValue.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                                    {/* Cash - Inline compact */}
+                                    <div className="flex items-center justify-between bg-black/40 rounded-lg px-3 py-2 border border-green-500/30 mb-2">
+                                        <div className="text-[10px] text-green-300 font-bold">💵 CASH</div>
+                                        <div className="text-sm font-black text-green-200">${portfolio.cash.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                                    </div>
+                                    {/* Compact Action Buttons */}
+                                    <div className="flex gap-1.5">
+                                        <button onClick={() => setMainTab('trading')} className="flex-1 bg-gradient-to-r from-green-500/80 to-emerald-600/80 hover:from-green-500 hover:to-emerald-600 text-white px-2 py-1.5 rounded-lg font-bold text-[10px] transition-all">
+                                            Trade
+                                        </button>
+                                        <button onClick={() => setMainTab('watchlist')} className="flex-1 bg-gradient-to-r from-cyan-500/80 to-blue-600/80 hover:from-cyan-500 hover:to-blue-600 text-white px-2 py-1.5 rounded-lg font-bold text-[10px] transition-all">
+                                            Watch
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Card 2: Performance - Compact UltraThink */}
+                            <div className={`group relative bg-black/90 backdrop-blur-2xl rounded-xl p-4 border-2 hover:scale-105 transition-all duration-300 overflow-hidden ${portfolioReturn >= 0 ? 'border-cyan-500/40 hover:border-cyan-400' : 'border-red-500/40 hover:border-red-400'}`} style={{boxShadow: portfolioReturn >= 0 ? '0 0 20px rgba(6, 182, 212, 0.2)' : '0 0 20px rgba(239, 68, 68, 0.2)'}}>
+                                <div className={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${portfolioReturn >= 0 ? 'from-cyan-500/10 to-green-500/10' : 'from-red-500/10 to-pink-500/10'}`}></div>
+                                <div className="relative">
+                                    {/* Header */}
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className={`text-[10px] font-black uppercase tracking-wider flex items-center gap-1 ${portfolioReturn >= 0 ? 'text-cyan-300' : 'text-red-300'}`}>
+                                            <span className="text-xs">{portfolioReturn >= 0 ? '🚀' : '📉'}</span>
+                                            <span>Returns</span>
+                                        </div>
+                                        <div className="bg-purple-500/30 px-2 py-0.5 rounded-full border border-purple-400/50 flex items-center gap-1">
+                                            <span className="text-[8px] text-purple-200 font-black">🧠 AI</span>
                                         </div>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => setMainTab('trading')} className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white px-3 py-2 rounded-lg font-bold text-xs transition-all shadow-lg">
-                                            📈 Trade
-                                        </button>
-                                        <button onClick={() => setMainTab('watchlist')} className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-3 py-2 rounded-lg font-bold text-xs transition-all shadow-lg">
-                                            ⭐ Watch
-                                        </button>
+                                    {/* Total Return */}
+                                    <div className={`text-3xl font-black mb-1 text-transparent bg-clip-text bg-gradient-to-r ${portfolioReturn >= 0 ? 'from-cyan-300 via-green-300 to-cyan-300' : 'from-red-300 via-pink-300 to-red-300'}`}>
+                                        {portfolioReturn >= 0 ? '+' : ''}{portfolioReturn.toFixed(2)}%
                                     </div>
-                                    {lastUpdate && (
-                                        <div className="text-[10px] text-green-300 mt-3 font-semibold text-center">🔄 Updated: {lastUpdate.toLocaleTimeString()}</div>
+                                    <div className={`text-xs font-bold mb-2 ${portfolioReturn >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                                        {portfolioReturn >= 0 ? '+' : ''}${(portfolioValue - 100000).toLocaleString(undefined, {maximumFractionDigits: 0})}
+                                    </div>
+                                    {/* Today's Change - Compact Inline */}
+                                    <div className="flex items-center justify-between bg-black/40 rounded-lg px-3 py-2 border border-cyan-500/30 mb-2">
+                                        <div className={`text-[10px] font-black ${dailyReturn >= 0 ? 'text-cyan-300' : 'text-orange-300'}`}>
+                                            {dailyReturn >= 0 ? '📈' : '📉'} TODAY
+                                        </div>
+                                        <div className="text-right">
+                                            <div className={`text-sm font-black ${dailyReturn >= 0 ? 'text-cyan-400' : 'text-orange-400'}`}>
+                                                {dailyReturn >= 0 ? '+' : ''}{dailyReturn.toFixed(2)}%
+                                            </div>
+                                            <div className={`text-[9px] font-bold ${dailyReturn >= 0 ? 'text-cyan-300' : 'text-orange-300'}`}>
+                                                {dailyReturn >= 0 ? '+' : ''}${(portfolioValue - yesterdayValue).toLocaleString(undefined, {maximumFractionDigits: 0})}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/* Mini Sparkline */}
+                                    {performanceHistory.length > 1 && (
+                                        <div className="flex items-center gap-0.5 h-6">
+                                            {performanceHistory.slice(-7).map((point, idx) => {
+                                                const isProfit = point.value >= 100000;
+                                                const maxValue = Math.max(...performanceHistory.slice(-7).map(p => p.value));
+                                                const minValue = Math.min(...performanceHistory.slice(-7).map(p => p.value));
+                                                const range = maxValue - minValue || 1;
+                                                const height = ((point.value - minValue) / range) * 100;
+                                                return (<div key={idx} className="flex-1 h-full flex items-end"><div className={`w-full rounded-t transition-all ${isProfit ? 'bg-cyan-500/60 hover:bg-cyan-500' : 'bg-red-500/60 hover:bg-red-500'}`} style={{ height: `${Math.max(height, 10)}%` }}></div></div>);
+                                            })}
+                                        </div>
                                     )}
                                 </div>
                             </div>
-                            <div className={`group relative bg-black/80 backdrop-blur-2xl rounded-2xl p-6 border-2 transition-all duration-500 overflow-hidden ${portfolioReturn >= 0 ? 'border-green-500/40 hover:border-green-400' : 'border-red-500/40 hover:border-red-400'}`} style={{boxShadow: portfolioReturn >= 0 ? '0 0 30px rgba(34, 197, 94, 0.2)' : '0 0 30px rgba(239, 68, 68, 0.2)'}}>
-                                <div className={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition duration-700 ${portfolioReturn >= 0 ? 'from-green-500/10 via-emerald-600/15 to-transparent' : 'from-red-500/10 via-pink-600/15 to-transparent'}`}></div>
-                                <div className={`relative text-xs font-bold mb-2 uppercase tracking-wide flex items-center gap-2 ${portfolioReturn >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-                                    {portfolioReturn >= 0 ? '🚀' : '📉'} <span>Performance</span>
-                                </div>
-                                <div className={`relative text-5xl font-black mb-1 text-transparent bg-clip-text bg-gradient-to-r ${portfolioReturn >= 0 ? 'from-green-300 via-emerald-400 to-green-300' : 'from-red-300 via-pink-400 to-red-300'}`} style={{textShadow: portfolioReturn >= 0 ? '0 0 20px rgba(74, 222, 128, 0.3)' : '0 0 20px rgba(239, 68, 68, 0.3)'}}>
-                                    {portfolioReturn >= 0 ? '+' : ''}{portfolioReturn.toFixed(2)}%
-                                </div>
-                                <div className={`relative text-lg font-black mb-4 ${portfolioReturn >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                    {portfolioReturn >= 0 ? '+' : ''}${(portfolioValue - 100000).toLocaleString(undefined, {maximumFractionDigits: 0})}
-                                </div>
-                                <div className={`bg-black/30 rounded-lg p-3 mb-3 border ${dailyReturn >= 0 ? 'border-cyan-500/30' : 'border-orange-500/30'}`}>
-                                    <div className="flex items-center justify-between mb-1">
-                                        <div className={`text-xs font-semibold ${dailyReturn >= 0 ? 'text-cyan-300' : 'text-orange-300'}`}>{dailyReturn >= 0 ? '📈' : '📉'} Today</div>
-                                        <div className={`text-2xl font-black ${dailyReturn >= 0 ? 'text-cyan-400' : 'text-orange-400'}`}>{dailyReturn >= 0 ? '+' : ''}{dailyReturn.toFixed(2)}%</div>
-                                    </div>
-                                    <div className={`text-xs font-bold text-right ${dailyReturn >= 0 ? 'text-cyan-300' : 'text-orange-300'}`}>{dailyReturn >= 0 ? '+' : ''}${(portfolioValue - yesterdayValue).toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
-                                </div>
-                                {performanceHistory.length > 1 && (
-                                    <div className="flex items-center gap-1 h-10">
-                                        {performanceHistory.slice(-7).map((point, idx) => {
-                                            const isProfit = point.value >= 100000;
-                                            const maxValue = Math.max(...performanceHistory.slice(-7).map(p => p.value));
-                                            const minValue = Math.min(...performanceHistory.slice(-7).map(p => p.value));
-                                            const range = maxValue - minValue || 1;
-                                            const height = ((point.value - minValue) / range) * 100;
-                                            return (<div key={idx} className="flex-1 h-full flex items-end"><div className={`w-full rounded-t transition-all ${isProfit ? 'bg-green-500/60 hover:bg-green-500' : 'bg-red-500/60 hover:bg-red-500'}`} style={{ height: `${Math.max(height, 10)}%` }}></div></div>);
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="group relative bg-black/80 backdrop-blur-2xl rounded-2xl p-6 border-2 border-purple-500/40 hover:border-purple-400 transition-all duration-500 overflow-hidden" style={{boxShadow: '0 0 30px rgba(168, 85, 247, 0.2)'}}>
-                                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-600/15 to-transparent opacity-0 group-hover:opacity-100 transition duration-700"></div>
+                            {/* Card 3: Portfolio Health - Compact UltraThink */}
+                            <div className="group relative bg-black/90 backdrop-blur-2xl rounded-xl p-4 border-2 border-purple-500/40 hover:border-purple-400 transition-all duration-300 hover:scale-105 overflow-hidden" style={{boxShadow: '0 0 20px rgba(168, 85, 247, 0.2)'}}>
+                                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                 <div className="relative">
-                                    <div className="text-purple-300 text-xs font-bold mb-3 uppercase tracking-wide flex items-center gap-2">🎯 <span>Portfolio Health</span> <span className="text-[10px] bg-purple-500/30 px-2 py-0.5 rounded-full border border-purple-400/50"><span className="animate-pulse">🧠</span> AI</span></div>
+                                    {/* Header with UltraThink Badge */}
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="text-[10px] text-purple-300 font-black uppercase tracking-wider flex items-center gap-1">
+                                            <span className="text-xs">🎯</span>
+                                            <span>Health</span>
+                                        </div>
+                                        <div className="bg-purple-500/30 px-2 py-0.5 rounded-full border border-purple-400/50 flex items-center gap-1">
+                                            <span className="text-[8px] text-purple-200 font-black animate-pulse">🧠 AI</span>
+                                        </div>
+                                    </div>
                                     {(() => {
                                         const positionsCount = Object.entries(portfolio.positions).filter(([_, qty]) => qty > 0).length;
                                         const sellTrades = portfolio.history?.filter(t => t.type === 'sell').length || 0;
@@ -6910,7 +6941,44 @@
                                         healthScore = Math.max(0, Math.min(100, healthScore));
                                         const healthColor = healthScore >= 70 ? 'green' : healthScore >= 40 ? 'yellow' : 'red';
                                         const healthLabel = healthScore >= 70 ? 'Excellent' : healthScore >= 40 ? 'Good' : 'Needs Work';
-                                        return (<><div className="flex items-center justify-center mb-4"><div className="relative w-28 h-28"><svg className="transform -rotate-90 w-28 h-28"><circle cx="56" cy="56" r="50" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-700" /><circle cx="56" cy="56" r="50" stroke="currentColor" strokeWidth="6" fill="none" strokeDasharray={`${2 * Math.PI * 50}`} strokeDashoffset={`${2 * Math.PI * 50 * (1 - healthScore / 100)}`} className={`transition-all duration-1000 ${healthColor === 'green' ? 'text-green-500' : healthColor === 'yellow' ? 'text-yellow-500' : 'text-red-500'}`} strokeLinecap="round" /></svg><div className="absolute inset-0 flex flex-col items-center justify-center"><div className={`text-3xl font-black ${healthColor === 'green' ? 'text-green-400' : healthColor === 'yellow' ? 'text-yellow-400' : 'text-red-400'}`}>{healthScore}</div><div className="text-[10px] text-gray-400 font-semibold">{healthLabel}</div></div></div></div><div className="space-y-2"><div className="bg-purple-900/30 rounded-lg p-2 border border-purple-500/30 flex items-center justify-between"><div className="text-xs text-purple-300 font-semibold">📊 Positions</div><div className="text-white font-black text-base">{positionsCount}</div></div><div className="bg-purple-900/30 rounded-lg p-2 border border-purple-500/30 flex items-center justify-between"><div className="text-xs text-purple-300 font-semibold">🎯 Win Rate</div><div className={`font-black text-base ${winRate >= 50 ? 'text-green-400' : 'text-orange-400'}`}>{sellTrades > 0 ? `${winRate.toFixed(0)}%` : 'N/A'}</div></div><div className="bg-purple-900/30 rounded-lg p-2 border border-purple-500/30 flex items-center justify-between"><div className="text-xs text-purple-300 font-semibold">⭐ Watching</div><div className="text-white font-black text-base">{watchlist.length}</div></div></div></>);
+                                        return (
+                                            <>
+                                                {/* Compact Health Score Gauge */}
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <div className="relative w-16 h-16 flex-shrink-0">
+                                                        <svg className="transform -rotate-90 w-16 h-16">
+                                                            <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="4" fill="none" className="text-gray-700" />
+                                                            <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray={`${2 * Math.PI * 28}`} strokeDashoffset={`${2 * Math.PI * 28 * (1 - healthScore / 100)}`} className={`transition-all duration-1000 ${healthColor === 'green' ? 'text-green-500' : healthColor === 'yellow' ? 'text-yellow-500' : 'text-red-500'}`} strokeLinecap="round" />
+                                                        </svg>
+                                                        <div className="absolute inset-0 flex items-center justify-center">
+                                                            <div className={`text-xl font-black ${healthColor === 'green' ? 'text-green-400' : healthColor === 'yellow' ? 'text-yellow-400' : 'text-red-400'}`}>{healthScore}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className={`text-sm font-black mb-0.5 ${healthColor === 'green' ? 'text-green-400' : healthColor === 'yellow' ? 'text-yellow-400' : 'text-red-400'}`}>{healthLabel}</div>
+                                                        <div className="text-[9px] text-purple-300 font-bold">AI Health Score</div>
+                                                    </div>
+                                                </div>
+                                                {/* Compact Metrics Grid */}
+                                                <div className="grid grid-cols-3 gap-1.5">
+                                                    <div className="bg-purple-900/30 rounded-lg p-2 border border-purple-500/30 text-center">
+                                                        <div className="text-xs mb-0.5">📊</div>
+                                                        <div className="text-sm font-black text-white">{positionsCount}</div>
+                                                        <div className="text-[8px] text-purple-300 font-bold">Stocks</div>
+                                                    </div>
+                                                    <div className="bg-purple-900/30 rounded-lg p-2 border border-purple-500/30 text-center">
+                                                        <div className="text-xs mb-0.5">🎯</div>
+                                                        <div className={`text-sm font-black ${winRate >= 50 ? 'text-green-400' : 'text-orange-400'}`}>{sellTrades > 0 ? `${winRate.toFixed(0)}%` : '-'}</div>
+                                                        <div className="text-[8px] text-purple-300 font-bold">Win</div>
+                                                    </div>
+                                                    <div className="bg-purple-900/30 rounded-lg p-2 border border-purple-500/30 text-center">
+                                                        <div className="text-xs mb-0.5">⭐</div>
+                                                        <div className="text-sm font-black text-white">{watchlist.length}</div>
+                                                        <div className="text-[8px] text-purple-300 font-bold">Watch</div>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        );
                                     })()}
                                 </div>
                             </div>
@@ -8511,7 +8579,14 @@
                                 {/* Animated shine effect */}
                                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
 
-                                <h2 className="relative text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 mb-4">🔍 Stock Search</h2>
+                                {/* Header with UltraThink Badge */}
+                                <div className="relative flex items-center justify-between mb-4">
+                                    <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300">🔍 Stock Search</h2>
+                                    <div className="flex items-center gap-2 bg-gradient-to-r from-purple-900/60 to-violet-900/60 border border-purple-500/50 rounded-full px-3 py-1">
+                                        <span className="text-purple-400 text-xs">🧠</span>
+                                        <span className="text-transparent bg-gradient-to-r from-purple-300 to-violet-300 bg-clip-text font-black text-xs">POWERED BY ULTRATHINK</span>
+                                    </div>
+                                </div>
 
                                 <div className="relative mb-4">
                                     <input
