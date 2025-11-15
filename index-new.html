@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Simulator - Professional Stock Trading Platform</title>
+    <meta name="description" content="Advanced stock trading simulator with real-time data, technical analysis, and comprehensive learning tools.">
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="js/app.js" as="script">
+    <link rel="preload" href="styles.css" as="style">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="css/ui-components.css">
+    <link rel="stylesheet" href="css/hubs.css">
+
+    <!-- TradingView Widget -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
+    <!-- Lightweight Charts -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+    <style>
+        /* Critical CSS for first paint */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0e14;
+            color: #e6e6e6;
+            overflow-x: hidden;
+        }
+
+        #app {
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Loading spinner */
+        .app-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0e14;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(74, 144, 226, 0.2);
+            border-top-color: #4a90e2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #888;
+        }
+
+        .loading-logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 70px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding-bottom: 80px;
+            }
+        }
+
+        /* Hub container wrapper */
+        .hub-container-wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- App container -->
+    <div id="app">
+        <!-- Loading screen -->
+        <div class="app-loading">
+            <div class="loading-logo">📈</div>
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading Trading Platform...</div>
+        </div>
+    </div>
+
+    <!-- Core utilities -->
+    <script src="js/config.js"></script>
+
+    <!-- UI Component Library -->
+    <script src="js/components/ui-library.js"></script>
+
+    <!-- Navigation System -->
+    <script src="js/components/navigation.js"></script>
+
+    <!-- Trading Engine -->
+    <script src="js/features/trading-engine.js"></script>
+
+    <!-- Chart libraries -->
+    <script src="js/tradingview-charts.js"></script>
+    <script src="js/websocket-live-data.js"></script>
+    <script src="js/technical-indicators.js"></script>
+
+    <!-- Hub components -->
+    <script src="js/features/markets-hub.js"></script>
+    <script src="js/features/trading-hub.js"></script>
+    <script src="js/features/portfolio-hub.js"></script>
+    <script src="js/features/research-hub.js"></script>
+    <script src="js/features/learn-hub.js"></script>
+
+    <!-- Main app -->
+    <script src="js/app.js"></script>
+
+    <!-- Remove loading screen when app is ready -->
+    <script>
+        window.addEventListener('load', () => {
+            // Wait for app to initialize
+            setTimeout(() => {
+                const loading = document.querySelector('.app-loading');
+                if (loading) {
+                    loading.style.opacity = '0';
+                    setTimeout(() => {
+                        loading.remove();
+                    }, 300);
+                }
+            }, 1000);
+        });
+
+        // Error handling
+        window.addEventListener('error', (e) => {
+            console.error('App Error:', e.error);
+            const loading = document.querySelector('.app-loading');
+            if (loading) {
+                loading.innerHTML = `
+                    <div class="loading-logo">⚠️</div>
+                    <div class="loading-text" style="color: #ff5252;">
+                        Failed to load application<br>
+                        <small style="font-size: 12px; margin-top: 10px; display: block;">
+                            Please check the console for details
+                        </small>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
