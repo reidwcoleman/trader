@@ -11244,153 +11244,282 @@
                                             </div>
                                         </button>
 
-                                    {/* Risk Management */}
-                                    <button
-                                        onClick={() => setLearningTopic('risk')}
-                                        className={`bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 transition-all hover:transform hover:scale-105 text-left cursor-pointer relative ${
-                                            learningProgress.completedLessons.includes('risk')
-                                                ? 'border-teal-400 bg-teal-900/20'
-                                                : 'border-teal-500/30 hover:border-teal-400/60'
-                                        }`}
-                                    >
-                                        {learningProgress.completedLessons.includes('risk') && (
-                                            <div className="absolute top-4 right-4 bg-teal-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
-                                                <span className="text-2xl">✓</span>
-                                            </div>
-                                        )}
-                                        <div className="text-4xl mb-4">🛡️</div>
-                                        <h3 className="text-2xl font-black text-teal-400 mb-3">Risk Management</h3>
-                                        <p className="text-green-100 mb-4">Protect your capital with proper position sizing and risk controls.</p>
-                                        <ul className="space-y-2 text-sm text-green-200">
-                                            <li>• Risk 1-2% per trade rule</li>
-                                            <li>• Position sizing formula</li>
-                                            <li>• Stop-loss placement</li>
-                                            <li>• Risk/reward ratios</li>
-                                        </ul>
-                                        {learningProgress.completedLessons.includes('risk') ? (
-                                            <div className="mt-4">
-                                                <div className="text-teal-400 font-bold mb-1">Completed! ✓</div>
-                                                {learningProgress.quizScores.risk && (
-                                                    <div className="text-sm text-teal-300">
-                                                        Quiz Score: {learningProgress.quizScores.risk}%
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div className="mt-4 text-teal-400 font-bold">Click to Learn →</div>
-                                        )}
-                                    </button>
+                                        {/* Risk Management - Enhanced */}
+                                        <button
+                                            onClick={() => setLearningTopic('risk')}
+                                            className={`group relative bg-gradient-to-br from-orange-900/60 to-red-900/60 backdrop-blur-xl rounded-2xl p-7 border-2 transition-all duration-500 hover:scale-105 hover:-translate-y-2 text-left cursor-pointer overflow-hidden ${
+                                                learningProgress.completedLessons.includes('risk')
+                                                    ? 'border-orange-400 shadow-2xl'
+                                                    : 'border-orange-500/40 hover:border-orange-400 hover:shadow-2xl'
+                                            }`}
+                                            style={{boxShadow: learningProgress.completedLessons.includes('risk') ? '0 0 40px rgba(251, 146, 60, 0.4)' : '0 0 20px rgba(251, 146, 60, 0.2)'}}
+                                        >
+                                            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
 
-                                    {/* Calculators */}
-                                    <button
-                                        onClick={() => setLearningTopic('calculators')}
-                                        className={`bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 transition-all hover:transform hover:scale-105 text-left cursor-pointer relative ${
-                                            learningProgress.completedLessons.includes('calculators')
-                                                ? 'border-cyan-400 bg-cyan-900/20'
-                                                : 'border-cyan-500/30 hover:border-cyan-400/60'
-                                        }`}
-                                    >
-                                        {learningProgress.completedLessons.includes('calculators') && (
-                                            <div className="absolute top-4 right-4 bg-cyan-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
-                                                <span className="text-2xl">✓</span>
-                                            </div>
-                                        )}
-                                        <div className="text-4xl mb-4">🧮</div>
-                                        <h3 className="text-2xl font-black text-cyan-400 mb-3">Trading Calculators</h3>
-                                        <p className="text-green-100 mb-4">Essential tools to calculate position sizes, P&L, and risk metrics.</p>
-                                        <ul className="space-y-2 text-sm text-green-200">
-                                            <li>• Position size calculator</li>
-                                            <li>• Profit/loss calculator</li>
-                                            <li>• Risk/reward calculator</li>
-                                            <li>• Interactive & instant results</li>
-                                        </ul>
-                                        {learningProgress.completedLessons.includes('calculators') ? (
-                                            <div className="mt-4">
-                                                <div className="text-cyan-400 font-bold mb-1">Completed! ✓</div>
-                                                {learningProgress.quizScores.calculators && (
-                                                    <div className="text-sm text-cyan-300">
-                                                        Quiz Score: {learningProgress.quizScores.calculators}%
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div className="mt-4 text-cyan-400 font-bold">Click to Learn →</div>
-                                        )}
-                                    </button>
+                                            {learningProgress.completedLessons.includes('risk') && (
+                                                <div className="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-full w-12 h-12 flex items-center justify-center shadow-2xl border-2 border-orange-300 animate-bounce">
+                                                    <span className="text-2xl">✓</span>
+                                                </div>
+                                            )}
 
-                                    {/* Chart Patterns */}
-                                    <button
-                                        onClick={() => setLearningTopic('patterns')}
-                                        className={`bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 transition-all hover:transform hover:scale-105 text-left cursor-pointer relative ${
-                                            learningProgress.completedLessons.includes('patterns')
-                                                ? 'border-blue-400 bg-blue-900/20'
-                                                : 'border-blue-500/30 hover:border-blue-400/60'
-                                        }`}
-                                    >
-                                        {learningProgress.completedLessons.includes('patterns') && (
-                                            <div className="absolute top-4 right-4 bg-blue-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
-                                                <span className="text-2xl">✓</span>
+                                            <div className="absolute top-4 left-4 bg-orange-500/30 text-orange-200 px-3 py-1 rounded-full font-black text-xs border border-orange-400/50">
+                                                MODULE 3
                                             </div>
-                                        )}
-                                        <div className="text-4xl mb-4">📊</div>
-                                        <h3 className="text-2xl font-black text-blue-400 mb-3">Chart Patterns</h3>
-                                        <p className="text-green-100 mb-4">Identify bullish and bearish patterns to predict price movements.</p>
-                                        <ul className="space-y-2 text-sm text-green-200">
-                                            <li>• Bull & bear flags</li>
-                                            <li>• Double tops & bottoms</li>
-                                            <li>• Head & shoulders</li>
-                                            <li>• Cup & handle patterns</li>
-                                        </ul>
-                                        {learningProgress.completedLessons.includes('patterns') ? (
-                                            <div className="mt-4">
-                                                <div className="text-blue-400 font-bold mb-1">Completed! ✓</div>
-                                                {learningProgress.quizScores.patterns && (
-                                                    <div className="text-sm text-blue-300">
-                                                        Quiz Score: {learningProgress.quizScores.patterns}%
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div className="mt-4 text-blue-400 font-bold">Click to Learn →</div>
-                                        )}
-                                    </button>
 
-                                    {/* Case Studies */}
-                                    <button
-                                        onClick={() => setLearningTopic('cases')}
-                                        className={`bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 transition-all hover:transform hover:scale-105 text-left cursor-pointer relative ${
-                                            learningProgress.completedLessons.includes('cases')
-                                                ? 'border-purple-400 bg-purple-900/20'
-                                                : 'border-purple-500/30 hover:border-purple-400/60'
-                                        }`}
-                                    >
-                                        {learningProgress.completedLessons.includes('cases') && (
-                                            <div className="absolute top-4 right-4 bg-purple-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
-                                                <span className="text-2xl">✓</span>
-                                            </div>
-                                        )}
-                                        <div className="text-4xl mb-4">💼</div>
-                                        <h3 className="text-2xl font-black text-purple-400 mb-3">Real Case Studies</h3>
-                                        <p className="text-green-100 mb-4">Learn from real winning and losing trades with detailed analysis.</p>
-                                        <ul className="space-y-2 text-sm text-green-200">
-                                            <li>• Tesla +42% success trade</li>
-                                            <li>• FOMO mistakes to avoid</li>
-                                            <li>• Disciplined stop-loss examples</li>
-                                            <li>• Key lessons from each trade</li>
-                                        </ul>
-                                        {learningProgress.completedLessons.includes('cases') ? (
-                                            <div className="mt-4">
-                                                <div className="text-purple-400 font-bold mb-1">Completed! ✓</div>
-                                                {learningProgress.quizScores.cases && (
-                                                    <div className="text-sm text-purple-300">
-                                                        Quiz Score: {learningProgress.quizScores.cases}%
+                                            <div className="relative z-10 mt-8">
+                                                <div className="text-5xl mb-5">🛡️</div>
+                                                <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-red-300 mb-3">
+                                                    Risk Management
+                                                </h3>
+                                                <p className="text-orange-100 mb-5 leading-relaxed">Protect your capital with proper position sizing and risk controls.</p>
+
+                                                <div className="space-y-2 mb-6">
+                                                    <div className="flex items-center gap-2 text-sm text-orange-200">
+                                                        <span className="text-orange-400">→</span>
+                                                        <span>Risk 1-2% per trade rule</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-orange-200">
+                                                        <span className="text-orange-400">→</span>
+                                                        <span>Position sizing formula</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-orange-200">
+                                                        <span className="text-orange-400">→</span>
+                                                        <span>Stop-loss placement</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-orange-200">
+                                                        <span className="text-orange-400">→</span>
+                                                        <span>Risk/reward ratios</span>
+                                                    </div>
+                                                </div>
+
+                                                {learningProgress.completedLessons.includes('risk') ? (
+                                                    <div className="bg-orange-500/20 rounded-xl p-3 border border-orange-400/50">
+                                                        <div className="flex items-center gap-2 text-orange-300 font-bold mb-1">
+                                                            <span className="text-xl">🎉</span>
+                                                            <span>Completed!</span>
+                                                        </div>
+                                                        {learningProgress.quizScores.risk && (
+                                                            <div className="text-sm text-orange-200">
+                                                                Quiz Score: {learningProgress.quizScores.risk}%
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-orange-300 font-bold group-hover:gap-3 transition-all">
+                                                        <span>Start Learning</span>
+                                                        <span className="text-xl">→</span>
                                                     </div>
                                                 )}
                                             </div>
-                                        ) : (
-                                            <div className="mt-4 text-purple-400 font-bold">Click to Learn →</div>
-                                        )}
-                                    </button>
+                                        </button>
+
+                                        {/* Calculators - Enhanced */}
+                                        <button
+                                            onClick={() => setLearningTopic('calculators')}
+                                            className={`group relative bg-gradient-to-br from-teal-900/60 to-emerald-900/60 backdrop-blur-xl rounded-2xl p-7 border-2 transition-all duration-500 hover:scale-105 hover:-translate-y-2 text-left cursor-pointer overflow-hidden ${
+                                                learningProgress.completedLessons.includes('calculators')
+                                                    ? 'border-teal-400 shadow-2xl'
+                                                    : 'border-teal-500/40 hover:border-teal-400 hover:shadow-2xl'
+                                            }`}
+                                            style={{boxShadow: learningProgress.completedLessons.includes('calculators') ? '0 0 40px rgba(20, 184, 166, 0.4)' : '0 0 20px rgba(20, 184, 166, 0.2)'}}
+                                        >
+                                            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+                                            {learningProgress.completedLessons.includes('calculators') && (
+                                                <div className="absolute top-4 right-4 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full w-12 h-12 flex items-center justify-center shadow-2xl border-2 border-teal-300 animate-bounce">
+                                                    <span className="text-2xl">✓</span>
+                                                </div>
+                                            )}
+
+                                            <div className="absolute top-4 left-4 bg-teal-500/30 text-teal-200 px-3 py-1 rounded-full font-black text-xs border border-teal-400/50">
+                                                MODULE 4
+                                            </div>
+
+                                            <div className="relative z-10 mt-8">
+                                                <div className="text-5xl mb-5">🧮</div>
+                                                <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300 mb-3">
+                                                    Trading Calculators
+                                                </h3>
+                                                <p className="text-teal-100 mb-5 leading-relaxed">Essential tools to calculate position sizes, P&L, and risk metrics.</p>
+
+                                                <div className="space-y-2 mb-6">
+                                                    <div className="flex items-center gap-2 text-sm text-teal-200">
+                                                        <span className="text-teal-400">→</span>
+                                                        <span>Position size calculator</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-teal-200">
+                                                        <span className="text-teal-400">→</span>
+                                                        <span>Profit/loss calculator</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-teal-200">
+                                                        <span className="text-teal-400">→</span>
+                                                        <span>Risk/reward calculator</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-teal-200">
+                                                        <span className="text-teal-400">→</span>
+                                                        <span>Interactive & instant results</span>
+                                                    </div>
+                                                </div>
+
+                                                {learningProgress.completedLessons.includes('calculators') ? (
+                                                    <div className="bg-teal-500/20 rounded-xl p-3 border border-teal-400/50">
+                                                        <div className="flex items-center gap-2 text-teal-300 font-bold mb-1">
+                                                            <span className="text-xl">🎉</span>
+                                                            <span>Completed!</span>
+                                                        </div>
+                                                        {learningProgress.quizScores.calculators && (
+                                                            <div className="text-sm text-teal-200">
+                                                                Quiz Score: {learningProgress.quizScores.calculators}%
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-teal-300 font-bold group-hover:gap-3 transition-all">
+                                                        <span>Start Learning</span>
+                                                        <span className="text-xl">→</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </button>
+
+                                        {/* Chart Patterns - Enhanced */}
+                                        <button
+                                            onClick={() => setLearningTopic('patterns')}
+                                            className={`group relative bg-gradient-to-br from-indigo-900/60 to-purple-900/60 backdrop-blur-xl rounded-2xl p-7 border-2 transition-all duration-500 hover:scale-105 hover:-translate-y-2 text-left cursor-pointer overflow-hidden ${
+                                                learningProgress.completedLessons.includes('patterns')
+                                                    ? 'border-indigo-400 shadow-2xl'
+                                                    : 'border-indigo-500/40 hover:border-indigo-400 hover:shadow-2xl'
+                                            }`}
+                                            style={{boxShadow: learningProgress.completedLessons.includes('patterns') ? '0 0 40px rgba(99, 102, 241, 0.4)' : '0 0 20px rgba(99, 102, 241, 0.2)'}}
+                                        >
+                                            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+                                            {learningProgress.completedLessons.includes('patterns') && (
+                                                <div className="absolute top-4 right-4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full w-12 h-12 flex items-center justify-center shadow-2xl border-2 border-indigo-300 animate-bounce">
+                                                    <span className="text-2xl">✓</span>
+                                                </div>
+                                            )}
+
+                                            <div className="absolute top-4 left-4 bg-indigo-500/30 text-indigo-200 px-3 py-1 rounded-full font-black text-xs border border-indigo-400/50">
+                                                MODULE 5
+                                            </div>
+
+                                            <div className="relative z-10 mt-8">
+                                                <div className="text-5xl mb-5">📊</div>
+                                                <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300 mb-3">
+                                                    Chart Patterns
+                                                </h3>
+                                                <p className="text-indigo-100 mb-5 leading-relaxed">Identify bullish and bearish patterns to predict price movements.</p>
+
+                                                <div className="space-y-2 mb-6">
+                                                    <div className="flex items-center gap-2 text-sm text-indigo-200">
+                                                        <span className="text-indigo-400">→</span>
+                                                        <span>Bull & bear flags</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-indigo-200">
+                                                        <span className="text-indigo-400">→</span>
+                                                        <span>Double tops & bottoms</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-indigo-200">
+                                                        <span className="text-indigo-400">→</span>
+                                                        <span>Head & shoulders</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-indigo-200">
+                                                        <span className="text-indigo-400">→</span>
+                                                        <span>Cup & handle patterns</span>
+                                                    </div>
+                                                </div>
+
+                                                {learningProgress.completedLessons.includes('patterns') ? (
+                                                    <div className="bg-indigo-500/20 rounded-xl p-3 border border-indigo-400/50">
+                                                        <div className="flex items-center gap-2 text-indigo-300 font-bold mb-1">
+                                                            <span className="text-xl">🎉</span>
+                                                            <span>Completed!</span>
+                                                        </div>
+                                                        {learningProgress.quizScores.patterns && (
+                                                            <div className="text-sm text-indigo-200">
+                                                                Quiz Score: {learningProgress.quizScores.patterns}%
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-indigo-300 font-bold group-hover:gap-3 transition-all">
+                                                        <span>Start Learning</span>
+                                                        <span className="text-xl">→</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </button>
+
+                                        {/* Case Studies - Enhanced */}
+                                        <button
+                                            onClick={() => setLearningTopic('cases')}
+                                            className={`group relative bg-gradient-to-br from-pink-900/60 to-rose-900/60 backdrop-blur-xl rounded-2xl p-7 border-2 transition-all duration-500 hover:scale-105 hover:-translate-y-2 text-left cursor-pointer overflow-hidden ${
+                                                learningProgress.completedLessons.includes('cases')
+                                                    ? 'border-pink-400 shadow-2xl'
+                                                    : 'border-pink-500/40 hover:border-pink-400 hover:shadow-2xl'
+                                            }`}
+                                            style={{boxShadow: learningProgress.completedLessons.includes('cases') ? '0 0 40px rgba(236, 72, 153, 0.4)' : '0 0 20px rgba(236, 72, 153, 0.2)'}}
+                                        >
+                                            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+                                            {learningProgress.completedLessons.includes('cases') && (
+                                                <div className="absolute top-4 right-4 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full w-12 h-12 flex items-center justify-center shadow-2xl border-2 border-pink-300 animate-bounce">
+                                                    <span className="text-2xl">✓</span>
+                                                </div>
+                                            )}
+
+                                            <div className="absolute top-4 left-4 bg-pink-500/30 text-pink-200 px-3 py-1 rounded-full font-black text-xs border border-pink-400/50">
+                                                MODULE 6
+                                            </div>
+
+                                            <div className="relative z-10 mt-8">
+                                                <div className="text-5xl mb-5">💼</div>
+                                                <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-rose-300 mb-3">
+                                                    Real Case Studies
+                                                </h3>
+                                                <p className="text-pink-100 mb-5 leading-relaxed">Learn from real winning and losing trades with detailed analysis.</p>
+
+                                                <div className="space-y-2 mb-6">
+                                                    <div className="flex items-center gap-2 text-sm text-pink-200">
+                                                        <span className="text-pink-400">→</span>
+                                                        <span>Tesla +42% success trade</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-pink-200">
+                                                        <span className="text-pink-400">→</span>
+                                                        <span>FOMO mistakes to avoid</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-pink-200">
+                                                        <span className="text-pink-400">→</span>
+                                                        <span>Disciplined stop-loss examples</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-pink-200">
+                                                        <span className="text-pink-400">→</span>
+                                                        <span>Key lessons from each trade</span>
+                                                    </div>
+                                                </div>
+
+                                                {learningProgress.completedLessons.includes('cases') ? (
+                                                    <div className="bg-pink-500/20 rounded-xl p-3 border border-pink-400/50">
+                                                        <div className="flex items-center gap-2 text-pink-300 font-bold mb-1">
+                                                            <span className="text-xl">🎉</span>
+                                                            <span>Completed!</span>
+                                                        </div>
+                                                        {learningProgress.quizScores.cases && (
+                                                            <div className="text-sm text-pink-200">
+                                                                Quiz Score: {learningProgress.quizScores.cases}%
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-pink-300 font-bold group-hover:gap-3 transition-all">
+                                                        <span>Start Learning</span>
+                                                        <span className="text-xl">→</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Chart Pattern Preview */}
