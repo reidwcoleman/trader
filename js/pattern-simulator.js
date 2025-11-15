@@ -17,9 +17,29 @@ class PatternSimulator {
     }
 
     /**
-     * Initialize simulator with random pattern
+     * Initialize simulator with random pattern or real stock data
+     * @param {boolean} useRealData - Use real stock data instead of patterns
+     * @param {string} symbol - Stock symbol if using real data
      */
-    async init() {
+    async init(useRealData = false, symbol = null) {
+        if (useRealData && symbol) {
+            // Use real stock data
+            this.currentPattern = symbol;
+            const data = await window.TradingViewCharts.getChartData(symbol, 40, true);
+
+            if (data && data.length > 0) {
+                this.chartInstance = window.TradingViewCharts.createInteractiveCandlestickChart(
+                    this.containerId,
+                    data,
+                    { height: 400 }
+                );
+                return symbol;
+            }
+            // Fallback to sample if real data fails
+            console.warn('Real data failed, falling back to sample pattern');
+        }
+
+        // Use sample pattern data (original behavior)
         const patterns = ['bullFlag', 'headShoulders', 'doubleBottom', 'uptrend', 'downtrend'];
         this.currentPattern = patterns[Math.floor(Math.random() * patterns.length)];
 
@@ -286,13 +306,26 @@ class PatternFlashCards {
 
     /**
      * Start new round
+     * @param {string} containerId - Chart container DOM ID
+     * @param {boolean} useRealData - Use real stock data
+     * @param {Array} symbols - Array of stock symbols (if using real data)
      */
-    startRound(containerId) {
+    async startRound(containerId, useRealData = false, symbols = null) {
         this.round++;
-        this.currentPattern = this.patterns[Math.floor(Math.random() * this.patterns.length)];
+
+        let data;
+        if (useRealData && symbols && symbols.length > 0) {
+            // Use random real stock
+            const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+            this.currentPattern = symbol;
+            data = await window.TradingViewCharts.getChartData(symbol, 30, true);
+        } else {
+            // Use sample pattern
+            this.currentPattern = this.patterns[Math.floor(Math.random() * this.patterns.length)];
+            data = window.TradingViewCharts.generateSampleChartData(this.currentPattern, 30);
+        }
 
         // Generate and display chart
-        const data = window.TradingViewCharts.generateSampleChartData(this.currentPattern, 30);
         const chart = window.TradingViewCharts.createInteractiveCandlestickChart(
             containerId,
             data,

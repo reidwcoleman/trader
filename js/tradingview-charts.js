@@ -325,38 +325,91 @@ function generateSampleChartData(pattern = 'uptrend', days = 30) {
     return data;
 }
 
+// Data cache for API calls (5-minute cache)
+const dataCache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 /**
- * Fetch real stock data from API
+ * Fetch real stock data from Finnhub API with caching
  */
-async function fetchRealStockData(symbol, days = 30) {
+async function fetchRealStockData(symbol, days = 30, resolution = 'D') {
+    const cacheKey = `${symbol}_${resolution}_${days}`;
+    const now = Date.now();
+
+    // Check cache first
+    const cached = dataCache.get(cacheKey);
+    if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+        console.log(`Using cached data for ${symbol}`);
+        return cached.data;
+    }
+
     try {
-        const toDate = Math.floor(Date.now() / 1000);
+        const toDate = Math.floor(now / 1000);
         const fromDate = toDate - (days * 24 * 60 * 60);
 
-        // Using Finnhub API
-        const apiKey = 'ctYOURAPIKEY'; // Replace with actual key from config
-        const response = await fetch(
-            `https://finnhub.io/api/v1/stock/candle?symbol=${symbol}&resolution=D&from=${fromDate}&to=${toDate}&token=${apiKey}`
-        );
+        // Using Finnhub API with key from config
+        const apiKey = typeof FINNHUB_API_KEY !== 'undefined' ? FINNHUB_API_KEY : 'd3sop19r01qpdd5kkpsgd3sop19r01qpdd5kkpt0';
+        const url = `https://finnhub.io/api/v1/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${fromDate}&to=${toDate}&token=${apiKey}`;
+
+        console.log(`Fetching real data for ${symbol} from Finnhub...`);
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
 
         const data = await response.json();
 
-        if (data.s === 'ok') {
-            return data.t.map((time, idx) => ({
-                time: time,
-                open: data.o[idx],
-                high: data.h[idx],
-                low: data.l[idx],
-                close: data.c[idx],
-                volume: data.v[idx]
-            }));
+        // Check for API errors
+        if (data.s === 'no_data') {
+            console.warn(`No data available for ${symbol}`);
+            return null;
         }
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-    }
 
-    return null;
+        if (data.s !== 'ok') {
+            console.error('Finnhub API error:', data);
+            return null;
+        }
+
+        // Transform data to chart format
+        const chartData = data.t.map((time, idx) => ({
+            time: time,
+            open: data.o[idx],
+            high: data.h[idx],
+            low: data.l[idx],
+            close: data.c[idx],
+            volume: data.v[idx]
+        }));
+
+        // Cache the result
+        dataCache.set(cacheKey, {
+            data: chartData,
+            timestamp: now
+        });
+
+        console.log(`Successfully fetched ${chartData.length} candles for ${symbol}`);
+        return chartData;
+
+    } catch (error) {
+        console.error(`Error fetching stock data for ${symbol}:`, error);
+        return null;
+    }
 }
+
+/**
+ * Clear old cache entries (cleanup function)
+ */
+function clearOldCache() {
+    const now = Date.now();
+    for (const [key, value] of dataCache.entries()) {
+        if (now - value.timestamp > CACHE_DURATION) {
+            dataCache.delete(key);
+        }
+    }
+}
+
+// Run cache cleanup every 10 minutes
+setInterval(clearOldCache, 10 * 60 * 1000);
 
 /**
  * Calculate Simple Moving Average
@@ -392,6 +445,182 @@ function destroyChart(chartInstance) {
     }
 }
 
+/**
+ * Smart data fetcher - tries real data, falls back to sample data
+ * @param {string} symbol - Stock symbol (e.g., 'AAPL') or pattern for sample data
+ * @param {number} days - Number of days of historical data
+ * @param {boolean} useRealData - Force real data (true) or sample data (false)
+ * @returns {Promise<Array>} Chart data array
+ */
+async function getChartData(symbol, days = 30, useRealData = true) {
+    if (!useRealData) {
+        // Use sample data - symbol is treated as pattern name
+        console.log(`Generating sample ${symbol} pattern data`);
+        return generateSampleChartData(symbol, days);
+    }
+
+    // Try to fetch real data
+    console.log(`Attempting to fetch real data for ${symbol}...`);
+    const realData = await fetchRealStockData(symbol, days);
+
+    if (realData && realData.length > 0) {
+        return realData;
+    }
+
+    // Fallback to sample uptrend data
+    console.warn(`Real data unavailable for ${symbol}, falling back to sample data`);
+    return generateSampleChartData('uptrend', days);
+}
+
+/**
+ * Create chart with loading state
+ * @param {string} containerId - DOM container ID
+ * @param {string} symbol - Stock symbol or pattern
+ * @param {Object} options - Chart options + { useRealData: boolean }
+ * @returns {Promise<Object>} Chart instance
+ */
+async function createChartWithData(containerId, symbol, options = {}) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+        console.error(`Container ${containerId} not found`);
+        return null;
+    }
+
+    // Show loading indicator
+    container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 400px; color: #b0b0b0; font-size: 16px;">📊 Loading chart data...</div>';
+
+    try {
+        const useRealData = options.useRealData !== false; // Default to true
+        const days = options.days || 30;
+
+        // Fetch data
+        const data = await getChartData(symbol, days, useRealData);
+
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 400px; color: #ef4444; font-size: 16px;">⚠️ No data available</div>';
+            return null;
+        }
+
+        // Create chart
+        const chartInstance = createInteractiveCandlestickChart(containerId, data, options);
+
+        // Add data source label
+        const label = useRealData ? '📊 Real Market Data (15-min delayed)' : '🎓 Sample Educational Data';
+        const labelDiv = document.createElement('div');
+        labelDiv.style.cssText = 'position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #10b981; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; z-index: 10;';
+        labelDiv.textContent = label;
+        container.style.position = 'relative';
+        container.insertBefore(labelDiv, container.firstChild);
+
+        return chartInstance;
+
+    } catch (error) {
+        console.error('Error creating chart:', error);
+        container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 400px; color: #ef4444; font-size: 16px;">⚠️ Error loading chart</div>';
+        return null;
+    }
+}
+
+/**
+ * Create a data source toggle UI element
+ * @param {Object} config - { containerId, symbol, onToggle: (useRealData) => {} }
+ * @returns {HTMLElement} Toggle element
+ */
+function createDataSourceToggle(config) {
+    const { containerId, symbol = 'AAPL', onToggle } = config;
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;';
+
+    const label = document.createElement('span');
+    label.style.cssText = 'font-size: 14px; color: #b0b0b0; font-weight: 600;';
+    label.textContent = 'Data Source:';
+
+    const toggle = document.createElement('div');
+    toggle.style.cssText = 'display: flex; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 4px; cursor: pointer;';
+
+    const realBtn = document.createElement('button');
+    realBtn.textContent = '📊 Real Data';
+    realBtn.style.cssText = 'padding: 8px 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;';
+
+    const sampleBtn = document.createElement('button');
+    sampleBtn.textContent = '🎓 Sample Data';
+    sampleBtn.style.cssText = 'padding: 8px 16px; background: transparent; color: #b0b0b0; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;';
+
+    let useRealData = true;
+
+    function updateToggle(isRealData) {
+        if (isRealData) {
+            realBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            realBtn.style.color = 'white';
+            sampleBtn.style.background = 'transparent';
+            sampleBtn.style.color = '#b0b0b0';
+        } else {
+            realBtn.style.background = 'transparent';
+            realBtn.style.color = '#b0b0b0';
+            sampleBtn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+            sampleBtn.style.color = 'white';
+        }
+    }
+
+    realBtn.addEventListener('click', async () => {
+        if (!useRealData) {
+            useRealData = true;
+            updateToggle(true);
+            if (onToggle) onToggle(true);
+        }
+    });
+
+    sampleBtn.addEventListener('click', async () => {
+        if (useRealData) {
+            useRealData = false;
+            updateToggle(false);
+            if (onToggle) onToggle(false);
+        }
+    });
+
+    toggle.appendChild(realBtn);
+    toggle.appendChild(sampleBtn);
+
+    wrapper.appendChild(label);
+    wrapper.appendChild(toggle);
+
+    // Add stock symbol input if real data
+    const symbolInput = document.createElement('div');
+    symbolInput.style.cssText = 'display: flex; gap: 8px; align-items: center;';
+
+    const symbolLabel = document.createElement('span');
+    symbolLabel.style.cssText = 'font-size: 13px; color: #888; margin-left: 12px;';
+    symbolLabel.textContent = 'Symbol:';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = symbol;
+    input.placeholder = 'AAPL';
+    input.style.cssText = 'width: 80px; padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #e8e8e8; font-size: 13px; text-transform: uppercase; font-weight: 600;';
+
+    const loadBtn = document.createElement('button');
+    loadBtn.textContent = 'Load';
+    loadBtn.style.cssText = 'padding: 6px 12px; background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;';
+    loadBtn.addEventListener('mouseover', () => {
+        loadBtn.style.background = 'rgba(16, 185, 129, 0.3)';
+    });
+    loadBtn.addEventListener('mouseout', () => {
+        loadBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+    });
+
+    loadBtn.addEventListener('click', () => {
+        if (onToggle) onToggle(useRealData, input.value.toUpperCase());
+    });
+
+    symbolInput.appendChild(symbolLabel);
+    symbolInput.appendChild(input);
+    symbolInput.appendChild(loadBtn);
+    wrapper.appendChild(symbolInput);
+
+    return wrapper;
+}
+
 // Export functions
 if (typeof window !== 'undefined') {
     window.TradingViewCharts = {
@@ -400,7 +629,11 @@ if (typeof window !== 'undefined') {
         addIndicatorOverlay,
         generateSampleChartData,
         fetchRealStockData,
+        getChartData,
+        createChartWithData,
+        createDataSourceToggle,
         calculateSMA,
-        destroyChart
+        destroyChart,
+        clearOldCache
     };
 }

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Charts Demo | FinClash Trading</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+            color: #e8e8e8;
+            font-family: 'Inter', sans-serif;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #b0b0b0;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .chart-section {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .chart-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f5f5f5;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #d0d0d0;
+        }
+
+        .info-box strong {
+            color: #3b82f6;
+        }
+
+        .chart-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 450px;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            color: #b0b0b0;
+            font-size: 16px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .feature-card h3 {
+            color: #10b981;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            color: #d0d0d0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Real-Time Trading Charts</h1>
+        <p class="subtitle">Live market data with TradingView Lightweight Charts + Finnhub API</p>
+
+        <div class="info-box">
+            <strong>🚀 Now Live:</strong> This page demonstrates real-time stock market data integration.
+            Free tier provides 15-minute delayed data from Finnhub API with smart caching to avoid rate limits.
+            Toggle between real market data and sample educational patterns.
+        </div>
+
+        <!-- Chart Section 1: Interactive Demo -->
+        <div class="chart-section">
+            <h2 class="chart-title">Interactive Chart Demo</h2>
+            <div id="toggle-container"></div>
+            <div class="chart-container">
+                <div id="demo-chart" class="loading">Loading chart...</div>
+            </div>
+        </div>
+
+        <!-- Chart Section 2: Popular Stocks -->
+        <div class="chart-section">
+            <h2 class="chart-title">Popular Stock Examples</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+                <div>
+                    <h3 style="color: #f5f5f5; font-size: 16px; margin-bottom: 12px;">AAPL - Apple Inc.</h3>
+                    <div id="chart-aapl" style="height: 300px;"></div>
+                </div>
+                <div>
+                    <h3 style="color: #f5f5f5; font-size: 16px; margin-bottom: 12px;">TSLA - Tesla Inc.</h3>
+                    <div id="chart-tsla" style="height: 300px;"></div>
+                </div>
+                <div>
+                    <h3 style="color: #f5f5f5; font-size: 16px; margin-bottom: 12px;">NVDA - NVIDIA Corporation</h3>
+                    <div id="chart-nvda" style="height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="features">
+            <div class="feature-card">
+                <h3>⚡ Smart Caching</h3>
+                <p>5-minute cache reduces API calls and improves performance. Automatic cleanup prevents memory bloat.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🔄 Auto Fallback</h3>
+                <p>If real data fails or symbol not found, automatically falls back to sample educational data.</p>
+            </div>
+            <div class="feature-card">
+                <h3>📊 Real Market Data</h3>
+                <p>15-minute delayed stock prices from Finnhub API. Upgrade to Pro for real-time data.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🎓 Educational Mode</h3>
+                <p>Toggle to sample data for learning chart patterns without API limits or costs.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/tradingview-charts.js"></script>
+
+    <script>
+        // Initialize main demo chart with toggle
+        let currentSymbol = 'AAPL';
+        let currentChartInstance = null;
+
+        async function loadDemoChart(useRealData = true, symbol = 'AAPL') {
+            if (currentChartInstance) {
+                window.TradingViewCharts.destroyChart(currentChartInstance);
+            }
+
+            currentSymbol = symbol;
+            const chartInstance = await window.TradingViewCharts.createChartWithData(
+                'demo-chart',
+                symbol,
+                {
+                    useRealData: useRealData,
+                    days: 60,
+                    height: 400
+                }
+            );
+
+            currentChartInstance = chartInstance;
+        }
+
+        // Create toggle UI
+        const toggleContainer = document.getElementById('toggle-container');
+        const toggle = window.TradingViewCharts.createDataSourceToggle({
+            containerId: 'demo-chart',
+            symbol: 'AAPL',
+            onToggle: async (useRealData, symbol) => {
+                await loadDemoChart(useRealData, symbol || currentSymbol);
+            }
+        });
+        toggleContainer.appendChild(toggle);
+
+        // Load initial chart
+        loadDemoChart(true, 'AAPL');
+
+        // Load popular stock charts
+        setTimeout(async () => {
+            await window.TradingViewCharts.createChartWithData('chart-aapl', 'AAPL', {
+                useRealData: true,
+                days: 30,
+                height: 300
+            });
+        }, 500);
+
+        setTimeout(async () => {
+            await window.TradingViewCharts.createChartWithData('chart-tsla', 'TSLA', {
+                useRealData: true,
+                days: 30,
+                height: 300
+            });
+        }, 1000);
+
+        setTimeout(async () => {
+            await window.TradingViewCharts.createChartWithData('chart-nvda', 'NVDA', {
+                useRealData: true,
+                days: 30,
+                height: 300
+            });
+        }, 1500);
+
+        // Log cache stats
+        console.log('Real-time charts demo loaded!');
+        console.log('Features:');
+        console.log('- Smart 5-minute caching');
+        console.log('- Finnhub API integration');
+        console.log('- Auto fallback to sample data');
+        console.log('- Data source toggle');
+    </script>
+</body>
+</html>
