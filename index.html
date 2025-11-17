@@ -72,166 +72,6 @@
 
     <!-- Heavy libraries removed - will lazy load when needed instead -->
 
-    <!-- Schema.org Structured Data (JSON-LD) -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Organization",
-          "@id": "https://finclash.us/#organization",
-          "name": "FinClash",
-          "url": "https://finclash.us",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://finclash.us/logo.png",
-            "width": 512,
-            "height": 512
-          },
-          "description": "FinClash is a free stock trading simulator platform where users can practice trading, learn market strategies, and compete with friends using real market data.",
-          "sameAs": [
-            "https://twitter.com/finclash",
-            "https://www.linkedin.com/company/finclash",
-            "https://github.com/finclash"
-          ],
-          "contactPoint": {
-            "@type": "ContactPoint",
-            "contactType": "Customer Support",
-            "email": "support@finclash.us"
-          }
-        },
-        {
-          "@type": "WebApplication",
-          "@id": "https://finclash.us/#webapp",
-          "name": "FinClash Stock Trading Simulator",
-          "url": "https://finclash.us",
-          "applicationCategory": "FinanceApplication",
-          "operatingSystem": "Web Browser",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
-          },
-          "description": "Practice stock trading with real market data in a risk-free environment. Learn technical analysis, build portfolios, and compete in trading tournaments.",
-          "featureList": [
-            "Real-time stock quotes",
-            "Paper trading with virtual money",
-            "Technical analysis tools and indicators",
-            "AI-powered trade recommendations",
-            "Trading competitions and leaderboards",
-            "Educational lessons and quizzes",
-            "Portfolio risk analysis",
-            "Social sentiment tracking"
-          ],
-          "screenshot": "https://finclash.us/screenshot.jpg",
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "ratingCount": "1250",
-            "bestRating": "5",
-            "worstRating": "1"
-          }
-        },
-        {
-          "@type": "WebSite",
-          "@id": "https://finclash.us/#website",
-          "url": "https://finclash.us",
-          "name": "FinClash",
-          "publisher": {
-            "@id": "https://finclash.us/#organization"
-          },
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://finclash.us/search?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-          }
-        },
-        {
-          "@type": "FAQPage",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "What is FinClash?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "FinClash is a free stock trading simulator that allows you to practice trading with real market data using virtual money. It's perfect for beginners learning to trade or experienced traders testing new strategies risk-free."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Is FinClash really free?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Yes! FinClash offers a free plan with unlimited paper trading, real-time market data, basic technical indicators, and educational resources. Premium plans unlock advanced features like AI analysis, unlimited competitions, and priority support."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "How does paper trading work?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Paper trading lets you practice buying and selling stocks with virtual money using real market prices. All trades are simulated, so there's zero financial risk. Your portfolio performance is tracked just like a real brokerage account."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Can I compete with friends?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Absolutely! FinClash features trading competitions where you can create private tournaments with friends or join public competitions. Compete for the highest returns and climb the leaderboard."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "What can I learn on FinClash?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "FinClash offers comprehensive trading education including stock market basics, technical analysis, chart patterns, risk management, trading psychology, and advanced strategies. Learn through interactive lessons, quizzes, and hands-on practice."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Does FinClash use real market data?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Yes! FinClash integrates with Finnhub API to provide real-time stock quotes, news, and market data. You're trading with the same information professional traders use."
-              }
-            }
-          ]
-        },
-        {
-          "@type": "BreadcrumbList",
-          "itemListElement": [
-            {
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Home",
-              "item": "https://finclash.us"
-            },
-            {
-              "@type": "ListItem",
-              "position": 2,
-              "name": "Trading Simulator",
-              "item": "https://finclash.us/#simulator"
-            },
-            {
-              "@type": "ListItem",
-              "position": 3,
-              "name": "Learn Trading",
-              "item": "https://finclash.us/#learn"
-            },
-            {
-              "@type": "ListItem",
-              "position": 4,
-              "name": "Competitions",
-              "item": "https://finclash.us/#compete"
-            }
-          ]
-        }
-      ]
-    }
-    </script>
 
     <!-- External CSS -->
     <link rel="stylesheet" href="css/styles.css">
@@ -547,48 +387,42 @@
     </div>
 
     <!-- External JavaScript modules -->
+    <!-- Only critical config loads synchronously -->
     <script src="js/config.js"></script>
-    <!-- database.js removed - using backend server API only -->
-    <script src="js/crypto-utils.js"></script>
-    <script src="js/analytics.js"></script>
-    <script src="js/news-feed.js"></script>
-    <script src="js/short-selling.js"></script>
-    <script src="js/security.js"></script>
 
-    <!-- Advanced Trading Features -->
-    <script src="js/options-trading.js"></script>
-    <script src="js/advanced-orders.js"></script>
-    <script src="js/margin-trading.js"></script>
-    <script src="js/stock-education.js"></script>
-    <script src="js/enhanced-ai-analysis.js"></script>
-
-    <!-- Advanced AI & ML Features -->
-    <script src="js/ai-service.js"></script>
-    <script src="js/sector-analysis.js"></script>
-    <script src="js/news-impact.js"></script>
-    <script src="js/advanced-indicators.js"></script>
-    <script src="js/fundamental-analysis.js"></script>
-
-    <!-- ULTRATHINK Phase 2: Advanced Analytics -->
-    <script src="js/social-sentiment-analyzer.js"></script>
-    <script src="js/portfolio-risk-analyzer.js"></script>
-    <script src="js/alert-system.js"></script>
-    <script src="js/api-cache-layer.js"></script>
-
-    <!-- Enhanced Learning Modules -->
-    <script src="js/microlearning-system.js"></script>
-    <script src="js/enhanced-gamification.js"></script>
-    <script src="js/ai-tutor-finbot.js"></script>
-    <script src="js/interactive-chart-playground.js"></script>
-    <script src="js/progress-dashboard.js"></script>
-    <script src="js/tradingview-charts.js"></script>
-    <script src="js/learning-gamification.js"></script>
-    <script src="js/flashcards.js"></script>
-    <script src="js/advanced-calculators.js"></script>
-    <script src="js/enhanced-quiz-engine.js"></script>
-    <script src="js/pattern-simulator.js"></script>
-    <script src="js/learning-challenges.js"></script>
-    <script src="js/learning-paths.js"></script>
+    <!-- All other JS files deferred for faster page load -->
+    <script defer src="js/crypto-utils.js"></script>
+    <script defer src="js/analytics.js"></script>
+    <script defer src="js/news-feed.js"></script>
+    <script defer src="js/short-selling.js"></script>
+    <script defer src="js/security.js"></script>
+    <script defer src="js/options-trading.js"></script>
+    <script defer src="js/advanced-orders.js"></script>
+    <script defer src="js/margin-trading.js"></script>
+    <script defer src="js/stock-education.js"></script>
+    <script defer src="js/enhanced-ai-analysis.js"></script>
+    <script defer src="js/ai-service.js"></script>
+    <script defer src="js/sector-analysis.js"></script>
+    <script defer src="js/news-impact.js"></script>
+    <script defer src="js/advanced-indicators.js"></script>
+    <script defer src="js/fundamental-analysis.js"></script>
+    <script defer src="js/social-sentiment-analyzer.js"></script>
+    <script defer src="js/portfolio-risk-analyzer.js"></script>
+    <script defer src="js/alert-system.js"></script>
+    <script defer src="js/api-cache-layer.js"></script>
+    <script defer src="js/microlearning-system.js"></script>
+    <script defer src="js/enhanced-gamification.js"></script>
+    <script defer src="js/ai-tutor-finbot.js"></script>
+    <script defer src="js/interactive-chart-playground.js"></script>
+    <script defer src="js/progress-dashboard.js"></script>
+    <script defer src="js/tradingview-charts.js"></script>
+    <script defer src="js/learning-gamification.js"></script>
+    <script defer src="js/flashcards.js"></script>
+    <script defer src="js/advanced-calculators.js"></script>
+    <script defer src="js/enhanced-quiz-engine.js"></script>
+    <script defer src="js/pattern-simulator.js"></script>
+    <script defer src="js/learning-challenges.js"></script>
+    <script defer src="js/learning-paths.js"></script>
 
     <!-- Database initialization removed - using backend server only -->
 
