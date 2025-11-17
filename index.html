@@ -104,10 +104,32 @@
     </noscript>
 
 
+    <!-- Simple loading indicator -->
+    <style>
+        .loading-app {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .loading-content { text-align: center; }
+        .loading-content h1 { font-size: 3rem; font-weight: 900; margin-bottom: 1rem; }
+        .loading-content p { font-size: 1.2rem; opacity: 0.8; }
+    </style>
+
     <!-- React root -->
     <div id="root">
+        <div class="loading-app">
+            <div class="loading-content">
+                <h1>⚡ FinClash</h1>
+                <p>Loading trading platform...</p>
+            </div>
+        </div>
         <!-- Static content for search engines (replaced by React on load) -->
-        <header role="banner">
+        <header role="banner" style="display:none">
             <h1>FinClash - Free Stock Trading Simulator & Paper Trading Platform</h1>
             <nav role="navigation" aria-label="Main navigation">
                 <a href="#simulator">Trading Simulator</a>
