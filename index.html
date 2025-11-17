@@ -55,18 +55,16 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/manifest.json">
 
-    <!-- Preconnect for Performance -->
+    <!-- Preconnect and Preload for Maximum Performance -->
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.socket.io" crossorigin>
-    <link rel="dns-prefetch" href="https://unpkg.com">
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://d3js.org">
 
-    <!-- Development build - CDN libraries for rapid prototyping -->
-    <!-- Note: For production deployment, these should be built/bundled properly -->
+    <!-- Preload critical scripts for faster loading -->
+    <link rel="preload" href="https://unpkg.com/react@18/umd/react.production.min.js" as="script" crossorigin>
+    <link rel="preload" href="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" as="script" crossorigin>
+    <link rel="preload" href="https://unpkg.com/@babel/standalone/babel.min.js" as="script">
+
     <!-- Critical libraries must load synchronously -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -464,22 +462,22 @@
             const root = document.getElementById('root');
             if (loader) {
                 loader.style.opacity = '0';
-                loader.style.transition = 'opacity 0.3s ease-out';
-                setTimeout(() => loader.remove(), 300);
+                loader.style.transition = 'opacity 0.25s ease-out';
+                setTimeout(() => loader.remove(), 250);
             }
             if (root) {
                 root.style.display = 'block';
             }
         }
 
-        // Check if React has rendered every 100ms
+        // Check if React has loaded - faster checking
         let checkCount = 0;
         const checkReactReady = setInterval(() => {
             checkCount++;
-            // Check if React has added content or after 3 seconds max
-            if (window.React || checkCount > 30) {
+            // Check if React is loaded or max 2.5 seconds
+            if (window.React || checkCount > 25) {
                 clearInterval(checkReactReady);
-                setTimeout(hideLoader, 500);
+                setTimeout(hideLoader, 300);
             }
         }, 100);
     </script>
