@@ -60,14 +60,15 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
-    <!-- Preload only React/ReactDOM - Babel loads separately -->
-    <link rel="preload" href="https://unpkg.com/react@18/umd/react.production.min.js" as="script" crossorigin>
-    <link rel="preload" href="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" as="script" crossorigin>
+    <!-- Preload critical libraries from fast jsdelivr CDN -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js" as="script" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js" as="script" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js" as="script">
 
-    <!-- Critical libraries load first -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Critical libraries - use jsdelivr CDN for better caching and speed -->
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
     <script defer src="https://cdn.tailwindcss.com"></script>
 
     <!-- Heavy libraries removed - will lazy load when needed instead -->
