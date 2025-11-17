@@ -67,11 +67,11 @@
 
     <!-- Development build - CDN libraries for rapid prototyping -->
     <!-- Note: For production deployment, these should be built/bundled properly -->
-    <!-- Critical libraries loaded async -->
-    <script async crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script async crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script async src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script async src="https://cdn.tailwindcss.com"></script>
+    <!-- Critical libraries must load synchronously -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Non-critical libraries loaded async -->
     <script async src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -458,19 +458,34 @@
     </div>
 
     <script>
-        // Remove loading screen immediately when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
+        // Wait for React to render, then hide loading screen
+        function hideLoader() {
             const loader = document.getElementById('ultrathink-loader');
+            const root = document.getElementById('root');
             if (loader) {
                 loader.style.opacity = '0';
-                loader.style.transition = 'opacity 0.2s ease-out';
-                setTimeout(() => loader.remove(), 200);
+                loader.style.transition = 'opacity 0.3s ease-out';
+                setTimeout(() => loader.remove(), 300);
             }
-        });
+            if (root) {
+                root.style.display = 'block';
+            }
+        }
+
+        // Check if React has rendered every 100ms
+        let checkCount = 0;
+        const checkReactReady = setInterval(() => {
+            checkCount++;
+            // Check if React has added content or after 3 seconds max
+            if (window.React || checkCount > 30) {
+                clearInterval(checkReactReady);
+                setTimeout(hideLoader, 500);
+            }
+        }, 100);
     </script>
 
     <!-- React root with SEO-friendly initial content -->
-    <div id="root">
+    <div id="root" style="display: none;">
         <!-- Static content for search engines (replaced by React on load) -->
         <header role="banner">
             <h1>FinClash - Free Stock Trading Simulator & Paper Trading Platform</h1>
