@@ -456,30 +456,19 @@
     </div>
 
     <script>
-        // Wait for React to render, then hide loading screen
-        function hideLoader() {
+        // Ultra-fast loading - hide screen after just 600ms
+        setTimeout(() => {
             const loader = document.getElementById('ultrathink-loader');
             const root = document.getElementById('root');
             if (loader) {
                 loader.style.opacity = '0';
-                loader.style.transition = 'opacity 0.25s ease-out';
-                setTimeout(() => loader.remove(), 250);
+                loader.style.transition = 'opacity 0.2s ease-out';
+                setTimeout(() => loader.remove(), 200);
             }
             if (root) {
                 root.style.display = 'block';
             }
-        }
-
-        // Check if React has loaded - faster checking
-        let checkCount = 0;
-        const checkReactReady = setInterval(() => {
-            checkCount++;
-            // Check if React is loaded or max 2.5 seconds
-            if (window.React || checkCount > 25) {
-                clearInterval(checkReactReady);
-                setTimeout(hideLoader, 300);
-            }
-        }, 100);
+        }, 600); // Show loading for just 600ms then force reveal
     </script>
 
     <!-- React root with SEO-friendly initial content -->
