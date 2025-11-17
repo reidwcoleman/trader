@@ -67,11 +67,11 @@
 
     <!-- Development build - CDN libraries for rapid prototyping -->
     <!-- Note: For production deployment, these should be built/bundled properly -->
-    <!-- Critical libraries (no defer) -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Optimized libraries with defer for faster loading -->
+    <script defer crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script defer crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script defer src="https://cdn.tailwindcss.com"></script>
 
     <!-- Non-critical libraries (defer for better performance) -->
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -458,8 +458,8 @@
     </div>
 
     <script>
-        // Remove loading screen when React app is ready
-        window.addEventListener('load', () => {
+        // Remove loading screen as soon as DOM is ready (faster)
+        document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const loader = document.getElementById('ultrathink-loader');
                 if (loader) {
@@ -467,7 +467,7 @@
                     loader.style.transition = 'opacity 0.3s ease-out';
                     setTimeout(() => loader.remove(), 300);
                 }
-            }, 200); // Show for just 200ms
+            }, 100); // Minimal delay
         });
     </script>
 
