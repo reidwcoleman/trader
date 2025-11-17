@@ -67,22 +67,22 @@
 
     <!-- Development build - CDN libraries for rapid prototyping -->
     <!-- Note: For production deployment, these should be built/bundled properly -->
-    <!-- Optimized libraries with defer for faster loading -->
-    <script defer crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script defer crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script defer src="https://cdn.tailwindcss.com"></script>
+    <!-- Critical libraries loaded async -->
+    <script async crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script async crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script async src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script async src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Non-critical libraries (defer for better performance) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
-    <script defer src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Non-critical libraries loaded async -->
+    <script async src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script async src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <!-- Enhanced Learning Dependencies (deferred) -->
-    <script defer src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-    <script defer src="https://d3js.org/d3.v7.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Enhanced Learning Dependencies async -->
+    <script async src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <script async src="https://d3js.org/d3.v7.min.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <!-- Schema.org Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -458,16 +458,14 @@
     </div>
 
     <script>
-        // Remove loading screen as soon as DOM is ready (faster)
+        // Remove loading screen immediately when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const loader = document.getElementById('ultrathink-loader');
-                if (loader) {
-                    loader.style.opacity = '0';
-                    loader.style.transition = 'opacity 0.3s ease-out';
-                    setTimeout(() => loader.remove(), 300);
-                }
-            }, 100); // Minimal delay
+            const loader = document.getElementById('ultrathink-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                loader.style.transition = 'opacity 0.2s ease-out';
+                setTimeout(() => loader.remove(), 200);
+            }
         });
     </script>
 
