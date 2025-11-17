@@ -60,27 +60,17 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
-    <!-- Preload critical scripts for faster loading -->
+    <!-- Preload only React/ReactDOM - Babel loads separately -->
     <link rel="preload" href="https://unpkg.com/react@18/umd/react.production.min.js" as="script" crossorigin>
     <link rel="preload" href="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" as="script" crossorigin>
-    <link rel="preload" href="https://unpkg.com/@babel/standalone/babel.min.js" as="script">
 
-    <!-- Critical libraries must load synchronously -->
+    <!-- Critical libraries load first -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script defer src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Non-critical libraries loaded async -->
-    <script async src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
-    <script async src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-    <!-- Enhanced Learning Dependencies async -->
-    <script async src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-    <script async src="https://d3js.org/d3.v7.min.js"></script>
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Heavy libraries removed - will lazy load when needed instead -->
 
     <!-- Schema.org Structured Data (JSON-LD) -->
     <script type="application/ld+json">
