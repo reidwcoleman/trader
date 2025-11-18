@@ -2,8 +2,10 @@
 module.exports = {
   content: [
     "./index.html",
+    "./index-vite.html",
     "./homepage.html",
-    "./app.html"
+    "./app.html",
+    "./src/**/*.{js,jsx,ts,tsx}"
   ],
   theme: {
     extend: {},
