@@ -6582,127 +6582,84 @@ const TradingSimulator = () => {
                         {/* Overview Sub-Tab - Summary View */}
                         {mainTab === 'portfolio' && portfolioSubTab === 'overview' && (
                             <>
-                                {/* UltraThink Portfolio Health Score */}
-                                <div className="relative bg-gradient-to-br from-purple-900/60 via-violet-900/60 to-indigo-900/60 backdrop-blur-2xl rounded-3xl p-8 border-2 border-purple-500/50 shadow-2xl mb-6 overflow-hidden group hover:border-purple-400 transition-all duration-300" style={{boxShadow: '0 0 60px rgba(168, 85, 247, 0.3)'}}>
+                                {/* Portfolio Health Score */}
+                                <div className="relative bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-2xl rounded-2xl p-6 border-2 border-cyan-500/40 shadow-2xl mb-4 overflow-hidden group hover:border-cyan-400/60 transition-all duration-300" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
                                     {/* Animated background */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-violet-600/15 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
 
                                     {/* UltraThink Badge */}
-                                    <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/60 backdrop-blur-xl rounded-full px-4 py-2 border border-purple-400/30">
-                                        <span className="text-purple-400 text-sm">🧠</span>
-                                        <span className="text-transparent bg-gradient-to-r from-purple-300 via-violet-400 to-purple-300 bg-clip-text font-black text-sm">ULTRATHINK AI</span>
-                                        <span className="flex h-2 w-2">
-                                            <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-purple-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+                                    <div className="absolute top-3 right-3 flex items-center gap-2 bg-black/60 backdrop-blur-xl rounded-full px-3 py-1.5 border border-cyan-400/30">
+                                        <span className="text-cyan-400 text-xs">🧠</span>
+                                        <span className="text-transparent bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 bg-clip-text font-black text-xs">AI POWERED</span>
+                                        <span className="flex h-1.5 w-1.5">
+                                            <span className="animate-ping absolute inline-flex h-1.5 w-1.5 rounded-full bg-cyan-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
                                         </span>
                                     </div>
 
                                     <div className="relative">
-                                        <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-violet-300 to-purple-200 mb-6">Portfolio Health Score</h2>
+                                        <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 mb-4">Portfolio Health Score</h2>
 
-                                        <div className="grid md:grid-cols-2 gap-6">
+                                        <div className="grid md:grid-cols-2 gap-4">
                                             {/* Health Score Gauge */}
-                                            <div className="flex flex-col items-center justify-center bg-black/40 rounded-2xl p-6 border border-purple-500/30">
-                                                <div className="relative w-48 h-48 mb-4">
-                                                    <svg className="transform -rotate-90 w-48 h-48">
-                                                        <circle cx="96" cy="96" r="88" stroke="rgba(139, 92, 246, 0.2)" strokeWidth="12" fill="none" />
-                                                        <circle cx="96" cy="96" r="88" stroke={(() => {
+                                            <div className="flex flex-col items-center justify-center bg-black/30 rounded-xl p-4 border border-cyan-500/30">
+                                                <div className="relative w-40 h-40 mb-3">
+                                                    <svg className="transform -rotate-90 w-40 h-40">
+                                                        <circle cx="80" cy="80" r="72" stroke="rgba(6, 182, 212, 0.2)" strokeWidth="10" fill="none" />
+                                                        <circle cx="80" cy="80" r="72" stroke={(() => {
                                                             const score = Math.min(100, Math.max(0, 50 + (portfolioReturn * 2) + (Object.keys(portfolio.positions).length * 5)));
                                                             return score >= 80 ? '#10B981' : score >= 60 ? '#F59E0B' : '#EF4444';
-                                                        })()} strokeWidth="12" fill="none" strokeDasharray="552.92" strokeDashoffset={552.92 - (552.92 * (Math.min(100, Math.max(0, 50 + (portfolioReturn * 2) + (Object.keys(portfolio.positions).length * 5))) / 100))} strokeLinecap="round" className="transition-all duration-1000" />
+                                                        })()} strokeWidth="10" fill="none" strokeDasharray="452.39" strokeDashoffset={452.39 - (452.39 * (Math.min(100, Math.max(0, 50 + (portfolioReturn * 2) + (Object.keys(portfolio.positions).length * 5))) / 100))} strokeLinecap="round" className="transition-all duration-1000" />
                                                     </svg>
                                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                        <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-violet-300">{Math.min(100, Math.max(0, 50 + (portfolioReturn * 2) + (Object.keys(portfolio.positions).length * 5))).toFixed(0)}</div>
-                                                        <div className="text-sm text-purple-300 font-bold">/ 100</div>
+                                                        <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">{Math.min(100, Math.max(0, 50 + (portfolioReturn * 2) + (Object.keys(portfolio.positions).length * 5))).toFixed(0)}</div>
+                                                        <div className="text-xs text-cyan-300 font-bold">/ 100</div>
                                                     </div>
                                                 </div>
-                                                <div className={`text-xl font-black ${(50 + (portfolioReturn * 2) + (Object.keys(portfolio.positions).length * 5)) >= 80 ? 'text-green-400' : (50 + (portfolioReturn * 2) + (Object.keys(portfolio.positions).length * 5)) >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
+                                                <div className={`text-lg font-black ${(50 + (portfolioReturn * 2) + (Object.keys(portfolio.positions).length * 5)) >= 80 ? 'text-green-400' : (50 + (portfolioReturn * 2) + (Object.keys(portfolio.positions).length * 5)) >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
                                                     {(50 + (portfolioReturn * 2) + (Object.keys(portfolio.positions).length * 5)) >= 80 ? '🎯 Excellent' : (50 + (portfolioReturn * 2) + (Object.keys(portfolio.positions).length * 5)) >= 60 ? '📊 Good' : '⚠️ Needs Attention'}
                                                 </div>
                                             </div>
 
                                             {/* Health Factors */}
-                                            <div className="space-y-3">
-                                                <h3 className="text-lg font-black text-purple-200 mb-3">Health Factors</h3>
-                                                <div className="bg-black/40 rounded-xl p-4 border border-purple-500/30">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <span className="text-sm font-bold text-purple-300">🎯 Diversification</span>
+                                            <div className="space-y-2">
+                                                <h3 className="text-base font-black text-cyan-300 mb-2">Health Factors</h3>
+                                                <div className="bg-black/30 rounded-lg p-3 border border-cyan-500/30">
+                                                    <div className="flex items-center justify-between mb-1.5">
+                                                        <span className="text-xs font-bold text-cyan-300">🎯 Diversification</span>
                                                         <span className={`text-sm font-black ${Object.keys(portfolio.positions).length >= 8 ? 'text-green-400' : Object.keys(portfolio.positions).length >= 4 ? 'text-yellow-400' : 'text-red-400'}`}>{Object.keys(portfolio.positions).length >= 8 ? 'Excellent' : Object.keys(portfolio.positions).length >= 4 ? 'Good' : 'Low'}</span>
                                                     </div>
-                                                    <div className="w-full bg-gray-800 rounded-full h-2"><div className={`h-2 rounded-full transition-all duration-1000 ${Object.keys(portfolio.positions).length >= 8 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : Object.keys(portfolio.positions).length >= 4 ? 'bg-gradient-to-r from-yellow-500 to-amber-500' : 'bg-gradient-to-r from-red-500 to-rose-500'}`} style={{width: `${Math.min(100, (Object.keys(portfolio.positions).length / 10) * 100)}%`}}></div></div>
-                                                    <div className="text-xs text-gray-400 mt-1">{Object.keys(portfolio.positions).length} positions</div>
+                                                    <div className="w-full bg-gray-800/50 rounded-full h-1.5"><div className={`h-1.5 rounded-full transition-all duration-1000 ${Object.keys(portfolio.positions).length >= 8 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : Object.keys(portfolio.positions).length >= 4 ? 'bg-gradient-to-r from-yellow-500 to-amber-500' : 'bg-gradient-to-r from-red-500 to-rose-500'}`} style={{width: `${Math.min(100, (Object.keys(portfolio.positions).length / 10) * 100)}%`}}></div></div>
+                                                    <div className="text-[10px] text-gray-400 mt-0.5">{Object.keys(portfolio.positions).length} positions</div>
                                                 </div>
-                                                <div className="bg-black/40 rounded-xl p-4 border border-purple-500/30">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <span className="text-sm font-bold text-purple-300">📈 Returns</span>
-                                                        <span className={`text-sm font-black ${portfolioReturn >= 10 ? 'text-green-400' : portfolioReturn >= 0 ? 'text-yellow-400' : 'text-red-400'}`}>{portfolioReturn >= 10 ? 'Strong' : portfolioReturn >= 0 ? 'Moderate' : 'Weak'}</span>
+                                                <div className="bg-black/30 rounded-lg p-3 border border-cyan-500/30">
+                                                    <div className="flex items-center justify-between mb-1.5">
+                                                        <span className="text-xs font-bold text-cyan-300">📈 Returns</span>
+                                                        <span className={`text-xs font-black ${portfolioReturn >= 10 ? 'text-green-400' : portfolioReturn >= 0 ? 'text-yellow-400' : 'text-red-400'}`}>{portfolioReturn >= 10 ? 'Strong' : portfolioReturn >= 0 ? 'Moderate' : 'Weak'}</span>
                                                     </div>
-                                                    <div className="w-full bg-gray-800 rounded-full h-2"><div className={`h-2 rounded-full transition-all duration-1000 ${portfolioReturn >= 10 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : portfolioReturn >= 0 ? 'bg-gradient-to-r from-yellow-500 to-amber-500' : 'bg-gradient-to-r from-red-500 to-rose-500'}`} style={{width: `${Math.min(100, Math.max(0, 50 + portfolioReturn * 2))}%`}}></div></div>
-                                                    <div className="text-xs text-gray-400 mt-1">{portfolioReturn >= 0 ? '+' : ''}{portfolioReturn.toFixed(2)}% total return</div>
+                                                    <div className="w-full bg-gray-800/50 rounded-full h-1.5"><div className={`h-1.5 rounded-full transition-all duration-1000 ${portfolioReturn >= 10 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : portfolioReturn >= 0 ? 'bg-gradient-to-r from-yellow-500 to-amber-500' : 'bg-gradient-to-r from-red-500 to-rose-500'}`} style={{width: `${Math.min(100, Math.max(0, 50 + portfolioReturn * 2))}%`}}></div></div>
+                                                    <div className="text-[10px] text-gray-400 mt-0.5">{portfolioReturn >= 0 ? '+' : ''}{portfolioReturn.toFixed(2)}% total return</div>
                                                 </div>
-                                                <div className="bg-black/40 rounded-xl p-4 border border-purple-500/30">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <span className="text-sm font-bold text-purple-300">💰 Cash Allocation</span>
-                                                        <span className={`text-sm font-black ${(portfolio.cash / portfolioValue * 100) >= 20 && (portfolio.cash / portfolioValue * 100) <= 40 ? 'text-green-400' : 'text-yellow-400'}`}>{(portfolio.cash / portfolioValue * 100) >= 20 && (portfolio.cash / portfolioValue * 100) <= 40 ? 'Optimal' : 'Review'}</span>
+                                                <div className="bg-black/30 rounded-lg p-3 border border-cyan-500/30">
+                                                    <div className="flex items-center justify-between mb-1.5">
+                                                        <span className="text-xs font-bold text-cyan-300">💰 Cash Allocation</span>
+                                                        <span className={`text-xs font-black ${(portfolio.cash / portfolioValue * 100) >= 20 && (portfolio.cash / portfolioValue * 100) <= 40 ? 'text-green-400' : 'text-yellow-400'}`}>{(portfolio.cash / portfolioValue * 100) >= 20 && (portfolio.cash / portfolioValue * 100) <= 40 ? 'Optimal' : 'Review'}</span>
                                                     </div>
-                                                    <div className="w-full bg-gray-800 rounded-full h-2"><div className="h-2 rounded-full transition-all duration-1000 bg-gradient-to-r from-cyan-500 to-blue-500" style={{width: `${(portfolio.cash / portfolioValue * 100)}%`}}></div></div>
-                                                    <div className="text-xs text-gray-400 mt-1">{(portfolio.cash / portfolioValue * 100).toFixed(1)}% in cash</div>
+                                                    <div className="w-full bg-gray-800/50 rounded-full h-1.5"><div className="h-1.5 rounded-full transition-all duration-1000 bg-gradient-to-r from-cyan-500 to-blue-500" style={{width: `${(portfolio.cash / portfolioValue * 100)}%`}}></div></div>
+                                                    <div className="text-[10px] text-gray-400 mt-0.5">{(portfolio.cash / portfolioValue * 100).toFixed(1)}% in cash</div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Quick Performance Summary */}
-                                {performanceHistory.length > 0 && (
-                                    <div className="bg-gradient-to-br from-indigo-900/40 to-purple-950/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-indigo-500/40 mb-6 shadow-xl">
-                                        <h3 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300 mb-4">📊 Performance at a Glance</h3>
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                            <div className="bg-black/30 rounded-lg p-3 border border-indigo-500/30">
-                                                <div className="text-xs text-indigo-300 mb-1">Peak Value</div>
-                                                <div className="text-lg font-black text-white">${Math.max(...performanceHistory.map(p => p.value)).toLocaleString()}</div>
-                                            </div>
-                                            <div className="bg-black/30 rounded-lg p-3 border border-indigo-500/30">
-                                                <div className="text-xs text-indigo-300 mb-1">Lowest Value</div>
-                                                <div className="text-lg font-black text-white">${Math.min(...performanceHistory.map(p => p.value)).toLocaleString()}</div>
-                                            </div>
-                                            <div className="bg-black/30 rounded-lg p-3 border border-indigo-500/30">
-                                                <div className="text-xs text-indigo-300 mb-1">Best Day</div>
-                                                <div className="text-lg font-black text-green-400">
-                                                    {(() => {
-                                                        let maxDailyChange = 0;
-                                                        for (let i = 1; i < performanceHistory.length; i++) {
-                                                            const change = ((performanceHistory[i].value - performanceHistory[i-1].value) / performanceHistory[i-1].value) * 100;
-                                                            if (change > maxDailyChange) maxDailyChange = change;
-                                                        }
-                                                        return `+${maxDailyChange.toFixed(2)}%`;
-                                                    })()}
-                                                </div>
-                                            </div>
-                                            <div className="bg-black/30 rounded-lg p-3 border border-indigo-500/30">
-                                                <div className="text-xs text-indigo-300 mb-1">Worst Day</div>
-                                                <div className="text-lg font-black text-red-400">
-                                                    {(() => {
-                                                        let minDailyChange = 0;
-                                                        for (let i = 1; i < performanceHistory.length; i++) {
-                                                            const change = ((performanceHistory[i].value - performanceHistory[i-1].value) / performanceHistory[i-1].value) * 100;
-                                                            if (change < minDailyChange) minDailyChange = change;
-                                                        }
-                                                        return `${minDailyChange.toFixed(2)}%`;
-                                                    })()}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
                                 {/* Top 3 Holdings Preview */}
-                                <div className="bg-gradient-to-br from-cyan-900/40 to-blue-950/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-cyan-500/40 mb-6 shadow-xl">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">💼 Top Holdings</h3>
+                                <div className="bg-gradient-to-br from-cyan-900/40 to-blue-950/40 backdrop-blur-xl rounded-2xl p-4 border-2 border-cyan-500/40 mb-4 shadow-xl" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.15)'}}>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">💼 Top Holdings</h3>
                                         <button
                                             onClick={() => setPortfolioSubTab('holdings')}
-                                            className="text-sm text-cyan-400 hover:text-cyan-300 font-bold transition-all"
+                                            className="text-xs text-cyan-400 hover:text-cyan-300 font-bold transition-all"
                                         >
                                             View All →
                                         </button>
@@ -6755,14 +6712,14 @@ const TradingSimulator = () => {
                                 </div>
 
                                 {/* AI Quick Insights */}
-                                <div className="bg-gradient-to-br from-purple-900/40 to-pink-950/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/40 shadow-xl">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 flex items-center gap-2">
-                                            🧠 AI Quick Insights
+                                <div className="bg-gradient-to-br from-blue-900/40 to-purple-950/40 backdrop-blur-xl rounded-2xl p-4 border-2 border-blue-500/40 shadow-xl" style={{boxShadow: '0 0 30px rgba(59, 130, 246, 0.15)'}}>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 flex items-center gap-2">
+                                            🧠 AI Insights
                                         </h3>
                                         <button
                                             onClick={() => setPortfolioSubTab('insights')}
-                                            className="text-sm text-purple-400 hover:text-purple-300 font-bold transition-all"
+                                            className="text-xs text-blue-400 hover:text-blue-300 font-bold transition-all"
                                         >
                                             Full Analysis →
                                         </button>
