@@ -433,22 +433,20 @@ app.post('/api/accounts/update-name', async (req, res) => {
     }
 });
 
-// Reset account endpoint (requires developer code)
-// ⚠️ PERMANENT DELETION - This irreversibly erases all account trading data
+// Reset account endpoint (ONE TIME ONLY per account)
+// ⚠️ PERMANENT DELETION - Clears all trading data, keeps email & password
 app.post('/api/accounts/reset', async (req, res) => {
     try {
-        const { email, developerCode } = req.body;
+        const { email, password } = req.body;
 
-        console.log('🔥 PERMANENT ACCOUNT RESET REQUEST for:', email);
-
-        // Validate developer code
-        if (developerCode !== 'RWC#1') {
-            console.error('❌ Invalid developer code');
-            return res.status(403).json({ error: 'Invalid developer code' });
-        }
+        console.log('🔄 ACCOUNT RESET REQUEST for:', email);
 
         if (!email || !isValidEmail(email)) {
             return res.status(400).json({ error: 'Valid email is required' });
+        }
+
+        if (!password) {
+            return res.status(400).json({ error: 'Password is required' });
         }
 
         const accounts = readAccounts();
@@ -457,6 +455,22 @@ app.post('/api/accounts/reset', async (req, res) => {
         if (!account) {
             console.error('❌ Account not found:', email);
             return res.status(404).json({ error: 'Account not found' });
+        }
+
+        // Verify password
+        const passwordMatch = await bcrypt.compare(password, account.passwordHash);
+        if (!passwordMatch) {
+            console.error('❌ Invalid password for:', email);
+            return res.status(401).json({ error: 'Invalid password' });
+        }
+
+        // Check if account has already been reset (ONE TIME ONLY)
+        if (account.hasBeenReset === true) {
+            console.error('❌ Account has already been reset (one-time limit reached):', email);
+            return res.status(403).json({
+                error: 'Account reset limit reached',
+                message: 'You can only reset your account once. This account has already been reset.'
+            });
         }
 
         // Store old data for logging purposes
@@ -470,7 +484,7 @@ app.post('/api/accounts/reset', async (req, res) => {
         console.log(`   - ${oldWatchlistCount} watchlist items`);
         console.log(`   - All performance data`);
 
-        // PERMANENT RESET - Overwrites all portfolio data with fresh state
+        // PERMANENT RESET - Clears all trading data, keeps email & password
         // ⚠️ OLD DATA IS PERMANENTLY LOST - NO RECOVERY POSSIBLE
         account.portfolio = {
             cash: 100000,
@@ -481,22 +495,29 @@ app.post('/api/accounts/reset', async (req, res) => {
             watchlist: [],
             performanceHistory: []
         };
-        account.resetCount = (account.resetCount || 0) + 1;
-        account.lastResetAt = new Date().toISOString();
+
+        // Mark account as reset (ONE TIME ONLY - can never reset again)
+        account.hasBeenReset = true;
+        account.resetAt = new Date().toISOString();
         account.updatedAt = new Date().toISOString();
+
+        // Email and passwordHash remain unchanged - user can still log in
 
         // Write to file - OLD DATA IS NOW PERMANENTLY DELETED
         writeAccounts(accounts);
 
-        console.log('🔥 PERMANENT RESET COMPLETE for:', email);
-        console.log('   ⛔ All previous data has been IRREVERSIBLY DELETED');
-        console.log(`   ✅ Account reset to $100,000 (Reset #${account.resetCount})`);
+        console.log('🔄 ACCOUNT RESET COMPLETE for:', email);
+        console.log('   ⛔ All trading data has been IRREVERSIBLY DELETED');
+        console.log('   ✅ Account reset to $100,000');
+        console.log('   ✅ Email and password preserved');
+        console.log('   ⚠️  ONE-TIME RESET USED - Cannot reset again');
 
         res.json({
             success: true,
-            message: 'Account permanently reset - all data deleted forever',
+            message: 'Account reset successful. All trading data cleared. Email and password preserved.',
             portfolio: account.portfolio,
-            resetCount: account.resetCount
+            hasBeenReset: true,
+            warning: 'This was your one-time account reset. You cannot reset again.'
         });
     } catch (error) {
         console.error('Account reset error:', error);

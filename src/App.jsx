@@ -14520,53 +14520,66 @@ const TradingSimulator = () => {
                                     <div className="space-y-4">
                                         <button
                                             onClick={async () => {
-                                                const developerCode = prompt('⚠️ Developer Access Required\n\nThis will reset your account to $100,000 and clear all positions and history.\n\nEnter developer code to continue:');
+                                                // Step 1: Confirm action
+                                                const confirmed = confirm('⚠️ RESET YOUR ACCOUNT?\n\nThis will permanently:\n\n• Delete ALL your stock positions\n• Delete ALL your trading history\n• Reset your cash to $100,000\n• Clear your watchlist\n\n✅ Your email and password will remain the same\n⚠️ You can only reset your account ONCE\n\nAre you absolutely sure?');
 
-                                                if (!developerCode) {
+                                                if (!confirmed) {
                                                     return;
                                                 }
 
-                                                if (developerCode !== 'RWC#1') {
-                                                    alert('❌ Invalid developer code. Access denied.');
+                                                // Step 2: Password verification
+                                                const password = prompt('⚠️ Password Required\n\nTo confirm this action, please enter your password:');
+
+                                                if (!password) {
                                                     return;
                                                 }
 
-                                                if (confirm('Are you sure you want to reset your account? This will:\n\n• Delete all your positions\n• Reset your cash to $100,000\n• Clear your trading history\n\nThis action cannot be undone!')) {
-                                                    try {
-                                                        setLoading(true);
-                                                        const response = await fetchWithTimeout(`${API_BASE_URL}/api/accounts/reset`, {
-                                                            method: 'POST',
-                                                            headers: { 'Content-Type': 'application/json' },
-                                                            body: JSON.stringify({
-                                                                email: userEmail,
-                                                                developerCode: developerCode
-                                                            })
-                                                        }, 30000);
+                                                // Step 3: Final confirmation
+                                                const finalConfirm = confirm('⛔ FINAL WARNING\n\nThis is your ONE-TIME account reset.\n\nAfter this reset, you will NEVER be able to reset your account again.\n\nAll your trading data will be PERMANENTLY DELETED and cannot be recovered.\n\nProceed with reset?');
 
-                                                        const data = await response.json();
+                                                if (!finalConfirm) {
+                                                    return;
+                                                }
 
-                                                        if (!response.ok) {
-                                                            throw new Error(data.error || 'Failed to reset account');
-                                                        }
+                                                try {
+                                                    setLoading(true);
+                                                    const response = await fetchWithTimeout(`${API_BASE_URL}/api/accounts/reset`, {
+                                                        method: 'POST',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({
+                                                            email: userEmail,
+                                                            password: password
+                                                        })
+                                                    }, 30000);
 
-                                                        // Update local state
-                                                        const newCompetition = { ...competition };
-                                                        newCompetition.members[0].portfolio = data.portfolio;
-                                                        setCompetition(newCompetition);
+                                                    const data = await response.json();
 
-                                                        showToast('✅ Account reset successfully!', 'success');
-                                                        window.location.reload();
-                                                    } catch (error) {
-                                                        alert(`❌ ${error.message}`);
-                                                    } finally {
-                                                        setLoading(false);
+                                                    if (!response.ok) {
+                                                        throw new Error(data.error || data.message || 'Failed to reset account');
                                                     }
+
+                                                    // Update local state
+                                                    const newCompetition = { ...competition };
+                                                    newCompetition.members[0].portfolio = data.portfolio;
+                                                    setCompetition(newCompetition);
+
+                                                    showToast('✅ Account reset successful! All trading data cleared.', 'success');
+
+                                                    // Show one-time warning
+                                                    setTimeout(() => {
+                                                        alert('⚠️ ' + data.warning);
+                                                        window.location.reload();
+                                                    }, 1000);
+                                                } catch (error) {
+                                                    alert(`❌ ${error.message}`);
+                                                } finally {
+                                                    setLoading(false);
                                                 }
                                             }}
                                             className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl hover:scale-105"
                                         >
                                             <span className="text-2xl">🔄</span>
-                                            <span>Reset Account</span>
+                                            <span>Reset Account (One-Time Only)</span>
                                         </button>
                                         <button
                                             onClick={() => {
