@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Chart, registerables } from 'chart.js';
+
+// Register Chart.js components
+Chart.register(...registerables);
 
 // Backend API Configuration
 // Automatically detects environment:
