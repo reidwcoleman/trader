@@ -9192,30 +9192,30 @@ const TradingSimulator = () => {
                         {/* Watchlist View */}
                         {mainTab === 'watchlist' && (
                             <>
-                                <div className="bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-blue-500/50 mb-6 shadow-2xl">
-                                    <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-6 flex items-center gap-2">
+                                <div className="bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-xl rounded-2xl p-4 border-2 border-cyan-500/40 mb-4 shadow-xl" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.15)'}}>
+                                    <h2 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-4 flex items-center gap-2">
                                         ⭐ My Watchlist
-                                        <span className="text-sm font-normal text-blue-300 ml-2">
+                                        <span className="text-sm font-normal text-cyan-300 ml-2">
                                             ({watchlist.length} stocks)
                                         </span>
                                     </h2>
 
                                     {loading && stocks.length === 0 ? (
-                                        <div className="text-center py-12">
-                                            <div className="text-purple-200">Loading stocks...</div>
+                                        <div className="text-center py-8">
+                                            <div className="text-cyan-200">Loading stocks...</div>
                                         </div>
                                     ) : watchlist.length === 0 ? (
-                                        <div className="text-center py-16 bg-blue-900/30 rounded-xl border-2 border-dashed border-blue-500/50 animate-fade-in">
-                                            <div className="text-8xl mb-4 opacity-50 animate-bounce">⭐</div>
-                                            <h3 className="text-2xl font-bold text-white mb-3">No Stocks in Watchlist</h3>
-                                            <p className="text-blue-200 text-lg mb-6">Add stocks to your watchlist to track them here</p>
-                                            <div className="inline-flex items-center gap-2 bg-blue-500/20 border-2 border-blue-500/50 rounded-xl px-6 py-3 text-blue-300 font-semibold animate-pulse hover:scale-105 transition-transform">
+                                        <div className="text-center py-12 bg-cyan-900/20 rounded-xl border-2 border-dashed border-cyan-500/40 animate-fade-in">
+                                            <div className="text-6xl mb-3 opacity-50 animate-bounce">⭐</div>
+                                            <h3 className="text-xl font-bold text-white mb-2">No Stocks in Watchlist</h3>
+                                            <p className="text-cyan-200 text-sm mb-4">Add stocks to your watchlist to track them here</p>
+                                            <div className="inline-flex items-center gap-2 bg-cyan-500/20 border-2 border-cyan-500/40 rounded-lg px-4 py-2 text-cyan-300 text-sm font-semibold hover:scale-105 transition-transform">
                                                 <span>💡</span>
                                                 <span>Go to Trading tab to search and add stocks</span>
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                             {filteredStocks.map((stock, index) => (
                                                 <div
                                                     key={stock.symbol}
@@ -9224,12 +9224,13 @@ const TradingSimulator = () => {
                                                         setTradeAnalysisData(null); // Clear trade analysis when switching stocks
                                                         setMainTab('trading');
                                                     }}
-                                                    className={`p-6 rounded-xl cursor-pointer transition-all bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl border-2 border-blue-500/50 hover:border-cyan-400 hover:-translate-y-2 shadow-xl hover:shadow-2xl hover-glow will-change-transform gpu-accelerated animate-fade-in stagger-${Math.min(index + 1, 6)}`}
+                                                    className={`p-4 rounded-xl cursor-pointer transition-all bg-gradient-to-br from-cyan-900/40 to-blue-950/40 backdrop-blur-xl border-2 border-cyan-500/40 hover:border-cyan-400 hover:-translate-y-1 shadow-lg hover:shadow-xl will-change-transform gpu-accelerated animate-fade-in stagger-${Math.min(index + 1, 6)}`}
+                                                    style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.1)'}}
                                                 >
-                                                    <div className="flex justify-between items-start mb-4">
+                                                    <div className="flex justify-between items-start mb-3">
                                                         <div>
-                                                            <div className="font-bold text-2xl text-white">{stock.symbol}</div>
-                                                            <div className="text-sm text-blue-200 mt-1">{stock.name}</div>
+                                                            <div className="font-bold text-xl text-white">{stock.symbol}</div>
+                                                            <div className="text-xs text-cyan-200 mt-0.5">{stock.name}</div>
                                                         </div>
                                                         <div className={`px-3 py-1 rounded-full font-bold text-sm transition-all ${
                                                             stock.change >= 0
@@ -9239,12 +9240,12 @@ const TradingSimulator = () => {
                                                             {stock.change >= 0 ? '↗' : '↘'} {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
                                                         </div>
                                                     </div>
-                                                    <div className="text-center pt-4 border-t border-blue-600/50">
-                                                        <div className="text-sm text-blue-300 mb-1">Current Price</div>
-                                                        <div className="font-bold text-3xl text-white">${stock.price.toFixed(2)}</div>
+                                                    <div className="text-center pt-3 border-t border-cyan-600/30">
+                                                        <div className="text-xs text-cyan-300 mb-1">Current Price</div>
+                                                        <div className="font-bold text-2xl text-white">${stock.price.toFixed(2)}</div>
                                                     </div>
-                                                    <div className="mt-4 text-center">
-                                                        <button className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-2 rounded-lg font-bold text-sm transition-all shadow-lg hover:shadow-xl hover:scale-105 active-press hover-glow">
+                                                    <div className="mt-3 text-center">
+                                                        <button className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-2 rounded-lg font-bold text-xs transition-all shadow-lg hover:shadow-xl hover:scale-105">
                                                             📊 Trade This Stock
                                                         </button>
                                                     </div>
