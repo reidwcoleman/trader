@@ -1,34 +1,140 @@
 # robots.txt for FinClash Stock Trading Simulator
 # Website: https://finclash.us
+# Updated: 2025-11-18
 
-# Allow all bots to crawl the site
+# ==========================================
+# SEARCH ENGINE BOTS - FULL ACCESS
+# ==========================================
+
+# Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Googlebot-Image
+Allow: /
+Crawl-delay: 0
+
+User-agent: Googlebot-Mobile
+Allow: /
+Crawl-delay: 0
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 0
+
+User-agent: BingPreview
+Allow: /
+
+# Yahoo
+User-agent: Slurp
+Allow: /
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+
+# Yandex
+User-agent: Yandex
+Allow: /
+
+# Baidu
+User-agent: Baiduspider
+Allow: /
+
+# ==========================================
+# SOCIAL MEDIA CRAWLERS - FOR RICH PREVIEWS
+# ==========================================
+
+# Facebook
+User-agent: facebookexternalhit
+Allow: /
+
+# Twitter
+User-agent: Twitterbot
+Allow: /
+
+# LinkedIn
+User-agent: LinkedInBot
+Allow: /
+
+# Pinterest
+User-agent: Pinterestbot
+Allow: /
+
+# ==========================================
+# GENERAL BOT RULES
+# ==========================================
+
 User-agent: *
 Allow: /
 
-# Disallow crawling of backend API endpoints
+# Disallow backend API endpoints and admin areas
 Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+
+# Disallow JSON files (except manifest.json)
 Disallow: /*.json$
+Allow: /manifest.json
 
 # Disallow backup and temporary files
 Disallow: /*backup*.html
 Disallow: /app-backup*.html
+Disallow: /*.bak$
+Disallow: /*.tmp$
+Disallow: /*~$
 
-# Sitemap location
+# Disallow development/test files
+Disallow: /test/
+Disallow: /tests/
+Disallow: /dev/
+
+# Disallow query strings that don't change content
+Disallow: /*?*utm_source=
+Disallow: /*?*utm_medium=
+Disallow: /*?*utm_campaign=
+Disallow: /*?*ref=
+
+# ==========================================
+# SITEMAPS
+# ==========================================
+
 Sitemap: https://finclash.us/sitemap.xml
 
-# Crawl-delay for polite bots (optional - prevents server overload)
-# User-agent: *
-# Crawl-delay: 1
+# ==========================================
+# BAD BOTS - BLOCKED
+# ==========================================
 
-# Specific bot configurations
-User-agent: Googlebot
-Allow: /
+# SEO spam bots
+User-agent: AhrefsBot
+Disallow: /
 
-User-agent: Bingbot
-Allow: /
+User-agent: SemrushBot
+Disallow: /
 
-User-agent: Slurp
-Allow: /
+User-agent: DotBot
+Disallow: /
 
-User-agent: DuckDuckBot
-Allow: /
+User-agent: MJ12bot
+Disallow: /
+
+# Scraper bots
+User-agent: HTTrack
+Disallow: /
+
+User-agent: WebReaper
+Disallow: /
+
+User-agent: WebCopier
+Disallow: /
+
+User-agent: Offline Explorer
+Disallow: /
+
+User-agent: Wget
+Disallow: /
+
+User-agent: curl
+Disallow: /
