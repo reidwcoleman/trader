@@ -10390,55 +10390,170 @@ const TradingSimulator = () => {
                         {/* Market Movers View */}
                         {mainTab === 'movers' && (
                             <>
-                                <div className="bg-gradient-to-br from-orange-900/60 via-red-900/60 to-pink-900/60 rounded-2xl p-8 border-2 border-orange-500/50 shadow-2xl mb-6">
-                                    <div className="text-center mb-8">
-                                        <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full mb-6 shadow-2xl">
-                                            <span className="text-5xl">🚀</span>
-                                        </div>
-                                        <h2 className="text-4xl font-black text-white mb-3 flex items-center justify-center gap-3">
-                                            Market Movers
-                                            <span className="text-sm bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full font-bold">TODAY</span>
-                                        </h2>
-                                        <p className="text-xl text-orange-200">Top gainers and losers of the day</p>
+                                {/* ULTRA-PREMIUM MARKET MOVERS HERO */}
+                                <div className="group relative bg-gradient-to-br from-orange-900/80 via-red-900/80 to-pink-900/80 backdrop-blur-2xl rounded-3xl p-12 border-2 border-orange-500/50 shadow-2xl mb-8 overflow-hidden" style={{boxShadow: '0 0 60px rgba(251, 146, 60, 0.4), inset 0 0 80px rgba(251, 146, 60, 0.1)'}}>
+                                    {/* Animated Background Pattern */}
+                                    <div className="absolute inset-0 opacity-10">
+                                        <div className="absolute inset-0" style={{
+                                            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(251, 146, 60, 0.4) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.4) 0%, transparent 50%)',
+                                            animation: 'pulse 4s ease-in-out infinite'
+                                        }}></div>
                                     </div>
 
+                                    {/* Floating Glow Effects */}
+                                    <div className="absolute top-10 left-20 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl animate-pulse" style={{animationDuration: '4s'}}></div>
+                                    <div className="absolute bottom-10 right-20 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-pulse" style={{animationDuration: '4s', animationDelay: '2s'}}></div>
+
+                                    {/* Animated shine effect */}
+                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"></div>
+
+                                    <div className="relative text-center mb-8">
+                                        {/* Premium Rocket Icon */}
+                                        <div className="relative inline-flex items-center justify-center mb-8">
+                                            <div className="absolute w-32 h-32 bg-gradient-to-br from-orange-500 to-red-500 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+                                            <div className="relative flex items-center justify-center w-28 h-28 bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 rounded-full overflow-hidden shadow-2xl" style={{boxShadow: '0 0 40px rgba(251, 146, 60, 0.6)'}}>
+                                                <div className="absolute inset-0 bg-gradient-to-br from-orange-400/30 to-transparent blur-xl animate-pulse"></div>
+                                                <span className="relative text-6xl animate-bounce" style={{animationDuration: '2s'}}>🚀</span>
+                                                {/* Pulse Ring */}
+                                                <div className="absolute inset-0 rounded-full border-4 border-orange-400/40 animate-ping"></div>
+                                            </div>
+                                        </div>
+
+                                        {/* TODAY Badge */}
+                                        <div className="inline-flex items-center gap-3 bg-black/40 backdrop-blur-xl border-2 border-orange-400/50 rounded-full px-8 py-4 mb-6 shadow-2xl" style={{boxShadow: '0 0 40px rgba(251, 146, 60, 0.5)'}}>
+                                            <div className="relative">
+                                                <span className="text-3xl">📊</span>
+                                                <div className="absolute -inset-1 animate-ping opacity-75">
+                                                    <span className="text-3xl">📊</span>
+                                                </div>
+                                            </div>
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-200 via-red-200 to-pink-200 font-black text-2xl tracking-wider">
+                                                TODAY'S MARKET MOVERS
+                                            </span>
+                                            <span className="flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-red-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 shadow-lg" style={{boxShadow: '0 0 10px rgba(239, 68, 68, 0.8)'}}></span>
+                                            </span>
+                                        </div>
+
+                                        {/* Main Title */}
+                                        <h2 className="text-5xl md:text-6xl font-black mb-4 leading-tight">
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-200 via-red-200 to-pink-200">
+                                                Market Movers
+                                            </span>
+                                        </h2>
+                                        <p className="text-2xl text-orange-100 mb-8 max-w-3xl mx-auto font-semibold">
+                                            Track today's biggest winners and losers in real-time
+                                        </p>
+
+                                        {/* Stats Pills */}
+                                        <div className="flex flex-wrap gap-3 justify-center max-w-3xl mx-auto">
+                                            {[
+                                                {icon: '📈', text: 'Top 5 Gainers', color: 'green'},
+                                                {icon: '📉', text: 'Top 5 Losers', color: 'red'},
+                                                {icon: '⚡', text: 'Real-Time Data', color: 'orange'},
+                                                {icon: '🎯', text: 'Click to Trade', color: 'blue'}
+                                            ].map((stat, idx) => (
+                                                <div key={idx} className={`bg-black/40 backdrop-blur-xl border-2 border-${stat.color}-400/30 rounded-full px-4 py-2 hover:border-${stat.color}-400 hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-${stat.color}-500/50`}>
+                                                    <span className={`text-sm font-bold text-${stat.color}-200 flex items-center gap-2`}>
+                                                        <span className="text-lg">{stat.icon}</span>
+                                                        {stat.text}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* ENHANCED LOADING STATE */}
                                     {loadingMovers ? (
-                                        <div className="text-center py-20">
-                                            <div className="text-6xl mb-4 animate-bounce">📊</div>
-                                            <p className="text-xl text-orange-200 mb-4">Loading market movers...</p>
-                                            <div className="bg-blue-900/40 rounded-xl p-6 max-w-md mx-auto">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-sm text-orange-300 font-semibold">
-                                                        Analyzing {moversProgress.total} stocks
-                                                    </span>
-                                                    <span className="text-sm text-orange-300 font-bold">
-                                                        {moversProgress.current}/{moversProgress.total}
-                                                    </span>
+                                        <div className="relative bg-gradient-to-br from-orange-900/80 via-red-900/80 to-pink-900/80 backdrop-blur-xl rounded-3xl p-12 border-2 border-orange-500/50 shadow-2xl overflow-hidden" style={{boxShadow: '0 0 60px rgba(251, 146, 60, 0.5), inset 0 0 80px rgba(251, 146, 60, 0.1)'}}>
+                                            {/* Animated Background */}
+                                            <div className="absolute inset-0 opacity-20">
+                                                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/30 via-red-500/30 to-pink-500/30 animate-pulse"></div>
+                                            </div>
+
+                                            <div className="relative text-center space-y-8">
+                                                {/* Premium Loading Spinner */}
+                                                <div className="relative inline-flex items-center justify-center">
+                                                    {/* Outer Glow */}
+                                                    <div className="absolute w-40 h-40 bg-gradient-to-br from-orange-500 to-red-500 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+
+                                                    {/* Spinning Border */}
+                                                    <div className="relative w-32 h-32">
+                                                        <div className="absolute inset-0 rounded-full border-4 border-orange-500/20"></div>
+                                                        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-orange-400 border-r-red-400 animate-spin" style={{animationDuration: '1s'}}></div>
+                                                        <div className="absolute inset-2 rounded-full border-4 border-transparent border-t-pink-400 border-l-rose-400 animate-spin" style={{animationDuration: '1.5s', animationDirection: 'reverse'}}></div>
+
+                                                        {/* Center Icon */}
+                                                        <div className="absolute inset-0 flex items-center justify-center">
+                                                            <span className="text-5xl animate-bounce" style={{animationDuration: '2s'}}>📊</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div className="w-full bg-blue-900/60 rounded-full h-3 overflow-hidden">
-                                                    <div
-                                                        className="bg-gradient-to-r from-orange-500 to-red-500 h-3 rounded-full transition-all duration-300"
-                                                        style={{ width: `${(moversProgress.current / moversProgress.total * 100)}%` }}
-                                                    ></div>
+
+                                                {/* Loading Title */}
+                                                <div className="space-y-2">
+                                                    <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-200 to-red-200 animate-pulse">
+                                                        🚀 Loading Market Movers...
+                                                    </h3>
+                                                    <p className="text-lg text-orange-300 font-semibold">
+                                                        Analyzing today's biggest price movements
+                                                    </p>
                                                 </div>
-                                                <p className="text-xs text-orange-200/60 mt-3">
-                                                    Fetching real-time data for accurate market movers
-                                                </p>
+
+                                                {/* Progress Stats */}
+                                                <div className="bg-black/40 backdrop-blur-xl rounded-xl p-6 border-2 border-orange-500/30 max-w-md mx-auto">
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <span className="text-sm text-orange-200 font-bold">
+                                                            Scanning {moversProgress.total} stocks
+                                                        </span>
+                                                        <span className="text-sm text-orange-200 font-black">
+                                                            {moversProgress.current}/{moversProgress.total}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Progress Bar */}
+                                                    <div className="w-full bg-orange-950/50 rounded-full h-4 overflow-hidden border border-orange-600/30 mb-4">
+                                                        <div
+                                                            className="h-full bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-full transition-all duration-300 animate-pulse"
+                                                            style={{ width: `${(moversProgress.current / moversProgress.total * 100)}%` }}
+                                                        ></div>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-center gap-2 text-xs text-orange-300">
+                                                        <span className="inline-flex h-2 w-2">
+                                                            <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-orange-400 opacity-75"></span>
+                                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                                                        </span>
+                                                        <span className="font-semibold">Fetching real-time price data...</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     ) : (
                                         <>
-                                            {/* Top Gainers Section */}
+                                            {/* PREMIUM TOP GAINERS SECTION */}
                                             <div className="mb-8">
-                                                <div className="flex items-center gap-3 mb-6">
-                                                    <div className="bg-gradient-to-br from-green-500 to-emerald-500 p-3 rounded-xl shadow-lg">
-                                                        <span className="text-3xl">📈</span>
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-300">
-                                                            Top Gainers
-                                                        </h3>
-                                                        <p className="text-sm text-green-300 font-semibold">Stocks with highest percentage gains</p>
+                                                <div className="relative bg-gradient-to-r from-green-900/40 via-emerald-900/40 to-teal-900/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-green-500/40 mb-6 overflow-hidden" style={{boxShadow: '0 0 30px rgba(34, 197, 94, 0.3)'}}>
+                                                    {/* Shine effect */}
+                                                    <div className="absolute inset-0 -translate-x-full hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"></div>
+
+                                                    <div className="relative flex items-center gap-4">
+                                                        <div className="relative">
+                                                            <div className="absolute inset-0 bg-green-500 rounded-xl blur-xl opacity-40 animate-pulse"></div>
+                                                            <div className="relative bg-gradient-to-br from-green-500 to-emerald-500 p-4 rounded-xl shadow-2xl">
+                                                                <span className="text-4xl">📈</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <h3 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-300 mb-1">
+                                                                Top Gainers
+                                                            </h3>
+                                                            <p className="text-sm text-green-200 font-semibold">Today's biggest winners - up to +20% gains</p>
+                                                        </div>
+                                                        <div className="bg-green-500/20 border-2 border-green-400/50 rounded-full px-4 py-2">
+                                                            <span className="text-green-300 font-black text-lg">{topGainers.length} Stocks</span>
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -10486,17 +10601,28 @@ const TradingSimulator = () => {
                                                 )}
                                             </div>
 
-                                            {/* Top Losers Section */}
+                                            {/* PREMIUM TOP LOSERS SECTION */}
                                             <div>
-                                                <div className="flex items-center gap-3 mb-6">
-                                                    <div className="bg-gradient-to-br from-red-500 to-pink-500 p-3 rounded-xl shadow-lg">
-                                                        <span className="text-3xl">📉</span>
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-300 to-pink-300">
-                                                            Top Losers
-                                                        </h3>
-                                                        <p className="text-sm text-red-300 font-semibold">Stocks with highest percentage losses</p>
+                                                <div className="relative bg-gradient-to-r from-red-900/40 via-pink-900/40 to-rose-900/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-red-500/40 mb-6 overflow-hidden" style={{boxShadow: '0 0 30px rgba(239, 68, 68, 0.3)'}}>
+                                                    {/* Shine effect */}
+                                                    <div className="absolute inset-0 -translate-x-full hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"></div>
+
+                                                    <div className="relative flex items-center gap-4">
+                                                        <div className="relative">
+                                                            <div className="absolute inset-0 bg-red-500 rounded-xl blur-xl opacity-40 animate-pulse"></div>
+                                                            <div className="relative bg-gradient-to-br from-red-500 to-pink-500 p-4 rounded-xl shadow-2xl">
+                                                                <span className="text-4xl">📉</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <h3 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-300 to-pink-300 mb-1">
+                                                                Top Losers
+                                                            </h3>
+                                                            <p className="text-sm text-red-200 font-semibold">Today's biggest decliners - down up to -20%</p>
+                                                        </div>
+                                                        <div className="bg-red-500/20 border-2 border-red-400/50 rounded-full px-4 py-2">
+                                                            <span className="text-red-300 font-black text-lg">{topLosers.length} Stocks</span>
+                                                        </div>
                                                     </div>
                                                 </div>
 
