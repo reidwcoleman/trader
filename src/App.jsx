@@ -9260,15 +9260,15 @@ const TradingSimulator = () => {
                         {/* News View */}
                         {mainTab === 'news' && (
                             <>
-                                <div className="group relative bg-black/80 backdrop-blur-2xl rounded-2xl p-6 border-2 border-cyan-500/30 mb-6 overflow-hidden transition-all duration-500" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
+                                <div className="group relative bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-xl rounded-2xl p-4 border-2 border-cyan-500/40 mb-4 overflow-hidden transition-all duration-500 shadow-xl" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.15)'}}>
                                     {/* Animated shine effect */}
                                     <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent pointer-events-none"></div>
 
-                                    <div className="relative flex items-center justify-between mb-6 flex-wrap gap-4">
+                                    <div className="relative flex items-center justify-between mb-4 flex-wrap gap-3">
                                         <div>
-                                            <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 flex items-center gap-2">
+                                            <h2 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 flex items-center gap-2">
                                                 📰 Market News
-                                                <span className="ml-2 px-3 py-1 bg-green-500/20 text-green-300 border-2 border-green-500/50 rounded-full text-xs font-bold animate-pulse" style={{boxShadow: '0 0 15px rgba(34, 197, 94, 0.3)'}}>
+                                                <span className="ml-2 px-2 py-0.5 bg-green-500/20 text-green-300 border border-green-500/50 rounded-full text-xs font-bold" style={{boxShadow: '0 0 10px rgba(34, 197, 94, 0.2)'}}>
                                                     ● LIVE
                                                 </span>
                                             </h2>
@@ -9281,28 +9281,28 @@ const TradingSimulator = () => {
                                         <button
                                             onClick={loadMarketNews}
                                             disabled={loadingMarketNews}
-                                            className="group/btn relative bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white px-5 py-2 rounded-lg font-black text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
-                                            style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.3)'}}
+                                            className="group/btn relative bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-4 py-2 rounded-lg font-bold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-lg"
+                                            style={{boxShadow: '0 0 15px rgba(6, 182, 212, 0.2)'}}
                                         >
-                                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
                                             <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
                                             <span className="relative">{loadingMarketNews ? '⏳ Loading...' : '🔄 Refresh News'}</span>
                                         </button>
                                     </div>
 
                                     {loadingMarketNews ? (
-                                        <div className="relative text-center py-16">
-                                            <div className="inline-block animate-spin text-6xl mb-4">⏳</div>
-                                            <div className="text-cyan-300 text-lg font-semibold">Loading latest market news...</div>
+                                        <div className="relative text-center py-12">
+                                            <div className="inline-block animate-spin text-5xl mb-3">⏳</div>
+                                            <div className="text-cyan-300 text-base font-semibold">Loading latest market news...</div>
                                         </div>
                                     ) : marketNews.length === 0 ? (
-                                        <div className="relative text-center py-16 bg-black/60 backdrop-blur-xl rounded-xl border-2 border-dashed border-cyan-500/30 animate-fade-in">
-                                            <div className="text-8xl mb-4 opacity-50 animate-bounce">📰</div>
-                                            <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-3">No News Available</h3>
-                                            <p className="text-cyan-300 text-lg mb-6 font-semibold">Click refresh to load the latest market news</p>
+                                        <div className="relative text-center py-12 bg-black/30 backdrop-blur-xl rounded-xl border-2 border-dashed border-cyan-500/40 animate-fade-in">
+                                            <div className="text-6xl mb-3 opacity-50 animate-bounce">📰</div>
+                                            <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-2">No News Available</h3>
+                                            <p className="text-cyan-300 text-sm mb-4 font-semibold">Click refresh to load the latest market news</p>
                                         </div>
                                     ) : (
-                                        <div className="relative space-y-4">
+                                        <div className="relative space-y-3">
                                             {marketNews.map((article, idx) => (
                                                 <div
                                                     key={idx}
@@ -9312,23 +9312,23 @@ const TradingSimulator = () => {
                                                         setShowNewsModal(true);
                                                         scrapeArticle(article);
                                                     }}
-                                                    className={`group/news relative block bg-black/60 hover:bg-black/70 backdrop-blur-xl rounded-xl p-5 transition-all border-2 border-cyan-500/30 hover:border-cyan-400 hover:-translate-y-1 cursor-pointer will-change-transform overflow-hidden animate-fade-in stagger-${Math.min(idx + 1, 6)}`}
-                                                    style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.15)'}}
+                                                    className={`group/news relative block bg-black/40 hover:bg-black/60 backdrop-blur-xl rounded-xl p-4 transition-all border-2 border-cyan-500/30 hover:border-cyan-400 hover:-translate-y-1 cursor-pointer will-change-transform overflow-hidden animate-fade-in stagger-${Math.min(idx + 1, 6)}`}
+                                                    style={{boxShadow: '0 0 15px rgba(6, 182, 212, 0.1)'}}
                                                 >
                                                     {/* Shine effect for news cards */}
                                                     <div className="absolute inset-0 -translate-x-full group-hover/news:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
 
-                                                    <div className="relative flex gap-4">
+                                                    <div className="relative flex gap-3">
                                                         {article.image && (
                                                             <img
                                                                 src={article.image}
                                                                 alt=""
-                                                                className="w-32 h-32 rounded-lg object-cover flex-shrink-0 border-2 border-cyan-500/30 group-hover/news:scale-105 transition-transform duration-300"
+                                                                className="w-24 h-24 rounded-lg object-cover flex-shrink-0 border-2 border-cyan-500/30 group-hover/news:scale-105 transition-transform duration-300"
                                                                 onError={(e) => e.target.style.display = 'none'}
                                                             />
                                                         )}
                                                         <div className="flex-1 min-w-0">
-                                                            <div className="flex items-center gap-2 mb-3 flex-wrap">
+                                                            <div className="flex items-center gap-2 mb-2 flex-wrap">
                                                                 <span className={`px-3 py-1 rounded-full text-xs font-bold border-2 transition-all ${
                                                                     article.sentiment === 'positive' ? 'bg-green-500/20 text-green-300 border-green-500/50 animate-pulse-glow-green' :
                                                                     article.sentiment === 'negative' ? 'bg-red-500/20 text-red-300 border-red-500/50 animate-pulse-glow-red' :
@@ -9347,10 +9347,10 @@ const TradingSimulator = () => {
                                                                     </span>
                                                                 )}
                                                             </div>
-                                                            <h4 className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 font-black text-lg mb-2 line-clamp-2 group-hover/news:from-cyan-300 group-hover/news:to-blue-400 transition-all">
+                                                            <h4 className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 font-black text-base mb-1.5 line-clamp-2 group-hover/news:from-cyan-300 group-hover/news:to-blue-400 transition-all">
                                                                 {article.headline}
                                                             </h4>
-                                                            <p className="text-sm text-gray-400 line-clamp-3 mb-3 leading-relaxed font-medium">
+                                                            <p className="text-xs text-gray-400 line-clamp-2 mb-2 leading-relaxed font-medium">
                                                                 {article.summary}
                                                             </p>
                                                             <div className="flex items-center justify-between">
