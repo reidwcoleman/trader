@@ -9260,20 +9260,20 @@ const TradingSimulator = () => {
                         {/* News View */}
                         {mainTab === 'news' && (
                             <>
-                                <div className="group relative bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-xl rounded-2xl p-4 border-2 border-cyan-500/40 mb-4 overflow-hidden transition-all duration-500 shadow-xl" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.15)'}}>
+                                <div className="group relative bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-2xl rounded-2xl p-6 border-2 border-cyan-500/40 mb-4 overflow-hidden transition-all duration-500 shadow-2xl" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
                                     {/* Animated shine effect */}
                                     <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent pointer-events-none"></div>
 
                                     <div className="relative flex items-center justify-between mb-4 flex-wrap gap-3">
                                         <div>
-                                            <h2 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 flex items-center gap-2">
+                                            <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 flex items-center gap-2">
                                                 📰 Market News
                                                 <span className="ml-2 px-2 py-0.5 bg-green-500/20 text-green-300 border border-green-500/50 rounded-full text-xs font-bold" style={{boxShadow: '0 0 10px rgba(34, 197, 94, 0.2)'}}>
                                                     ● LIVE
                                                 </span>
                                             </h2>
                                             {lastNewsUpdate && (
-                                                <div className="text-xs text-cyan-400 mt-1 font-semibold">
+                                                <div className="text-xs text-cyan-400 mt-2 font-semibold">
                                                     🔄 Last updated: {lastNewsUpdate.toLocaleTimeString()} • Auto-refreshes every 2 min
                                                 </div>
                                             )}
@@ -9281,7 +9281,7 @@ const TradingSimulator = () => {
                                         <button
                                             onClick={loadMarketNews}
                                             disabled={loadingMarketNews}
-                                            className="group/btn relative bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-4 py-2 rounded-lg font-bold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-lg"
+                                            className="group/btn relative bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-5 py-3 rounded-lg font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-lg"
                                             style={{boxShadow: '0 0 15px rgba(6, 182, 212, 0.2)'}}
                                         >
                                             <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
@@ -10719,29 +10719,29 @@ const TradingSimulator = () => {
                                 {!learningTopic && (
                                 <>
                                 {/* Ultra-Premium Hero Section with UltraThink AI Branding */}
-                                <div className="relative bg-gradient-to-br from-purple-900/80 via-blue-900/80 to-cyan-900/80 rounded-3xl p-12 border-2 border-purple-500/50 shadow-2xl overflow-hidden" style={{boxShadow: '0 0 60px rgba(168, 85, 247, 0.3)'}}>
+                                <div className="relative bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-2xl rounded-2xl p-8 md:p-12 border-2 border-cyan-500/40 shadow-2xl overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
                                     {/* Animated Background Pattern */}
                                     <div className="absolute inset-0 opacity-10">
                                         <div className="absolute inset-0" style={{
-                                            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(168, 85, 247, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.3) 0%, transparent 50%)',
+                                            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.3) 0%, transparent 50%)',
                                             animation: 'pulse 4s ease-in-out infinite'
                                         }}></div>
                                     </div>
 
                                     {/* Floating Glow Effect */}
-                                    <div className="absolute top-10 left-20 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-                                    <div className="absolute bottom-10 right-20 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+                                    <div className="absolute top-10 left-20 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
+                                    <div className="absolute bottom-10 right-20 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
 
                                     <div className="relative z-10 text-center">
                                         {/* UltraThink AI Badge */}
-                                        <div className="inline-flex items-center gap-3 bg-black/40 backdrop-blur-xl border-2 border-purple-400/50 rounded-full px-6 py-3 mb-6 shadow-2xl" style={{boxShadow: '0 0 30px rgba(168, 85, 247, 0.4)'}}>
+                                        <div className="inline-flex items-center gap-3 bg-black/40 backdrop-blur-xl border-2 border-cyan-400/50 rounded-full px-6 py-3 mb-6 shadow-2xl" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.4)'}}>
                                             <div className="relative">
                                                 <span className="text-3xl">🧠</span>
                                                 <div className="absolute inset-0 animate-ping">
                                                     <span className="text-3xl opacity-75">🧠</span>
                                                 </div>
                                             </div>
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-cyan-300 to-purple-300 font-black text-lg">
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-cyan-300 font-black text-lg">
                                                 POWERED BY ULTRATHINK AI
                                             </span>
                                             <span className="flex h-2 w-2">
@@ -10751,20 +10751,20 @@ const TradingSimulator = () => {
                                         </div>
 
                                         {/* Main Hero Title */}
-                                        <h2 className="text-5xl md:text-6xl font-black mb-4 leading-tight">
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-cyan-200 to-purple-200">
+                                        <h2 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-cyan-300">
                                                 Elite Trading Academy
                                             </span>
                                         </h2>
-                                        <p className="text-2xl text-purple-100 mb-8 max-w-3xl mx-auto font-semibold">
+                                        <p className="text-xl text-cyan-100 mb-8 max-w-3xl mx-auto font-semibold">
                                             Master the markets with AI-powered lessons, interactive tools, and real-world strategies
                                         </p>
 
                                         {/* Premium Stats Grid */}
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                                            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-400/30 hover:border-purple-400 transition-all duration-300 hover:scale-105 hover:shadow-2xl" style={{boxShadow: '0 0 20px rgba(168, 85, 247, 0.2)'}}>
-                                                <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 mb-2">50+</div>
-                                                <div className="text-sm font-bold text-purple-200">Expert Lessons</div>
+                                            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-cyan-400/30 hover:border-cyan-400 transition-all duration-300 hover:scale-105 hover:shadow-2xl" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.2)'}}>
+                                                <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300 mb-2">50+</div>
+                                                <div className="text-sm font-bold text-cyan-200">Expert Lessons</div>
                                             </div>
                                             <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-cyan-400/30 hover:border-cyan-400 transition-all duration-300 hover:scale-105 hover:shadow-2xl" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.2)'}}>
                                                 <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300 mb-2">100%</div>
@@ -10789,30 +10789,30 @@ const TradingSimulator = () => {
                                 </div>
 
                                 {/* AI-Powered Daily Trading Tip */}
-                                <div className="relative bg-gradient-to-br from-orange-900/60 via-yellow-900/60 to-amber-900/60 rounded-3xl p-8 border-2 border-yellow-500/50 shadow-2xl overflow-hidden" style={{boxShadow: '0 0 40px rgba(234, 179, 8, 0.3)'}}>
+                                <div className="relative bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-2xl rounded-2xl p-8 border-2 border-cyan-500/40 shadow-2xl overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
                                     {/* Glow Effect */}
-                                    <div className="absolute top-0 right-0 w-48 h-48 bg-yellow-500/20 rounded-full blur-3xl"></div>
+                                    <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl"></div>
 
                                     <div className="relative z-10 flex items-start gap-6">
                                         <div className="relative flex-shrink-0">
                                             <div className="text-6xl">💡</div>
-                                            <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full p-1">
+                                            <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full p-1">
                                                 <span className="text-xs">🧠</span>
                                             </div>
                                         </div>
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-4">
-                                                <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-orange-200">
+                                                <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
                                                     AI Daily Wisdom
                                                 </h3>
-                                                <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-3 py-1 rounded-full font-black text-xs animate-pulse">
+                                                <span className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-3 py-1 rounded-full font-black text-xs animate-pulse">
                                                     TODAY
                                                 </span>
-                                                <span className="bg-purple-500/30 text-purple-200 px-3 py-1 rounded-full font-bold text-xs border border-purple-400/50">
+                                                <span className="bg-cyan-500/30 text-cyan-200 px-3 py-1 rounded-full font-bold text-xs border border-cyan-400/50">
                                                     UltraThink AI
                                                 </span>
                                             </div>
-                                            <p className="text-lg text-yellow-100 font-semibold mb-2">
+                                            <p className="text-lg text-cyan-100 font-semibold mb-2">
                                                 {(() => {
                                                     const tips = [
                                                         "Always set a stop-loss before entering a trade. It's your safety net against unexpected losses.",
@@ -10835,7 +10835,7 @@ const TradingSimulator = () => {
                                                     return tips[dayOfYear % tips.length];
                                                 })()}
                                             </p>
-                                            <div className="flex items-center gap-2 text-sm text-yellow-200/90">
+                                            <div className="flex items-center gap-2 text-sm text-cyan-200/90">
                                                 <span className="text-lg">✨</span>
                                                 <span className="font-semibold italic">New AI-curated tip every day to sharpen your edge</span>
                                             </div>
@@ -10845,25 +10845,25 @@ const TradingSimulator = () => {
 
                                 {/* Enhanced Progress Dashboard */}
                                 {learningProgress.completedLessons.length > 0 && (
-                                    <div className="relative bg-gradient-to-br from-purple-900/70 via-blue-900/70 to-cyan-900/70 rounded-3xl p-8 border-2 border-purple-500/50 shadow-2xl overflow-hidden" style={{boxShadow: '0 0 50px rgba(168, 85, 247, 0.4)'}}>
+                                    <div className="relative bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-2xl rounded-2xl p-8 border-2 border-cyan-500/40 shadow-2xl overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
                                         {/* Animated Background */}
                                         <div className="absolute inset-0 opacity-20">
-                                            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/30 via-cyan-500/30 to-purple-500/30 animate-pulse"></div>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-cyan-500/30 animate-pulse"></div>
                                         </div>
 
                                         <div className="relative z-10 flex items-center justify-between mb-8">
                                             <div className="flex items-center gap-5">
                                                 <div className="relative">
                                                     <div className="text-6xl">🏆</div>
-                                                    <div className="absolute -top-1 -right-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full w-6 h-6 flex items-center justify-center border-2 border-purple-900 animate-bounce">
+                                                    <div className="absolute -top-1 -right-1 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full w-6 h-6 flex items-center justify-center border-2 border-cyan-900 animate-bounce">
                                                         <span className="text-xs">✨</span>
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <h3 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-cyan-200 mb-1">
+                                                    <h3 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300 mb-1">
                                                         Your Journey
                                                     </h3>
-                                                    <p className="text-lg text-purple-200 font-semibold">Keep crushing it and level up! 🚀</p>
+                                                    <p className="text-lg text-cyan-200 font-semibold">Keep crushing it and level up! 🚀</p>
                                                 </div>
                                             </div>
                                             {/* Level Badge */}
@@ -11015,11 +11015,11 @@ const TradingSimulator = () => {
                                 {/* Premium Learning Paths Grid */}
                                 <div>
                                     <div className="flex items-center gap-3 mb-6">
-                                        <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-cyan-300">
+                                        <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
                                             Learning Paths
                                         </h3>
-                                        <div className="flex-1 h-1 bg-gradient-to-r from-purple-500/50 to-transparent rounded-full"></div>
-                                        <span className="bg-purple-500/30 text-purple-200 px-4 py-1 rounded-full font-bold text-sm border border-purple-400/50">
+                                        <div className="flex-1 h-1 bg-gradient-to-r from-cyan-500/50 to-transparent rounded-full"></div>
+                                        <span className="bg-cyan-500/30 text-cyan-200 px-4 py-1 rounded-full font-bold text-sm border border-cyan-400/50">
                                             6 Modules
                                         </span>
                                     </div>
