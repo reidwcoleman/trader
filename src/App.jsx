@@ -9391,43 +9391,43 @@ const TradingSimulator = () => {
                         {mainTab === 'ai-analysis' && (
                             <>
                                 {/* ULTRA-PREMIUM HERO SECTION */}
-                                <div className="group relative bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 backdrop-blur-2xl rounded-3xl p-12 border-2 border-purple-500/50 mb-8 overflow-hidden transition-all duration-500" style={{boxShadow: '0 0 60px rgba(168, 85, 247, 0.4), inset 0 0 80px rgba(168, 85, 247, 0.1)'}}>
+                                <div className="group relative bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-2xl rounded-2xl p-8 md:p-12 border-2 border-cyan-500/40 mb-8 overflow-hidden transition-all duration-500 shadow-2xl" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
                                     {/* Animated Background Pattern */}
                                     <div className="absolute inset-0 opacity-10">
                                         <div className="absolute inset-0" style={{
-                                            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(168, 85, 247, 0.4) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.4) 0%, transparent 50%)',
+                                            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.3) 0%, transparent 50%)',
                                             animation: 'pulse 4s ease-in-out infinite'
                                         }}></div>
                                     </div>
 
                                     {/* Floating Glow Effects */}
-                                    <div className="absolute top-10 left-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{animationDuration: '4s'}}></div>
+                                    <div className="absolute top-10 left-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{animationDuration: '4s'}}></div>
                                     <div className="absolute bottom-10 right-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{animationDuration: '4s', animationDelay: '2s'}}></div>
 
                                     {/* Animated shine effect */}
-                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"></div>
+                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent pointer-events-none"></div>
 
                                     <div className="relative text-center mb-8">
                                         {/* Premium AI Brain Icon */}
                                         <div className="relative inline-flex items-center justify-center mb-8">
-                                            <div className="absolute w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full blur-3xl opacity-60 animate-pulse"></div>
-                                            <div className="relative flex items-center justify-center w-28 h-28 bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 rounded-full overflow-hidden shadow-2xl" style={{boxShadow: '0 0 40px rgba(168, 85, 247, 0.6)'}}>
-                                                <div className="absolute inset-0 bg-gradient-to-br from-purple-400/30 to-transparent blur-xl animate-pulse"></div>
+                                            <div className="absolute w-32 h-32 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+                                            <div className="relative flex items-center justify-center w-28 h-28 bg-gradient-to-br from-cyan-600 via-blue-600 to-cyan-600 rounded-full overflow-hidden shadow-2xl" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.6)'}}>
+                                                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/30 to-transparent blur-xl animate-pulse"></div>
                                                 <span className="relative text-6xl animate-pulse" style={{animationDuration: '2s'}}>🧠</span>
                                                 {/* Pulse Ring */}
-                                                <div className="absolute inset-0 rounded-full border-4 border-purple-400/40 animate-ping"></div>
+                                                <div className="absolute inset-0 rounded-full border-4 border-cyan-400/40 animate-ping"></div>
                                             </div>
                                         </div>
 
                                         {/* UltraThink AI Badge */}
-                                        <div className="inline-flex items-center gap-3 bg-black/40 backdrop-blur-xl border-2 border-purple-400/50 rounded-full px-8 py-4 mb-6 shadow-2xl" style={{boxShadow: '0 0 40px rgba(168, 85, 247, 0.5)'}}>
+                                        <div className="inline-flex items-center gap-3 bg-black/40 backdrop-blur-xl border-2 border-cyan-400/50 rounded-full px-8 py-4 mb-6 shadow-2xl" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.4)'}}>
                                             <div className="relative">
                                                 <span className="text-3xl">⚡</span>
                                                 <div className="absolute -inset-1 animate-ping opacity-75">
                                                     <span className="text-3xl">⚡</span>
                                                 </div>
                                             </div>
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 font-black text-2xl tracking-wider">
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-blue-200 to-cyan-200 font-black text-2xl tracking-wider">
                                                 ULTRATHINK AI
                                             </span>
                                             <span className="flex h-3 w-3">
@@ -9437,12 +9437,12 @@ const TradingSimulator = () => {
                                         </div>
 
                                         {/* Main Title */}
-                                        <h2 className="text-5xl md:text-6xl font-black mb-4 leading-tight">
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-200 to-blue-200">
+                                        <h2 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-cyan-300">
                                                 AI Stock Analysis
                                             </span>
                                         </h2>
-                                        <p className="text-2xl text-purple-100 mb-8 max-w-3xl mx-auto font-semibold">
+                                        <p className="text-xl text-cyan-100 mb-8 max-w-3xl mx-auto font-semibold">
                                             Deep neural reasoning & institutional-grade market intelligence for any stock
                                         </p>
 
@@ -9455,8 +9455,8 @@ const TradingSimulator = () => {
                                                 {icon: '📰', text: 'News Sentiment AI'},
                                                 {icon: '⚡', text: 'Real-Time Analysis'}
                                             ].map((feature, idx) => (
-                                                <div key={idx} className="bg-black/40 backdrop-blur-xl border-2 border-purple-400/30 rounded-full px-4 py-2 hover:border-purple-400 hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/50">
-                                                    <span className="text-sm font-bold text-purple-200 flex items-center gap-2">
+                                                <div key={idx} className="bg-black/40 backdrop-blur-xl border-2 border-cyan-400/30 rounded-full px-4 py-2 hover:border-cyan-400 hover:scale-105 transition-all duration-300 shadow-lg" style={{boxShadow: '0 0 10px rgba(6, 182, 212, 0.2)'}}>
+                                                    <span className="text-sm font-bold text-cyan-200 flex items-center gap-2">
                                                         <span className="text-lg">{feature.icon}</span>
                                                         {feature.text}
                                                     </span>
@@ -9467,14 +9467,14 @@ const TradingSimulator = () => {
 
                                     {/* ENHANCED STOCK SEARCH */}
                                     <div className="relative max-w-3xl mx-auto mb-8">
-                                        <label className="block text-purple-200 font-black mb-4 text-sm uppercase tracking-wider flex items-center gap-2">
+                                        <label className="block text-cyan-200 font-black mb-4 text-sm uppercase tracking-wider flex items-center gap-2">
                                             <span className="text-xl">🔍</span>
                                             <span>Select Stock to Analyze</span>
                                         </label>
                                         <div className="relative group">
                                             {/* Search Icon */}
                                             <div className="absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none">
-                                                <span className="text-2xl text-purple-400 group-focus-within:text-purple-300 transition-colors">💹</span>
+                                                <span className="text-2xl text-cyan-400 group-focus-within:text-cyan-300 transition-colors">💹</span>
                                             </div>
 
                                             <input
@@ -9482,15 +9482,15 @@ const TradingSimulator = () => {
                                                 placeholder="Type any stock symbol or company name (e.g., AAPL, Tesla, Microsoft)..."
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full bg-gradient-to-r from-black/70 via-purple-900/30 to-black/70 backdrop-blur-xl border-2 border-purple-500/40 hover:border-purple-400 focus:border-purple-300 rounded-2xl pl-16 pr-16 py-5 text-white text-lg placeholder-purple-300/50 focus:outline-none transition-all font-semibold shadow-lg focus:shadow-2xl focus:shadow-purple-500/30"
-                                                style={{boxShadow: '0 0 30px rgba(168, 85, 247, 0.2), inset 0 0 40px rgba(168, 85, 247, 0.05)'}}
+                                                className="w-full bg-gradient-to-r from-black/70 via-cyan-900/30 to-black/70 backdrop-blur-xl border-2 border-cyan-500/40 hover:border-cyan-400 focus:border-cyan-300 rounded-2xl pl-16 pr-16 py-5 text-white text-lg placeholder-cyan-300/50 focus:outline-none transition-all font-semibold shadow-lg focus:shadow-2xl focus:shadow-cyan-500/30"
+                                                style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.2)'}}
                                             />
 
                                             {/* Searching Indicator */}
                                             {searching && (
                                                 <div className="absolute right-6 top-1/2 -translate-y-1/2">
                                                     <div className="relative">
-                                                        <div className="w-6 h-6 border-4 border-purple-500/30 border-t-purple-400 rounded-full animate-spin"></div>
+                                                        <div className="w-6 h-6 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin"></div>
                                                     </div>
                                                 </div>
                                             )}
@@ -9502,7 +9502,7 @@ const TradingSimulator = () => {
                                                         <button
                                                             key={symbol}
                                                             onClick={() => setSearchQuery(symbol)}
-                                                            className="px-3 py-1 bg-purple-500/20 hover:bg-purple-500/40 border border-purple-400/30 hover:border-purple-400 rounded-lg text-xs font-bold text-purple-300 hover:text-purple-200 transition-all hover:scale-105"
+                                                            className="px-3 py-1 bg-cyan-500/20 hover:bg-cyan-500/40 border border-cyan-400/30 hover:border-cyan-400 rounded-lg text-xs font-bold text-cyan-300 hover:text-cyan-200 transition-all hover:scale-105"
                                                         >
                                                             {symbol}
                                                         </button>
@@ -9513,13 +9513,13 @@ const TradingSimulator = () => {
 
                                         {/* Search Results for AI Analysis */}
                                         {searchQuery && showSearchResults && (
-                                            <div className="group/airesults relative mt-4 bg-black/80 backdrop-blur-2xl border-2 border-purple-500/30 rounded-xl overflow-hidden max-h-80 overflow-y-auto transition-all duration-500" style={{boxShadow: '0 0 25px rgba(168, 85, 247, 0.2)'}}>
+                                            <div className="group/airesults relative mt-4 bg-black/80 backdrop-blur-2xl border-2 border-cyan-500/30 rounded-xl overflow-hidden max-h-80 overflow-y-auto transition-all duration-500 shadow-lg" style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.2)'}}>
                                                 {/* Shine effect */}
-                                                <div className="absolute inset-0 -translate-x-full group-hover/airesults:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent pointer-events-none"></div>
+                                                <div className="absolute inset-0 -translate-x-full group-hover/airesults:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent pointer-events-none"></div>
 
                                                 {searching ? (
                                                     <div className="relative p-6 text-center">
-                                                        <div className="text-purple-300 font-semibold">Searching...</div>
+                                                        <div className="text-cyan-300 font-semibold">Searching...</div>
                                                     </div>
                                                 ) : searchResults.length > 0 ? (
                                                     searchResults.map((result) => (
@@ -9548,10 +9548,10 @@ const TradingSimulator = () => {
                                                                 // Clear previous AI analysis
                                                                 setAiAnalysis(null);
                                                             }}
-                                                            className="group/aiitem relative p-5 border-b border-purple-500/20 last:border-b-0 hover:bg-purple-500/10 cursor-pointer transition-all overflow-hidden"
+                                                            className="group/aiitem relative p-5 border-b border-cyan-500/20 last:border-b-0 hover:bg-cyan-500/10 cursor-pointer transition-all overflow-hidden"
                                                         >
                                                             {/* Item shine */}
-                                                            <div className="absolute inset-0 -translate-x-full group-hover/aiitem:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent"></div>
+                                                            <div className="absolute inset-0 -translate-x-full group-hover/aiitem:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
 
                                                             <div className="relative flex items-center justify-between">
                                                                 <div className="flex-1">
@@ -9561,12 +9561,12 @@ const TradingSimulator = () => {
                                                                             <span className="bg-green-500/20 border border-green-500/50 text-green-300 text-xs font-bold px-2 py-0.5 rounded-full">OWNED</span>
                                                                         )}
                                                                     </div>
-                                                                    <div className="text-sm text-purple-300 font-semibold">{result.name}</div>
+                                                                    <div className="text-sm text-cyan-300 font-semibold">{result.name}</div>
                                                                     <div className="text-xs text-gray-400 mt-1 font-medium">
                                                                         {result.region} • {result.currency}
                                                                     </div>
                                                                 </div>
-                                                                <div className="text-purple-400 text-3xl group-hover/aiitem:translate-x-1 transition-transform">→</div>
+                                                                <div className="text-cyan-400 text-3xl group-hover/aiitem:translate-x-1 transition-transform">→</div>
                                                             </div>
                                                         </div>
                                                     ))
@@ -9577,8 +9577,8 @@ const TradingSimulator = () => {
                                                     </div>
                                                 ) : (
                                                     <div className="relative p-6 text-center">
-                                                        <div className="text-purple-400 mb-2 text-2xl">🔍</div>
-                                                        <div className="text-purple-300 font-semibold">No results found for "{searchQuery}"</div>
+                                                        <div className="text-cyan-400 mb-2 text-2xl">🔍</div>
+                                                        <div className="text-cyan-300 font-semibold">No results found for "{searchQuery}"</div>
                                                         <div className="text-xs text-gray-400 mt-2 font-medium">Try: AAPL, GOOGL, MSFT, TSLA, NVDA</div>
                                                     </div>
                                                 )}
@@ -9589,11 +9589,11 @@ const TradingSimulator = () => {
                                     {/* Selected Stock Display */}
                                     {selectedStock && (
                                         <div className="max-w-4xl mx-auto">
-                                            <div className="bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-blue-500/50 mb-6 shadow-2xl">
+                                            <div className="bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-xl rounded-2xl p-6 border-2 border-cyan-500/40 mb-6 shadow-2xl" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
                                                 <div className="flex items-center justify-between mb-4">
                                                     <div>
                                                         <h3 className="text-3xl font-black text-white">{selectedStock}</h3>
-                                                        <p className="text-blue-200 text-lg">{stocks.find(s => s.symbol === selectedStock)?.name || selectedStock}</p>
+                                                        <p className="text-cyan-200 text-lg">{stocks.find(s => s.symbol === selectedStock)?.name || selectedStock}</p>
                                                     </div>
                                                     <div className="text-right">
                                                         <div className="text-4xl font-black text-white mb-1">
@@ -9613,7 +9613,8 @@ const TradingSimulator = () => {
                                                 <button
                                                     onClick={generateAIAnalysis}
                                                     disabled={loadingAnalysis}
-                                                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-4 rounded-xl font-black text-xl transition-all shadow-2xl hover:shadow-purple-500/50 disabled:opacity-50 flex items-center justify-center gap-3 hover:scale-105 active-press hover-glow-amber will-change-transform gpu-accelerated"
+                                                    className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-4 rounded-xl font-black text-xl transition-all shadow-2xl disabled:opacity-50 flex items-center justify-center gap-3 hover:scale-105 will-change-transform"
+                                                    style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.3)'}}
                                                 >
                                                     {loadingAnalysis ? (
                                                         <>
@@ -9631,22 +9632,22 @@ const TradingSimulator = () => {
 
                                             {/* ULTRA-PREMIUM AI ANALYSIS LOADING STATE */}
                                             {loadingAnalysis && (
-                                                <div className="relative bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 backdrop-blur-xl rounded-3xl p-12 border-2 border-purple-500/50 shadow-2xl overflow-hidden" style={{boxShadow: '0 0 60px rgba(168, 85, 247, 0.5), inset 0 0 80px rgba(168, 85, 247, 0.1)'}}>
+                                                <div className="relative bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-2xl rounded-2xl p-8 md:p-12 border-2 border-cyan-500/40 shadow-2xl overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
                                                     {/* Animated Background */}
                                                     <div className="absolute inset-0 opacity-20">
-                                                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/30 via-blue-500/30 to-purple-500/30 animate-pulse"></div>
+                                                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-cyan-500/30 animate-pulse"></div>
                                                     </div>
 
                                                     <div className="relative text-center space-y-8">
                                                         {/* Premium Loading Spinner */}
                                                         <div className="relative inline-flex items-center justify-center">
                                                             {/* Outer Glow */}
-                                                            <div className="absolute w-40 h-40 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+                                                            <div className="absolute w-40 h-40 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full blur-3xl opacity-60 animate-pulse"></div>
 
                                                             {/* Spinning Border */}
                                                             <div className="relative w-32 h-32">
-                                                                <div className="absolute inset-0 rounded-full border-4 border-purple-500/20"></div>
-                                                                <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-purple-400 border-r-pink-400 animate-spin" style={{animationDuration: '1s'}}></div>
+                                                                <div className="absolute inset-0 rounded-full border-4 border-cyan-500/20"></div>
+                                                                <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-cyan-400 border-r-blue-400 animate-spin" style={{animationDuration: '1s'}}></div>
                                                                 <div className="absolute inset-2 rounded-full border-4 border-transparent border-t-blue-400 border-l-cyan-400 animate-spin" style={{animationDuration: '1.5s', animationDirection: 'reverse'}}></div>
 
                                                                 {/* Center Icon */}
@@ -9658,10 +9659,10 @@ const TradingSimulator = () => {
 
                                                         {/* Processing Title */}
                                                         <div className="space-y-2">
-                                                            <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-pink-200 animate-pulse">
+                                                            <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300 animate-pulse">
                                                                 🚀 ULTRATHINK AI Processing...
                                                             </h3>
-                                                            <p className="text-lg text-purple-300 font-semibold">
+                                                            <p className="text-lg text-cyan-300 font-semibold">
                                                                 Running institutional-grade analysis
                                                             </p>
                                                         </div>
@@ -9682,28 +9683,28 @@ const TradingSimulator = () => {
                                                             ].map((step, idx) => (
                                                                 <div
                                                                     key={idx}
-                                                                    className="bg-black/30 backdrop-blur-xl border border-purple-500/30 rounded-xl p-4 text-left animate-pulse hover:border-purple-400 transition-all"
+                                                                    className="bg-black/30 backdrop-blur-xl border border-cyan-500/30 rounded-xl p-4 text-left animate-pulse hover:border-cyan-400 transition-all"
                                                                     style={{animationDelay: step.delay, animationDuration: '2s'}}
                                                                 >
                                                                     <div className="flex items-center gap-3">
                                                                         <span className="text-2xl">{step.icon}</span>
-                                                                        <span className="text-purple-200 font-semibold flex-1">{step.text}</span>
-                                                                        <div className="w-5 h-5 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin"></div>
+                                                                        <span className="text-cyan-200 font-semibold flex-1">{step.text}</span>
+                                                                        <div className="w-5 h-5 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin"></div>
                                                                     </div>
                                                                 </div>
                                                             ))}
                                                         </div>
 
                                                         {/* Status Bar */}
-                                                        <div className="bg-black/40 backdrop-blur-xl rounded-xl p-6 border-2 border-purple-500/30">
-                                                            <div className="text-sm text-purple-300 mb-3 font-semibold">Analysis Progress</div>
-                                                            <div className="w-full bg-purple-950/50 rounded-full h-3 overflow-hidden border border-purple-600/30">
-                                                                <div className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-full animate-pulse" style={{width: '100%'}}></div>
+                                                        <div className="bg-black/40 backdrop-blur-xl rounded-xl p-6 border-2 border-cyan-500/30">
+                                                            <div className="text-sm text-cyan-300 mb-3 font-semibold">Analysis Progress</div>
+                                                            <div className="w-full bg-cyan-950/50 rounded-full h-3 overflow-hidden border border-cyan-600/30">
+                                                                <div className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 rounded-full animate-pulse" style={{width: '100%'}}></div>
                                                             </div>
-                                                            <div className="text-xs text-purple-400 mt-3 flex items-center justify-center gap-2">
+                                                            <div className="text-xs text-cyan-400 mt-3 flex items-center justify-center gap-2">
                                                                 <span className="inline-flex h-2 w-2">
-                                                                    <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-purple-400 opacity-75"></span>
-                                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+                                                                    <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-cyan-400 opacity-75"></span>
+                                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
                                                                 </span>
                                                                 <span className="font-semibold">Processing typically takes 2-5 seconds...</span>
                                                             </div>
@@ -9725,12 +9726,12 @@ const TradingSimulator = () => {
                                                     </div>
 
                                                     {/* Timestamp */}
-                                                    <div className="text-center text-sm text-purple-300">
+                                                    <div className="text-center text-sm text-cyan-300">
                                                         Analysis generated: {aiAnalysis.timestamp}
                                                     </div>
 
                                                     {/* SIGNAL STRENGTH METER */}
-                                                    <div className="bg-gradient-to-br from-purple-900/60 to-indigo-900/60 backdrop-blur-xl rounded-2xl p-8 border-2 border-purple-500/50 shadow-2xl">
+                                                    <div className="bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-xl rounded-2xl p-8 border-2 border-cyan-500/40 shadow-2xl" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
                                                         <h3 className="text-2xl font-black text-white mb-4 text-center">📡 Signal Strength</h3>
                                                         <div className="relative">
                                                             <div className="w-full bg-gray-800 rounded-full h-8 overflow-hidden border-2 border-gray-700">
