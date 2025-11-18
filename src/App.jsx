@@ -7725,20 +7725,20 @@ const TradingSimulator = () => {
                         {mainTab === 'trading' && (
                             <>
                         {/* Chart Pattern Quick Tip */}
-                        <div className="bg-gradient-to-br from-blue-900/60 via-indigo-900/60 to-purple-900/60 rounded-2xl p-6 border-2 border-blue-500/50 shadow-2xl mb-6">
-                            <div className="flex items-start gap-4">
-                                <div className="text-5xl flex-shrink-0">📊</div>
+                        <div className="bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-xl rounded-2xl p-4 border-2 border-cyan-500/40 shadow-xl mb-4" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.15)'}}>
+                            <div className="flex items-start gap-3">
+                                <div className="text-4xl flex-shrink-0">📊</div>
                                 <div className="flex-1">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <h3 className="text-2xl font-black text-blue-300">Master Chart Patterns</h3>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h3 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">Master Chart Patterns</h3>
                                         <button
                                             onClick={() => setMainTab('learning')}
-                                            className="text-xs bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-3 py-1 rounded-full font-bold transition-all"
+                                            className="text-xs bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 px-3 py-1.5 rounded-full font-bold transition-all"
                                         >
                                             Learn More →
                                         </button>
                                     </div>
-                                    <p className="text-blue-100 mb-4">
+                                    <p className="text-cyan-100/80 mb-3 text-sm">
                                         Identify patterns to predict price movements! Learn 6 key patterns with interactive charts showing exact entry, target, and stop-loss points.
                                     </p>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -7764,10 +7764,10 @@ const TradingSimulator = () => {
 
                         {/* Leaderboard for Family Competitions */}
                         {(plan === 'family-public' || plan === 'family-private') && competition?.members && competition.members.length > 1 && (
-                            <div className="bg-gradient-to-br from-purple-800/40 to-indigo-900/40 rounded-2xl p-6 border-2 border-purple-500 mb-6 shadow-xl">
-                                <h2 className="text-2xl font-black text-white mb-6 flex items-center gap-2">
+                            <div className="bg-gradient-to-br from-cyan-900/40 to-blue-950/40 backdrop-blur-xl rounded-2xl p-4 border-2 border-cyan-500/40 mb-4 shadow-xl" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.15)'}}>
+                                <h2 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300 mb-4 flex items-center gap-2">
                                     🏆 Leaderboard
-                                    <span className="text-sm font-normal text-purple-300 ml-2">
+                                    <span className="text-sm font-normal text-cyan-300 ml-2">
                                         ({competition.members.length} players)
                                     </span>
                                 </h2>
@@ -7839,22 +7839,22 @@ const TradingSimulator = () => {
                         {/* Main Content */}
                         <div className="w-full">
                             {/* Market Status Banner */}
-                            <div className={`mb-6 rounded-2xl p-6 border-2 shadow-2xl transition-all duration-300 ${
+                            <div className={`mb-4 rounded-2xl p-4 border-2 shadow-xl transition-all duration-300 backdrop-blur-xl ${
                                 marketOpen
-                                    ? 'bg-gradient-to-r from-green-900/60 to-emerald-900/60 border-green-500 animate-pulse-slow'
-                                    : 'bg-gradient-to-r from-red-900/60 to-rose-900/60 border-red-500'
-                            }`}>
-                                <div className="flex items-center justify-between flex-wrap gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl ${
+                                    ? 'bg-gradient-to-r from-green-900/50 to-emerald-900/50 border-green-500/50'
+                                    : 'bg-gradient-to-r from-red-900/50 to-rose-900/50 border-red-500/50'
+                            }`} style={{boxShadow: marketOpen ? '0 0 30px rgba(34, 197, 94, 0.2)' : '0 0 30px rgba(239, 68, 68, 0.2)'}}>
+                                <div className="flex items-center justify-between flex-wrap gap-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
                                             marketOpen
-                                                ? 'bg-green-500/30 border-2 border-green-400 animate-pulse'
+                                                ? 'bg-green-500/30 border-2 border-green-400'
                                                 : 'bg-red-500/30 border-2 border-red-400'
                                         }`}>
                                             {marketOpen ? '🟢' : '🔴'}
                                         </div>
                                         <div>
-                                            <h3 className={`text-2xl font-black ${marketOpen ? 'text-green-300' : 'text-red-300'}`}>
+                                            <h3 className={`text-xl font-black ${marketOpen ? 'text-green-300' : 'text-red-300'}`}>
                                                 {marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED'}
                                             </h3>
                                             <p className={`text-sm font-semibold ${marketOpen ? 'text-green-200' : 'text-red-200'}`}>
