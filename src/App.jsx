@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-        const TradingSimulator = () => {
+// Backend API Configuration
+// Automatically detects environment:
+// - localhost: http://localhost:3001 (local development)
+// - production: https://trader-umh8.onrender.com (deployed backend)
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3001'
+    : 'https://trader-umh8.onrender.com';
+
+const TradingSimulator = () => {
             const [view, setView] = useState('plan-select');
             const [plan, setPlan] = useState(null);
             const [showAccountTypeModal, setShowAccountTypeModal] = useState(false);
