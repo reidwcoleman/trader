@@ -59,73 +59,29 @@ const TradingSimulator = () => {
             ]);
 
             // Curated universe for "Top Stocks to Buy" recommendations
-            // 150+ quality stocks across 15+ major sectors for ultra-enhanced analysis
+            // Limited to top 20 stocks to avoid API rate limits
             const curatedUniverse = [
-                // Technology & AI (22 stocks)
+                // Top Tech & AI Leaders
                 'NVDA', 'MSFT', 'GOOGL', 'AAPL', 'META', 'AMZN',
-                'AMD', 'TSM', 'AVGO', 'INTC', 'QCOM', 'MU',
-                'ARM', 'SMCI', 'KLAC', 'LRCX', 'ASML', 'AMAT', 'MRVL', 'ON', 'TXN', 'NXPI',
+                'AMD', 'TSM', 'PLTR',
 
-                // Cloud & Software (8 stocks)
-                'PLTR', 'NOW', 'CRM', 'SNOW', 'DDOG', 'NET',
-                'WDAY', 'ZS',
+                // Financial Leaders
+                'JPM', 'V', 'MA',
 
-                // Financial Services (8 stocks)
-                'JPM', 'BAC', 'GS', 'MS', 'C', 'V', 'MA', 'BRK.B',
+                // Healthcare Leaders
+                'UNH', 'LLY',
 
-                // Healthcare & Biotech (14 stocks)
-                'UNH', 'JNJ', 'PFE', 'ABBV', 'LLY', 'TMO',
-                'MRNA', 'BNTX', 'REGN', 'VRTX', 'BIIB', 'GILD', 'AMGN', 'ISRG',
+                // Consumer & Retail
+                'TSLA', 'COST',
 
-                // Energy & Utilities (5 stocks)
-                'XOM', 'CVX', 'COP', 'SLB', 'OXY',
+                // Fintech & Crypto
+                'COIN',
 
-                // Consumer & Retail (12 stocks)
-                'TSLA', 'NKE', 'DIS', 'SBUX', 'MCD', 'HD', 'WMT',
-                'COST', 'TGT', 'LOW', 'CHWY', 'BBY',
+                // Cybersecurity
+                'CRWD',
 
-                // Fintech & Crypto (9 stocks)
-                'COIN', 'SQ', 'PYPL', 'HOOD',
-                'MARA', 'RIOT', 'CLSK', 'MSTR', 'HUT',
-
-                // E-commerce & Growth (5 stocks)
-                'SHOP', 'BABA', 'MELI', 'SE', 'ABNB',
-
-                // Cybersecurity & Defense (3 stocks)
-                'CRWD', 'PANW', 'LMT',
-
-                // Industrial & Transportation (7 stocks)
-                'CAT', 'UPS', 'DE', 'HON', 'GE', 'BA', 'FDX',
-
-                // EV & Clean Energy (8 stocks)
-                'RIVN', 'LCID', 'ENPH', 'SEDG', 'RUN', 'PLUG', 'BE', 'FCEL',
-
-                // Space & Aerospace (5 stocks)
-                'RKLB', 'SPCE', 'RTX', 'NOC', 'GD',
-
-                // Dividend Aristocrats (8 stocks)
-                'PG', 'KO', 'PEP', 'T', 'VZ', 'MMM', 'ABT', 'CVS',
-
-                // ETFs (8 stocks)
-                'SPY', 'QQQ', 'DIA', 'IWM', 'XLF', 'XLE', 'XLK', 'VTI',
-
-                // Small/Mid-Cap Growth (10 stocks)
-                'UPST', 'DKNG', 'PATH', 'U', 'RBLX', 'AFRM', 'SOFI', 'OPEN', 'ZI', 'BILL',
-
-                // Emerging Markets (8 stocks)
-                'NIO', 'XPEV', 'LI', 'PDD', 'JD', 'BIDU', 'GRAB', 'TME',
-
-                // Commodities & Materials (6 stocks)
-                'FCX', 'NEM', 'GOLD', 'BHP', 'VALE', 'ALB',
-
-                // Real Estate & REITs (5 stocks)
-                'AMT', 'PLD', 'EQIX', 'PSA', 'O',
-
-                // Media & Entertainment (5 stocks)
-                'NFLX', 'ROKU', 'PARA', 'WBD', 'SPOT',
-
-                // Trending/Meme Stocks (10 stocks)
-                'GME', 'AMC', 'BBBY', 'BB', 'WISH', 'CLOV', 'WKHS', 'RIDE', 'ATER', 'SNDL'
+                // ETFs
+                'SPY', 'QQQ'
             ];
 
             const [stocks, setStocks] = useState([]);
