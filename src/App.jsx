@@ -2908,6 +2908,18 @@ const TradingSimulator = () => {
                 setLoadingAnalysis(false);
             };
 
+            // Auto-generate AI analysis when stock is selected in AI Analysis tab
+            useEffect(() => {
+                if (selectedStock && mainTab === 'ai-analysis' && !aiAnalysis && !loadingAnalysis) {
+                    // Auto-generate analysis when entering AI Analysis tab with a selected stock
+                    const autoGenerate = setTimeout(() => {
+                        generateAIAnalysis();
+                    }, 500); // Small delay to prevent rapid re-renders
+
+                    return () => clearTimeout(autoGenerate);
+                }
+            }, [selectedStock, mainTab]);
+
             // Market Hours Detection Functions
             const getEasterDate = (year) => {
                 // Simplified Easter calculation (Meeus/Jones/Butcher algorithm)
@@ -9621,10 +9633,15 @@ const TradingSimulator = () => {
                                                             <span className="inline-block animate-spin text-2xl">⚡</span>
                                                             <span>Analyzing with UltraThink...</span>
                                                         </>
+                                                    ) : aiAnalysis ? (
+                                                        <>
+                                                            <span className="text-2xl">🔄</span>
+                                                            <span>Refresh Analysis</span>
+                                                        </>
                                                     ) : (
                                                         <>
                                                             <span className="text-2xl animate-pulse">🔮</span>
-                                                            <span>Generate AI Analysis</span>
+                                                            <span>Generate AI Analysis (Auto-generating...)</span>
                                                         </>
                                                     )}
                                                 </button>
