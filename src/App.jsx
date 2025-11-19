@@ -10116,69 +10116,44 @@ const TradingSimulator = () => {
                                                             )}
                                                         </div>
 
-                                                    {/* CATALYST-BASED TRIGGERS */}
-                                                    {aiAnalysis.catalysts && aiAnalysis.catalysts.length > 0 && (
-                                                        <div className="bg-gradient-to-br from-pink-900/60 to-fuchsia-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-pink-500/50 shadow-2xl">
-                                                            <h3 className="text-2xl font-black text-pink-300 mb-4 flex items-center gap-2">
-                                                                ⚡ Event Catalysts & Triggers
-                                                            </h3>
-                                                            <div className="space-y-4">
-                                                                {aiAnalysis.catalysts.map((catalyst, idx) => (
-                                                                    <div
-                                                                        key={idx}
-                                                                        className={`rounded-xl p-5 border-2 ${
-                                                                            catalyst.impact === 'high' ? 'bg-red-950/50 border-red-500/50 animate-pulse-glow-red' :
-                                                                            catalyst.impact === 'medium' ? 'bg-yellow-950/50 border-yellow-500/50' :
-                                                                            'bg-blue-950/50 border-blue-500/50'
-                                                                        }`}
-                                                                    >
-                                                                        <div className="flex items-start justify-between mb-3">
-                                                                            <div className="flex-1">
+                                                        {/* Event Catalysts */}
+                                                        {aiAnalysis.catalysts && aiAnalysis.catalysts.length > 0 && (
+                                                            <div className="bg-cyan-900/30 backdrop-blur-xl rounded-xl border-2 border-cyan-500/40 overflow-hidden">
+                                                                <button
+                                                                    onClick={() => setExpandedSections(prev => ({...prev, catalysts: !prev.catalysts}))}
+                                                                    className="w-full px-5 py-4 flex items-center justify-between hover:bg-cyan-500/10 transition-all"
+                                                                >
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-2xl">⚡</span>
+                                                                        <span className="text-white font-bold text-lg">Event Catalysts ({aiAnalysis.catalysts.length})</span>
+                                                                    </div>
+                                                                    <span className={`text-cyan-300 text-xl transition-transform ${expandedSections.catalysts ? 'rotate-180' : ''}`}>▼</span>
+                                                                </button>
+                                                                {expandedSections.catalysts && (
+                                                                    <div className="px-5 pb-5 space-y-2">
+                                                                        {aiAnalysis.catalysts.map((catalyst, idx) => (
+                                                                            <div key={idx} className={`rounded-lg p-4 border ${
+                                                                                catalyst.impact === 'high' ? 'bg-red-950/50 border-red-500/50' :
+                                                                                catalyst.impact === 'medium' ? 'bg-yellow-950/50 border-yellow-500/50' :
+                                                                                'bg-blue-950/50 border-blue-500/50'
+                                                                            }`}>
                                                                                 <div className="flex items-center gap-2 mb-2">
-                                                                                    <span className={`font-black text-lg ${
+                                                                                    <span className={`font-bold text-sm ${
                                                                                         catalyst.impact === 'high' ? 'text-red-300' :
                                                                                         catalyst.impact === 'medium' ? 'text-yellow-300' :
                                                                                         'text-blue-300'
                                                                                     }`}>
                                                                                         {catalyst.title}
                                                                                     </span>
-                                                                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                                                                                        catalyst.impact === 'high' ? 'bg-red-500/30 text-red-200' :
-                                                                                        catalyst.impact === 'medium' ? 'bg-yellow-500/30 text-yellow-200' :
-                                                                                        'bg-blue-500/30 text-blue-200'
-                                                                                    }`}>
-                                                                                        {catalyst.impact.toUpperCase()} IMPACT
-                                                                                    </span>
+                                                                                    <span className="text-xs text-gray-400">• {catalyst.date}</span>
                                                                                 </div>
-                                                                                <div className="text-sm text-gray-300 mb-2">
-                                                                                    {catalyst.daysAway > 0 ? (
-                                                                                        <span>📅 {catalyst.daysAway} days away • {catalyst.date}</span>
-                                                                                    ) : (
-                                                                                        <span>🔴 {catalyst.date}</span>
-                                                                                    )}
-                                                                                </div>
+                                                                                <p className="text-sm text-white/70">{catalyst.recommendation}</p>
                                                                             </div>
-                                                                        </div>
-                                                                        <div className={`text-sm leading-relaxed ${
-                                                                            catalyst.impact === 'high' ? 'text-red-100' :
-                                                                            catalyst.impact === 'medium' ? 'text-yellow-100' :
-                                                                            'text-blue-100'
-                                                                        }`}>
-                                                                            {catalyst.recommendation}
-                                                                        </div>
+                                                                        ))}
                                                                     </div>
-                                                                ))}
+                                                                )}
                                                             </div>
-                                                            <div className="mt-4 bg-pink-950/30 border-2 border-pink-500/50 rounded-xl p-4">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-2xl">💡</span>
-                                                                    <span className="text-pink-200 font-bold">
-                                                                        {aiAnalysis.catalysts.length} active {aiAnalysis.catalysts.length === 1 ? 'catalyst' : 'catalysts'} detected. Adjust your strategy accordingly.
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
+                                                        )}
 
                                                     {/* ADVANCED TECHNICAL INDICATORS - Ichimoku, Fibonacci, Volume Profile, ADX */}
                                                     {(aiAnalysis.advancedIndicators?.ichimoku || aiAnalysis.advancedIndicators?.fibonacci ||
