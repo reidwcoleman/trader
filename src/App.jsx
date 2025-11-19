@@ -10044,129 +10044,77 @@ const TradingSimulator = () => {
                                                         </div>
                                                     </div>
 
-                                                    {/* POSITION SIZING */}
-                                                    <div className="bg-gradient-to-br from-emerald-900/60 to-green-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-emerald-500/50 shadow-2xl">
-                                                        <h3 className="text-2xl font-black text-emerald-300 mb-4 flex items-center gap-2">
-                                                            💰 Position Sizing
-                                                        </h3>
-                                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
-                                                                <div className="text-sm text-emerald-300 mb-1">Suggested Shares</div>
-                                                                <div className="text-white font-black text-2xl">{aiAnalysis.positionSizing.suggestedShares}</div>
-                                                            </div>
-                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
-                                                                <div className="text-sm text-emerald-300 mb-1">Position Value</div>
-                                                                <div className="text-white font-black text-2xl">${aiAnalysis.positionSizing.positionValue}</div>
-                                                            </div>
-                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
-                                                                <div className="text-sm text-emerald-300 mb-1">Portfolio %</div>
-                                                                <div className="text-white font-black text-2xl">{aiAnalysis.positionSizing.positionPercent}%</div>
-                                                            </div>
-                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
-                                                                <div className="text-sm text-emerald-300 mb-1">Risk Amount</div>
-                                                                <div className="text-white font-black text-xl">${aiAnalysis.positionSizing.dollarRisk}</div>
-                                                            </div>
-                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
-                                                                <div className="text-sm text-emerald-300 mb-1">Risk %</div>
-                                                                <div className="text-white font-black text-xl">{aiAnalysis.positionSizing.riskPercent}%</div>
-                                                            </div>
-                                                            <div className="bg-black/30 rounded-xl p-4 border border-emerald-500/30">
-                                                                <div className="text-sm text-emerald-300 mb-1">Stop Loss %</div>
-                                                                <div className="text-red-300 font-black text-xl">-{aiAnalysis.positionSizing.stopLossPercent}%</div>
-                                                            </div>
+                                                    {/* COLLAPSIBLE SECTIONS */}
+                                                    <div className="space-y-3">
+                                                        {/* Exit Strategy */}
+                                                        <div className="bg-cyan-900/30 backdrop-blur-xl rounded-xl border-2 border-cyan-500/40 overflow-hidden">
+                                                            <button
+                                                                onClick={() => setExpandedSections(prev => ({...prev, exit: !prev.exit}))}
+                                                                className="w-full px-5 py-4 flex items-center justify-between hover:bg-cyan-500/10 transition-all"
+                                                            >
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className="text-2xl">🎯</span>
+                                                                    <span className="text-white font-bold text-lg">Exit Strategy (4 Scenarios)</span>
+                                                                </div>
+                                                                <span className={`text-cyan-300 text-xl transition-transform ${expandedSections.exit ? 'rotate-180' : ''}`}>▼</span>
+                                                            </button>
+                                                            {expandedSections.exit && (
+                                                                <div className="px-5 pb-5 space-y-3">
+                                                                    <div className="bg-green-950/50 rounded-lg p-4 border border-green-500/40">
+                                                                        <div className="flex items-center justify-between mb-2">
+                                                                            <span className="text-green-300 font-bold">📈 BULL</span>
+                                                                            <span className="text-green-300 font-bold">${aiAnalysis.exitPlan.bull.target} (+{aiAnalysis.exitPlan.bull.gain}%)</span>
+                                                                        </div>
+                                                                        <p className="text-green-100/80 text-sm">{aiAnalysis.exitPlan.bull.action}</p>
+                                                                    </div>
+                                                                    <div className="bg-blue-950/50 rounded-lg p-4 border border-blue-500/40">
+                                                                        <div className="flex items-center justify-between mb-2">
+                                                                            <span className="text-blue-300 font-bold">📊 BASE</span>
+                                                                            <span className="text-blue-300 font-bold">${aiAnalysis.exitPlan.base.target} (+{aiAnalysis.exitPlan.base.gain}%)</span>
+                                                                        </div>
+                                                                        <p className="text-blue-100/80 text-sm">{aiAnalysis.exitPlan.base.action}</p>
+                                                                    </div>
+                                                                    <div className="bg-yellow-950/50 rounded-lg p-4 border border-yellow-500/40">
+                                                                        <div className="flex items-center justify-between mb-2">
+                                                                            <span className="text-yellow-300 font-bold">📉 BEAR</span>
+                                                                            <span className="text-yellow-300 font-bold">${aiAnalysis.exitPlan.bear.target} ({aiAnalysis.exitPlan.bear.loss}%)</span>
+                                                                        </div>
+                                                                        <p className="text-yellow-100/80 text-sm">{aiAnalysis.exitPlan.bear.action}</p>
+                                                                    </div>
+                                                                    <div className="bg-red-950/50 rounded-lg p-4 border border-red-500/40">
+                                                                        <div className="flex items-center justify-between mb-2">
+                                                                            <span className="text-red-300 font-bold">🚨 EMERGENCY</span>
+                                                                            <span className="text-red-300 font-bold">${aiAnalysis.exitPlan.emergency.target} ({aiAnalysis.exitPlan.emergency.loss}%)</span>
+                                                                        </div>
+                                                                        <p className="text-red-100/80 text-sm font-bold">{aiAnalysis.exitPlan.emergency.action}</p>
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                    </div>
 
-                                                    {/* EXIT PLAN - Multi-Scenario */}
-                                                    <div className="bg-gradient-to-br from-orange-900/60 to-red-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-orange-500/50 shadow-2xl">
-                                                        <h3 className="text-2xl font-black text-orange-300 mb-4 flex items-center gap-2">
-                                                            🎯 Exit Strategy (4 Scenarios)
-                                                        </h3>
-                                                        <div className="space-y-4">
-                                                            {/* Bull Case */}
-                                                            <div className="bg-green-950/50 rounded-xl p-5 border-2 border-green-500/50">
-                                                                <div className="flex items-center justify-between mb-3">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-2xl">📈</span>
-                                                                        <span className="text-green-300 font-black text-lg">BULL CASE</span>
-                                                                    </div>
-                                                                    <div className="text-right">
-                                                                        <div className="text-green-300 font-black text-xl">${aiAnalysis.exitPlan.bull.target}</div>
-                                                                        <div className="text-green-400 text-sm">+{aiAnalysis.exitPlan.bull.gain}%</div>
-                                                                    </div>
+                                                        {/* Pre-Trade Checklist */}
+                                                        <div className="bg-cyan-900/30 backdrop-blur-xl rounded-xl border-2 border-cyan-500/40 overflow-hidden">
+                                                            <button
+                                                                onClick={() => setExpandedSections(prev => ({...prev, checklist: !prev.checklist}))}
+                                                                className="w-full px-5 py-4 flex items-center justify-between hover:bg-cyan-500/10 transition-all"
+                                                            >
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className="text-2xl">✅</span>
+                                                                    <span className="text-white font-bold text-lg">Pre-Trade Checklist ({aiAnalysis.checklist.length} items)</span>
                                                                 </div>
-                                                                <p className="text-green-100 text-sm">{aiAnalysis.exitPlan.bull.action}</p>
-                                                            </div>
-
-                                                            {/* Base Case */}
-                                                            <div className="bg-blue-950/50 rounded-xl p-5 border-2 border-blue-500/50">
-                                                                <div className="flex items-center justify-between mb-3">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-2xl">📊</span>
-                                                                        <span className="text-blue-300 font-black text-lg">BASE CASE</span>
-                                                                    </div>
-                                                                    <div className="text-right">
-                                                                        <div className="text-blue-300 font-black text-xl">${aiAnalysis.exitPlan.base.target}</div>
-                                                                        <div className="text-blue-400 text-sm">+{aiAnalysis.exitPlan.base.gain}%</div>
-                                                                    </div>
+                                                                <span className={`text-cyan-300 text-xl transition-transform ${expandedSections.checklist ? 'rotate-180' : ''}`}>▼</span>
+                                                            </button>
+                                                            {expandedSections.checklist && (
+                                                                <div className="px-5 pb-5 space-y-2">
+                                                                    {aiAnalysis.checklist.map((item, idx) => (
+                                                                        <div key={idx} className="flex items-start gap-2 bg-black/20 rounded-lg p-3">
+                                                                            <span className="text-cyan-400 mt-0.5">□</span>
+                                                                            <span className="text-white/80 text-sm flex-1">{item.task}</span>
+                                                                        </div>
+                                                                    ))}
                                                                 </div>
-                                                                <p className="text-blue-100 text-sm">{aiAnalysis.exitPlan.base.action}</p>
-                                                            </div>
-
-                                                            {/* Bear Case */}
-                                                            <div className="bg-yellow-950/50 rounded-xl p-5 border-2 border-yellow-500/50">
-                                                                <div className="flex items-center justify-between mb-3">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-2xl">📉</span>
-                                                                        <span className="text-yellow-300 font-black text-lg">BEAR CASE</span>
-                                                                    </div>
-                                                                    <div className="text-right">
-                                                                        <div className="text-yellow-300 font-black text-xl">${aiAnalysis.exitPlan.bear.target}</div>
-                                                                        <div className="text-red-400 text-sm">{aiAnalysis.exitPlan.bear.loss}%</div>
-                                                                    </div>
-                                                                </div>
-                                                                <p className="text-yellow-100 text-sm">{aiAnalysis.exitPlan.bear.action}</p>
-                                                            </div>
-
-                                                            {/* Emergency Stop */}
-                                                            <div className="bg-red-950/50 rounded-xl p-5 border-2 border-red-500/50 animate-pulse-glow-red">
-                                                                <div className="flex items-center justify-between mb-3">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-2xl">🚨</span>
-                                                                        <span className="text-red-300 font-black text-lg">EMERGENCY STOP</span>
-                                                                    </div>
-                                                                    <div className="text-right">
-                                                                        <div className="text-red-300 font-black text-xl">${aiAnalysis.exitPlan.emergency.target}</div>
-                                                                        <div className="text-red-400 text-sm">{aiAnalysis.exitPlan.emergency.loss}%</div>
-                                                                    </div>
-                                                                </div>
-                                                                <p className="text-red-100 text-sm font-bold">{aiAnalysis.exitPlan.emergency.action}</p>
-                                                            </div>
+                                                            )}
                                                         </div>
-                                                    </div>
-
-                                                    {/* EXECUTION CHECKLIST */}
-                                                    <div className="bg-gradient-to-br from-indigo-900/60 to-purple-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-indigo-500/50 shadow-2xl">
-                                                        <h3 className="text-2xl font-black text-indigo-300 mb-4 flex items-center gap-2">
-                                                            ✅ Pre-Trade Checklist
-                                                        </h3>
-                                                        <div className="space-y-3">
-                                                            {aiAnalysis.checklist.map((item, idx) => (
-                                                                <div key={idx} className="flex items-start gap-3 bg-black/30 rounded-lg p-4 border border-indigo-500/30 hover:bg-indigo-900/20 transition-all">
-                                                                    <div className="flex-shrink-0 w-6 h-6 rounded border-2 border-indigo-400 flex items-center justify-center mt-0.5">
-                                                                        <span className="text-indigo-400 text-sm">□</span>
-                                                                    </div>
-                                                                    <span className="text-indigo-100 flex-1">{item.task}</span>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                        <div className="mt-4 bg-yellow-900/30 border-2 border-yellow-500/50 rounded-xl p-4">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-2xl">⚠️</span>
-                                                                <span className="text-yellow-200 font-bold">Review all items before executing your trade!</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
 
                                                     {/* CATALYST-BASED TRIGGERS */}
                                                     {aiAnalysis.catalysts && aiAnalysis.catalysts.length > 0 && (
