@@ -19,8 +19,11 @@ const io = new Server(server, {
         origin: [
             'http://localhost:3000',
             'http://localhost:3001',
+            'http://localhost:5173',
             'https://reidwcoleman.github.io',
-            'https://trader-snowy.vercel.app'
+            'https://trader-snowy.vercel.app',
+            'https://finclash.us',
+            'https://www.finclash.us'
         ],
         methods: ["GET", "POST"],
         credentials: true
@@ -117,8 +120,11 @@ app.use(cors({
         const allowedOrigins = [
             'http://localhost:3000',
             'http://localhost:3001',
+            'http://localhost:5173',
             'https://reidwcoleman.github.io',
-            'https://trader-snowy.vercel.app'
+            'https://trader-snowy.vercel.app',
+            'https://finclash.us',
+            'https://www.finclash.us'
         ];
 
         if (allowedOrigins.indexOf(origin) !== -1) {
