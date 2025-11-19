@@ -1476,7 +1476,7 @@ async function calculateMarketRating(apiKey) {
         const toDate = Math.floor(today.getTime() / 1000);
         const fromDate = toDate - (30 * 24 * 60 * 60); // 30 days
 
-        // Fetch data for all indices
+        // Fetch data for all indices with delay to avoid rate limiting
         for (const symbol of Object.keys(indices)) {
             try {
                 const response = await fetch(
@@ -1496,9 +1496,14 @@ async function calculateMarketRating(apiKey) {
                         weekChange: ((currentPrice - weekAgo) / weekAgo) * 100,
                         closes: closes
                     };
+                } else if (response.status === 403 || response.status === 429) {
+                    console.warn(`⚠️ API rate limit reached for ${symbol} - Using cached/fallback data`);
                 }
+
+                // Small delay to avoid rate limiting (1 second between calls)
+                await new Promise(resolve => setTimeout(resolve, 1000));
             } catch (err) {
-                console.warn(`Error fetching ${symbol}:`, err);
+                console.warn(`⚠️ Error fetching ${symbol} (using fallback):`, err.message);
             }
         }
 
