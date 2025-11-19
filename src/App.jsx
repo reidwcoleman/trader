@@ -3026,6 +3026,14 @@ const TradingSimulator = () => {
                 }
             }, [selectedStock, mainTab]);
 
+            // Auto-fetch prediction when stock is selected in Trading tab
+            useEffect(() => {
+                if (selectedStock && mainTab === 'trading' && !stockPredictions[selectedStock]) {
+                    console.log(`🎯 Trading tab: Auto-fetching prediction for ${selectedStock}`);
+                    fetchStockPrediction(selectedStock);
+                }
+            }, [selectedStock, mainTab]);
+
             // Market Hours Detection Functions
             const getEasterDate = (year) => {
                 // Simplified Easter calculation (Meeus/Jones/Butcher algorithm)
@@ -9156,11 +9164,7 @@ const TradingSimulator = () => {
                                         {(() => {
                                             const prediction = stockPredictions[selectedStock];
 
-                                            // Auto-fetch prediction if not loaded
-                                            if (!prediction) {
-                                                fetchStockPrediction(selectedStock);
-                                            }
-
+                                            // Show loading state if no prediction yet
                                             if (!prediction) {
                                                 return (
                                                     <div className="mb-6 rounded-xl p-4 border-2 bg-purple-900/20 border-purple-500/40 animate-pulse">
