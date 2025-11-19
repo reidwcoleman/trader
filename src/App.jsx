@@ -10402,10 +10402,9 @@ const TradingSimulator = () => {
                                                                 )}
                                                             </div>
 
-                                                                        </div>
                                                                         {/* Key Signals */}
                                                                         <div className="space-y-2">
-                                                                            {aiAnalysis.fundamentalAnalysis.signals.map((signal, idx) => (
+                                                                            {aiAnalysis.fundamentalAnalysis && aiAnalysis.fundamentalAnalysis.signals && aiAnalysis.fundamentalAnalysis.signals.map((signal, idx) => (
                                                                                 <div key={idx} className="bg-black/20 rounded-lg p-2 text-sm text-emerald-100 flex items-center gap-2">
                                                                                     <span className="text-emerald-400">•</span>
                                                                                     <span>{signal}</span>
