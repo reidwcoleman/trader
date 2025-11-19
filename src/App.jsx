@@ -2947,7 +2947,23 @@ const TradingSimulator = () => {
             const fetchStockPrediction = async (symbol) => {
                 try {
                     const stock = stocks.find(s => s.symbol === symbol);
-                    if (!stock) return null;
+                    if (!stock) {
+                        console.log('Stock not found:', symbol);
+                        return null;
+                    }
+
+                    // Check if enhancedAI is loaded
+                    if (!window.enhancedAI || !window.enhancedAI.predictNextWeekPrice) {
+                        console.warn('⚠️ Enhanced AI not loaded yet. Waiting...');
+                        // Wait for script to load
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                        // Try again after waiting
+                        if (!window.enhancedAI || !window.enhancedAI.predictNextWeekPrice) {
+                            console.error('❌ Enhanced AI failed to load');
+                            return null;
+                        }
+                    }
 
                     // Fetch historical data
                     const toDate = Math.floor(Date.now() / 1000);
@@ -2958,7 +2974,7 @@ const TradingSimulator = () => {
                     );
                     const data = await response.json();
 
-                    if (data.s === 'ok' && window.enhancedAI && window.enhancedAI.predictNextWeekPrice) {
+                    if (data.s === 'ok') {
                         const historicalData = {
                             closes: data.c || [],
                             highs: data.h || [],
@@ -2966,18 +2982,24 @@ const TradingSimulator = () => {
                             volumes: data.v || []
                         };
 
+                        console.log(`🔮 Generating prediction for ${symbol}...`);
                         const prediction = window.enhancedAI.predictNextWeekPrice(stock, historicalData);
 
                         if (prediction) {
+                            console.log(`✅ Prediction generated for ${symbol}:`, prediction);
                             setStockPredictions(prev => ({
                                 ...prev,
                                 [symbol]: prediction
                             }));
                             return prediction;
+                        } else {
+                            console.warn(`⚠️ No prediction returned for ${symbol}`);
                         }
+                    } else {
+                        console.warn(`⚠️ Failed to fetch historical data for ${symbol}:`, data);
                     }
                 } catch (error) {
-                    console.error(`Error fetching prediction for ${symbol}:`, error);
+                    console.error(`❌ Error fetching prediction for ${symbol}:`, error);
                 }
                 return null;
             };
