@@ -165,6 +165,22 @@ const TradingSimulator = () => {
             const [aiAnalysis, setAiAnalysis] = useState(null);
             const [loadingAnalysis, setLoadingAnalysis] = useState(false);
             const [analysisExpanded, setAnalysisExpanded] = useState(true);
+            const [expandedSections, setExpandedSections] = useState({
+                technical: false,
+                fundamental: false,
+                sentiment: false,
+                advanced: false,
+                exit: false,
+                checklist: false,
+                catalysts: false,
+                risk: false
+            }); // Track which AI analysis sections are expanded
+
+            // UltraThink v2.5 - Predictive AI & Market Intelligence
+            const [marketRating, setMarketRating] = useState(null);
+            const [loadingMarketRating, setLoadingMarketRating] = useState(false);
+            const [stockPredictions, setStockPredictions] = useState({}); // { symbol: prediction }
+            const [showMarketBanner, setShowMarketBanner] = useState(true);
 
             // Trade analysis system
             const [showTradeAnalysis, setShowTradeAnalysis] = useState(false);
@@ -2907,6 +2923,74 @@ const TradingSimulator = () => {
                 setAiAnalysis(analysis);
                 setLoadingAnalysis(false);
             };
+
+            // ═══════════════════════════════════════════════════════════════
+            // ULTRATHINK V2.5 - PREDICTIVE AI & MARKET INTELLIGENCE
+            // ═══════════════════════════════════════════════════════════════
+
+            // Fetch overall market rating and sentiment
+            const fetchMarketRating = async () => {
+                setLoadingMarketRating(true);
+                try {
+                    if (window.enhancedAI && window.enhancedAI.calculateMarketRating) {
+                        const rating = await window.enhancedAI.calculateMarketRating(FINNHUB_API_KEY);
+                        setMarketRating(rating);
+                    }
+                } catch (error) {
+                    console.error('Error fetching market rating:', error);
+                } finally {
+                    setLoadingMarketRating(false);
+                }
+            };
+
+            // Fetch price prediction for a specific stock
+            const fetchStockPrediction = async (symbol) => {
+                try {
+                    const stock = stocks.find(s => s.symbol === symbol);
+                    if (!stock) return null;
+
+                    // Fetch historical data
+                    const toDate = Math.floor(Date.now() / 1000);
+                    const fromDate = toDate - (30 * 24 * 60 * 60);
+
+                    const response = await fetch(
+                        `${FINNHUB_API_BASE}/stock/candle?symbol=${symbol}&resolution=D&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`
+                    );
+                    const data = await response.json();
+
+                    if (data.s === 'ok' && window.enhancedAI && window.enhancedAI.predictNextWeekPrice) {
+                        const historicalData = {
+                            closes: data.c || [],
+                            highs: data.h || [],
+                            lows: data.l || [],
+                            volumes: data.v || []
+                        };
+
+                        const prediction = window.enhancedAI.predictNextWeekPrice(stock, historicalData);
+
+                        if (prediction) {
+                            setStockPredictions(prev => ({
+                                ...prev,
+                                [symbol]: prediction
+                            }));
+                            return prediction;
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error fetching prediction for ${symbol}:`, error);
+                }
+                return null;
+            };
+
+            // Auto-fetch market rating on mount and daily
+            useEffect(() => {
+                fetchMarketRating();
+
+                // Refresh market rating every hour
+                const interval = setInterval(fetchMarketRating, 60 * 60 * 1000);
+
+                return () => clearInterval(interval);
+            }, []);
 
             // Auto-generate AI analysis when stock is selected in AI Analysis tab
             useEffect(() => {
@@ -6391,6 +6475,96 @@ const TradingSimulator = () => {
                             </div>
                         </div>
 
+                        {/* ═══════════════════════════════════════════════════════════════ */}
+                        {/* ULTRATHINK V2.5 - MARKET RATING BANNER */}
+                        {/* ═══════════════════════════════════════════════════════════════ */}
+                        {marketRating && showMarketBanner && (
+                            <div className="relative bg-gradient-to-r from-black/95 via-gray-900/95 to-black/95 backdrop-blur-xl rounded-2xl p-4 mb-6 border-2 border-cyan-500/40 hover:border-cyan-400 transition-all duration-500 overflow-hidden group" style={{boxShadow: `0 0 40px ${marketRating.rating >= 65 ? 'rgba(34, 197, 94, 0.3)' : marketRating.rating >= 45 ? 'rgba(234, 179, 8, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`}}>
+                                {/* Animated background */}
+                                <div className={`absolute inset-0 opacity-10 bg-gradient-to-r ${marketRating.rating >= 65 ? 'from-green-500 to-emerald-500' : marketRating.rating >= 45 ? 'from-yellow-500 to-orange-500' : 'from-red-500 to-rose-500'} animate-pulse`}></div>
+
+                                {/* Close button */}
+                                <button
+                                    onClick={() => setShowMarketBanner(false)}
+                                    className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors duration-200 z-10"
+                                    title="Dismiss"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+
+                                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-4">
+                                    {/* Left: Icon & Title */}
+                                    <div className="flex items-center gap-3">
+                                        <div className={`text-4xl md:text-5xl transition-transform duration-300 group-hover:scale-110`}>
+                                            {marketRating.emoji}
+                                        </div>
+                                        <div>
+                                            <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">
+                                                TODAY'S MARKET RATING
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className={`text-2xl md:text-3xl font-black ${marketRating.rating >= 65 ? 'text-green-400' : marketRating.rating >= 45 ? 'text-yellow-400' : 'text-red-400'}`}>
+                                                    {marketRating.rating}/100
+                                                </span>
+                                                <span className={`text-sm md:text-base font-bold px-3 py-1 rounded-full ${marketRating.rating >= 65 ? 'bg-green-500/20 text-green-300 border border-green-500/40' : marketRating.rating >= 45 ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40' : 'bg-red-500/20 text-red-300 border border-red-500/40'}`}>
+                                                    {marketRating.sentiment}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Middle: Recommendation */}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-start gap-2 mb-2">
+                                            <span className={`text-lg font-black ${marketRating.rating >= 65 ? 'text-green-400' : marketRating.rating >= 45 ? 'text-yellow-400' : 'text-red-400'}`}>
+                                                {marketRating.recommendation}
+                                            </span>
+                                        </div>
+                                        <p className="text-sm text-gray-300 leading-relaxed">
+                                            {marketRating.advice}
+                                        </p>
+                                    </div>
+
+                                    {/* Right: Key Factors (collapsed on mobile) */}
+                                    <div className="hidden lg:block flex-shrink-0 w-64">
+                                        <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2">
+                                            Market Factors:
+                                        </div>
+                                        <div className="space-y-1 max-h-20 overflow-y-auto custom-scrollbar">
+                                            {marketRating.factors && marketRating.factors.slice(0, 3).map((factor, idx) => (
+                                                <div key={idx} className="text-xs text-gray-300 flex items-start gap-1">
+                                                    <span className="text-cyan-400 flex-shrink-0">•</span>
+                                                    <span className="line-clamp-1">{factor}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Mobile: Expand button */}
+                                    <button className="lg:hidden text-xs text-cyan-400 hover:text-cyan-300 font-bold uppercase tracking-wider">
+                                        View Details →
+                                    </button>
+                                </div>
+
+                                {/* Bottom: Full factors (mobile expanded view) */}
+                                <details className="lg:hidden mt-3 pt-3 border-t border-gray-700/50">
+                                    <summary className="cursor-pointer text-xs text-cyan-400 hover:text-cyan-300 font-bold uppercase tracking-wider">
+                                        View All Market Factors
+                                    </summary>
+                                    <div className="mt-2 space-y-1">
+                                        {marketRating.factors && marketRating.factors.map((factor, idx) => (
+                                            <div key={idx} className="text-xs text-gray-300 flex items-start gap-2 pl-2">
+                                                <span className="text-cyan-400 flex-shrink-0">•</span>
+                                                <span>{factor}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </details>
+                            </div>
+                        )}
+
                         {/* Stats - Premium Compact 3-Card Layout */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                             {/* Card 1: Portfolio Overview - Compact UltraThink */}
@@ -7429,6 +7603,83 @@ const TradingSimulator = () => {
                                                                                     <div className={`font-bold text-sm ${aiColor === 'green' ? 'text-green-300' : aiColor === 'red' ? 'text-red-300' : aiColor === 'yellow' ? 'text-yellow-300' : 'text-blue-300'}`}>{aiAction}</div>
                                                                                     <div className="text-xs text-gray-400 mt-1">{aiReason}</div>
                                                                                 </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })()}
+
+                                                                {/* ULTRATHINK V2.5 - PRICE PREDICTION */}
+                                                                {(() => {
+                                                                    const prediction = stockPredictions[symbol];
+
+                                                                    // Auto-fetch prediction if not loaded
+                                                                    if (!prediction && isExpanded) {
+                                                                        fetchStockPrediction(symbol);
+                                                                    }
+
+                                                                    if (!prediction) {
+                                                                        return (
+                                                                            <div className="rounded-lg p-3 border bg-purple-900/10 border-purple-500/20 animate-pulse mt-3">
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <span className="text-lg">🔮</span>
+                                                                                    <div className="text-xs text-purple-300">Loading price prediction...</div>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    }
+
+                                                                    const isPredictionBullish = prediction.expectedChange > 0;
+                                                                    const predictionColor = prediction.expectedChange > 5 ? 'green' : prediction.expectedChange > 2 ? 'cyan' : prediction.expectedChange < -5 ? 'red' : prediction.expectedChange < -2 ? 'orange' : 'gray';
+
+                                                                    return (
+                                                                        <div className={`rounded-lg p-4 border mt-3 ${predictionColor === 'green' ? 'bg-green-900/20 border-green-500/40' : predictionColor === 'cyan' ? 'bg-cyan-900/20 border-cyan-500/40' : predictionColor === 'red' ? 'bg-red-900/20 border-red-500/40' : predictionColor === 'orange' ? 'bg-orange-900/20 border-orange-500/40' : 'bg-gray-900/20 border-gray-500/40'}`}>
+                                                                            <div className="flex items-start gap-2 mb-3">
+                                                                                <span className="text-2xl">🔮</span>
+                                                                                <div className="flex-1">
+                                                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                                                        <span className="font-black text-sm text-purple-300">7-DAY PREDICTION</span>
+                                                                                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${predictionColor === 'green' ? 'bg-green-500/20 text-green-300' : predictionColor === 'cyan' ? 'bg-cyan-500/20 text-cyan-300' : predictionColor === 'red' ? 'bg-red-500/20 text-red-300' : predictionColor === 'orange' ? 'bg-orange-500/20 text-orange-300' : 'bg-gray-500/20 text-gray-300'}`}>
+                                                                                            {prediction.expectedReturn}
+                                                                                        </span>
+                                                                                        <span className="text-xs text-gray-400">({prediction.confidence}% confidence)</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                                                                                <div className="bg-black/40 rounded-lg p-2">
+                                                                                    <div className="text-[10px] text-gray-400 uppercase font-bold mb-1">Current</div>
+                                                                                    <div className="text-white font-bold text-sm">${prediction.currentPrice.toFixed(2)}</div>
+                                                                                </div>
+                                                                                <div className="bg-black/40 rounded-lg p-2">
+                                                                                    <div className="text-[10px] text-gray-400 uppercase font-bold mb-1">Predicted</div>
+                                                                                    <div className={`font-bold text-sm ${isPredictionBullish ? 'text-green-300' : 'text-red-300'}`}>
+                                                                                        ${prediction.predictedPrice.toFixed(2)}
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="bg-black/40 rounded-lg p-2">
+                                                                                    <div className="text-[10px] text-gray-400 uppercase font-bold mb-1">Change</div>
+                                                                                    <div className={`font-bold text-sm ${isPredictionBullish ? 'text-green-300' : 'text-red-300'}`}>
+                                                                                        {isPredictionBullish ? '+' : ''}{prediction.expectedChange.toFixed(2)}%
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="bg-black/40 rounded-lg p-2">
+                                                                                    <div className="text-[10px] text-gray-400 uppercase font-bold mb-1">Range</div>
+                                                                                    <div className="text-white font-bold text-[10px]">
+                                                                                        ${prediction.lowerBound.toFixed(0)}-${prediction.upperBound.toFixed(0)}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div className="text-xs text-gray-300 mb-2">
+                                                                                <span className="text-cyan-400 font-bold">AI Analysis:</span> {prediction.interpretation}
+                                                                            </div>
+
+                                                                            <div className="flex items-center gap-1 text-[10px] text-gray-500">
+                                                                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                                                                </svg>
+                                                                                <span>Ensemble model ({prediction.methodsUsed} algorithms) • {prediction.timeframe} forecast</span>
                                                                             </div>
                                                                         </div>
                                                                     );
@@ -9731,68 +9982,64 @@ const TradingSimulator = () => {
                                             )}
 
                                             {!loadingAnalysis && aiAnalysis && (
-                                                <div className="space-y-6 animate-fade-in">
+                                                <div className="space-y-4 animate-fade-in">
                                                     {/* AI Disclaimer */}
-                                                    <div className="bg-gradient-to-r from-red-900/40 to-orange-900/40 backdrop-blur-xl rounded-xl p-4 border-2 border-red-500/50">
-                                                        <div className="flex items-start gap-3">
-                                                            <span className="text-2xl flex-shrink-0">⚠️</span>
+                                                    <div className="bg-gradient-to-r from-red-900/40 to-orange-900/40 backdrop-blur-xl rounded-xl p-3 border-2 border-red-500/50">
+                                                        <div className="flex items-start gap-2">
+                                                            <span className="text-xl flex-shrink-0">⚠️</span>
                                                             <p className="text-red-100 text-xs leading-relaxed">
-                                                                <strong>NOT Financial Advice:</strong> This AI analysis is for educational purposes only. These recommendations are simulated and should NOT be used for real trading decisions. Always conduct your own research and consult a licensed financial advisor.
+                                                                <strong>NOT Financial Advice:</strong> This AI analysis is for educational purposes only. These recommendations are simulated and should NOT be used for real trading decisions.
                                                             </p>
                                                         </div>
                                                     </div>
 
-                                                    {/* Timestamp */}
-                                                    <div className="text-center text-sm text-cyan-300">
-                                                        Analysis generated: {aiAnalysis.timestamp}
-                                                    </div>
-
-                                                    {/* SIGNAL STRENGTH METER */}
-                                                    <div className="bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-xl rounded-2xl p-8 border-2 border-cyan-500/40 shadow-2xl" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
-                                                        <h3 className="text-2xl font-black text-white mb-4 text-center">📡 Signal Strength</h3>
-                                                        <div className="relative">
-                                                            <div className="w-full bg-gray-800 rounded-full h-8 overflow-hidden border-2 border-gray-700">
-                                                                <div
-                                                                    className={`h-full rounded-full transition-all duration-1000 ${
-                                                                        aiAnalysis.signalStrength >= 80 ? 'bg-gradient-to-r from-green-500 via-green-400 to-emerald-500' :
-                                                                        aiAnalysis.signalStrength >= 60 ? 'bg-gradient-to-r from-lime-500 via-green-400 to-lime-500' :
-                                                                        aiAnalysis.signalStrength >= 40 ? 'bg-gradient-to-r from-yellow-500 via-yellow-400 to-amber-500' :
-                                                                        aiAnalysis.signalStrength >= 20 ? 'bg-gradient-to-r from-orange-500 via-orange-400 to-red-500' :
-                                                                        'bg-gradient-to-r from-red-500 via-red-600 to-red-700'
-                                                                    } flex items-center justify-center font-black text-white text-sm animate-pulse-glow-green`}
-                                                                    style={{ width: `${aiAnalysis.signalStrength}%` }}
-                                                                >
-                                                                    {aiAnalysis.signalStrength >= 15 && aiAnalysis.signalStrength + '/100'}
+                                                    {/* ULTRA-COMPACT SUMMARY CARD */}
+                                                    <div className={`bg-gradient-to-br ${
+                                                        aiAnalysis.recommendation.color === 'green' ? 'from-green-900/60 to-emerald-900/60 border-green-500/60' :
+                                                        aiAnalysis.recommendation.color === 'red' ? 'from-red-900/60 to-rose-900/60 border-red-500/60' :
+                                                        'from-yellow-900/60 to-amber-900/60 border-yellow-500/60'
+                                                    } backdrop-blur-xl rounded-2xl p-6 border-2 shadow-2xl`}>
+                                                        <div className="flex items-center justify-between mb-4">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className={`text-4xl px-4 py-2 rounded-xl font-black ${
+                                                                    aiAnalysis.recommendation.color === 'green' ? 'bg-green-500/90 text-white' :
+                                                                    aiAnalysis.recommendation.color === 'red' ? 'bg-red-500/90 text-white' :
+                                                                    'bg-yellow-500/90 text-gray-900'
+                                                                }`}>
+                                                                    {aiAnalysis.recommendation.action}
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-white text-lg font-bold">Signal: {aiAnalysis.signalStrength}/100</div>
+                                                                    <div className="text-white/80 text-sm">Confidence: {aiAnalysis.recommendation.confidence}%</div>
                                                                 </div>
                                                             </div>
-                                                            {aiAnalysis.signalStrength < 15 && (
-                                                                <div className="absolute top-0 right-4 h-full flex items-center">
-                                                                    <span className="text-white font-black text-sm">{aiAnalysis.signalStrength}/100</span>
-                                                                </div>
-                                                            )}
+                                                            <div className="text-right text-xs text-white/60">
+                                                                {aiAnalysis.timestamp}
+                                                            </div>
                                                         </div>
-                                                        <div className="flex justify-between text-xs text-gray-400 mt-2">
-                                                            <span>Strong Sell</span>
-                                                            <span>Neutral</span>
-                                                            <span>Strong Buy</span>
-                                                        </div>
-                                                    </div>
 
-                                                    {/* ACTION SUMMARY - Natural Language */}
-                                                    <div className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 backdrop-blur-xl rounded-2xl p-8 border-4 border-cyan-500/50 shadow-2xl animate-pulse-glow-cyan">
-                                                        <div className="flex items-start gap-4">
-                                                            <div className="text-5xl">🚨</div>
-                                                            <div className="flex-1">
-                                                                <h3 className="text-2xl font-black text-cyan-300 mb-3">ACTION PLAN</h3>
-                                                                <p className="text-white text-lg leading-relaxed font-semibold">
-                                                                    {aiAnalysis.actionSummary}
-                                                                </p>
-                                                                <div className="mt-4 bg-black/30 rounded-xl p-4 border-2 border-cyan-500/30">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-2xl">⏰</span>
-                                                                        <span className="text-cyan-200 font-bold text-lg">{aiAnalysis.actionTiming}</span>
-                                                                    </div>
-                                                                </div>
+                                                        {/* One-line summary */}
+                                                        <p className="text-white text-base leading-relaxed font-medium mb-4">
+                                                            {aiAnalysis.actionSummary}
+                                                        </p>
+
+                                                        {/* Quick metrics grid */}
+                                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                                                            <div className="bg-black/30 rounded-lg p-3">
+                                                                <div className="text-xs text-white/60 mb-1">Entry</div>
+                                                                <div className="text-white font-bold text-lg">${aiAnalysis.recommendation.targets.entry}</div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-lg p-3">
+                                                                <div className="text-xs text-white/60 mb-1">Stop Loss</div>
+                                                                <div className="text-red-300 font-bold text-lg">${aiAnalysis.recommendation.targets.stopLoss}</div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-lg p-3">
+                                                                <div className="text-xs text-white/60 mb-1">Target</div>
+                                                                <div className="text-green-300 font-bold text-lg">${aiAnalysis.recommendation.targets.takeProfit}</div>
+                                                            </div>
+                                                            <div className="bg-black/30 rounded-lg p-3">
+                                                                <div className="text-xs text-white/60 mb-1">Position</div>
+                                                                <div className="text-white font-bold text-lg">{aiAnalysis.positionSizing.suggestedShares} shares</div>
                                                             </div>
                                                         </div>
                                                     </div>
