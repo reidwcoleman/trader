@@ -10155,16 +10155,24 @@ const TradingSimulator = () => {
                                                             </div>
                                                         )}
 
-                                                    {/* ADVANCED TECHNICAL INDICATORS - Ichimoku, Fibonacci, Volume Profile, ADX */}
-                                                    {(aiAnalysis.advancedIndicators?.ichimoku || aiAnalysis.advancedIndicators?.fibonacci ||
-                                                      aiAnalysis.advancedIndicators?.volumeProfile || aiAnalysis.advancedIndicators?.adx) && (
-                                                        <div className="bg-gradient-to-br from-violet-900/60 to-purple-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-violet-500/50 shadow-2xl">
-                                                            <h3 className="text-2xl font-black text-violet-300 mb-6 flex items-center gap-2">
-                                                                📊 Advanced Technical Analysis
-                                                                <span className="text-xs bg-violet-500/30 px-3 py-1 rounded-full border border-violet-400/50">INSTITUTIONAL GRADE</span>
-                                                            </h3>
-
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        {/* Advanced Technical Indicators */}
+                                                        {(aiAnalysis.advancedIndicators?.ichimoku || aiAnalysis.advancedIndicators?.fibonacci ||
+                                                          aiAnalysis.advancedIndicators?.volumeProfile || aiAnalysis.advancedIndicators?.adx) && (
+                                                            <div className="bg-cyan-900/30 backdrop-blur-xl rounded-xl border-2 border-cyan-500/40 overflow-hidden">
+                                                                <button
+                                                                    onClick={() => setExpandedSections(prev => ({...prev, advanced: !prev.advanced}))}
+                                                                    className="w-full px-5 py-4 flex items-center justify-between hover:bg-cyan-500/10 transition-all"
+                                                                >
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-2xl">📊</span>
+                                                                        <span className="text-white font-bold text-lg">Advanced Indicators</span>
+                                                                        <span className="text-xs bg-cyan-500/30 px-2 py-1 rounded-full border border-cyan-400/50 text-cyan-200">INSTITUTIONAL</span>
+                                                                    </div>
+                                                                    <span className={`text-cyan-300 text-xl transition-transform ${expandedSections.advanced ? 'rotate-180' : ''}`}>▼</span>
+                                                                </button>
+                                                                {expandedSections.advanced && (
+                                                                    <div className="px-5 pb-5">
+                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                                 {/* Ichimoku Cloud */}
                                                                 {aiAnalysis.advancedIndicators?.ichimoku && (
                                                                     <div className="bg-black/30 rounded-xl p-5 border-2 border-cyan-500/30 hover:border-cyan-400/50 transition-all">
@@ -10312,27 +10320,37 @@ const TradingSimulator = () => {
                                                                         </div>
                                                                     </div>
                                                                 )}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                        </div>
-                                                    )}
+                                                        )}
 
-                                                    {/* FUNDAMENTAL ANALYSIS RESULTS */}
-                                                    {aiAnalysis.fundamentalAnalysis && (
-                                                        <div className="bg-gradient-to-br from-emerald-900/60 to-teal-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-emerald-500/50 shadow-2xl">
-                                                            <h3 className="text-2xl font-black text-emerald-300 mb-6 flex items-center gap-2">
-                                                                💎 Fundamental Analysis
-                                                                <span className={`text-xs px-3 py-1 rounded-full border ${
-                                                                    aiAnalysis.fundamentalAnalysis.rating === 'EXCELLENT' ? 'bg-green-500/30 border-green-400/50 text-green-200' :
-                                                                    aiAnalysis.fundamentalAnalysis.rating === 'GOOD' ? 'bg-lime-500/30 border-lime-400/50 text-lime-200' :
-                                                                    aiAnalysis.fundamentalAnalysis.rating === 'FAIR' ? 'bg-yellow-500/30 border-yellow-400/50 text-yellow-200' :
-                                                                    aiAnalysis.fundamentalAnalysis.rating === 'AVERAGE' ? 'bg-orange-500/30 border-orange-400/50 text-orange-200' :
-                                                                    'bg-red-500/30 border-red-400/50 text-red-200'
-                                                                }`}>
-                                                                    {aiAnalysis.fundamentalAnalysis.rating}
-                                                                </span>
-                                                            </h3>
-
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                                        {/* Fundamental Analysis */}
+                                                        {aiAnalysis.fundamentalAnalysis && (
+                                                            <div className="bg-cyan-900/30 backdrop-blur-xl rounded-xl border-2 border-cyan-500/40 overflow-hidden">
+                                                                <button
+                                                                    onClick={() => setExpandedSections(prev => ({...prev, fundamental: !prev.fundamental}))}
+                                                                    className="w-full px-5 py-4 flex items-center justify-between hover:bg-cyan-500/10 transition-all"
+                                                                >
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-2xl">💎</span>
+                                                                        <span className="text-white font-bold text-lg">Fundamental Analysis</span>
+                                                                        <span className={`text-xs px-2 py-1 rounded-full border ${
+                                                                            aiAnalysis.fundamentalAnalysis.rating === 'EXCELLENT' ? 'bg-green-500/30 border-green-400/50 text-green-200' :
+                                                                            aiAnalysis.fundamentalAnalysis.rating === 'GOOD' ? 'bg-lime-500/30 border-lime-400/50 text-lime-200' :
+                                                                            aiAnalysis.fundamentalAnalysis.rating === 'FAIR' ? 'bg-yellow-500/30 border-yellow-400/50 text-yellow-200' :
+                                                                            aiAnalysis.fundamentalAnalysis.rating === 'AVERAGE' ? 'bg-orange-500/30 border-orange-400/50 text-orange-200' :
+                                                                            'bg-red-500/30 border-red-400/50 text-red-200'
+                                                                        }`}>
+                                                                            {aiAnalysis.fundamentalAnalysis.rating}
+                                                                        </span>
+                                                                    </div>
+                                                                    <span className={`text-cyan-300 text-xl transition-transform ${expandedSections.fundamental ? 'rotate-180' : ''}`}>▼</span>
+                                                                </button>
+                                                                {expandedSections.fundamental && (
+                                                                    <div className="px-5 pb-5">
+                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                                                 {/* Quality Score */}
                                                                 <div className="bg-black/30 rounded-xl p-5 border-2 border-emerald-500/30">
                                                                     <div className="text-center mb-3">
@@ -10384,18 +10402,20 @@ const TradingSimulator = () => {
                                                                 )}
                                                             </div>
 
-                                                            {/* Key Signals */}
-                                                            <div className="space-y-2">
-                                                                <div className="text-sm font-bold text-emerald-300 mb-2">Key Metrics:</div>
-                                                                {aiAnalysis.fundamentalAnalysis.signals.map((signal, idx) => (
-                                                                    <div key={idx} className="bg-black/20 rounded-lg p-3 text-sm text-emerald-100 flex items-center gap-2">
-                                                                        <span className="text-lg">•</span>
-                                                                        <span>{signal}</span>
+                                                                        </div>
+                                                                        {/* Key Signals */}
+                                                                        <div className="space-y-2">
+                                                                            {aiAnalysis.fundamentalAnalysis.signals.map((signal, idx) => (
+                                                                                <div key={idx} className="bg-black/20 rounded-lg p-2 text-sm text-emerald-100 flex items-center gap-2">
+                                                                                    <span className="text-emerald-400">•</span>
+                                                                                    <span>{signal}</span>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
                                                                     </div>
-                                                                ))}
+                                                                )}
                                                             </div>
-                                                        </div>
-                                                    )}
+                                                        )}
 
                                                     {/* Main Recommendation */}
                                                     <div className={`bg-gradient-to-br ${
@@ -10442,108 +10462,112 @@ const TradingSimulator = () => {
                                                         </div>
                                                     </div>
 
-                                                    {/* Detailed Analysis Cards */}
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                        {/* Technical Analysis */}
-                                                        <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/40 border-2 border-blue-500/50 rounded-2xl p-6">
-                                                            <h4 className="text-2xl font-black text-cyan-300 mb-6 flex items-center gap-2">
-                                                                📊 Technical Analysis
-                                                            </h4>
-                                                            <div className="space-y-4">
-                                                                <div>
-                                                                    <div className="text-sm text-blue-300 mb-1">Signal</div>
-                                                                    <div className={`text-2xl font-bold ${
-                                                                        aiAnalysis.technical.signal.includes('Bullish') ? 'text-green-300' :
-                                                                        aiAnalysis.technical.signal.includes('Bearish') ? 'text-red-300' :
-                                                                        'text-yellow-300'
-                                                                    }`}>{aiAnalysis.technical.signal}</div>
-                                                                </div>
-                                                                <div>
-                                                                    <div className="text-sm text-blue-300 mb-1">Price Change</div>
-                                                                    <div className={`text-2xl font-bold ${parseFloat(aiAnalysis.technical.priceChange) >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-                                                                        {parseFloat(aiAnalysis.technical.priceChange) >= 0 ? '+' : ''}{aiAnalysis.technical.priceChange}%
+                                                        {/* Technical/Sentiment/Risk - Compact Cards */}
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                            {/* Technical */}
+                                                            <div className="bg-cyan-900/30 backdrop-blur-xl rounded-xl border-2 border-cyan-500/40 overflow-hidden">
+                                                                <button
+                                                                    onClick={() => setExpandedSections(prev => ({...prev, technical: !prev.technical}))}
+                                                                    className="w-full px-4 py-3 flex items-center justify-between hover:bg-cyan-500/10 transition-all"
+                                                                >
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-xl">📊</span>
+                                                                        <span className="text-white font-bold">Technical</span>
                                                                     </div>
-                                                                </div>
-                                                                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-blue-600/50">
-                                                                    <div>
-                                                                        <div className="text-xs text-blue-300 mb-1">Support</div>
-                                                                        <div className="text-white font-bold text-lg">${aiAnalysis.technical.support}</div>
+                                                                    <span className={`text-cyan-300 transition-transform ${expandedSections.technical ? 'rotate-180' : ''}`}>▼</span>
+                                                                </button>
+                                                                {expandedSections.technical && (
+                                                                    <div className="px-4 pb-4 space-y-2">
+                                                                        <div className="bg-black/20 rounded p-2">
+                                                                            <div className="text-xs text-gray-400">Signal</div>
+                                                                            <div className={`text-sm font-bold ${
+                                                                                aiAnalysis.technical.signal.includes('Bullish') ? 'text-green-300' :
+                                                                                aiAnalysis.technical.signal.includes('Bearish') ? 'text-red-300' :
+                                                                                'text-yellow-300'
+                                                                            }`}>{aiAnalysis.technical.signal}</div>
+                                                                        </div>
+                                                                        <div className="grid grid-cols-2 gap-2">
+                                                                            <div className="bg-black/20 rounded p-2">
+                                                                                <div className="text-xs text-gray-400">Support</div>
+                                                                                <div className="text-sm font-bold text-white">${aiAnalysis.technical.support}</div>
+                                                                            </div>
+                                                                            <div className="bg-black/20 rounded p-2">
+                                                                                <div className="text-xs text-gray-400">Resistance</div>
+                                                                                <div className="text-sm font-bold text-white">${aiAnalysis.technical.resistance}</div>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
-                                                                    <div>
-                                                                        <div className="text-xs text-blue-300 mb-1">Resistance</div>
-                                                                        <div className="text-white font-bold text-lg">${aiAnalysis.technical.resistance}</div>
-                                                                    </div>
-                                                                </div>
+                                                                )}
                                                             </div>
-                                                        </div>
 
-                                                        {/* Sentiment Analysis */}
-                                                        <div className="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border-2 border-indigo-500/50 rounded-2xl p-6">
-                                                            <h4 className="text-2xl font-black text-indigo-300 mb-6 flex items-center gap-2">
-                                                                📰 News Sentiment
-                                                            </h4>
-                                                            <div className="space-y-4">
-                                                                <div>
-                                                                    <div className="text-sm text-indigo-300 mb-1">Signal</div>
-                                                                    <div className={`text-2xl font-bold ${
-                                                                        aiAnalysis.sentiment.signal === 'Positive' ? 'text-green-300' :
-                                                                        aiAnalysis.sentiment.signal === 'Negative' ? 'text-red-300' :
-                                                                        'text-yellow-300'
-                                                                    }`}>{aiAnalysis.sentiment.signal}</div>
-                                                                </div>
-                                                                <div>
-                                                                    <div className="text-sm text-indigo-300 mb-1">Sentiment Score</div>
-                                                                    <div className={`text-2xl font-bold ${
-                                                                        parseFloat(aiAnalysis.sentiment.score) > 30 ? 'text-green-300' :
-                                                                        parseFloat(aiAnalysis.sentiment.score) < -30 ? 'text-red-300' :
-                                                                        'text-yellow-300'
-                                                                    }`}>{aiAnalysis.sentiment.score}/100</div>
-                                                                </div>
-                                                                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-indigo-600/50">
-                                                                    <div>
-                                                                        <div className="text-xs text-indigo-300 mb-1">Articles</div>
-                                                                        <div className="text-white font-bold text-lg">{aiAnalysis.sentiment.articlesAnalyzed}</div>
+                                                            {/* Sentiment */}
+                                                            <div className="bg-cyan-900/30 backdrop-blur-xl rounded-xl border-2 border-cyan-500/40 overflow-hidden">
+                                                                <button
+                                                                    onClick={() => setExpandedSections(prev => ({...prev, sentiment: !prev.sentiment}))}
+                                                                    className="w-full px-4 py-3 flex items-center justify-between hover:bg-cyan-500/10 transition-all"
+                                                                >
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-xl">📰</span>
+                                                                        <span className="text-white font-bold">Sentiment</span>
                                                                     </div>
-                                                                    <div>
-                                                                        <div className="text-xs text-indigo-300 mb-1">Interest</div>
-                                                                        <div className="text-white font-bold text-lg">{aiAnalysis.sentiment.trending}</div>
+                                                                    <span className={`text-cyan-300 transition-transform ${expandedSections.sentiment ? 'rotate-180' : ''}`}>▼</span>
+                                                                </button>
+                                                                {expandedSections.sentiment && (
+                                                                    <div className="px-4 pb-4 space-y-2">
+                                                                        <div className="bg-black/20 rounded p-2">
+                                                                            <div className="text-xs text-gray-400">Score</div>
+                                                                            <div className={`text-sm font-bold ${
+                                                                                parseFloat(aiAnalysis.sentiment.score) > 30 ? 'text-green-300' :
+                                                                                parseFloat(aiAnalysis.sentiment.score) < -30 ? 'text-red-300' :
+                                                                                'text-yellow-300'
+                                                                            }`}>{aiAnalysis.sentiment.score}/100 ({aiAnalysis.sentiment.signal})</div>
+                                                                        </div>
+                                                                        <div className="grid grid-cols-2 gap-2">
+                                                                            <div className="bg-black/20 rounded p-2">
+                                                                                <div className="text-xs text-gray-400">Articles</div>
+                                                                                <div className="text-sm font-bold text-white">{aiAnalysis.sentiment.articlesAnalyzed}</div>
+                                                                            </div>
+                                                                            <div className="bg-black/20 rounded p-2">
+                                                                                <div className="text-xs text-gray-400">Interest</div>
+                                                                                <div className="text-sm font-bold text-white">{aiAnalysis.sentiment.trending}</div>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
+                                                                )}
                                                             </div>
-                                                        </div>
-                                                    </div>
 
-                                                    {/* Risk Assessment */}
-                                                    <div className="bg-gradient-to-br from-purple-900/40 to-pink-900/40 border-2 border-purple-500/50 rounded-2xl p-6">
-                                                        <h4 className="text-2xl font-black text-purple-300 mb-6 flex items-center gap-2">
-                                                            ⚠️ Risk Assessment
-                                                        </h4>
-                                                        <div className="mb-6">
-                                                            <div className="flex items-center justify-between mb-3">
-                                                                <span className="text-lg text-purple-200">Risk Level: <span className={`font-black text-xl ${
-                                                                    aiAnalysis.risk.level === 'High' ? 'text-red-300' :
-                                                                    aiAnalysis.risk.level === 'Moderate' ? 'text-yellow-300' :
-                                                                    'text-green-300'
-                                                                }`}>{aiAnalysis.risk.level}</span></span>
-                                                                <span className="text-lg text-purple-200">Rating: <span className="font-black text-xl text-white">{aiAnalysis.risk.rating}/10</span></span>
+                                                            {/* Risk */}
+                                                            <div className="bg-cyan-900/30 backdrop-blur-xl rounded-xl border-2 border-cyan-500/40 overflow-hidden">
+                                                                <button
+                                                                    onClick={() => setExpandedSections(prev => ({...prev, risk: !prev.risk}))}
+                                                                    className="w-full px-4 py-3 flex items-center justify-between hover:bg-cyan-500/10 transition-all"
+                                                                >
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-xl">⚠️</span>
+                                                                        <span className="text-white font-bold">Risk</span>
+                                                                    </div>
+                                                                    <span className={`text-cyan-300 transition-transform ${expandedSections.risk ? 'rotate-180' : ''}`}>▼</span>
+                                                                </button>
+                                                                {expandedSections.risk && (
+                                                                    <div className="px-4 pb-4 space-y-2">
+                                                                        <div className="bg-black/20 rounded p-2">
+                                                                            <div className="text-xs text-gray-400">Level</div>
+                                                                            <div className={`text-sm font-bold ${
+                                                                                aiAnalysis.risk.level === 'High' ? 'text-red-300' :
+                                                                                aiAnalysis.risk.level === 'Moderate' ? 'text-yellow-300' :
+                                                                                'text-green-300'
+                                                                            }`}>{aiAnalysis.risk.level} ({aiAnalysis.risk.rating}/10)</div>
+                                                                        </div>
+                                                                        <div className="space-y-1">
+                                                                            {aiAnalysis.risk.factors.map((factor, idx) => (
+                                                                                <div key={idx} className="bg-black/20 rounded p-2 text-xs text-white/70">
+                                                                                    {factor}
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                            <div className="w-full bg-purple-950/50 rounded-full h-4 overflow-hidden border-2 border-purple-600/30">
-                                                                <div
-                                                                    className={`h-full rounded-full transition-all ${
-                                                                        aiAnalysis.risk.rating >= 7 ? 'bg-gradient-to-r from-red-500 to-red-600' :
-                                                                        aiAnalysis.risk.rating >= 4 ? 'bg-gradient-to-r from-yellow-500 to-yellow-600' :
-                                                                        'bg-gradient-to-r from-green-500 to-green-600'
-                                                                    }`}
-                                                                    style={{ width: `${aiAnalysis.risk.rating * 10}%` }}
-                                                                ></div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="space-y-3">
-                                                            {aiAnalysis.risk.factors.map((factor, idx) => (
-                                                                <div key={idx} className="text-purple-100 bg-purple-950/30 rounded-lg p-3">
-                                                                    {factor}
-                                                                </div>
-                                                            ))}
                                                         </div>
                                                     </div>
                                                 </div>
