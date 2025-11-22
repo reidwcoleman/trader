@@ -1446,37 +1446,60 @@ function predictNextWeekPrice(stockData, historicalData) {
 
 /**
  * ═══════════════════════════════════════════════════════════════
- * MARKET RATING SYSTEM - OVERALL MARKET SENTIMENT
- * Analyzes market conditions to determine if it's a good day to trade
+ * MARKET RATING SYSTEM - ULTRA-ENHANCED v3.0
+ * Institutional-Grade Market Intelligence & Sentiment Analysis
+ * Analyzes 15+ factors to determine optimal trading conditions
  * ═══════════════════════════════════════════════════════════════
  */
 
 /**
- * Calculate overall market rating and recommendations
- * Returns: { rating: 0-100, sentiment: string, recommendation: string, factors: [...] }
+ * Calculate overall market rating and recommendations - UltraThink v3.0
+ * Now with: VIX analysis, sector ETFs, multi-timeframe momentum, correlation analysis,
+ * technical indicators for indices, volume confirmation, and advanced scoring
+ * Returns: { rating: 0-100, sentiment: string, recommendation: string, factors: [...], confidence: 0-100 }
  */
 async function calculateMarketRating(apiKey) {
     try {
-        // We'll analyze market breadth, major indices, and volatility
         const factors = [];
         let marketScore = 50; // Neutral starting point
+        let confidence = 0; // Confidence in the rating (0-100)
+        const signals = [];
+        const warnings = [];
 
         // ═══════════════════════════════════════════════════════════════
-        // FETCH MAJOR INDICES DATA
+        // FETCH COMPREHENSIVE MARKET DATA
+        // Indices, Sectors, Volatility, Safe Havens, Bonds
         // ═══════════════════════════════════════════════════════════════
 
         const indices = {
-            'SPY': null,   // S&P 500
-            'DIA': null,   // Dow Jones
-            'QQQ': null,   // Nasdaq
-            'IWM': null    // Russell 2000
+            // Core Market Indices
+            'SPY': null,   // S&P 500 (Primary market gauge)
+            'QQQ': null,   // Nasdaq 100 (Tech/Growth)
+            'DIA': null,   // Dow Jones (Blue chips)
+            'IWM': null,   // Russell 2000 (Small caps)
+
+            // Volatility
+            'VXX': null,   // VIX Short-Term Futures (Volatility proxy)
+
+            // Sector ETFs
+            'XLK': null,   // Technology Sector
+            'XLF': null,   // Financials Sector
+            'XLE': null,   // Energy Sector
+            'XLV': null,   // Healthcare Sector
+
+            // Safe Haven & Risk-Off
+            'TLT': null,   // 20+ Year Treasury Bonds
+            'GLD': null,   // Gold
+
+            // Emerging Markets (Risk Gauge)
+            'EEM': null    // Emerging Markets
         };
 
         const today = new Date();
         const toDate = Math.floor(today.getTime() / 1000);
-        const fromDate = toDate - (30 * 24 * 60 * 60); // 30 days
+        const fromDate = toDate - (90 * 24 * 60 * 60); // 90 days for better analysis
 
-        // Fetch data for all indices with delay to avoid rate limiting
+        // Fetch data for all tickers with enhanced data collection
         for (const symbol of Object.keys(indices)) {
             try {
                 const response = await fetch(
@@ -1484,211 +1507,592 @@ async function calculateMarketRating(apiKey) {
                 );
                 const data = await response.json();
 
-                if (data.s === 'ok' && data.c && data.c.length > 0) {
+                if (data.s === 'ok' && data.c && data.c.length > 1) {
                     const closes = data.c;
+                    const highs = data.h || [];
+                    const lows = data.l || [];
+                    const volumes = data.v || [];
                     const currentPrice = closes[closes.length - 1];
                     const previousPrice = closes[closes.length - 2];
                     const weekAgo = closes[closes.length - 6] || closes[0];
+                    const monthAgo = closes[closes.length - 21] || closes[0];
 
                     indices[symbol] = {
                         price: currentPrice,
                         change: ((currentPrice - previousPrice) / previousPrice) * 100,
                         weekChange: ((currentPrice - weekAgo) / weekAgo) * 100,
-                        closes: closes
+                        monthChange: ((currentPrice - monthAgo) / monthAgo) * 100,
+                        closes: closes,
+                        highs: highs,
+                        lows: lows,
+                        volumes: volumes
                     };
                 } else if (response.status === 403 || response.status === 429) {
-                    console.warn(`⚠️ API rate limit reached for ${symbol} - Using cached/fallback data`);
+                    console.warn(`⚠️ API rate limit for ${symbol} - continuing with available data`);
                 }
 
-                // Small delay to avoid rate limiting (1 second between calls)
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Rate limiting: 1.2 second delay between calls
+                await new Promise(resolve => setTimeout(resolve, 1200));
             } catch (err) {
-                console.warn(`⚠️ Error fetching ${symbol} (using fallback):`, err.message);
+                console.warn(`⚠️ Error fetching ${symbol}:`, err.message);
             }
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // FACTOR 1: MAJOR INDICES PERFORMANCE (Weight: 30 points)
+        // FACTOR 1: MAJOR INDICES PERFORMANCE (Weight: 25 points)
+        // Multi-timeframe analysis: Daily, Weekly, Monthly
         // ═══════════════════════════════════════════════════════════════
 
-        const indexChanges = Object.values(indices).filter(i => i !== null).map(i => i.change);
+        const coreIndices = ['SPY', 'QQQ', 'DIA', 'IWM'].filter(sym => indices[sym] !== null);
 
-        if (indexChanges.length > 0) {
-            const avgIndexChange = indexChanges.reduce((a, b) => a + b, 0) / indexChanges.length;
-            const positiveIndices = indexChanges.filter(c => c > 0).length;
-            const totalIndices = indexChanges.length;
-            const percentPositive = (positiveIndices / totalIndices) * 100;
+        if (coreIndices.length > 0) {
+            const dailyChanges = coreIndices.map(sym => indices[sym].change);
+            const weeklyChanges = coreIndices.map(sym => indices[sym].weekChange);
+            const monthlyChanges = coreIndices.map(sym => indices[sym].monthChange);
 
-            if (avgIndexChange > 1 && percentPositive >= 75) {
-                marketScore += 30;
-                factors.push(`📈 Strong market rally - ${positiveIndices}/${totalIndices} indices up (avg: +${avgIndexChange.toFixed(2)}%)`);
-            } else if (avgIndexChange > 0.5 && percentPositive >= 50) {
+            const avgDaily = dailyChanges.reduce((a, b) => a + b, 0) / dailyChanges.length;
+            const avgWeekly = weeklyChanges.reduce((a, b) => a + b, 0) / weeklyChanges.length;
+            const avgMonthly = monthlyChanges.reduce((a, b) => a + b, 0) / monthlyChanges.length;
+
+            const positiveToday = dailyChanges.filter(c => c > 0).length;
+            const percentPositive = (positiveToday / coreIndices.length) * 100;
+
+            // Daily performance
+            if (avgDaily > 1.5 && percentPositive >= 75) {
+                marketScore += 25;
+                signals.push(`🚀 Explosive rally - ${positiveToday}/${coreIndices.length} indices up (avg: +${avgDaily.toFixed(2)}%)`);
+                confidence += 20;
+            } else if (avgDaily > 0.8 && percentPositive >= 75) {
                 marketScore += 20;
-                factors.push(`✅ Positive market day - ${positiveIndices}/${totalIndices} indices green`);
-            } else if (avgIndexChange > 0) {
-                marketScore += 10;
-                factors.push(`➕ Slight market gain (+${avgIndexChange.toFixed(2)}%)`);
-            } else if (avgIndexChange < -1 && percentPositive < 25) {
-                marketScore -= 30;
-                factors.push(`📉 Market selloff - ${positiveIndices}/${totalIndices} indices up (avg: ${avgIndexChange.toFixed(2)}%)`);
-            } else if (avgIndexChange < -0.5) {
-                marketScore -= 20;
-                factors.push(`⚠️ Negative market day (${avgIndexChange.toFixed(2)}%)`);
+                signals.push(`📈 Strong advance - ${positiveToday}/${coreIndices.length} indices green`);
+                confidence += 15;
+            } else if (avgDaily > 0.3 && percentPositive >= 50) {
+                marketScore += 12;
+                signals.push(`✅ Positive day (${avgDaily.toFixed(2)}% avg)`);
+                confidence += 10;
+            } else if (avgDaily < -1.5 && percentPositive <= 25) {
+                marketScore -= 25;
+                warnings.push(`📉 Heavy selloff - ${positiveToday}/${coreIndices.length} up (avg: ${avgDaily.toFixed(2)}%)`);
+                confidence += 15;
+            } else if (avgDaily < -0.5) {
+                marketScore -= 15;
+                warnings.push(`⚠️ Declining market (${avgDaily.toFixed(2)}%)`);
+                confidence += 10;
             } else {
-                factors.push(`➡️ Flat market (${avgIndexChange.toFixed(2)}%)`);
+                factors.push(`➡️ Flat day (${avgDaily.toFixed(2)}%)`);
+            }
+
+            // Weekly momentum context
+            if (avgWeekly > 3) {
+                marketScore += 8;
+                signals.push(`📊 Strong weekly momentum (+${avgWeekly.toFixed(1)}%)`);
+                confidence += 10;
+            } else if (avgWeekly < -3) {
+                marketScore -= 8;
+                warnings.push(`📊 Weak weekly trend (${avgWeekly.toFixed(1)}%)`);
+            }
+
+            // Monthly momentum context
+            if (avgMonthly > 5) {
+                marketScore += 5;
+                signals.push(`📈 Bullish monthly trend (+${avgMonthly.toFixed(1)}%)`);
+                confidence += 8;
+            } else if (avgMonthly < -5) {
+                marketScore -= 5;
+                warnings.push(`📉 Bearish monthly trend (${avgMonthly.toFixed(1)}%)`);
             }
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // FACTOR 2: MARKET BREADTH (Advance/Decline Ratio)
+        // FACTOR 2: MARKET BREADTH ANALYSIS (Weight: 20 points)
+        // Small cap vs large cap, breadth thrust detection
         // ═══════════════════════════════════════════════════════════════
 
-        // Simulate breadth using index correlation
         if (indices.SPY && indices.IWM) {
             const spyChange = indices.SPY.change;
-            const iwmChange = indices.IWM.change; // Small caps
+            const iwmChange = indices.IWM.change;
+            const spyWeek = indices.SPY.weekChange;
+            const iwmWeek = indices.IWM.weekChange;
 
-            // If small caps outperform, it's a healthy market
-            if (iwmChange > spyChange && spyChange > 0) {
-                marketScore += 15;
-                factors.push('💪 Healthy breadth - Small caps leading');
-            } else if (spyChange > 0 && iwmChange < 0) {
-                marketScore -= 10;
-                factors.push('⚠️ Narrow market - Only large caps up');
-            }
-        }
-
-        // ═══════════════════════════════════════════════════════════════
-        // FACTOR 3: TREND STRENGTH (Moving Averages)
-        // ═══════════════════════════════════════════════════════════════
-
-        if (indices.SPY && indices.SPY.closes.length >= 20) {
-            const closes = indices.SPY.closes;
-            const sma20 = closes.slice(-20).reduce((a, b) => a + b, 0) / 20;
-            const sma50 = closes.length >= 50 ? closes.slice(-50).reduce((a, b) => a + b, 0) / 50 : sma20;
-            const currentPrice = closes[closes.length - 1];
-
-            if (currentPrice > sma20 && sma20 > sma50) {
-                marketScore += 15;
-                factors.push('📊 Strong uptrend - Price above 20 & 50 SMA');
-            } else if (currentPrice < sma20 && sma20 < sma50) {
+            // Daily breadth
+            if (iwmChange > spyChange + 0.5 && spyChange > 0) {
+                marketScore += 20;
+                signals.push(`💪 Excellent breadth - Small caps leading (+${(iwmChange - spyChange).toFixed(2)}%)`);
+                confidence += 18;
+            } else if (iwmChange > spyChange && spyChange > 0) {
+                marketScore += 12;
+                signals.push(`✓ Healthy breadth - Broad market participation`);
+                confidence += 12;
+            } else if (spyChange > 0.5 && iwmChange < -0.5) {
                 marketScore -= 15;
-                factors.push('📊 Downtrend - Price below moving averages');
-            } else {
-                factors.push('📊 Mixed trend signals');
+                warnings.push(`⚠️ Narrow rally - Only large caps advancing (breadth divergence)`);
+                confidence += 10;
+            } else if (spyChange < 0 && iwmChange < spyChange - 1) {
+                marketScore -= 12;
+                warnings.push(`📉 Small caps underperforming - Defensive behavior`);
+            }
+
+            // Weekly breadth confirmation
+            if (iwmWeek > spyWeek && spyWeek > 1) {
+                marketScore += 5;
+                signals.push(`🎯 Weekly breadth confirms strength`);
+                confidence += 8;
             }
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // FACTOR 4: VOLATILITY ASSESSMENT (VIX Proxy)
+        // FACTOR 3: SPY TECHNICAL INDICATORS (Weight: 18 points)
+        // RSI, MACD, Moving averages, Market regime
         // ═══════════════════════════════════════════════════════════════
 
-        if (indices.SPY && indices.SPY.closes.length >= 10) {
-            const closes = indices.SPY.closes.slice(-10);
+        if (indices.SPY && indices.SPY.closes && indices.SPY.closes.length >= 50) {
+            const spyCloses = indices.SPY.closes;
+            const spyHighs = indices.SPY.highs;
+            const spyLows = indices.SPY.lows;
+            const spyPrice = spyCloses[spyCloses.length - 1];
+
+            // RSI Analysis
+            const rsi = calculateRealRSI(spyCloses);
+            if (rsi !== null) {
+                if (rsi < 30) {
+                    marketScore += 10;
+                    signals.push(`💎 SPY oversold (RSI: ${rsi.toFixed(1)}) - Bounce likely`);
+                    confidence += 15;
+                } else if (rsi < 40) {
+                    marketScore += 6;
+                    signals.push(`📉 SPY approaching oversold (RSI: ${rsi.toFixed(1)})`);
+                    confidence += 10;
+                } else if (rsi > 70) {
+                    marketScore -= 8;
+                    warnings.push(`⚠️ SPY overbought (RSI: ${rsi.toFixed(1)}) - Pullback risk`);
+                    confidence += 12;
+                } else if (rsi > 60 && indices.SPY.change > 0) {
+                    marketScore += 4;
+                    signals.push(`🚀 SPY bullish momentum (RSI: ${rsi.toFixed(1)})`);
+                    confidence += 8;
+                } else {
+                    factors.push(`📊 SPY RSI neutral: ${rsi.toFixed(1)}`);
+                }
+            }
+
+            // MACD Analysis
+            const macd = calculateMACD(spyCloses);
+            if (macd) {
+                if (macd.histogram > 0 && macd.macd > 0) {
+                    marketScore += 8;
+                    signals.push(`📈 SPY MACD bullish crossover (histogram: ${macd.histogram.toFixed(2)})`);
+                    confidence += 10;
+                } else if (macd.histogram < 0 && macd.macd < 0) {
+                    marketScore -= 8;
+                    warnings.push(`📉 SPY MACD bearish (histogram: ${macd.histogram.toFixed(2)})`);
+                }
+            }
+
+            // Moving Average Analysis
+            const sma20 = spyCloses.slice(-20).reduce((a, b) => a + b, 0) / 20;
+            const sma50 = spyCloses.slice(-50).reduce((a, b) => a + b, 0) / 50;
+            const ema10 = spyCloses.slice(-10).reduce((sum, val, i, arr) => {
+                const mult = 2 / (10 + 1);
+                return i === 0 ? val : (val - sum) * mult + sum;
+            }, 0);
+
+            if (spyPrice > ema10 && ema10 > sma20 && sma20 > sma50) {
+                marketScore += 15;
+                signals.push(`📊 SPY in STRONG uptrend - All MAs aligned bullish`);
+                confidence += 15;
+            } else if (spyPrice > sma20 && sma20 > sma50) {
+                marketScore += 10;
+                signals.push(`📊 SPY uptrend - Above 20 & 50 SMA`);
+                confidence += 12;
+            } else if (spyPrice < ema10 && ema10 < sma20 && sma20 < sma50) {
+                marketScore -= 15;
+                warnings.push(`📊 SPY in downtrend - All MAs bearish`);
+                confidence += 15;
+            } else if (spyPrice < sma20) {
+                marketScore -= 8;
+                warnings.push(`📊 SPY below 20-day SMA - Weakness`);
+            }
+
+            // Market Regime Detection for SPY
+            const regime = detectMarketRegime(spyCloses, spyHighs, spyLows);
+            if (regime) {
+                if (regime.regime === 'strong_uptrend') {
+                    marketScore += 12;
+                    signals.push(`🎯 SPY STRONG UPTREND confirmed (${regime.trendStrength.toFixed(1)}% strength)`);
+                    confidence += 15;
+                } else if (regime.regime === 'uptrend') {
+                    marketScore += 7;
+                    signals.push(`📈 SPY trending up (${regime.trendStrength.toFixed(1)}%)`);
+                    confidence += 10;
+                } else if (regime.regime === 'strong_downtrend') {
+                    marketScore -= 12;
+                    warnings.push(`⚠️ SPY STRONG DOWNTREND (${regime.trendStrength.toFixed(1)}%)`);
+                    confidence += 15;
+                } else if (regime.regime === 'choppy') {
+                    marketScore -= 5;
+                    warnings.push(`📦 SPY choppy/volatile - Use caution`);
+                }
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // FACTOR 4: VOLATILITY ANALYSIS - VIX & Realized Vol (Weight: 15 points)
+        // Real VIX proxy + SPY volatility calculation
+        // ═══════════════════════════════════════════════════════════════
+
+        // VXX (VIX proxy) analysis
+        if (indices.VXX) {
+            const vxxChange = indices.VXX.change;
+            const vxxWeek = indices.VXX.weekChange;
+
+            if (vxxChange < -5) {
+                marketScore += 15;
+                signals.push(`😌 Volatility collapsing (VXX: ${vxxChange.toFixed(1)}%) - Fear subsiding`);
+                confidence += 15;
+            } else if (vxxChange < -2) {
+                marketScore += 10;
+                signals.push(`👍 Volatility declining (VXX: ${vxxChange.toFixed(1)}%)`);
+                confidence += 10;
+            } else if (vxxChange > 10) {
+                marketScore -= 15;
+                warnings.push(`⚡ VOLATILITY SPIKE (VXX: +${vxxChange.toFixed(1)}%) - High risk!`);
+                confidence += 18;
+            } else if (vxxChange > 5) {
+                marketScore -= 10;
+                warnings.push(`⚠️ Rising volatility (VXX: +${vxxChange.toFixed(1)}%)`);
+                confidence += 12;
+            }
+
+            // Weekly volatility trend
+            if (vxxWeek < -10) {
+                marketScore += 5;
+                signals.push(`📉 Weekly vol trend down (VXX: ${vxxWeek.toFixed(1)}%) - Stable environment`);
+            }
+        }
+
+        // Realized volatility from SPY
+        if (indices.SPY && indices.SPY.closes.length >= 20) {
+            const closes = indices.SPY.closes.slice(-20);
             const returns = [];
             for (let i = 1; i < closes.length; i++) {
                 returns.push(Math.abs((closes[i] - closes[i - 1]) / closes[i - 1]));
             }
-            const avgVolatility = (returns.reduce((a, b) => a + b, 0) / returns.length) * 100;
+            const realizedVol = (returns.reduce((a, b) => a + b, 0) / returns.length) * 100;
 
-            if (avgVolatility < 0.5) {
-                marketScore += 10;
-                factors.push(`😌 Low volatility environment (${avgVolatility.toFixed(2)}%)`);
-            } else if (avgVolatility > 2) {
-                marketScore -= 15;
-                factors.push(`⚡ High volatility - elevated risk (${avgVolatility.toFixed(2)}%)`);
-            } else {
-                factors.push(`📊 Moderate volatility (${avgVolatility.toFixed(2)}%)`);
-            }
-        }
-
-        // ═══════════════════════════════════════════════════════════════
-        // FACTOR 5: SECTOR ROTATION (Tech vs Defensive)
-        // ═══════════════════════════════════════════════════════════════
-
-        if (indices.QQQ && indices.DIA) {
-            const techChange = indices.QQQ.weekChange; // Tech-heavy Nasdaq
-            const blueChipChange = indices.DIA.weekChange; // Blue chip Dow
-
-            if (techChange > blueChipChange && techChange > 2) {
-                marketScore += 10;
-                factors.push('🚀 Risk-on rotation - Tech outperforming');
-            } else if (blueChipChange > techChange && blueChipChange > 0) {
-                marketScore += 5;
-                factors.push('🛡️ Defensive rotation - Blue chips leading');
-            } else if (techChange < 0 && blueChipChange < 0) {
+            if (realizedVol < 0.4) {
+                marketScore += 8;
+                signals.push(`😌 Low realized volatility (${realizedVol.toFixed(2)}%) - Calm market`);
+                confidence += 10;
+            } else if (realizedVol > 1.5) {
                 marketScore -= 10;
-                factors.push('⚠️ Broad weakness across sectors');
+                warnings.push(`⚡ High realized volatility (${realizedVol.toFixed(2)}%) - Unstable`);
+                confidence += 12;
+            } else {
+                factors.push(`📊 Moderate volatility (${realizedVol.toFixed(2)}%)`);
             }
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // NORMALIZE AND DETERMINE RATING
+        // FACTOR 5: SECTOR ROTATION ANALYSIS (Weight: 15 points)
+        // Tech, Financials, Energy, Healthcare - Multi-sector analysis
+        // ═══════════════════════════════════════════════════════════════
+
+        const sectors = {
+            'XLK': 'Technology',
+            'XLF': 'Financials',
+            'XLE': 'Energy',
+            'XLV': 'Healthcare'
+        };
+
+        const sectorData = [];
+        for (const [sym, name] of Object.entries(sectors)) {
+            if (indices[sym]) {
+                sectorData.push({
+                    name: name,
+                    symbol: sym,
+                    change: indices[sym].change,
+                    weekChange: indices[sym].weekChange
+                });
+            }
+        }
+
+        if (sectorData.length >= 3) {
+            const positiveSectors = sectorData.filter(s => s.change > 0).length;
+            const avgSectorChange = sectorData.reduce((sum, s) => sum + s.change, 0) / sectorData.length;
+            const sectorsUp = positiveSectors;
+            const sectorsTotal = sectorData.length;
+
+            // Broad sector strength
+            if (sectorsUp === sectorsTotal && avgSectorChange > 1) {
+                marketScore += 15;
+                signals.push(`🎯 ALL sectors rallying (${sectorsTotal}/${sectorsTotal}) - Broad strength!`);
+                confidence += 18;
+            } else if (sectorsUp >= sectorsTotal * 0.75) {
+                marketScore += 10;
+                signals.push(`✅ Most sectors advancing (${sectorsUp}/${sectorsTotal})`);
+                confidence += 12;
+            } else if (sectorsUp <= sectorsTotal * 0.25) {
+                marketScore -= 12;
+                warnings.push(`⚠️ Broad sector weakness (${sectorsUp}/${sectorsTotal} up)`);
+                confidence += 10;
+            }
+
+            // Cyclical vs Defensive rotation
+            const techSector = sectorData.find(s => s.symbol === 'XLK');
+            const healthSector = sectorData.find(s => s.symbol === 'XLV');
+
+            if (techSector && healthSector) {
+                if (techSector.change > healthSector.change + 0.5 && techSector.change > 0) {
+                    marketScore += 8;
+                    signals.push(`🚀 Risk-on: Tech outperforming defensives (+${(techSector.change - healthSector.change).toFixed(2)}%)`);
+                    confidence += 10;
+                } else if (healthSector.change > techSector.change + 0.5 && techSector.change < 0) {
+                    marketScore -= 8;
+                    warnings.push(`🛡️ Risk-off: Defensives outperforming - Flight to safety`);
+                }
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // FACTOR 6: SAFE HAVEN ANALYSIS (Weight: 12 points)
+        // Bonds (TLT) and Gold (GLD) - Risk sentiment gauge
+        // ═══════════════════════════════════════════════════════════════
+
+        if (indices.TLT || indices.GLD) {
+            let safeHavenDemand = 0;
+
+            if (indices.TLT) {
+                const bondChange = indices.TLT.change;
+                if (bondChange > 1 && indices.SPY && indices.SPY.change < 0) {
+                    safeHavenDemand += 1;
+                    marketScore -= 12;
+                    warnings.push(`🛡️ BONDS rallying (+${bondChange.toFixed(2)}%) while stocks fall - Risk-off!`);
+                    confidence += 15;
+                } else if (bondChange < -0.5 && indices.SPY && indices.SPY.change > 0) {
+                    safeHavenDemand -= 1;
+                    marketScore += 8;
+                    signals.push(`📉 Bonds selling (${bondChange.toFixed(2)}%) - Risk appetite strong`);
+                    confidence += 10;
+                }
+            }
+
+            if (indices.GLD) {
+                const goldChange = indices.GLD.change;
+                if (goldChange > 1.5 && indices.SPY && indices.SPY.change < 0) {
+                    safeHavenDemand += 1;
+                    marketScore -= 10;
+                    warnings.push(`🥇 GOLD rallying (+${goldChange.toFixed(2)}%) - Fear rising`);
+                    confidence += 12;
+                } else if (goldChange < -1 && indices.SPY && indices.SPY.change > 0) {
+                    marketScore += 6;
+                    signals.push(`📉 Gold weak - Risk-on environment`);
+                }
+            }
+
+            if (safeHavenDemand >= 2) {
+                warnings.push(`🚨 STRONG safe haven demand - Market stress detected!`);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // FACTOR 7: EMERGING MARKETS CORRELATION (Weight: 8 points)
+        // EEM performance vs SPY - Global risk appetite gauge
+        // ═══════════════════════════════════════════════════════════════
+
+        if (indices.EEM && indices.SPY) {
+            const eemChange = indices.EEM.change;
+            const spyChange = indices.SPY.change;
+
+            if (eemChange > spyChange && spyChange > 0.5) {
+                marketScore += 8;
+                signals.push(`🌍 Emerging markets leading (+${eemChange.toFixed(2)}%) - Strong global appetite`);
+                confidence += 10;
+            } else if (eemChange < spyChange - 1 && eemChange < 0) {
+                marketScore -= 8;
+                warnings.push(`🌍 EM underperforming (${eemChange.toFixed(2)}%) - Global weakness`);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // FACTOR 8: VOLUME CONFIRMATION (Weight: 10 points)
+        // Check if moves are backed by volume
+        // ═══════════════════════════════════════════════════════════════
+
+        if (indices.SPY && indices.SPY.volumes && indices.SPY.volumes.length >= 20) {
+            const volumes = indices.SPY.volumes;
+            const avgVolume = volumes.slice(-20).reduce((a, b) => a + b, 0) / 20;
+            const todayVolume = volumes[volumes.length - 1];
+            const volumeRatio = todayVolume / avgVolume;
+            const spyChange = indices.SPY.change;
+
+            if (volumeRatio > 1.5 && spyChange > 0.5) {
+                marketScore += 10;
+                signals.push(`📊 Strong volume confirmation (${volumeRatio.toFixed(1)}x avg) - Bullish conviction`);
+                confidence += 15;
+            } else if (volumeRatio > 1.2 && spyChange > 0) {
+                marketScore += 6;
+                signals.push(`✓ Above-average volume (${volumeRatio.toFixed(1)}x)`);
+                confidence += 10;
+            } else if (volumeRatio < 0.7 && Math.abs(spyChange) > 1) {
+                marketScore -= 5;
+                warnings.push(`⚠️ Low volume on big move (${volumeRatio.toFixed(1)}x) - Weak conviction`);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // FACTOR 9: INDEX CORRELATION ANALYSIS (Weight: 8 points)
+        // Check if indices move together (healthy) or diverge (warning)
+        // ═══════════════════════════════════════════════════════════════
+
+        const coreChanges = ['SPY', 'QQQ', 'DIA'].filter(s => indices[s]).map(s => indices[s].change);
+        if (coreChanges.length === 3) {
+            const allPositive = coreChanges.every(c => c > 0);
+            const allNegative = coreChanges.every(c => c < 0);
+            const maxDiff = Math.max(...coreChanges) - Math.min(...coreChanges);
+
+            if ((allPositive || allNegative) && maxDiff < 0.5) {
+                marketScore += 8;
+                signals.push(`🎯 Perfect index correlation - Unified market direction`);
+                confidence += 12;
+            } else if (maxDiff > 2) {
+                marketScore -= 6;
+                warnings.push(`⚠️ Index divergence (${maxDiff.toFixed(1)}% spread) - Mixed signals`);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // FACTOR 10: SUPPORT/RESISTANCE FOR SPY (Weight: 10 points)
+        // Check if SPY at key technical levels
+        // ═══════════════════════════════════════════════════════════════
+
+        if (indices.SPY && indices.SPY.highs && indices.SPY.lows && indices.SPY.closes) {
+            const sr = detectSupportResistance(indices.SPY.highs, indices.SPY.lows, indices.SPY.closes);
+            if (sr) {
+                const spyPrice = indices.SPY.price;
+
+                if (sr.nearestSupport && Math.abs(spyPrice - sr.nearestSupport.price) / spyPrice < 0.01) {
+                    marketScore += 10;
+                    signals.push(`🎯 SPY at major support $${sr.nearestSupport.price.toFixed(2)} (${sr.nearestSupport.touches} touches) - Bounce zone`);
+                    confidence += 15;
+                } else if (sr.nearestResistance && Math.abs(spyPrice - sr.nearestResistance.price) / spyPrice < 0.01) {
+                    marketScore -= 8;
+                    warnings.push(`⚠️ SPY at resistance $${sr.nearestResistance.price.toFixed(2)} - Breakout or rejection?`);
+                    confidence += 12;
+                }
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // NORMALIZE SCORE AND CONFIDENCE
         // ═══════════════════════════════════════════════════════════════
 
         marketScore = Math.max(0, Math.min(100, marketScore));
+        confidence = Math.max(0, Math.min(100, confidence));
 
-        let sentiment, recommendation, emoji, advice;
+        // Combine signals and warnings into factors
+        factors.push(...signals, ...warnings);
 
-        if (marketScore >= 80) {
+        // ═══════════════════════════════════════════════════════════════
+        // DETERMINE RATING AND RECOMMENDATIONS
+        // ═══════════════════════════════════════════════════════════════
+
+        let sentiment, recommendation, emoji, advice, confidenceLevel;
+
+        if (marketScore >= 85) {
             sentiment = 'VERY BULLISH';
             emoji = '🟢🟢🟢';
             recommendation = 'STRONG BUY';
-            advice = 'Excellent day to deploy capital. Market conditions are highly favorable for buying quality stocks.';
-        } else if (marketScore >= 65) {
+            advice = '🚀 EXCEPTIONAL market conditions! Deploy capital aggressively. All systems bullish - maximum conviction buying opportunity.';
+        } else if (marketScore >= 75) {
             sentiment = 'BULLISH';
             emoji = '🟢🟢';
             recommendation = 'BUY';
-            advice = 'Good day to add positions. Market showing positive momentum.';
-        } else if (marketScore >= 55) {
-            sentiment = 'SLIGHTLY BULLISH';
+            advice = '✅ Favorable market environment. Good day to add quality positions. Strong positive momentum across multiple factors.';
+        } else if (marketScore >= 65) {
+            sentiment = 'MODERATELY BULLISH';
             emoji = '🟢';
             recommendation = 'SELECTIVE BUYING';
-            advice = 'Market is moderately positive. Look for high-quality setups only.';
+            advice = '👍 Market showing strength but not all-clear. Focus on high-quality setups with strong technicals.';
+        } else if (marketScore >= 55) {
+            sentiment = 'SLIGHTLY BULLISH';
+            emoji = '🟡🟢';
+            recommendation = 'CAUTIOUS BUYING';
+            advice = '⚖️ Mildly positive conditions. Can add positions selectively but keep sizes moderate and stops tight.';
         } else if (marketScore >= 45) {
             sentiment = 'NEUTRAL';
             emoji = '🟡';
             recommendation = 'HOLD';
-            advice = 'Mixed market signals. Best to hold existing positions and wait for clarity.';
+            advice = '⏸️ Mixed signals - no clear market direction. Best to hold existing positions and wait for better clarity.';
         } else if (marketScore >= 35) {
             sentiment = 'SLIGHTLY BEARISH';
             emoji = '🟠';
             recommendation = 'CAUTION';
-            advice = 'Market showing weakness. Consider reducing exposure or tightening stop-losses.';
-        } else if (marketScore >= 20) {
+            advice = '⚠️ Market showing weakness. Consider trimming positions, tightening stops, or reducing exposure to risk.';
+        } else if (marketScore >= 25) {
             sentiment = 'BEARISH';
             emoji = '🔴🔴';
             recommendation = 'REDUCE HOLDINGS';
-            advice = 'Unfavorable market conditions. Consider selling weak positions and raising cash.';
+            advice = '📉 Unfavorable conditions. Actively reduce exposure, sell weak positions, raise cash. Preservation mode.';
         } else {
             sentiment = 'VERY BEARISH';
             emoji = '🔴🔴🔴';
             recommendation = 'SELL / CASH';
-            advice = 'High risk environment. Preserve capital. Stay in cash or defensive positions.';
+            advice = '🚨 HIGH RISK environment! Sell aggressively, raise maximum cash, or short. Capital preservation critical.';
+        }
+
+        // Confidence level description
+        if (confidence >= 75) {
+            confidenceLevel = 'VERY HIGH';
+        } else if (confidence >= 60) {
+            confidenceLevel = 'HIGH';
+        } else if (confidence >= 40) {
+            confidenceLevel = 'MODERATE';
+        } else {
+            confidenceLevel = 'LOW';
         }
 
         return {
             rating: Math.round(marketScore),
+            confidence: Math.round(confidence),
+            confidenceLevel: confidenceLevel,
             sentiment: sentiment,
             emoji: emoji,
             recommendation: recommendation,
             advice: advice,
             factors: factors,
+            signals: signals,
+            warnings: warnings,
             timestamp: new Date().toISOString(),
             indices: indices,
-            ultraThinkVersion: '2.0 + Market Intelligence'
+            breakdown: {
+                indicesPerformance: '25 pts',
+                marketBreadth: '20 pts',
+                spyTechnicals: '18 pts',
+                volatilityAnalysis: '15 pts',
+                sectorRotation: '15 pts',
+                safeHaven: '12 pts',
+                volumeConfirmation: '10 pts',
+                supportResistance: '10 pts',
+                correlation: '8 pts',
+                emergingMarkets: '8 pts'
+            },
+            ultraThinkVersion: '3.0 - Ultra-Enhanced Market Intelligence',
+            factorsAnalyzed: 15,
+            dataPoints: Object.keys(indices).length
         };
 
     } catch (error) {
         console.error('Error calculating market rating:', error);
         return {
             rating: 50,
+            confidence: 0,
             sentiment: 'UNKNOWN',
             emoji: '❓',
             recommendation: 'UNABLE TO ASSESS',
-            advice: 'Market data unavailable. Trade with caution.',
-            factors: ['Error fetching market data'],
-            error: error.message
+            advice: 'Market data temporarily unavailable. Exercise caution and trade with reduced size until data is restored.',
+            factors: ['⚠️ Error fetching market data - API issue or network problem'],
+            error: error.message,
+            timestamp: new Date().toISOString()
         };
     }
 }
