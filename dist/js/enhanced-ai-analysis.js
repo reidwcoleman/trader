@@ -1460,13 +1460,38 @@ function predictNextWeekPrice(stockData, historicalData) {
 function getMarketStatus() {
     const now = new Date();
 
-    // Convert to ET timezone
-    const etTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    // Convert to ET timezone using proper date formatting
+    const etString = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
+    const etTime = new Date(etString);
+
+    // Validate the date
+    if (isNaN(etTime.getTime())) {
+        console.error('Invalid ET time conversion');
+        // Fallback to UTC
+        const utcTime = new Date();
+        const day = utcTime.getDay();
+        const hours = utcTime.getHours();
+        const minutes = utcTime.getMinutes();
+        const timeInMinutes = hours * 60 + minutes;
+
+        // Adjust for ET (UTC - 5 hours for EST, UTC - 4 for EDT)
+        // Simple approximation - assume EDT (summer time)
+        const etHours = (hours - 4 + 24) % 24;
+        const etMinutes = minutes;
+        const etTimeInMinutes = etHours * 60 + etMinutes;
+
+        return createMarketStatus(day, etTimeInMinutes, new Date());
+    }
+
     const day = etTime.getDay(); // 0 = Sunday, 6 = Saturday
     const hours = etTime.getHours();
     const minutes = etTime.getMinutes();
     const timeInMinutes = hours * 60 + minutes;
 
+    return createMarketStatus(day, timeInMinutes, etTime);
+}
+
+function createMarketStatus(day, timeInMinutes, currentTime) {
     // Market hours: 9:30 AM (570 min) to 4:00 PM (960 min)
     const marketOpen = 9 * 60 + 30;  // 9:30 AM = 570 minutes
     const marketClose = 16 * 60;      // 4:00 PM = 960 minutes
@@ -1478,7 +1503,7 @@ function getMarketStatus() {
     const isMarketHours = !isWeekend && timeInMinutes >= marketOpen && timeInMinutes < marketClose;
 
     // Calculate last close time
-    let lastClose = new Date(etTime);
+    let lastClose = new Date(currentTime.getTime());
     if (isWeekend) {
         // If weekend, last close was Friday 4 PM
         const daysToFriday = day === 0 ? 2 : 1; // Sunday = 2 days back, Saturday = 1 day back
@@ -1500,7 +1525,7 @@ function getMarketStatus() {
     }
 
     // Calculate next open
-    let nextOpen = new Date(etTime);
+    let nextOpen = new Date(currentTime.getTime());
     if (isWeekend) {
         // Next open is Monday 9:30 AM
         const daysToMonday = day === 0 ? 1 : 2; // Sunday = 1 day, Saturday = 2 days
@@ -1533,7 +1558,7 @@ function getMarketStatus() {
         nextOpen,
         lastClose,
         status,
-        currentTime: etTime
+        currentTime: currentTime
     };
 }
 
@@ -1558,11 +1583,17 @@ async function calculateMarketRating(apiKey) {
         // ═══════════════════════════════════════════════════════════════
 
         const marketStatus = getMarketStatus();
-        console.log(`📊 Market Status: ${marketStatus.status}`);
-        console.log(`🕐 Current ET Time: ${marketStatus.currentTime.toLocaleString()}`);
-        console.log(`🟢 Last Close: ${marketStatus.lastClose.toLocaleString()}`);
+        console.log(`📊 Market Status: ${marketStatus.status || 'Unknown'}`);
 
-        if (!marketStatus.isOpen) {
+        if (marketStatus.currentTime && typeof marketStatus.currentTime.toLocaleString === 'function') {
+            console.log(`🕐 Current ET Time: ${marketStatus.currentTime.toLocaleString()}`);
+        }
+
+        if (marketStatus.lastClose && typeof marketStatus.lastClose.toLocaleString === 'function') {
+            console.log(`🟢 Last Close: ${marketStatus.lastClose.toLocaleString()}`);
+        }
+
+        if (!marketStatus.isOpen && marketStatus.nextOpen && typeof marketStatus.nextOpen.toLocaleString === 'function') {
             console.log(`⏰ Next Open: ${marketStatus.nextOpen.toLocaleString()}`);
         }
 
@@ -2075,14 +2106,30 @@ async function calculateMarketRating(apiKey) {
                 correlation: '8 pts'
             },
             // Market Status Information
-            marketStatus: marketStatus.status,
-            isMarketOpen: marketStatus.isOpen,
-            dataAsOf: marketStatus.isOpen
-                ? `Live data (${marketStatus.currentTime.toLocaleTimeString('en-US', { timeZone: 'America/New_York' })} ET)`
-                : `Last close: ${marketStatus.lastClose.toLocaleString('en-US', { timeZone: 'America/New_York', dateStyle: 'short', timeStyle: 'short' })}`,
-            nextMarketOpen: marketStatus.isOpen
-                ? null
-                : marketStatus.nextOpen.toLocaleString('en-US', { timeZone: 'America/New_York', dateStyle: 'short', timeStyle: 'short' }),
+            marketStatus: marketStatus.status || 'Unknown',
+            isMarketOpen: marketStatus.isOpen || false,
+            dataAsOf: (() => {
+                try {
+                    if (marketStatus.isOpen && marketStatus.currentTime) {
+                        return `Live data (${marketStatus.currentTime.toLocaleTimeString('en-US', { timeZone: 'America/New_York' })} ET)`;
+                    } else if (marketStatus.lastClose) {
+                        return `Last close: ${marketStatus.lastClose.toLocaleString('en-US', { timeZone: 'America/New_York', dateStyle: 'short', timeStyle: 'short' })}`;
+                    }
+                } catch (e) {
+                    console.warn('Error formatting dataAsOf:', e);
+                }
+                return 'Recent market data';
+            })(),
+            nextMarketOpen: (() => {
+                try {
+                    if (!marketStatus.isOpen && marketStatus.nextOpen) {
+                        return marketStatus.nextOpen.toLocaleString('en-US', { timeZone: 'America/New_York', dateStyle: 'short', timeStyle: 'short' });
+                    }
+                } catch (e) {
+                    console.warn('Error formatting nextMarketOpen:', e);
+                }
+                return null;
+            })(),
             updateFrequency: marketStatus.isOpen ? 'Every 5 minutes' : 'Data from last market close',
             ultraThinkVersion: '3.1 - Market Hours Aware (Live/Last Close)',
             factorsAnalyzed: 7,
