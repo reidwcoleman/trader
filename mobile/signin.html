@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Mobile Redirect Script -->
-    <script src="/trader/mobile-redirect.js"></script>
+    <!-- Desktop Redirect Script -->
+    <script src="/trader/desktop-redirect.js"></script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account | FinClash Trading</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-optimized" content="true">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Sign In | FinClash Trading (Mobile)</title>
 
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6480210605786899"
@@ -159,17 +162,6 @@
             color: #93c5fd;
         }
 
-        .password-requirements {
-            font-size: 13px;
-            color: #93c5fd;
-            margin-top: 8px;
-            line-height: 1.6;
-        }
-
-        .password-requirements.valid {
-            color: #10b981;
-        }
-
         .btn-primary {
             width: 100%;
             padding: 16px;
@@ -262,25 +254,23 @@
             color: #6ee7b7;
         }
 
-        .premium-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
-            border: 2px solid rgba(6, 182, 212, 0.4);
-            padding: 12px 20px;
-            border-radius: 12px;
-            margin-bottom: 32px;
-            font-size: 14px;
-            font-weight: 700;
-            color: #22d3ee;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+        .forgot-password {
+            text-align: right;
+            margin-top: -12px;
+            margin-bottom: 24px;
         }
 
-        .premium-badge svg {
-            width: 20px;
-            height: 20px;
-            color: #10b981;
+        .forgot-password a {
+            font-size: 14px;
+            color: #06b6d4;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-weight: 600;
+        }
+
+        .forgot-password a:hover {
+            color: #22d3ee;
+            text-decoration: underline;
         }
 
         @media (max-width: 768px) {
@@ -293,37 +283,21 @@
             }
         }
     </style>
+    <!-- Mobile-Optimized CSS -->
+    <link rel="stylesheet" href="/trader/mobile/mobile/css/mobile-optimized.css">
 </head>
 <body>
     <!-- Main Content -->
     <div class="auth-container">
         <div class="auth-box">
             <div class="auth-header">
-                <h1 class="auth-title">Create Account</h1>
-                <p class="auth-subtitle">Start trading with FinClash</p>
-            </div>
-
-            <div class="premium-badge">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                Free Access to Trading Portfolio
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-subtitle">Sign in to FinClash Trading</p>
             </div>
 
             <div id="alert" class="alert"></div>
 
-            <form id="registerForm">
-                <div class="form-group">
-                    <label for="name" class="form-label">Full Name (Optional)</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        class="form-input"
-                        placeholder="John Doe"
-                    >
-                </div>
-
+            <form id="signinForm">
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address</label>
                     <input
@@ -346,44 +320,30 @@
                         placeholder="••••••••"
                         required
                     >
-                    <div id="passwordReqs" class="password-requirements">
-                        Must be at least 8 characters
-                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="confirmPassword" class="form-label">Confirm Password</label>
-                    <input
-                        type="password"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        class="form-input"
-                        placeholder="••••••••"
-                        required
-                    >
+                <div class="forgot-password">
+                    <a href="#" id="forgotPasswordLink">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="btn-primary" id="submitBtn">
-                    Create Account
+                    Sign In
                 </button>
             </form>
 
             <div class="auth-divider">or</div>
 
             <div class="auth-footer">
-                Already have an account? <a href="signin.html">Sign In</a>
+                Don't have an account? <a href="create-account.html">Create Account</a>
             </div>
         </div>
     </div>
 
     <!-- Scripts -->
     <script>
-        const form = document.getElementById('registerForm');
+        const form = document.getElementById('signinForm');
         const alertBox = document.getElementById('alert');
         const submitBtn = document.getElementById('submitBtn');
-        const passwordInput = document.getElementById('password');
-        const passwordReqs = document.getElementById('passwordReqs');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
 
         function showAlert(message, type) {
             alertBox.textContent = message;
@@ -395,72 +355,55 @@
             }, 5000);
         }
 
-        // Password validation
-        passwordInput.addEventListener('input', () => {
-            if (passwordInput.value.length >= 8) {
-                passwordReqs.classList.add('valid');
-                passwordReqs.textContent = '✓ Password meets requirements';
-            } else {
-                passwordReqs.classList.remove('valid');
-                passwordReqs.textContent = 'Must be at least 8 characters';
-            }
-        });
-
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
-            const password = passwordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
+            const password = document.getElementById('password').value;
 
-            // Validation
+            // Basic validation
             if (!email || !password) {
-                showAlert('Please fill in all required fields', 'error');
-                return;
-            }
-
-            if (password.length < 8) {
-                showAlert('Password must be at least 8 characters', 'error');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                showAlert('Passwords do not match', 'error');
+                showAlert('Please fill in all fields', 'error');
                 return;
             }
 
             // Disable button during submission
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Creating Account...';
+            submitBtn.textContent = 'Signing in...';
 
             try {
-                const response = await fetch('/api/accounts/create', {
+                const response = await fetch('/api/accounts/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ userName: name, email, password })
+                    body: JSON.stringify({ email, password })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    showAlert('Account created successfully! Redirecting...', 'success');
+                    showAlert('Sign in successful! Redirecting...', 'success');
                     setTimeout(() => {
                         window.location.href = 'index.html';
                     }, 1000);
                 } else {
-                    showAlert(data.message || 'Registration failed', 'error');
+                    showAlert(data.message || 'Sign in failed', 'error');
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Create Account';
+                    submitBtn.textContent = 'Sign In';
                 }
             } catch (error) {
-                console.error('Registration error:', error);
+                console.error('Sign in error:', error);
                 showAlert('An error occurred. Please try again.', 'error');
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Create Account';
+                submitBtn.textContent = 'Sign In';
             }
+        });
+
+        // Forgot password handler (placeholder)
+        document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showAlert('Password reset feature coming soon! Please contact support.', 'error');
         });
     </script>
 </body>

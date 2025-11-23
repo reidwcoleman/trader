@@ -1,0 +1,570 @@
+/**
+ * FinClash Mobile-Optimized CSS
+ * UltraThink Mobile Optimization System
+ * Comprehensive mobile-first styling for trading platform
+ */
+
+/* ============================================
+   MOBILE-FIRST RESET & BASE STYLES
+   ============================================ */
+
+* {
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.2);
+    -webkit-touch-callout: none;
+}
+
+html {
+    font-size: 16px; /* Optimal mobile readability */
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+
+body.mobile-optimized {
+    font-size: 16px;
+    line-height: 1.5;
+    overflow-x: hidden;
+    max-width: 100vw;
+    position: relative;
+}
+
+/* ============================================
+   TOUCH TARGET OPTIMIZATION
+   ============================================ */
+
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+.clickable,
+.tab-button,
+.nav-button {
+    min-height: 44px; /* Apple HIG recommendation */
+    min-width: 44px;
+    padding: 12px 16px;
+    touch-action: manipulation;
+}
+
+/* Larger touch targets for critical actions */
+.primary-button,
+.buy-button,
+.sell-button,
+.trade-button {
+    min-height: 48px !important;
+    min-width: 120px !important;
+    font-size: 16px !important;
+    font-weight: 600;
+}
+
+/* ============================================
+   RESPONSIVE LAYOUT
+   ============================================ */
+
+.container,
+.main-container,
+.app-container {
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 12px !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+}
+
+.grid,
+.flex-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+.row {
+    flex-direction: column !important;
+}
+
+.col,
+.column {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+}
+
+/* ============================================
+   NAVIGATION & HEADER
+   ============================================ */
+
+.header,
+.navbar,
+.nav-bar,
+.top-bar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    width: 100% !important;
+    padding: 12px 16px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.nav-links,
+.menu-links {
+    flex-direction: column !important;
+    width: 100% !important;
+}
+
+.nav-item {
+    width: 100% !important;
+    padding: 12px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Hamburger Menu */
+.mobile-menu-toggle {
+    display: block !important;
+    position: absolute;
+    top: 12px;
+    right: 16px;
+}
+
+/* ============================================
+   TRADING INTERFACE
+   ============================================ */
+
+.trading-panel,
+.order-panel,
+.trade-form {
+    width: 100% !important;
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    border-radius: 12px !important;
+}
+
+.stock-search,
+.symbol-input {
+    width: 100% !important;
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+    padding: 12px 16px !important;
+}
+
+.order-inputs {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+.order-input,
+.quantity-input,
+.price-input {
+    width: 100% !important;
+    font-size: 16px !important;
+    padding: 12px !important;
+}
+
+/* Buy/Sell Buttons - Full Width on Mobile */
+.buy-button,
+.sell-button {
+    width: 100% !important;
+    margin: 8px 0 !important;
+}
+
+/* ============================================
+   CHARTS & GRAPHS
+   ============================================ */
+
+.chart-container,
+.tradingview-chart,
+.stock-chart {
+    width: 100% !important;
+    height: 300px !important; /* Optimized for mobile viewing */
+    margin: 16px 0 !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.chart-controls {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    justify-content: center !important;
+    padding: 12px 0 !important;
+}
+
+.chart-button {
+    min-width: 60px !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+}
+
+/* ============================================
+   PORTFOLIO & HOLDINGS
+   ============================================ */
+
+.portfolio-card,
+.holdings-card {
+    width: 100% !important;
+    padding: 16px !important;
+    margin-bottom: 12px !important;
+    border-radius: 12px !important;
+}
+
+.portfolio-stats {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+}
+
+.stat-card {
+    padding: 12px !important;
+    text-align: center;
+}
+
+.holdings-list {
+    width: 100% !important;
+}
+
+.holding-item {
+    padding: 12px !important;
+    margin-bottom: 8px !important;
+    border-radius: 8px !important;
+}
+
+/* ============================================
+   TABLES & DATA DISPLAY
+   ============================================ */
+
+table {
+    width: 100% !important;
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    font-size: 14px !important;
+}
+
+thead {
+    display: none !important; /* Hide on mobile, use card layout */
+}
+
+tbody {
+    display: block !important;
+}
+
+tr {
+    display: block !important;
+    margin-bottom: 12px !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    background: rgba(255,255,255,0.05) !important;
+}
+
+td {
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 8px !important;
+    border: none !important;
+}
+
+td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    margin-right: 12px;
+}
+
+/* ============================================
+   MODALS & POPUPS
+   ============================================ */
+
+.modal,
+.popup,
+.dialog {
+    width: 95% !important;
+    max-width: 95vw !important;
+    margin: 20px auto !important;
+    padding: 20px !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+}
+
+.modal-content {
+    padding: 16px !important;
+}
+
+.modal-header {
+    font-size: 20px !important;
+    margin-bottom: 16px !important;
+}
+
+.modal-close {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    font-size: 24px !important;
+}
+
+/* ============================================
+   FORMS & INPUTS
+   ============================================ */
+
+form {
+    width: 100% !important;
+}
+
+input,
+select,
+textarea {
+    width: 100% !important;
+    font-size: 16px !important; /* Prevents iOS zoom */
+    padding: 12px 16px !important;
+    margin-bottom: 12px !important;
+    border-radius: 8px !important;
+    box-sizing: border-box;
+}
+
+label {
+    display: block !important;
+    margin-bottom: 6px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+}
+
+/* ============================================
+   LEARNING & EDUCATION SECTIONS
+   ============================================ */
+
+.lesson-card,
+.quiz-card,
+.education-card {
+    width: 100% !important;
+    padding: 16px !important;
+    margin-bottom: 12px !important;
+    border-radius: 12px !important;
+}
+
+.quiz-option {
+    width: 100% !important;
+    padding: 12px !important;
+    margin-bottom: 8px !important;
+    min-height: 44px !important;
+}
+
+.flashcard {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 250px !important;
+    margin: 16px 0 !important;
+}
+
+/* ============================================
+   AI ANALYSIS & INSIGHTS
+   ============================================ */
+
+.ai-panel,
+.analysis-card,
+.insight-card {
+    width: 100% !important;
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    border-radius: 12px !important;
+}
+
+.ai-recommendation {
+    padding: 12px !important;
+    margin: 8px 0 !important;
+    border-left: 4px solid #3b82f6;
+}
+
+/* ============================================
+   NOTIFICATIONS & ALERTS
+   ============================================ */
+
+.notification,
+.alert,
+.toast {
+    width: calc(100% - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
+    margin: 16px !important;
+    padding: 16px !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+}
+
+/* ============================================
+   TABS & NAVIGATION
+   ============================================ */
+
+.tabs,
+.tab-list {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 8px !important;
+    padding: 8px !important;
+}
+
+.tab {
+    min-width: 100px !important;
+    flex-shrink: 0 !important;
+    padding: 12px 16px !important;
+    white-space: nowrap !important;
+}
+
+/* ============================================
+   SCROLLBARS - WEBKIT MOBILE
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.5);
+    border-radius: 3px;
+}
+
+/* ============================================
+   IMAGES & MEDIA
+   ============================================ */
+
+img {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+video {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* ============================================
+   TYPOGRAPHY - MOBILE OPTIMIZED
+   ============================================ */
+
+h1 { font-size: 28px !important; line-height: 1.2 !important; margin-bottom: 16px !important; }
+h2 { font-size: 24px !important; line-height: 1.3 !important; margin-bottom: 14px !important; }
+h3 { font-size: 20px !important; line-height: 1.4 !important; margin-bottom: 12px !important; }
+h4 { font-size: 18px !important; line-height: 1.4 !important; margin-bottom: 10px !important; }
+h5 { font-size: 16px !important; line-height: 1.5 !important; margin-bottom: 8px !important; }
+h6 { font-size: 14px !important; line-height: 1.5 !important; margin-bottom: 8px !important; }
+
+p {
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 12px !important;
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+.heavy-animation,
+.complex-animation {
+    animation: none !important; /* Disable heavy animations on mobile */
+    transition: none !important;
+}
+
+.will-change-transform {
+    will-change: transform; /* Hardware acceleration hint */
+}
+
+/* Reduce motion for better performance */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================
+   DARK MODE OPTIMIZATION
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+    body.mobile-optimized {
+        background: #0a0a0a;
+        color: #e8e8e8;
+    }
+}
+
+/* ============================================
+   ORIENTATION HANDLING
+   ============================================ */
+
+@media (orientation: landscape) {
+    .chart-container {
+        height: 250px !important;
+    }
+
+    .portfolio-stats {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
+
+/* ============================================
+   SMALL MOBILE DEVICES (< 375px)
+   ============================================ */
+
+@media (max-width: 375px) {
+    html {
+        font-size: 14px;
+    }
+
+    .container {
+        padding: 8px !important;
+    }
+
+    button {
+        min-height: 40px !important;
+        padding: 10px 12px !important;
+    }
+
+    h1 { font-size: 24px !important; }
+    h2 { font-size: 20px !important; }
+    h3 { font-size: 18px !important; }
+}
+
+/* ============================================
+   LARGE MOBILE DEVICES & PHABLETS (> 600px)
+   ============================================ */
+
+@media (min-width: 600px) {
+    .portfolio-stats {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    .chart-container {
+        height: 350px !important;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.mobile-only {
+    display: block !important;
+}
+
+.desktop-only {
+    display: none !important;
+}
+
+.full-width {
+    width: 100% !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.no-scroll {
+    overflow: hidden !important;
+}
+
+.scroll-smooth {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
