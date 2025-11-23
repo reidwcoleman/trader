@@ -182,6 +182,7 @@ const TradingSimulator = () => {
             const [stockPredictions, setStockPredictions] = useState({}); // { symbol: prediction }
             const [showMarketBanner, setShowMarketBanner] = useState(true);
             const [showMarketRatingModal, setShowMarketRatingModal] = useState(false); // Auto-popup on login
+            const [shouldShowMarketRatingOnLoad, setShouldShowMarketRatingOnLoad] = useState(false); // Flag for auto-show after login
 
             // Trade analysis system
             const [showTradeAnalysis, setShowTradeAnalysis] = useState(false);
@@ -3014,6 +3015,19 @@ const TradingSimulator = () => {
 
                 return () => clearInterval(interval);
             }, []);
+
+            // Auto-show market rating modal after login when data is ready
+            useEffect(() => {
+                if (shouldShowMarketRatingOnLoad && marketRating && !loadingMarketRating) {
+                    // Show modal with a small delay for smooth transition
+                    const timer = setTimeout(() => {
+                        setShowMarketRatingModal(true);
+                        setShouldShowMarketRatingOnLoad(false); // Reset flag
+                    }, 500);
+
+                    return () => clearTimeout(timer);
+                }
+            }, [shouldShowMarketRatingOnLoad, marketRating, loadingMarketRating]);
 
             // Auto-generate AI analysis when stock is selected in AI Analysis tab
             useEffect(() => {
@@ -5905,10 +5919,11 @@ const TradingSimulator = () => {
                                                         setView('app');
                                                         setLoading(false);
 
-                                                        // Show market rating popup after 1 second
-                                                        setTimeout(() => {
-                                                            setShowMarketRatingModal(true);
-                                                        }, 1000);
+                                                        // Set flag to show market rating modal once it loads
+                                                        setShouldShowMarketRatingOnLoad(true);
+
+                                                        // Fetch market rating immediately on login
+                                                        fetchMarketRating();
                                                     } catch (error) {
                                                         clearInterval(countdownInterval);
                                                         setLoginCountdown(null);
