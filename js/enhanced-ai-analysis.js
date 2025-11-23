@@ -1466,21 +1466,35 @@ function getMarketStatus() {
 
     // Validate the date
     if (isNaN(etTime.getTime())) {
-        console.error('Invalid ET time conversion');
-        // Fallback to UTC
+        console.warn('⚠️ Invalid ET time conversion, using fallback UTC calculation');
+        // Fallback: Create ET time manually from UTC
         const utcTime = new Date();
-        const day = utcTime.getDay();
-        const hours = utcTime.getHours();
-        const minutes = utcTime.getMinutes();
-        const timeInMinutes = hours * 60 + minutes;
+        const utcHours = utcTime.getUTCHours();
+        const utcMinutes = utcTime.getUTCMinutes();
 
-        // Adjust for ET (UTC - 5 hours for EST, UTC - 4 for EDT)
-        // Simple approximation - assume EDT (summer time)
-        const etHours = (hours - 4 + 24) % 24;
-        const etMinutes = minutes;
+        // ET is UTC-5 (EST) or UTC-4 (EDT)
+        // Determine DST - rough approximation (March-November is EDT)
+        const month = utcTime.getUTCMonth();
+        const isDST = month >= 2 && month <= 10; // March (2) to November (10)
+        const offset = isDST ? -4 : -5;
+
+        // Calculate ET time
+        const etHours = (utcHours + offset + 24) % 24;
+        const etMinutes = utcMinutes;
         const etTimeInMinutes = etHours * 60 + etMinutes;
 
-        return createMarketStatus(day, etTimeInMinutes, new Date());
+        // Adjust day if needed (when crossing midnight)
+        let etDay = utcTime.getUTCDay();
+        if (utcHours + offset < 0) {
+            etDay = (etDay - 1 + 7) % 7;
+        } else if (utcHours + offset >= 24) {
+            etDay = (etDay + 1) % 7;
+        }
+
+        // Create approximate ET date for last close calculations
+        const etApproxDate = new Date(utcTime.getTime() + (offset * 60 * 60 * 1000));
+
+        return createMarketStatus(etDay, etTimeInMinutes, etApproxDate);
     }
 
     const day = etTime.getDay(); // 0 = Sunday, 6 = Saturday
@@ -1648,8 +1662,14 @@ async function calculateMarketRating(apiKey) {
             console.log('📡 Fetching LIVE market data...');
         } else {
             // Market is closed - use last close time
-            toDate = Math.floor(marketStatus.lastClose.getTime() / 1000);
-            console.log(`📦 Fetching data from last close (${marketStatus.lastClose.toLocaleString()})...`);
+            if (marketStatus.lastClose && typeof marketStatus.lastClose.getTime === 'function') {
+                toDate = Math.floor(marketStatus.lastClose.getTime() / 1000);
+                console.log(`📦 Fetching data from last close (${marketStatus.lastClose.toLocaleString()})...`);
+            } else {
+                // Fallback to current time if lastClose is invalid
+                console.warn('⚠️ lastClose is invalid, using current time');
+                toDate = Math.floor(Date.now() / 1000);
+            }
         }
 
         const fromDate = toDate - (60 * 24 * 60 * 60); // 60 days of history
