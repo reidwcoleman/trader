@@ -181,6 +181,7 @@ const TradingSimulator = () => {
             const [loadingMarketRating, setLoadingMarketRating] = useState(false);
             const [stockPredictions, setStockPredictions] = useState({}); // { symbol: prediction }
             const [showMarketBanner, setShowMarketBanner] = useState(true);
+            const [showMarketRatingModal, setShowMarketRatingModal] = useState(false); // Auto-popup on login
 
             // Trade analysis system
             const [showTradeAnalysis, setShowTradeAnalysis] = useState(false);
@@ -5903,6 +5904,11 @@ const TradingSimulator = () => {
                                                         // Immediately transition to app
                                                         setView('app');
                                                         setLoading(false);
+
+                                                        // Show market rating popup after 1 second
+                                                        setTimeout(() => {
+                                                            setShowMarketRatingModal(true);
+                                                        }, 1000);
                                                     } catch (error) {
                                                         clearInterval(countdownInterval);
                                                         setLoginCountdown(null);
@@ -6037,6 +6043,125 @@ const TradingSimulator = () => {
 
             return (
                 <>
+                    {/* Market Rating Auto-Popup Modal */}
+                    {showMarketRatingModal && marketRating && (
+                        <div
+                            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fadeIn"
+                            onClick={() => setShowMarketRatingModal(false)}
+                        >
+                            <div
+                                className="bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-3xl max-w-2xl w-full border-4 shadow-2xl overflow-hidden animate-slideUp"
+                                style={{
+                                    borderColor: marketRating.rating >= 65 ? '#10b981' : marketRating.rating >= 45 ? '#f59e0b' : '#ef4444',
+                                    boxShadow: `0 0 60px ${marketRating.rating >= 65 ? 'rgba(16, 185, 129, 0.4)' : marketRating.rating >= 45 ? 'rgba(245, 158, 11, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {/* Header */}
+                                <div className={`p-6 bg-gradient-to-r ${marketRating.rating >= 65 ? 'from-green-500/20 to-emerald-500/20' : marketRating.rating >= 45 ? 'from-yellow-500/20 to-orange-500/20' : 'from-red-500/20 to-rose-500/20'} border-b border-gray-700`}>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-6xl">{marketRating.emoji}</div>
+                                            <div>
+                                                <h2 className="text-3xl font-black text-white mb-1">Market Intelligence Report</h2>
+                                                <p className="text-gray-400">UltraThink v3.1 - Market Hours Aware</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowMarketRatingModal(false)}
+                                            className="text-gray-400 hover:text-white text-3xl transition-colors"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Content */}
+                                <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+                                    {/* Market Status */}
+                                    <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-gray-400 font-semibold">Market Status</span>
+                                            <span className="text-lg font-bold text-white">{marketRating.marketStatus}</span>
+                                        </div>
+                                        <div className="text-sm text-gray-400">{marketRating.dataAsOf}</div>
+                                        {marketRating.nextMarketOpen && (
+                                            <div className="text-sm text-cyan-400 mt-1">Next Open: {marketRating.nextMarketOpen}</div>
+                                        )}
+                                        <div className="text-xs text-gray-500 mt-1">{marketRating.updateFrequency}</div>
+                                    </div>
+
+                                    {/* Rating Score */}
+                                    <div className="text-center">
+                                        <div className={`text-7xl font-black mb-2 ${marketRating.rating >= 65 ? 'text-green-400' : marketRating.rating >= 45 ? 'text-yellow-400' : 'text-red-400'}`}>
+                                            {marketRating.rating}/100
+                                        </div>
+                                        <div className={`text-2xl font-bold mb-2 px-6 py-2 rounded-full inline-block ${marketRating.rating >= 65 ? 'bg-green-500/20 text-green-300 border-2 border-green-500/40' : marketRating.rating >= 45 ? 'bg-yellow-500/20 text-yellow-300 border-2 border-yellow-500/40' : 'bg-red-500/20 text-red-300 border-2 border-red-500/40'}`}>
+                                            {marketRating.sentiment}
+                                        </div>
+                                        <div className={`text-xl font-black ${marketRating.rating >= 65 ? 'text-green-400' : marketRating.rating >= 45 ? 'text-yellow-400' : 'text-red-400'}`}>
+                                            {marketRating.recommendation}
+                                        </div>
+                                    </div>
+
+                                    {/* Advice */}
+                                    <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl p-4">
+                                        <p className="text-white leading-relaxed">{marketRating.advice}</p>
+                                    </div>
+
+                                    {/* Confidence */}
+                                    <div className="flex items-center justify-between bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                                        <span className="text-gray-400 font-semibold">Confidence Level</span>
+                                        <span className="text-lg font-bold text-cyan-400">{marketRating.confidenceLevel} ({marketRating.confidence}%)</span>
+                                    </div>
+
+                                    {/* Signals */}
+                                    {marketRating.signals && marketRating.signals.length > 0 && (
+                                        <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4">
+                                            <h3 className="text-green-400 font-bold mb-3 flex items-center gap-2">
+                                                <span>📈</span> Bullish Signals
+                                            </h3>
+                                            <ul className="space-y-2">
+                                                {marketRating.signals.map((signal, idx) => (
+                                                    <li key={idx} className="text-sm text-gray-300">{signal}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {/* Warnings */}
+                                    {marketRating.warnings && marketRating.warnings.length > 0 && (
+                                        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                                            <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2">
+                                                <span>⚠️</span> Bearish Warnings
+                                            </h3>
+                                            <ul className="space-y-2">
+                                                {marketRating.warnings.map((warning, idx) => (
+                                                    <li key={idx} className="text-sm text-gray-300">{warning}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {/* Footer */}
+                                    <div className="text-center text-xs text-gray-500">
+                                        {marketRating.factorsAnalyzed} factors analyzed • {marketRating.dataPoints} data points • {marketRating.ultraThinkVersion}
+                                    </div>
+                                </div>
+
+                                {/* Close Button */}
+                                <div className="p-4 bg-gray-800/50 border-t border-gray-700">
+                                    <button
+                                        onClick={() => setShowMarketRatingModal(false)}
+                                        className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl"
+                                    >
+                                        Got It! Let's Trade
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Toast Notification Container */}
                     <div className="toast-container">
                         {toasts.map(toast => {
