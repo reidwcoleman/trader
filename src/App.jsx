@@ -9337,12 +9337,12 @@ const TradingSimulator = () => {
                                                     <div className="grid grid-cols-2 gap-3 mb-3">
                                                         <div className="bg-black/40 rounded-lg p-3 border border-white/10">
                                                             <div className="text-xs text-gray-400 mb-1">Current Price</div>
-                                                            <div className="text-white font-bold text-lg">${prediction.currentPrice}</div>
+                                                            <div className="text-white font-bold text-lg">${prediction.currentPrice.toFixed(2)}</div>
                                                         </div>
                                                         <div className="bg-black/40 rounded-lg p-3 border border-white/10">
                                                             <div className="text-xs text-gray-400 mb-1">7-Day Target</div>
                                                             <div className={`font-bold text-lg ${isPredictionBullish ? 'text-green-300' : 'text-red-300'}`}>
-                                                                ${prediction.targetPrice} ({isPredictionBullish ? '+' : ''}{prediction.expectedChange}%)
+                                                                ${prediction.predictedPrice.toFixed(2)} ({isPredictionBullish ? '+' : ''}{prediction.expectedChange.toFixed(2)}%)
                                                             </div>
                                                         </div>
                                                     </div>
@@ -9350,9 +9350,9 @@ const TradingSimulator = () => {
                                                     <div className="bg-black/40 rounded-lg p-3 border border-white/10 mb-3">
                                                         <div className="text-xs text-gray-400 mb-2">Confidence Range</div>
                                                         <div className="flex items-center justify-between text-xs font-semibold">
-                                                            <span className="text-red-300">Low: ${prediction.lowerBound}</span>
-                                                            <span className="text-white">Target: ${prediction.targetPrice}</span>
-                                                            <span className="text-green-300">High: ${prediction.upperBound}</span>
+                                                            <span className="text-red-300">Low: ${prediction.lowerBound.toFixed(2)}</span>
+                                                            <span className="text-white">Target: ${prediction.predictedPrice.toFixed(2)}</span>
+                                                            <span className="text-green-300">High: ${prediction.upperBound.toFixed(2)}</span>
                                                         </div>
                                                     </div>
 
