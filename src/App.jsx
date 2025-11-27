@@ -6822,7 +6822,6 @@ const TradingSimulator = () => {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                             {/* Card 1: Portfolio Overview - Compact UltraThink */}
                             <div className="group relative bg-black/90 backdrop-blur-2xl rounded-xl p-4 border border-gray-800 hover:border-gray-700 overflow-hidden transition-all duration-300 " >
-                                {/* Animated glow */}
                                 <div className="relative">
                                     {/* Header with UltraThink Badge */}
                                     <div className="flex items-center justify-between mb-3">
