@@ -3849,6 +3849,10 @@ const TradingSimulator = () => {
                             outputsize = 'compact';
                             break;
                         case '3M':
+                        case '6M':
+                        case 'YTD':
+                        case '1Y':
+                        case '5Y':
                         case 'ALL':
                             functionType = 'TIME_SERIES_DAILY';
                             outputsize = 'full';
@@ -3891,16 +3895,31 @@ const TradingSimulator = () => {
                                 limit = 78; // Last 78 5-min points (6.5 hours)
                                 break;
                             case '1W':
-                                limit = 5;
+                                limit = 5; // ~5 trading days
                                 break;
                             case '1M':
-                                limit = 22;
+                                limit = 22; // ~22 trading days in a month
                                 break;
                             case '3M':
-                                limit = 66;
+                                limit = 66; // ~66 trading days in 3 months
+                                break;
+                            case '6M':
+                                limit = 126; // ~126 trading days in 6 months
+                                break;
+                            case 'YTD':
+                                // Calculate days since Jan 1 of current year
+                                const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+                                const daysSinceYearStart = Math.floor((Date.now() - startOfYear) / (1000 * 60 * 60 * 24));
+                                limit = Math.floor(daysSinceYearStart * 0.71); // ~71% are trading days
+                                break;
+                            case '1Y':
+                                limit = 252; // ~252 trading days in a year
+                                break;
+                            case '5Y':
+                                limit = 1260; // ~1260 trading days in 5 years
                                 break;
                             case 'ALL':
-                                limit = 252;
+                                limit = 2520; // ~10 years of data
                                 break;
                             default:
                                 limit = 22;
@@ -3945,7 +3964,15 @@ const TradingSimulator = () => {
                         case '1W': dataPoints = 5; break;
                         case '1M': dataPoints = 22; break;
                         case '3M': dataPoints = 66; break;
-                        case 'ALL': dataPoints = 252; break;
+                        case '6M': dataPoints = 126; break;
+                        case 'YTD':
+                            const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+                            const daysSinceYearStart = Math.floor((Date.now() - startOfYear) / (1000 * 60 * 60 * 24));
+                            dataPoints = Math.floor(daysSinceYearStart * 0.71);
+                            break;
+                        case '1Y': dataPoints = 252; break;
+                        case '5Y': dataPoints = 1260; break;
+                        case 'ALL': dataPoints = 2520; break;
                         default: dataPoints = 22;
                     }
 
@@ -4036,6 +4063,20 @@ const TradingSimulator = () => {
                             hour: 'numeric',
                             minute: '2-digit'
                         }));
+                    } else if (period === '5Y' || period === 'ALL') {
+                        // For long periods, show year or month/year
+                        date.setDate(date.getDate() - (dataPoints - i));
+                        labels.push(date.toLocaleDateString('en-US', {
+                            month: 'short',
+                            year: '2-digit'
+                        }));
+                    } else if (period === '1Y' || period === 'YTD') {
+                        // For 1 year periods, show month/day
+                        date.setDate(date.getDate() - (dataPoints - i));
+                        labels.push(date.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric'
+                        }));
                     } else {
                         date.setDate(date.getDate() - (dataPoints - i));
                         labels.push(date.toLocaleDateString('en-US', {
@@ -4045,7 +4086,7 @@ const TradingSimulator = () => {
                     }
 
                     const trend = startPrice + (priceRange * progress);
-                    const volatility = period === '1D' ? 0.003 : 0.015;
+                    const volatility = period === '1D' ? 0.003 : (period === '5Y' || period === 'ALL') ? 0.025 : 0.015;
                     const randomWalk = (Math.random() - 0.5) * (currentPrice * volatility);
                     const price = trend + randomWalk;
 
@@ -6850,7 +6891,7 @@ const TradingSimulator = () => {
                                 </div>
                             </div>
                             {/* Card 2: Performance - Compact UltraThink */}
-                            <div className={`group relative bg-black/90 backdrop-blur-2xl rounded-xl p-4 border border-gray-800 hover:border-gray-700 transition-all duration-200 overflow-hidden ${portfolioReturn >= 0 ? .bg-emerald-500/5. : .bg-red-500/5.}`} >
+                            <div className={`group relative bg-black/90 backdrop-blur-2xl rounded-xl p-4 border border-gray-800 hover:border-gray-700 transition-all duration-200 overflow-hidden ${portfolioReturn >= 0 ? 'bg-emerald-500/5' : 'bg-red-500/5'}`}>
                                 <div className="relative">
                                     {/* Header */}
                                     <div className="flex items-center justify-between mb-3">
@@ -9360,14 +9401,14 @@ const TradingSimulator = () => {
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div className="flex gap-1 bg-black/60 backdrop-blur-sm rounded-lg p-1 border border-cyan-500/20">
-                                                    {['1D', '1W', '1M', '3M', 'ALL'].map(period => (
+                                                <div className="flex flex-wrap gap-1 bg-black/60 backdrop-blur-sm rounded-lg p-1 border border-cyan-500/20">
+                                                    {['1D', '1W', '1M', '3M', '6M', 'YTD', '1Y', '5Y', 'ALL'].map(period => (
                                                         <button
                                                             key={period}
                                                             onClick={() => setChartPeriod(period)}
-                                                            className={`px-3 py-1 rounded font-black text-xs transition-all ${
+                                                            className={`px-2 py-1 rounded font-black text-xs transition-all ${
                                                                 chartPeriod === period
-                                                                    ? 'bg-gray-700 hover:bg-gray-600 text-white shadow-lg'
+                                                                    ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg'
                                                                     : 'text-gray-400 hover:text-gray-300 hover:bg-cyan-500/10'
                                                             }`}
                                                         >
