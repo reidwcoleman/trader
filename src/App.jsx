@@ -3934,6 +3934,16 @@ const TradingSimulator = () => {
                                     hour: 'numeric',
                                     minute: '2-digit'
                                 });
+                            } else if (period === '5Y' || period === 'ALL') {
+                                return date.toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    year: '2-digit'
+                                });
+                            } else if (period === '1Y' || period === 'YTD') {
+                                return date.toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric'
+                                });
                             } else {
                                 return date.toLocaleDateString('en-US', {
                                     month: 'short',
