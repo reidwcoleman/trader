@@ -9377,69 +9377,6 @@ const TradingSimulator = () => {
                                             )}
                                         </div>
 
-                                        {/* ULTRATHINK V2.5 - 7-DAY PRICE PREDICTION */}
-                                        {(() => {
-                                            const prediction = stockPredictions[selectedStock];
-
-                                            // Show loading state if no prediction yet
-                                            if (!prediction) {
-                                                return (
-                                                    <div className="mb-6 rounded-xl p-4 border-2 bg-purple-900/20 border-purple-500/40 animate-pulse">
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="text-2xl">🔮</span>
-                                                            <div className="text-sm text-gray-300 font-semibold">Loading next week prediction...</div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }
-
-                                            const isPredictionBullish = prediction.expectedChange > 0;
-                                            const predictionColor = prediction.expectedChange > 5 ? 'green' : prediction.expectedChange > 2 ? 'cyan' : prediction.expectedChange < -5 ? 'red' : prediction.expectedChange < -2 ? 'orange' : 'gray';
-
-                                            return (
-                                                <div className={`mb-6 rounded-xl p-5 border-2 ${predictionColor === 'green' ? 'bg-green-900/30 border-green-500/50' : predictionColor === 'cyan' ? 'bg-cyan-900/30 border-cyan-500/50' : predictionColor === 'red' ? 'bg-red-900/30 border-red-500/50' : predictionColor === 'orange' ? 'bg-orange-900/30 border-orange-500/50' : 'bg-gray-900/30 border-gray-500/50'}`} style={{boxShadow: `0 0 30px ${predictionColor === 'green' ? 'rgba(34, 197, 94, 0.3)' : predictionColor === 'cyan' ? 'rgba(6, 182, 212, 0.3)' : predictionColor === 'red' ? 'rgba(239, 68, 68, 0.3)' : predictionColor === 'orange' ? 'rgba(249, 115, 22, 0.3)' : 'rgba(107, 114, 128, 0.3)'}`}}>
-                                                    <div className="flex items-start gap-3 mb-4">
-                                                        <span className="text-3xl">🔮</span>
-                                                        <div className="flex-1">
-                                                            <div className="flex items-center gap-2 flex-wrap mb-2">
-                                                                <span className="font-black text-base text-gray-300 uppercase tracking-wide">Next Week Prediction</span>
-                                                                <span className={`text-xs font-bold px-3 py-1 rounded-full ${predictionColor === 'green' ? 'bg-green-500/30 text-green-300 border border-green-500/50' : predictionColor === 'cyan' ? 'bg-cyan-500/30 text-gray-300 border border-cyan-500/50' : predictionColor === 'red' ? 'bg-red-500/30 text-red-300 border border-red-500/50' : predictionColor === 'orange' ? 'bg-orange-500/30 text-orange-300 border border-orange-500/50' : 'bg-gray-500/30 text-gray-300 border border-gray-500/50'}`}>
-                                                                    {prediction.expectedReturn}
-                                                                </span>
-                                                                <span className="text-xs text-gray-400 font-semibold">({prediction.confidence}% confidence)</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="grid grid-cols-2 gap-3 mb-3">
-                                                        <div className="bg-black/40 rounded-lg p-3 border border-white/10">
-                                                            <div className="text-xs text-gray-400 mb-1">Current Price</div>
-                                                            <div className="text-white font-bold text-lg">${prediction.currentPrice.toFixed(2)}</div>
-                                                        </div>
-                                                        <div className="bg-black/40 rounded-lg p-3 border border-white/10">
-                                                            <div className="text-xs text-gray-400 mb-1">7-Day Target</div>
-                                                            <div className={`font-bold text-lg ${isPredictionBullish ? 'text-green-300' : 'text-red-300'}`}>
-                                                                ${prediction.predictedPrice.toFixed(2)} ({isPredictionBullish ? '+' : ''}{prediction.expectedChange.toFixed(2)}%)
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="bg-black/40 rounded-lg p-3 border border-white/10 mb-3">
-                                                        <div className="text-xs text-gray-400 mb-2">Confidence Range</div>
-                                                        <div className="flex items-center justify-between text-xs font-semibold">
-                                                            <span className="text-red-300">Low: ${prediction.lowerBound.toFixed(2)}</span>
-                                                            <span className="text-white">Target: ${prediction.predictedPrice.toFixed(2)}</span>
-                                                            <span className="text-green-300">High: ${prediction.upperBound.toFixed(2)}</span>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className={`text-center py-3 px-4 rounded-lg font-bold text-sm ${isPredictionBullish ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
-                                                        {isPredictionBullish ? '📈' : '📉'} AI predicts {prediction.expectedReturn} move over next 7 days
-                                                    </div>
-                                                </div>
-                                            );
-                                        })()}
-
                                         {/* Trade Type Selector */}
                                         <div className="mb-6">
                                             <label className="block text-gray-300 font-bold mb-3 text-sm uppercase tracking-wide">Trade Type</label>
