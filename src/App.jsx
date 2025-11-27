@@ -6662,11 +6662,11 @@ const TradingSimulator = () => {
 
                         {/* Quick Tips Banner */}
                         {portfolio.history?.length === 0 && (
-                            <div className="mb-6 bg-gradient-to-r from-purple-900/60 via-indigo-900/60 to-blue-900/60 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-500/50 shadow-2xl">
+                            <div className="mb-6 bg-gray-900/80 rounded-2xl p-6 border border-gray-800">
                                 <div className="flex items-start gap-4">
                                     <div className="text-5xl">💡</div>
                                     <div className="flex-1">
-                                        <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-cyan-300 mb-3">
+                                        <h3 className="text-2xl font-black text-white mb-3">
                                             Getting Started with FinClash
                                         </h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
@@ -6674,21 +6674,21 @@ const TradingSimulator = () => {
                                                 <span className="text-cyan-400 font-bold">🔍</span>
                                                 <div>
                                                     <span className="text-white font-bold">Search Stocks:</span>
-                                                    <span className="text-purple-200"> Use the search in Trading tab or click popular stocks</span>
+                                                    <span className="text-gray-400"> Use the search in Trading tab or click popular stocks</span>
                                                 </div>
                                             </div>
                                             <div className="flex items-start gap-2">
                                                 <span className="text-green-400 font-bold">💰</span>
                                                 <div>
                                                     <span className="text-white font-bold">Quick Trade:</span>
-                                                    <span className="text-purple-200"> Use 25%, 50%, 75%, 100% buttons for fast trading</span>
+                                                    <span className="text-gray-400"> Use 25%, 50%, 75%, 100% buttons for fast trading</span>
                                                 </div>
                                             </div>
                                             <div className="flex items-start gap-2">
                                                 <span className="text-blue-400 font-bold">⌨️</span>
                                                 <div>
                                                     <span className="text-white font-bold">Keyboard:</span>
-                                                    <span className="text-purple-200"> Press Enter to select first search result, Esc to clear</span>
+                                                    <span className="text-gray-400"> Press Enter to select first search result, Esc to clear</span>
                                                 </div>
                                             </div>
                                             <div className="flex items-start gap-2">
