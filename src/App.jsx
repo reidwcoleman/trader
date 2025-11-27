@@ -150,6 +150,11 @@ const TradingSimulator = () => {
             });
             const [chartPeriod, setChartPeriod] = useState('1M');
             const [isRealChartData, setIsRealChartData] = useState(false);
+            const [intradayInterval, setIntradayInterval] = useState(5); // 1 or 5 minute bars
+            const polygonCache = useRef({});
+            const lastPolygonCall = useRef(0);
+            const POLYGON_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+            const POLYGON_RATE_LIMIT_MS = 12000; // 12 seconds between calls (5 calls/min)
             const [stockNews, setStockNews] = useState([]);
             const [loadingNews, setLoadingNews] = useState(false);
             const [tradeType, setTradeType] = useState('long'); // 'long' or 'short'
@@ -226,6 +231,11 @@ const TradingSimulator = () => {
             // STRIPE_FAMILY_PUBLIC_LINK, STRIPE_FAMILY_PRIVATE_LINK
             // POPULAR_STOCKS, TOP_12_STOCKS
             // FINNHUB_API_KEY, FINNHUB_API_BASE, STOCK_DATABASE, FALLBACK_STOCK_DATA
+
+            // Polygon.io API (free tier: 5 calls/min, 15-min delayed data)
+            // Get your free key at: https://polygon.io/pricing
+            const POLYGON_API_KEY = 'Wz3IRbNswkjBXg0hg_CxCSTYmWTTy57W';
+            const POLYGON_API_BASE = 'https://api.polygon.io';
 
             useEffect(() => {
                 if (competition?.members) {
@@ -3814,6 +3824,16 @@ const TradingSimulator = () => {
 
             const fetchHistoricalData = async (symbol, period = '1M') => {
                 try {
+                    // For 1D, use Polygon.io first (better intraday data)
+                    if (period === '1D') {
+                        const polygonData = await fetchPolygonIntradayData(symbol, intradayInterval);
+                        if (polygonData) {
+                            setIsRealChartData(true);
+                            return polygonData;
+                        }
+                        console.log('Polygon.io unavailable, falling back to Alpha Vantage...');
+                    }
+
                     const API_KEY = 'VX9GKME3X62U5ZM0';
                     let functionType, interval, outputsize;
 
@@ -3931,6 +3951,69 @@ const TradingSimulator = () => {
 
                     setIsRealChartData(false);
                     return generateRealisticChartData(currentPrice, currentChange, dataPoints, period);
+                }
+            };
+
+            const fetchPolygonIntradayData = async (symbol, interval = 5) => {
+                const cacheKey = `${symbol}_${interval}`;
+                const now = Date.now();
+
+                // Check cache
+                if (polygonCache.current[cacheKey] &&
+                    (now - polygonCache.current[cacheKey].timestamp) < POLYGON_CACHE_DURATION) {
+                    console.log(`Using cached Polygon data for ${symbol}`);
+                    return polygonCache.current[cacheKey].data;
+                }
+
+                // Rate limiting
+                const timeSinceLastCall = now - lastPolygonCall.current;
+                if (timeSinceLastCall < POLYGON_RATE_LIMIT_MS) {
+                    await new Promise(r => setTimeout(r, POLYGON_RATE_LIMIT_MS - timeSinceLastCall));
+                }
+                lastPolygonCall.current = Date.now();
+
+                try {
+                    // Get trading day date
+                    const today = new Date();
+                    const dayOfWeek = today.getDay();
+                    let daysBack = 0;
+                    if (dayOfWeek === 0) daysBack = 2; // Sunday -> Friday
+                    if (dayOfWeek === 6) daysBack = 1; // Saturday -> Friday
+
+                    const targetDate = new Date(today);
+                    targetDate.setDate(targetDate.getDate() - daysBack);
+                    const dateStr = targetDate.toISOString().split('T')[0];
+
+                    const url = `${POLYGON_API_BASE}/v2/aggs/ticker/${symbol}/range/${interval}/minute/${dateStr}/${dateStr}?adjusted=true&sort=asc&limit=500&apiKey=${POLYGON_API_KEY}`;
+
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    if (data.status === 'OK' && data.results?.length > 0) {
+                        const labels = data.results.map(bar => {
+                            const date = new Date(bar.t);
+                            return date.toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                timeZone: 'America/New_York'
+                            });
+                        });
+
+                        const prices = data.results.map(bar => parseFloat(bar.c.toFixed(2)));
+
+                        const result = { labels, data: prices };
+
+                        // Cache result
+                        polygonCache.current[cacheKey] = { data: result, timestamp: Date.now() };
+
+                        console.log(`Fetched ${prices.length} bars from Polygon.io for ${symbol}`);
+                        return result;
+                    }
+
+                    return null;
+                } catch (error) {
+                    console.error('Polygon.io error:', error);
+                    return null;
                 }
             };
 
@@ -4134,7 +4217,7 @@ const TradingSimulator = () => {
                         chartInstance.current.destroy();
                     }
                 };
-            }, [selectedStock, stocks, chartPeriod]);
+            }, [selectedStock, stocks, chartPeriod, intradayInterval]);
 
             useEffect(() => {
                 if (selectedStock) {
@@ -4374,7 +4457,7 @@ const TradingSimulator = () => {
                                             {/* Animated Background Gradient */}
                                             <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-600/5 opacity-0 group-hover:opacity-100 transition duration-300 rounded-2xl"></div>
 
-                                            <div className="relative z-10 flex flex-col items-center justify-center py-6">
+                                            <div className="flex flex-col items-center justify-center py-6">
                                                 {/* Icon */}
                                                 <div className="relative mb-4">
                                                     <div className="relative bg-gradient-to-br from-green-400 to-emerald-600 p-4 rounded-2xl shadow-xl">
@@ -4435,7 +4518,7 @@ const TradingSimulator = () => {
                                             {/* Animated Background Gradient */}
                                             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-violet-600/5 opacity-0 group-hover:opacity-100 transition duration-300 rounded-2xl"></div>
 
-                                            <div className="relative z-10 flex flex-col items-center justify-center py-6">
+                                            <div className="flex flex-col items-center justify-center py-6">
                                                 {/* Icon */}
                                                 <div className="relative mb-4">
                                                     <div className="relative bg-gradient-to-br from-purple-400 via-pink-500 to-purple-600 p-4 rounded-2xl shadow-xl">
@@ -5492,7 +5575,7 @@ const TradingSimulator = () => {
                                                 </span>
                                             </div>
 
-                                            <div className="relative z-10 flex flex-col items-center">
+                                            <div className="flex flex-col items-center">
                                                 {/* Icon */}
                                                 <div className="relative mb-4 mt-2">
                                                     <div className="relative bg-gradient-to-br from-green-400 via-emerald-500 to-green-600 p-6 rounded-2xl shadow-lg">
@@ -5554,7 +5637,7 @@ const TradingSimulator = () => {
                                                 </span>
                                             </div>
 
-                                            <div className="relative z-10 flex flex-col items-center">
+                                            <div className="flex flex-col items-center">
                                                 {/* Icon */}
                                                 <div className="relative mb-4 mt-2">
                                                     <div className="relative bg-gradient-to-br from-purple-400 via-pink-500 to-purple-600 p-6 rounded-2xl shadow-lg">
@@ -6455,18 +6538,18 @@ const TradingSimulator = () => {
                         {/* Market Movers section removed - use dedicated Market Movers tab to avoid API rate limiting */}
 
                         {/* Main Tab Navigation */}
-                        <nav className="sticky top-0 z-40 mb-6 bg-black/95 backdrop-blur-2xl border-b-2 border-cyan-500/30" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.1)'}}>
+                        <nav className="sticky top-0 z-40 mb-6 bg-black/95 backdrop-blur-sm border-b border-gray-800">
                             <div className="flex items-center justify-center gap-3 px-4 py-3 overflow-x-auto">
                                 <button
                                     onClick={() => setMainTab('portfolio')}
                                     title="Portfolio - View your holdings and performance"
-                                    className={`relative px-5 py-3 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap min-w-[120px] ${
+                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
                                         mainTab === 'portfolio'
-                                            ? 'text-white bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20'
-                                            : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent hover:border-cyan-500/20'
+                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
+                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
                                     }`}
                                 >
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
+                                    <span className="flex items-center justify-center gap-2">
                                         <span className="text-base">💼</span>
                                         <span>Portfolio</span>
                                     </span>
@@ -6474,13 +6557,13 @@ const TradingSimulator = () => {
                                 <button
                                     onClick={() => setMainTab('trading')}
                                     title="Trading - Buy and sell stocks"
-                                    className={`relative px-5 py-3 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap min-w-[120px] ${
+                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
                                         mainTab === 'trading'
-                                            ? 'text-white bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20'
-                                            : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent hover:border-cyan-500/20'
+                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
+                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
                                     }`}
                                 >
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
+                                    <span className="flex items-center justify-center gap-2">
                                         <span className="text-base">📈</span>
                                         <span>Trading</span>
                                     </span>
@@ -6488,13 +6571,13 @@ const TradingSimulator = () => {
                                 <button
                                     onClick={() => setMainTab('watchlist')}
                                     title="Watchlist - Track your favorite stocks"
-                                    className={`relative px-5 py-3 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap min-w-[120px] ${
+                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
                                         mainTab === 'watchlist'
-                                            ? 'text-white bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20'
-                                            : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent hover:border-cyan-500/20'
+                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
+                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
                                     }`}
                                 >
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
+                                    <span className="flex items-center justify-center gap-2">
                                         <span className="text-base">⭐</span>
                                         <span>Watchlist</span>
                                     </span>
@@ -6502,13 +6585,13 @@ const TradingSimulator = () => {
                                 <button
                                     onClick={() => setMainTab('news')}
                                     title="News - Latest market news"
-                                    className={`relative px-5 py-3 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap min-w-[120px] ${
+                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
                                         mainTab === 'news'
-                                            ? 'text-white bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20'
-                                            : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent hover:border-cyan-500/20'
+                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
+                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
                                     }`}
                                 >
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
+                                    <span className="flex items-center justify-center gap-2">
                                         <span className="text-base">📰</span>
                                         <span>News</span>
                                     </span>
@@ -6516,13 +6599,13 @@ const TradingSimulator = () => {
                                 <button
                                     onClick={() => setMainTab('ai-analysis')}
                                     title="AI Analysis - Get AI-powered stock insights"
-                                    className={`relative px-5 py-3 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap min-w-[120px] ${
+                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
                                         mainTab === 'ai-analysis'
-                                            ? 'text-white bg-gradient-to-r from-purple-500/30 to-pink-500/30 border-2 border-purple-400/50 shadow-lg shadow-purple-500/20'
-                                            : 'text-gray-400 hover:text-white hover:bg-purple-500/10 border-2 border-transparent hover:border-purple-500/20'
+                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
+                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
                                     }`}
                                 >
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
+                                    <span className="flex items-center justify-center gap-2">
                                         <span className="text-base">🧠</span>
                                         <span>AI Analysis</span>
                                     </span>
@@ -6535,13 +6618,13 @@ const TradingSimulator = () => {
                                         }
                                     }}
                                     title="Market Movers - Top gainers and losers"
-                                    className={`relative px-5 py-3 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap min-w-[120px] ${
+                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
                                         mainTab === 'movers'
-                                            ? 'text-white bg-gradient-to-r from-orange-500/30 to-red-500/30 border-2 border-orange-400/50 shadow-lg shadow-orange-500/20'
-                                            : 'text-gray-400 hover:text-white hover:bg-orange-500/10 border-2 border-transparent hover:border-orange-500/20'
+                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
+                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
                                     }`}
                                 >
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
+                                    <span className="flex items-center justify-center gap-2">
                                         <span className="text-base">🚀</span>
                                         <span>Movers</span>
                                     </span>
@@ -6549,13 +6632,13 @@ const TradingSimulator = () => {
                                 <button
                                     onClick={() => setMainTab('learning')}
                                     title="Learning - Trading education and tutorials"
-                                    className={`relative px-5 py-3 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap min-w-[120px] ${
+                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
                                         mainTab === 'learning'
-                                            ? 'text-white bg-gradient-to-r from-green-500/30 to-emerald-500/30 border-2 border-green-400/50 shadow-lg shadow-green-500/20'
-                                            : 'text-gray-400 hover:text-white hover:bg-green-500/10 border-2 border-transparent hover:border-green-500/20'
+                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
+                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
                                     }`}
                                 >
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
+                                    <span className="flex items-center justify-center gap-2">
                                         <span className="text-base">🎓</span>
                                         <span>Learning</span>
                                     </span>
@@ -6563,13 +6646,13 @@ const TradingSimulator = () => {
                                 <button
                                     onClick={() => setMainTab('account')}
                                     title="Account - Manage your account settings"
-                                    className={`relative px-5 py-3 font-bold text-sm transition-all duration-300 rounded-lg group whitespace-nowrap min-w-[120px] ${
+                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
                                         mainTab === 'account'
-                                            ? 'text-white bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20'
-                                            : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent hover:border-cyan-500/20'
+                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
+                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
                                     }`}
                                 >
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
+                                    <span className="flex items-center justify-center gap-2">
                                         <span className="text-base">👤</span>
                                         <span>Account</span>
                                     </span>
@@ -9264,10 +9347,17 @@ const TradingSimulator = () => {
                                                 <div className="flex items-center gap-2">
                                                     <h3 className="text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">📈 Price Chart</h3>
                                                     {isRealChartData ? (
-                                                        <div className="flex items-center gap-1 bg-green-500/20 border-2 border-green-500/50 rounded-full px-2 py-1" style={{boxShadow: '0 0 10px rgba(34, 197, 94, 0.2)'}}>
-                                                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                                                            <span className="text-green-300 text-[10px] font-black uppercase tracking-wide">Alpha Vantage Live</span>
-                                                        </div>
+                                                        chartPeriod === '1D' ? (
+                                                            <div className="flex items-center gap-1 bg-purple-500/20 border-2 border-purple-500/50 rounded-full px-2 py-1" style={{boxShadow: '0 0 10px rgba(168, 85, 247, 0.2)'}}>
+                                                                <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse"></span>
+                                                                <span className="text-purple-300 text-[10px] font-black uppercase tracking-wide">Polygon.io (15m delay)</span>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center gap-1 bg-green-500/20 border-2 border-green-500/50 rounded-full px-2 py-1" style={{boxShadow: '0 0 10px rgba(34, 197, 94, 0.2)'}}>
+                                                                <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                                                                <span className="text-green-300 text-[10px] font-black uppercase tracking-wide">Alpha Vantage Live</span>
+                                                            </div>
+                                                        )
                                                     ) : (
                                                         <div className="flex items-center gap-1 bg-yellow-500/20 border-2 border-yellow-500/50 rounded-full px-2 py-1" style={{boxShadow: '0 0 10px rgba(234, 179, 8, 0.2)'}}>
                                                             <span className="text-yellow-300 text-[10px] font-black uppercase tracking-wide">Simulated</span>
@@ -9289,6 +9379,23 @@ const TradingSimulator = () => {
                                                         </button>
                                                     ))}
                                                 </div>
+                                                {chartPeriod === '1D' && (
+                                                    <div className="flex gap-1 bg-black/60 backdrop-blur-sm rounded-lg p-1 border border-purple-500/20 mt-2">
+                                                        {[1, 5].map(interval => (
+                                                            <button
+                                                                key={interval}
+                                                                onClick={() => setIntradayInterval(interval)}
+                                                                className={`px-2 py-1 text-xs font-bold rounded ${
+                                                                    intradayInterval === interval
+                                                                        ? 'bg-purple-500 text-white'
+                                                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                                                }`}
+                                                            >
+                                                                {interval}min
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="relative h-48">
                                                 <canvas ref={chartRef}></canvas>
@@ -11236,7 +11343,7 @@ const TradingSimulator = () => {
                                     {/* Glow Effect */}
                                     <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl"></div>
 
-                                    <div className="relative z-10 flex items-start gap-6">
+                                    <div className="flex items-start gap-6">
                                         <div className="relative flex-shrink-0">
                                             <div className="text-6xl">💡</div>
                                             <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full p-1">
@@ -11294,7 +11401,7 @@ const TradingSimulator = () => {
                                             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-cyan-500/30 animate-pulse"></div>
                                         </div>
 
-                                        <div className="relative z-10 flex items-center justify-between mb-8">
+                                        <div className="flex items-center justify-between mb-8">
                                             <div className="flex items-center gap-5">
                                                 <div className="relative">
                                                     <div className="text-6xl">🏆</div>
