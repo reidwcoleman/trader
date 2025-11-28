@@ -9358,19 +9358,17 @@ const TradingSimulator = () => {
                             <>
                                 {/* Clean News Section - Robinhood Style */}
                                 <div className="mb-4">
-                                    {/* Animated shine effect */}
-                                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent pointer-events-none"></div>
 
-                                    <div className="relative flex items-center justify-between mb-4 flex-wrap gap-3">
+                                    <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                                         <div>
-                                            <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300 flex items-center gap-2">
+                                            <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
                                                 📰 Market News
-                                                <span className="ml-2 px-2 py-0.5 bg-green-500/20 text-green-300 border border-green-500/50 rounded-full text-xs font-bold" style={{boxShadow: '0 0 10px rgba(34, 197, 94, 0.2)'}}>
+                                                <span className="ml-2 px-2 py-0.5 bg-[#00C805]/20 text-[#00C805] rounded-full text-xs font-medium">
                                                     ● LIVE
                                                 </span>
                                             </h2>
                                             {lastNewsUpdate && (
-                                                <div className="text-xs text-cyan-400 mt-2 font-semibold">
+                                                <div className="text-xs text-[#A0A0A0] mt-2 font-normal">
                                                     🔄 Last updated: {lastNewsUpdate.toLocaleTimeString()} • Auto-refreshes every 2 min
                                                 </div>
                                             )}
@@ -9378,28 +9376,25 @@ const TradingSimulator = () => {
                                         <button
                                             onClick={loadMarketNews}
                                             disabled={loadingMarketNews}
-                                            className="group/btn relative bg-gray-700 hover:bg-gray-600 hover:from-cyan-400 hover:to-blue-500 text-white px-5 py-3 rounded-lg font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-lg"
-                                            style={{boxShadow: '0 0 15px rgba(6, 182, 212, 0.2)'}}
+                                            className="bg-[#1C1C1C] hover:bg-[#2C2C2C] border border-[#2C2C2C] text-white px-5 py-3 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
-                                            <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-                                            <span className="relative">{loadingMarketNews ? '⏳ Loading...' : '🔄 Refresh News'}</span>
+                                            {loadingMarketNews ? '⏳ Loading...' : '🔄 Refresh News'}
                                         </button>
                                     </div>
 
                                     {loadingMarketNews ? (
-                                        <div className="relative text-center py-12">
+                                        <div className="text-center py-12">
                                             <div className="inline-block animate-spin text-5xl mb-3">⏳</div>
-                                            <div className="text-gray-300 text-base font-semibold">Loading latest market news...</div>
+                                            <div className="text-[#A0A0A0] text-base font-normal">Loading latest market news...</div>
                                         </div>
                                     ) : marketNews.length === 0 ? (
-                                        <div className="relative text-center py-12 bg-black/30 backdrop-blur-xl rounded-xl border-2 border-dashed border-cyan-500/40 animate-fade-in">
-                                            <div className="text-6xl mb-3 opacity-50 animate-bounce">📰</div>
-                                            <h3 className="text-xl font-bold text-white mb-2">No News Available</h3>
-                                            <p className="text-gray-300 text-sm mb-4 font-semibold">Click refresh to load the latest market news</p>
+                                        <div className="text-center py-12 bg-[#1C1C1C] rounded-xl border border-dashed border-[#2C2C2C]">
+                                            <div className="text-6xl mb-3 opacity-50">📰</div>
+                                            <h3 className="text-xl font-medium text-white mb-2">No News Available</h3>
+                                            <p className="text-[#A0A0A0] text-sm mb-4 font-normal">Click refresh to load the latest market news</p>
                                         </div>
                                     ) : (
-                                        <div className="relative space-y-3">
+                                        <div className="space-y-3">
                                             {marketNews.map((article, idx) => (
                                                 <div
                                                     key={idx}
@@ -9409,53 +9404,50 @@ const TradingSimulator = () => {
                                                         setShowNewsModal(true);
                                                         scrapeArticle(article);
                                                     }}
-                                                    className={`group/news relative block bg-black/40 hover:bg-black/60 backdrop-blur-xl rounded-xl p-4 transition-all border border-gray-800 hover:border-gray-700 hover:-translate-y-1 cursor-pointer will-change-transform overflow-hidden animate-fade-in stagger-${Math.min(idx + 1, 6)}`}
-                                                    style={{boxShadow: '0 0 15px rgba(6, 182, 212, 0.1)'}}
+                                                    className={`block bg-[#1C1C1C] hover:bg-[#2C2C2C] rounded-xl p-4 transition-colors border border-[#2C2C2C] cursor-pointer animate-fade-in stagger-${Math.min(idx + 1, 6)}`}
                                                 >
-                                                    {/* Shine effect for news cards */}
-                                                    <div className="absolute inset-0 -translate-x-full group-hover/news:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
 
-                                                    <div className="relative flex gap-3">
+                                                    <div className="flex gap-3">
                                                         {article.image && (
                                                             <img
                                                                 src={article.image}
                                                                 alt=""
-                                                                className="w-24 h-24 rounded-lg object-cover flex-shrink-0 border border-gray-800 group-hover/news:scale-105 transition-transform duration-300"
+                                                                className="w-24 h-24 rounded-lg object-cover flex-shrink-0 border border-[#2C2C2C]"
                                                                 onError={(e) => e.target.style.display = 'none'}
                                                             />
                                                         )}
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                                                <span className={`px-3 py-1 rounded-full text-xs font-bold border-2 transition-all ${
-                                                                    article.sentiment === 'positive' ? 'bg-green-500/20 text-green-300 border-green-500/50 animate-pulse-glow-green' :
-                                                                    article.sentiment === 'negative' ? 'bg-red-500/20 text-red-300 border-red-500/50 animate-pulse-glow-red' :
-                                                                    'bg-gray-500/20 text-gray-300 border-gray-500/50'
-                                                                }`} style={{boxShadow: article.sentiment === 'positive' ? '0 0 10px rgba(34, 197, 94, 0.2)' : article.sentiment === 'negative' ? '0 0 10px rgba(239, 68, 68, 0.2)' : 'none'}}>
+                                                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                                                    article.sentiment === 'positive' ? 'bg-[#00C805]/20 text-[#00C805]' :
+                                                                    article.sentiment === 'negative' ? 'bg-[#FF5252]/20 text-[#FF5252]' :
+                                                                    'bg-[#A0A0A0]/20 text-[#A0A0A0]'
+                                                                }`}>
                                                                     {article.sentiment === 'positive' ? '📈 Bullish' :
                                                                      article.sentiment === 'negative' ? '📉 Bearish' :
                                                                      '➖ Neutral'}
                                                                 </span>
-                                                                <span className="text-xs text-cyan-400 font-semibold">
+                                                                <span className="text-xs text-[#A0A0A0] font-normal">
                                                                     {window.newsFeed.formatNewsDate(article.datetime)}
                                                                 </span>
                                                                 {article.category && (
-                                                                    <span className="text-xs text-gray-300 bg-cyan-500/10 border border-gray-800 px-2 py-1 rounded-full font-semibold">
+                                                                    <span className="text-xs text-[#A0A0A0] bg-[#1C1C1C] border border-[#2C2C2C] px-2 py-1 rounded-full font-normal">
                                                                         {article.category}
                                                                     </span>
                                                                 )}
                                                             </div>
-                                                            <h4 className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 font-black text-base mb-1.5 line-clamp-2 group-hover/news:from-cyan-300 group-hover/news:to-blue-400 transition-all">
+                                                            <h4 className="text-white font-medium text-base mb-1.5 line-clamp-2">
                                                                 {article.headline}
                                                             </h4>
-                                                            <p className="text-xs text-gray-400 line-clamp-2 mb-2 leading-relaxed font-medium">
+                                                            <p className="text-xs text-[#A0A0A0] line-clamp-2 mb-2 leading-relaxed font-normal">
                                                                 {article.summary}
                                                             </p>
                                                             <div className="flex items-center justify-between">
-                                                                <div className="text-xs text-cyan-400 font-semibold flex items-center gap-1">
+                                                                <div className="text-xs text-[#A0A0A0] font-normal flex items-center gap-1">
                                                                     <span>📡</span>
                                                                     <span>{article.source}</span>
                                                                 </div>
-                                                                <div className="text-xs text-gray-300 font-bold flex items-center gap-1 group-hover/news:translate-x-1 transition-transform">
+                                                                <div className="text-xs text-[#A0A0A0] font-normal flex items-center gap-1">
                                                                     <span>Click to read in app</span>
                                                                     <span>→</span>
                                                                 </div>
@@ -9469,15 +9461,15 @@ const TradingSimulator = () => {
                                 </div>
 
                                 {/* Top Gainers section removed - use dedicated Market Movers tab to avoid API rate limiting */}
-                                <div className="bg-gradient-to-br from-blue-900/60 to-indigo-950/60 backdrop-blur-xl rounded-2xl p-6 border border-gray-800 shadow-2xl">
+                                <div className="bg-[#1C1C1C] rounded-xl p-6 border border-[#2C2C2C]">
                                     <div className="text-center py-8">
-                                        <h3 className="text-xl font-black text-white mb-4">📈 Market Movers</h3>
-                                        <p className="text-blue-300 mb-6">View real-time top gainers and losers in the Market Movers tab</p>
+                                        <h3 className="text-xl font-medium text-white mb-4">📈 Market Movers</h3>
+                                        <p className="text-[#A0A0A0] mb-6">View real-time top gainers and losers in the Market Movers tab</p>
                                         <button
                                             onClick={() => setMainTab('movers')}
-                                            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 text-white px-8 py-3 rounded-xl font-black text-lg transition-all shadow-lg hover:shadow-xl  active-press"
+                                            className="bg-[#00C805] hover:bg-[#00B804] text-white px-8 py-3 rounded-xl font-medium text-lg transition-colors"
                                         >
-                                            🚀 Go to Trading
+                                            🚀 Go to Market Movers
                                         </button>
                                     </div>
                                 </div>
