@@ -14230,27 +14230,26 @@ const TradingSimulator = () => {
 
                         {/* Account Tab */}
                         {mainTab === 'account' && (
-                            <div className="bg-gradient-to-br from-cyan-900/60 via-blue-900/60 to-indigo-900/60 rounded-2xl p-8 border border-gray-800 shadow-2xl">
+                            <div className="bg-[#1C1C1C] rounded-xl p-8 border border-[#2C2C2C]">
                                 <div className="text-center mb-8">
-                                    <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full mb-6 shadow-2xl">
+                                    <div className="inline-flex items-center justify-center w-24 h-24 bg-[#2C2C2C] rounded-full mb-6">
                                         <span className="text-5xl">👤</span>
                                     </div>
-                                    <h2 className="text-4xl font-black text-white mb-3">Account Settings</h2>
-                                    <p className="text-xl text-gray-200">Manage your account and preferences</p>
+                                    <h2 className="text-4xl font-semibold text-white mb-3">Account Settings</h2>
+                                    <p className="text-xl text-[#A0A0A0]">Manage your account and preferences</p>
                                 </div>
 
                                 {/* Account Information */}
-                                <div className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border border-gray-800 mb-6">
-                                    <h3 className="text-2xl font-black text-white mb-6 flex items-center gap-2">
-                                        <span className="text-3xl">ℹ️</span>
+                                <div className="bg-[#1C1C1C] rounded-xl p-6 border border-[#2C2C2C] mb-6">
+                                    <h3 className="text-2xl font-medium text-white mb-6">
                                         Account Information
                                     </h3>
                                     <div className="space-y-4">
                                         {/* Name - Editable */}
-                                        <div className="flex justify-between items-center py-3 border-b border-cyan-500/20 group/field">
-                                            <span className="text-gray-300 font-semibold">Name</span>
+                                        <div className="flex justify-between items-center py-3 border-b border-[#2C2C2C] group/field">
+                                            <span className="text-[#A0A0A0] font-normal">Name</span>
                                             <div className="flex items-center gap-3">
-                                                <span className="text-white font-bold">{userName}</span>
+                                                <span className="text-white font-medium">{userName}</span>
                                                 <button
                                                     onClick={async () => {
                                                         const newName = prompt('Enter your new name:', userName);
@@ -14284,7 +14283,7 @@ const TradingSimulator = () => {
                                                             }
                                                         }
                                                     }}
-                                                    className="opacity-0 group-hover/field:opacity-100 transition-opacity duration-200 bg-cyan-600/50 hover:bg-cyan-500 text-white px-3 py-1 rounded-lg text-sm font-bold"
+                                                    className="opacity-0 group-hover/field:opacity-100 transition-opacity duration-200 bg-[#2C2C2C] hover:bg-[#3C3C3C] text-white px-3 py-1 rounded-lg text-sm font-medium"
                                                 >
                                                     ✏️ Edit
                                                 </button>
@@ -14292,29 +14291,28 @@ const TradingSimulator = () => {
                                         </div>
 
                                         {/* Email - Read Only */}
-                                        <div className="flex justify-between items-center py-3 border-b border-cyan-500/20">
-                                            <span className="text-gray-300 font-semibold">Email</span>
-                                            <span className="text-white font-bold">{userEmail}</span>
+                                        <div className="flex justify-between items-center py-3 border-b border-[#2C2C2C]">
+                                            <span className="text-[#A0A0A0] font-normal">Email</span>
+                                            <span className="text-white font-medium">{userEmail}</span>
                                         </div>
 
                                         {/* Account Code - Read Only */}
-                                        <div className="flex justify-between items-center py-3 border-b border-cyan-500/20">
-                                            <span className="text-gray-300 font-semibold">Account Code</span>
-                                            <span className="text-white font-bold font-mono">{competitionCode}</span>
+                                        <div className="flex justify-between items-center py-3 border-b border-[#2C2C2C]">
+                                            <span className="text-[#A0A0A0] font-normal">Account Code</span>
+                                            <span className="text-white font-medium font-mono">{competitionCode}</span>
                                         </div>
 
                                         {/* Plan - Read Only */}
                                         <div className="flex justify-between items-center py-3">
-                                            <span className="text-gray-300 font-semibold">Plan</span>
-                                            <span className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-1 rounded-full font-bold text-sm">Personal</span>
+                                            <span className="text-[#A0A0A0] font-normal">Plan</span>
+                                            <span className="bg-[#2C2C2C] text-white px-4 py-1 rounded-full font-medium text-sm">Personal</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Account Actions */}
-                                <div className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border-2 border-yellow-500/30 mb-6">
-                                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400 mb-6 flex items-center gap-2">
-                                        <span className="text-3xl">⚙️</span>
+                                <div className="bg-[#1C1C1C] rounded-xl p-6 border border-[#2C2C2C] mb-6">
+                                    <h3 className="text-2xl font-medium text-white mb-6">
                                         Account Actions
                                     </h3>
                                     <div className="space-y-4">
@@ -14376,7 +14374,7 @@ const TradingSimulator = () => {
                                                     setLoading(false);
                                                 }
                                             }}
-                                            className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl "
+                                            className="w-full bg-[#2C2C2C] hover:bg-[#3C3C3C] text-white px-6 py-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-3"
                                         >
                                             <span className="text-2xl">🔄</span>
                                             <span>Reset Account (One-Time Only)</span>
@@ -14393,7 +14391,7 @@ const TradingSimulator = () => {
                                                     showToast('Signed out successfully', 'success');
                                                 }
                                             }}
-                                            className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl "
+                                            className="w-full bg-[#FF5252] hover:bg-[#FF4242] text-white px-6 py-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-3"
                                         >
                                             <span className="text-2xl">🚪</span>
                                             <span>Sign Out</span>
@@ -14402,23 +14400,22 @@ const TradingSimulator = () => {
                                 </div>
 
                                 {/* Portfolio Summary */}
-                                <div className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border border-gray-800">
-                                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400 mb-6 flex items-center gap-2">
-                                        <span className="text-3xl">💰</span>
+                                <div className="bg-[#1C1C1C] rounded-xl p-6 border border-[#2C2C2C]">
+                                    <h3 className="text-2xl font-medium text-white mb-6">
                                         Portfolio Summary
                                     </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="bg-gradient-to-br from-green-900/40 to-emerald-900/40 rounded-xl p-4 border border-gray-800">
-                                            <div className="text-green-300 text-sm font-semibold mb-2">Total Value</div>
-                                            <div className="text-white font-black text-2xl">${portfolioValue.toLocaleString()}</div>
+                                        <div className="bg-[#1C1C1C] rounded-xl p-4 border border-[#2C2C2C]">
+                                            <div className="text-[#A0A0A0] text-sm font-normal mb-2">Total Value</div>
+                                            <div className="text-white font-semibold text-2xl">${portfolioValue.toLocaleString()}</div>
                                         </div>
-                                        <div className="bg-gradient-to-br from-cyan-900/40 to-blue-900/40 rounded-xl p-4 border border-gray-800">
-                                            <div className="text-gray-300 text-sm font-semibold mb-2">Cash Balance</div>
-                                            <div className="text-white font-black text-2xl">${portfolio.cash.toLocaleString()}</div>
+                                        <div className="bg-[#1C1C1C] rounded-xl p-4 border border-[#2C2C2C]">
+                                            <div className="text-[#A0A0A0] text-sm font-normal mb-2">Cash Balance</div>
+                                            <div className="text-white font-semibold text-2xl">${portfolio.cash.toLocaleString()}</div>
                                         </div>
-                                        <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 rounded-xl p-4 border border-gray-800">
-                                            <div className="text-gray-300 text-sm font-semibold mb-2">Total Trades</div>
-                                            <div className="text-white font-black text-2xl">{portfolio.history?.length || 0}</div>
+                                        <div className="bg-[#1C1C1C] rounded-xl p-4 border border-[#2C2C2C]">
+                                            <div className="text-[#A0A0A0] text-sm font-normal mb-2">Total Trades</div>
+                                            <div className="text-white font-semibold text-2xl">{portfolio.history?.length || 0}</div>
                                         </div>
                                     </div>
                                 </div>
