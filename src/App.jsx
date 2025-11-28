@@ -182,13 +182,8 @@ const TradingSimulator = () => {
                 risk: false
             }); // Track which AI analysis sections are expanded
 
-            // UltraThink v2.5 - Predictive AI & Market Intelligence
-            const [marketRating, setMarketRating] = useState(null);
-            const [loadingMarketRating, setLoadingMarketRating] = useState(false);
+            // UltraThink v2.5 - Predictive AI
             const [stockPredictions, setStockPredictions] = useState({}); // { symbol: prediction }
-            const [showMarketBanner, setShowMarketBanner] = useState(true);
-            const [showMarketRatingModal, setShowMarketRatingModal] = useState(false); // Auto-popup on login
-            const [shouldShowMarketRatingOnLoad, setShouldShowMarketRatingOnLoad] = useState(false); // Flag for auto-show after login
 
             // Trade analysis system
             const [showTradeAnalysis, setShowTradeAnalysis] = useState(false);
@@ -2941,21 +2936,6 @@ const TradingSimulator = () => {
             // ULTRATHINK V2.5 - PREDICTIVE AI & MARKET INTELLIGENCE
             // ═══════════════════════════════════════════════════════════════
 
-            // Fetch overall market rating and sentiment
-            const fetchMarketRating = async () => {
-                setLoadingMarketRating(true);
-                try {
-                    if (window.enhancedAI && window.enhancedAI.calculateMarketRating) {
-                        const rating = await window.enhancedAI.calculateMarketRating(FINNHUB_API_KEY);
-                        setMarketRating(rating);
-                    }
-                } catch (error) {
-                    console.error('Error fetching market rating:', error);
-                } finally {
-                    setLoadingMarketRating(false);
-                }
-            };
-
             // Fetch price prediction for a specific stock
             const fetchStockPrediction = async (symbol) => {
                 try {
@@ -3016,29 +2996,6 @@ const TradingSimulator = () => {
                 }
                 return null;
             };
-
-            // Auto-fetch market rating on mount and daily
-            useEffect(() => {
-                fetchMarketRating();
-
-                // Refresh market rating every hour
-                const interval = setInterval(fetchMarketRating, 60 * 60 * 1000);
-
-                return () => clearInterval(interval);
-            }, []);
-
-            // Auto-show market rating modal after login when data is ready
-            useEffect(() => {
-                if (shouldShowMarketRatingOnLoad && marketRating && !loadingMarketRating) {
-                    // Show modal with a small delay for smooth transition
-                    const timer = setTimeout(() => {
-                        setShowMarketRatingModal(true);
-                        setShouldShowMarketRatingOnLoad(false); // Reset flag
-                    }, 500);
-
-                    return () => clearTimeout(timer);
-                }
-            }, [shouldShowMarketRatingOnLoad, marketRating, loadingMarketRating]);
 
             // Auto-generate AI analysis when stock is selected in AI Analysis tab
             useEffect(() => {
