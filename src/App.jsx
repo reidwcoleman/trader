@@ -150,6 +150,7 @@ const TradingSimulator = () => {
             });
             const [chartPeriod, setChartPeriod] = useState('1M');
             const [isRealChartData, setIsRealChartData] = useState(false);
+            const [chartLoading, setChartLoading] = useState(false);
             const [intradayInterval, setIntradayInterval] = useState(5); // 1 or 5 minute bars
             const polygonCache = useRef({});
             const lastPolygonCall = useRef(0);
@@ -4158,31 +4159,61 @@ const TradingSimulator = () => {
 
             // Chart effect - create/update chart when stock is selected
             useEffect(() => {
-                if (!selectedStock || !chartRef.current || !stocks.length) return;
+                if (!selectedStock || !chartRef.current || !stocks.length) {
+                    console.log('Chart skipped:', { selectedStock, hasRef: !!chartRef.current, stocksLength: stocks.length });
+                    return;
+                }
 
                 const stock = stocks.find(s => s.symbol === selectedStock);
-                if (!stock) return;
+                if (!stock) {
+                    console.log('Stock not found:', selectedStock);
+                    return;
+                }
 
                 // Destroy existing chart
                 if (chartInstance.current) {
-                    chartInstance.current.destroy();
+                    try {
+                        chartInstance.current.destroy();
+                        chartInstance.current = null;
+                    } catch (e) {
+                        console.error('Error destroying chart:', e);
+                    }
                 }
 
                 const loadChart = async () => {
+                    try {
+                        setChartLoading(true);
+                        console.log(`Loading chart for ${selectedStock} (${chartPeriod})`);
 
-                    let historicalData = await fetchHistoricalData(selectedStock, chartPeriod);
+                        let historicalData = await fetchHistoricalData(selectedStock, chartPeriod);
 
-                    // Fallback to generated data if API fails
-                    if (!historicalData) {
-                        historicalData = generateFallbackHistoricalData(stock.price);
-                        setIsRealChartData(false);
-                    } else {
-                        setIsRealChartData(true);
-                    }
+                        // Fallback to generated data if API fails
+                        if (!historicalData || !historicalData.labels || !historicalData.data) {
+                            console.log('Using fallback data for', selectedStock);
+                            historicalData = generateFallbackHistoricalData(stock.price);
+                            setIsRealChartData(false);
+                        } else {
+                            setIsRealChartData(true);
+                        }
 
-                    const { labels, data } = historicalData;
+                        const { labels, data } = historicalData;
 
-                    const ctx = chartRef.current.getContext('2d');
+                        if (!labels || !data || labels.length === 0 || data.length === 0) {
+                            console.error('Invalid chart data:', { labels, data });
+                            return;
+                        }
+
+                        // Verify canvas is still available
+                        if (!chartRef.current) {
+                            console.error('Canvas ref lost during async load');
+                            return;
+                        }
+
+                        const ctx = chartRef.current.getContext('2d');
+                        if (!ctx) {
+                            console.error('Failed to get canvas context');
+                            return;
+                        }
                     chartInstance.current = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -4257,15 +4288,72 @@ const TradingSimulator = () => {
                         }
                     }
                     });
+
+                        console.log(`Chart successfully created for ${selectedStock}`);
+                        setChartLoading(false);
+                    } catch (error) {
+                        console.error('Error loading chart:', error);
+                        console.error('Error details:', {
+                            selectedStock,
+                            chartPeriod,
+                            hasStock: !!stock,
+                            hasCanvas: !!chartRef.current
+                        });
+
+                        // Try to display fallback chart even on error
+                        try {
+                            if (chartRef.current && stock) {
+                                const fallbackData = generateFallbackHistoricalData(stock.price);
+                                const ctx = chartRef.current.getContext('2d');
+                                if (ctx) {
+                                    chartInstance.current = new Chart(ctx, {
+                                        type: 'line',
+                                        data: {
+                                            labels: fallbackData.labels,
+                                            datasets: [{
+                                                label: `${stock.symbol} Price`,
+                                                data: fallbackData.data,
+                                                borderColor: 'rgb(156, 163, 175)',
+                                                backgroundColor: 'rgba(156, 163, 175, 0.1)',
+                                                borderWidth: 2,
+                                                fill: true,
+                                                tension: 0.4,
+                                                pointRadius: 0
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: { legend: { display: false } }
+                                        }
+                                    });
+                                    setIsRealChartData(false);
+                                    console.log('Fallback chart created successfully');
+                                }
+                            }
+                        } catch (fallbackError) {
+                            console.error('Failed to create fallback chart:', fallbackError);
+                        } finally {
+                            setChartLoading(false);
+                        }
+                    }
                 };
 
-                // Call async function
-                loadChart();
+                // Call async function with small delay to ensure canvas is ready
+                const timeoutId = setTimeout(() => {
+                    loadChart();
+                }, 10);
 
                 // Cleanup on unmount
                 return () => {
+                    clearTimeout(timeoutId);
                     if (chartInstance.current) {
-                        chartInstance.current.destroy();
+                        try {
+                            chartInstance.current.destroy();
+                            chartInstance.current = null;
+                        } catch (e) {
+                            console.error('Error in chart cleanup:', e);
+                        }
                     }
                 };
             }, [selectedStock, stocks, chartPeriod, intradayInterval]);
@@ -9368,6 +9456,14 @@ const TradingSimulator = () => {
                                                 )}
                                             </div>
                                             <div className="relative h-48">
+                                                {chartLoading && (
+                                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10 rounded-lg">
+                                                        <div className="flex flex-col items-center gap-2">
+                                                            <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                                                            <span className="text-emerald-400 text-xs font-bold">Loading chart...</span>
+                                                        </div>
+                                                    </div>
+                                                )}
                                                 <canvas ref={chartRef}></canvas>
                                             </div>
                                             {!isRealChartData && (
