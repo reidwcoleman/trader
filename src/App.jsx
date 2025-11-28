@@ -7358,8 +7358,9 @@ const TradingSimulator = () => {
                                             </button>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-3">
                                             {topBuys.map((stock, idx) => {
+                                                const isStrongBuy = stock.buyScore >= 70;
                                                 const isStrongBuy = stock.buyScore >= 70;
                                                 const recommendationColor =
                                                     stock.recommendation === 'STRONG BUY' ? 'from-green-500 to-emerald-500' :
@@ -8353,19 +8354,11 @@ const TradingSimulator = () => {
                                 {/* Animated shine effect */}
                                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
 
-                                {/* Header with UltraThink Badge */}
-                                <div className="relative flex items-center justify-between mb-4">
-                                    <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-cyan-300">🔍 Stock Search</h2>
-                                    <div className="flex items-center gap-2 bg-gradient-to-r from-purple-900/60 to-violet-900/60 border border-purple-500/50 rounded-full px-3 py-1">
-                                        <span className="text-purple-400 text-xs">🧠</span>
-                                        <span className="text-transparent bg-gradient-to-r from-purple-300 to-violet-300 bg-clip-text font-black text-xs">POWERED BY ULTRATHINK</span>
-                                    </div>
-                                </div>
-
-                                <div className="relative mb-4">
+                                {/* Clean Search Bar - Robinhood Style */}
+                                <div className="relative mb-6">
                                     <input
                                         type="text"
-                                        placeholder="Search stocks by symbol or name..."
+                                        placeholder="Search"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onKeyDown={(e) => {
@@ -8391,54 +8384,37 @@ const TradingSimulator = () => {
                                                 setShowSearchResults(false);
                                             }
                                         }}
-                                        className="w-full bg-black/60 border border-gray-800 hover:border-gray-700 focus:border-cyan-400 rounded-xl px-4 py-4 pr-24 text-white text-lg placeholder-gray-500 focus:outline-none transition-all focus:shadow-lg focus:shadow-cyan-500/30 focus:scale-[1.02]"
+                                        className="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-gray-700 focus:outline-none transition-colors"
                                     />
-                                    <div className="absolute right-3 top-3 flex items-center gap-2">
-                                        {searching && (
-                                            <div className="text-gray-300 animate-spin text-xl">🔍</div>
-                                        )}
-                                        {searchQuery && !searching && (
-                                            <button
-                                                onClick={() => {
-                                                    setSearchQuery('');
-                                                    setShowSearchResults(false);
-                                                }}
-                                                className="bg-cyan-600/50 hover:bg-cyan-500 text-white rounded-lg px-3 py-1 font-bold text-sm transition-all duration-200 hover:scale-110"
-                                            >
-                                                ✕
-                                            </button>
-                                        )}
-                                    </div>
+                                    {searching && (
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+                                            <div className="animate-spin">🔍</div>
+                                        </div>
+                                    )}
                                 </div>
 
-                                {/* Quick access to popular stocks */}
+                                {/* Popular stocks as simple text links */}
                                 {!searchQuery && (
-                                    <div className="mb-6 flex flex-wrap gap-2">
-                                        <span className="text-gray-300 text-sm font-semibold mr-2">Popular:</span>
+                                    <div className="mb-6 flex gap-4 text-sm text-gray-400">
                                         {['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'NVDA', 'AMZN'].map(symbol => (
-                                            <button
+                                            <span
                                                 key={symbol}
                                                 onClick={() => setSearchQuery(symbol)}
-                                                className="bg-cyan-600/30 hover:bg-cyan-500/50 border border-cyan-400/50 text-gray-200 px-3 py-1 rounded-lg font-bold text-xs transition-all duration-200 hover:scale-110 hover:shadow-lg hover:shadow-cyan-500/30"
+                                                className="hover:text-white cursor-pointer transition-colors"
                                             >
                                                 {symbol}
-                                            </button>
+                                            </span>
                                         ))}
                                     </div>
                                 )}
 
-                                {/* Search Results */}
+                                {/* Clean Search Results */}
                                 {searchQuery && showSearchResults && (
-                                    <div className="group/results relative mb-6 bg-black/80 backdrop-blur-2xl border border-gray-800 rounded-xl overflow-hidden transition-all duration-500" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.2)'}}>
-                                        {/* Animated shine effect */}
-                                        <div className="absolute inset-0 -translate-x-full group-hover/results:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent pointer-events-none"></div>
-
+                                    <div className="mb-6 bg-gray-900/50 border border-gray-800 rounded-lg overflow-hidden">
                                         {searching ? (
-                                            <div className="relative p-6 text-center">
-                                                <div className="text-gray-300 font-semibold">Searching...</div>
-                                            </div>
+                                            <div className="p-6 text-center text-gray-500">Searching...</div>
                                         ) : searchResults.length > 0 ? (
-                                            <div className="relative max-h-60 overflow-y-auto">
+                                            <div className="max-h-60 overflow-y-auto">
                                                 {searchResults.map((result) => (
                                                     <div
                                                         key={result.symbol}
@@ -8455,44 +8431,36 @@ const TradingSimulator = () => {
                                                                 setStocks([...stocks, stockData]);
                                                             }
                                                             setSelectedStock(result.symbol);
-                                                            setTradeAnalysisData(null); // Clear trade analysis when switching stocks
+                                                            setTradeAnalysisData(null);
                                                             setSearchQuery('');
                                                             setShowSearchResults(false);
                                                             setSearching(false);
                                                         }}
-                                                        className="group/item relative p-4 border-b border-cyan-500/20 last:border-b-0 hover:bg-cyan-500/10 cursor-pointer transition-all hover:scale-[1.02] overflow-hidden"
+                                                        className="p-4 border-b border-gray-800 last:border-b-0 hover:bg-gray-900/50 cursor-pointer transition-colors"
                                                     >
-                                                        {/* Item shine effect */}
-                                                        <div className="absolute inset-0 -translate-x-full group-hover/item:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
-
-                                                        <div className="relative flex items-center justify-between">
+                                                        <div className="flex items-center justify-between">
                                                             <div className="flex-1">
                                                                 <div className="flex items-center gap-2">
-                                                                    <div className="font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 text-lg">{result.symbol}</div>
+                                                                    <div className="font-semibold text-white">{result.symbol}</div>
                                                                     {result.owned && (
-                                                                        <span className="bg-green-500/20 border border-green-500/50 text-green-300 text-xs font-bold px-2 py-0.5 rounded-full">OWNED</span>
+                                                                        <span className="bg-emerald-600/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full">Owned</span>
                                                                     )}
                                                                 </div>
-                                                                <div className="text-sm text-gray-300 font-semibold">{result.name}</div>
-                                                                <div className="text-xs text-gray-400 mt-1 font-medium">
-                                                                    {result.region} • {result.currency}
-                                                                </div>
+                                                                <div className="text-sm text-gray-500">{result.name}</div>
                                                             </div>
-                                                            <div className="text-cyan-400 text-2xl group-hover/item:translate-x-1 transition-transform">→</div>
                                                         </div>
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : error ? (
-                                            <div className="relative p-6 text-center">
-                                                <div className="text-yellow-400 mb-2 text-2xl">⚠️</div>
-                                                <div className="text-yellow-300 text-sm font-semibold">{error}</div>
+                                            <div className="p-6 text-center">
+                                                <div className="text-yellow-400 mb-2">⚠️</div>
+                                                <div className="text-yellow-300 text-sm">{error}</div>
                                             </div>
                                         ) : (
-                                            <div className="relative p-6 text-center">
-                                                <div className="text-cyan-400 mb-2 text-2xl">🔍</div>
-                                                <div className="text-gray-300 font-semibold">No results found for "{searchQuery}"</div>
-                                                <div className="text-xs text-gray-400 mt-2 font-medium">Try: AAPL, GOOGL, MSFT, TSLA, NVDA</div>
+                                            <div className="p-6 text-center">
+                                                <div className="text-gray-500 mb-2">No results found</div>
+                                                <div className="text-xs text-gray-600">Try: AAPL, GOOGL, MSFT, TSLA</div>
                                             </div>
                                         )}
                                     </div>
@@ -9213,93 +9181,56 @@ const TradingSimulator = () => {
                                             </div>
                                         </div>
 
-                                        {/* Quantity Selector */}
-                                        <div className="mb-6">
-                                            <label className="block text-gray-300 font-bold mb-3 text-sm uppercase tracking-wide">Select Quantity</label>
-                                            <div className="flex gap-3 mb-3">
-                                                <button
-                                                    onClick={() => handleQuantityChange(quantity - 1)}
-                                                    className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white w-14 h-14 rounded-xl font-bold text-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110 active-press hover-glow"
-                                                >
-                                                    −
-                                                </button>
+                                        {/* Clean Quantity Input - Robinhood Style */}
+                                        <div className="mb-6 space-y-4">
+                                            <div className="text-center">
                                                 <input
                                                     type="number"
                                                     min="1"
                                                     value={quantity}
                                                     onChange={(e) => handleQuantityChange(e.target.value)}
-                                                    className="flex-1 bg-blue-700/50 border border-gray-800 rounded-xl px-4 py-3 text-white text-center text-2xl font-black focus:border-cyan-400 focus:outline-none transition-all focus:shadow-lg focus:shadow-cyan-500/30"
+                                                    className="w-24 bg-transparent text-3xl font-bold text-white text-center border-b-2 border-gray-700 focus:border-emerald-500 outline-none"
                                                 />
-                                                <button
-                                                    onClick={() => handleQuantityChange(quantity + 1)}
-                                                    className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white w-14 h-14 rounded-xl font-bold text-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110 active-press hover-glow"
-                                                >
-                                                    +
-                                                </button>
+                                                <div className="text-gray-500 mt-1">Shares</div>
                                             </div>
 
-                                            {/* Quick Actions */}
-                                            <div className="flex gap-2 mb-3">
-                                                <button
-                                                    onClick={buyMax}
-                                                    className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white py-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg hover:shadow-xl  active-press hover-glow-green"
-                                                >
-                                                    💰 Buy Max ({getMaxBuyQuantity(selectedStock)})
-                                                </button>
-                                                <button
-                                                    onClick={sellMax}
-                                                    className="flex-1 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white py-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg hover:shadow-xl  active-press hover-glow-red"
-                                                >
-                                                    📊 Sell Max ({getCurrentPosition(selectedStock)})
-                                                </button>
-                                            </div>
+                                            {/* Simple dollar buttons */}
+                                            <div className="flex justify-center gap-2">
+                                                {['$100', '$500', '$1000', 'Max'].map((amt, idx) => {
+                                                    const maxQty = getMaxBuyQuantity(selectedStock);
+                                                    const stock = stocks.find(s => s.symbol === selectedStock);
+                                                    const price = stock?.price || 0;
+                                                    const dollarAmounts = [100, 500, 1000];
+                                                    const qty = idx < 3 ? Math.max(1, Math.floor(dollarAmounts[idx] / price)) : maxQty;
 
-                                            {/* Quick Percentage Buttons */}
-                                            <div className="grid grid-cols-4 gap-2 mb-3">
-                                                <button
-                                                    onClick={() => setQuantity(Math.max(1, Math.floor(getMaxBuyQuantity(selectedStock) * 0.25)))}
-                                                    className="bg-cyan-600/50 hover:bg-cyan-500/70 border border-cyan-400/50 text-gray-200 py-2 rounded-lg font-bold text-xs transition-all duration-200  hover:shadow-lg hover:shadow-cyan-500/30"
-                                                >
-                                                    25%
-                                                </button>
-                                                <button
-                                                    onClick={() => setQuantity(Math.max(1, Math.floor(getMaxBuyQuantity(selectedStock) * 0.5)))}
-                                                    className="bg-cyan-600/50 hover:bg-cyan-500/70 border border-cyan-400/50 text-gray-200 py-2 rounded-lg font-bold text-xs transition-all duration-200  hover:shadow-lg hover:shadow-cyan-500/30"
-                                                >
-                                                    50%
-                                                </button>
-                                                <button
-                                                    onClick={() => setQuantity(Math.max(1, Math.floor(getMaxBuyQuantity(selectedStock) * 0.75)))}
-                                                    className="bg-cyan-600/50 hover:bg-cyan-500/70 border border-cyan-400/50 text-gray-200 py-2 rounded-lg font-bold text-xs transition-all duration-200  hover:shadow-lg hover:shadow-cyan-500/30"
-                                                >
-                                                    75%
-                                                </button>
-                                                <button
-                                                    onClick={() => setQuantity(getMaxBuyQuantity(selectedStock))}
-                                                    className="bg-cyan-600/50 hover:bg-cyan-500/70 border border-cyan-400/50 text-gray-200 py-2 rounded-lg font-bold text-xs transition-all duration-200  hover:shadow-lg hover:shadow-cyan-500/30"
-                                                >
-                                                    100%
-                                                </button>
+                                                    return (
+                                                        <button
+                                                            key={amt}
+                                                            onClick={() => setQuantity(qty)}
+                                                            className="px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-full transition-colors"
+                                                        >
+                                                            {amt}
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
 
                                             {/* Error message */}
                                             {quantityError && (
-                                                <div className="bg-red-900/40 border-2 border-red-500 rounded-xl p-4 text-red-200 text-sm font-semibold animate-shake animate-pulse-glow-red">
+                                                <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-3 text-red-300 text-sm text-center">
                                                     ⚠️ {quantityError}
                                                 </div>
                                             )}
-                                        </div>
 
-                                        {/* Total Cost Summary */}
-                                        <div className="mb-6 p-5 bg-gray-900/80 border border-gray-800 rounded-xl">
-                                            <div className="flex justify-between items-center text-white">
-                                                <span className="text-gray-400 font-semibold">Total Cost:</span>
-                                                <span className="text-3xl font-black">${((stocks.find(s => s.symbol === selectedStock)?.price || 0) * quantity).toFixed(2)}</span>
+                                            {/* Clean total */}
+                                            <div className="text-center py-4 border-t border-gray-800">
+                                                <div className="text-gray-500 text-sm">Estimated Cost</div>
+                                                <div className="text-2xl font-bold text-white">
+                                                    ${((stocks.find(s => s.symbol === selectedStock)?.price || 0) * quantity).toFixed(2)}
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        {/* Trade Actions */}
-                                        <div className="grid grid-cols-2 gap-4">
+                                            {/* Single prominent action button */}
                                             <button
                                                 onClick={() => {
                                                     if (tradeType === 'long') {
@@ -9309,45 +9240,40 @@ const TradingSimulator = () => {
                                                     }
                                                 }}
                                                 disabled={!marketOpen}
-                                                className={`group relative py-5 rounded-xl font-black text-xl shadow-2xl transition-all duration-300 will-change-transform gpu-accelerated ${
+                                                className={`w-full py-4 rounded-full font-semibold text-lg transition-colors ${
                                                     marketOpen
-                                                        ? 'bg-emerald-500 hover:bg-emerald-400 text-white hover:shadow-green-500/50  active-press hover-glow-green cursor-pointer'
-                                                        : 'bg-gradient-to-r from-gray-600 to-gray-700 text-gray-400 cursor-not-allowed opacity-60'
+                                                        ? 'bg-emerald-500 hover:bg-emerald-400 text-white cursor-pointer'
+                                                        : 'bg-gray-700 text-gray-400 cursor-not-allowed opacity-60'
                                                 }`}
                                             >
-                                                <span className="flex items-center justify-center gap-2">
-                                                    {!marketOpen && <span className="text-2xl">🔒</span>}
-                                                    <span className={`text-2xl ${marketOpen ? 'group-hover:animate-bounce' : ''}`}>{tradeType === 'long' ? '🚀' : '📉'}</span>
-                                                    <span>{tradeType === 'long' ? 'BUY' : 'SHORT'}</span>
-                                                    {!marketOpen && <span className="text-xs ml-2">(Closed)</span>}
-                                                </span>
+                                                {!marketOpen && '🔒 '}
+                                                {tradeType === 'long' ? `Buy ${selectedStock}` : `Short ${selectedStock}`}
+                                                {!marketOpen && ' (Market Closed)'}
                                             </button>
-                                            <button
-                                                onClick={() => {
-                                                    const shortPos = window.shortSelling.getShortPosition(portfolio, selectedStock);
-                                                    if (shortPos.quantity > 0) {
-                                                        executeCoverShort();
-                                                    } else {
-                                                        executeTrade('sell');
-                                                    }
-                                                }}
-                                                disabled={!marketOpen}
-                                                className={`group relative py-5 rounded-xl font-black text-xl shadow-2xl transition-all duration-300 will-change-transform gpu-accelerated ${
-                                                    marketOpen
-                                                        ? 'bg-red-500/20 text-red-400 hover:from-red-400 hover:to-pink-500 text-white hover:shadow-red-500/50  active-press hover-glow-red cursor-pointer'
-                                                        : 'bg-gradient-to-r from-gray-600 to-gray-700 text-gray-400 cursor-not-allowed opacity-60'
-                                                }`}
-                                            >
-                                                <span className="flex items-center justify-center gap-2">
-                                                    {!marketOpen && <span className="text-2xl">🔒</span>}
-                                                    <span className={`text-2xl ${marketOpen ? 'group-hover:animate-bounce' : ''}`}>💸</span>
-                                                    <span>{(() => {
+
+                                            {/* Sell button (if owns shares) */}
+                                            {getCurrentPosition(selectedStock) > 0 && (
+                                                <button
+                                                    onClick={() => {
                                                         const shortPos = window.shortSelling.getShortPosition(portfolio, selectedStock);
-                                                        return shortPos.quantity > 0 ? 'COVER' : 'SELL';
-                                                    })()}</span>
-                                                    {!marketOpen && <span className="text-xs ml-2">(Closed)</span>}
-                                                </span>
-                                            </button>
+                                                        if (shortPos.quantity > 0) {
+                                                            executeCoverShort();
+                                                        } else {
+                                                            executeTrade('sell');
+                                                        }
+                                                    }}
+                                                    disabled={!marketOpen}
+                                                    className={`w-full py-4 rounded-full font-semibold text-lg transition-colors ${
+                                                        marketOpen
+                                                            ? 'bg-gray-800 hover:bg-gray-700 text-white cursor-pointer'
+                                                            : 'bg-gray-700 text-gray-400 cursor-not-allowed opacity-60'
+                                                    }`}
+                                                >
+                                                    {!marketOpen && '🔒 '}
+                                                    Sell {selectedStock}
+                                                    {!marketOpen && ' (Market Closed)'}
+                                                </button>
+                                            )}
                                         </div>
 
                                         {/* Short Position Display */}
