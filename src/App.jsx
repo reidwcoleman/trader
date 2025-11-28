@@ -6525,58 +6525,46 @@ const TradingSimulator = () => {
                                 <button
                                     onClick={() => setMainTab('trading')}
                                     title="Trading - Buy and sell stocks"
-                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
+                                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                         mainTab === 'trading'
-                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
+                                            ? 'text-white border-[#00C805]'
+                                            : 'text-[#A0A0A0] hover:text-white border-transparent'
                                     }`}
                                 >
-                                    <span className="flex items-center justify-center gap-2">
-                                        <span className="text-base">📈</span>
-                                        <span>Trading</span>
-                                    </span>
+                                    Trading
                                 </button>
                                 <button
                                     onClick={() => setMainTab('watchlist')}
                                     title="Watchlist - Track your favorite stocks"
-                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
+                                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                         mainTab === 'watchlist'
-                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
+                                            ? 'text-white border-[#00C805]'
+                                            : 'text-[#A0A0A0] hover:text-white border-transparent'
                                     }`}
                                 >
-                                    <span className="flex items-center justify-center gap-2">
-                                        <span className="text-base">⭐</span>
-                                        <span>Watchlist</span>
-                                    </span>
+                                    Watchlist
                                 </button>
                                 <button
                                     onClick={() => setMainTab('news')}
                                     title="News - Latest market news"
-                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
+                                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                         mainTab === 'news'
-                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
+                                            ? 'text-white border-[#00C805]'
+                                            : 'text-[#A0A0A0] hover:text-white border-transparent'
                                     }`}
                                 >
-                                    <span className="flex items-center justify-center gap-2">
-                                        <span className="text-base">📰</span>
-                                        <span>News</span>
-                                    </span>
+                                    News
                                 </button>
                                 <button
                                     onClick={() => setMainTab('ai-analysis')}
                                     title="AI Analysis - Get AI-powered stock insights"
-                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
+                                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                         mainTab === 'ai-analysis'
-                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
+                                            ? 'text-white border-[#00C805]'
+                                            : 'text-[#A0A0A0] hover:text-white border-transparent'
                                     }`}
                                 >
-                                    <span className="flex items-center justify-center gap-2">
-                                        <span className="text-base">🧠</span>
-                                        <span>AI Analysis</span>
-                                    </span>
+                                    AI Analysis
                                 </button>
                                 <button
                                     onClick={() => {
@@ -6586,44 +6574,35 @@ const TradingSimulator = () => {
                                         }
                                     }}
                                     title="Market Movers - Top gainers and losers"
-                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
+                                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                         mainTab === 'movers'
-                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
+                                            ? 'text-white border-[#00C805]'
+                                            : 'text-[#A0A0A0] hover:text-white border-transparent'
                                     }`}
                                 >
-                                    <span className="flex items-center justify-center gap-2">
-                                        <span className="text-base">🚀</span>
-                                        <span>Movers</span>
-                                    </span>
+                                    Movers
                                 </button>
                                 <button
                                     onClick={() => setMainTab('learning')}
                                     title="Learning - Trading education and tutorials"
-                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
+                                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                         mainTab === 'learning'
-                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
+                                            ? 'text-white border-[#00C805]'
+                                            : 'text-[#A0A0A0] hover:text-white border-transparent'
                                     }`}
                                 >
-                                    <span className="flex items-center justify-center gap-2">
-                                        <span className="text-base">🎓</span>
-                                        <span>Learning</span>
-                                    </span>
+                                    Learning
                                 </button>
                                 <button
                                     onClick={() => setMainTab('account')}
                                     title="Account - Manage your account settings"
-                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
+                                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                         mainTab === 'account'
-                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
+                                            ? 'text-white border-[#00C805]'
+                                            : 'text-[#A0A0A0] hover:text-white border-transparent'
                                     }`}
                                 >
-                                    <span className="flex items-center justify-center gap-2">
-                                        <span className="text-base">👤</span>
-                                        <span>Account</span>
-                                    </span>
+                                    Account
                                 </button>
                             </div>
                         </nav>
