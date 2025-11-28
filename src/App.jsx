@@ -6508,22 +6508,19 @@ const TradingSimulator = () => {
 
                         {/* Market Movers section removed - use dedicated Market Movers tab to avoid API rate limiting */}
 
-                        {/* Main Tab Navigation */}
-                        <nav className="sticky top-0 z-40 mb-6 bg-black/95 backdrop-blur-sm border-b border-gray-800">
-                            <div className="flex items-center justify-center gap-3 px-4 py-3 overflow-x-auto">
+                        {/* Main Tab Navigation - Robinhood Style */}
+                        <nav className="sticky top-0 z-40 mb-6 bg-black border-b border-[#2C2C2C]">
+                            <div className="flex items-center justify-start gap-1 px-4 py-2 overflow-x-auto">
                                 <button
                                     onClick={() => setMainTab('portfolio')}
                                     title="Portfolio - View your holdings and performance"
-                                    className={`px-5 py-3 font-semibold text-sm transition-all duration-200 rounded-lg whitespace-nowrap ${
+                                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                         mainTab === 'portfolio'
-                                            ? 'text-white bg-emerald-500/20 border border-emerald-500/50'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent'
+                                            ? 'text-white border-[#00C805]'
+                                            : 'text-[#A0A0A0] hover:text-white border-transparent'
                                     }`}
                                 >
-                                    <span className="flex items-center justify-center gap-2">
-                                        <span className="text-base">💼</span>
-                                        <span>Portfolio</span>
-                                    </span>
+                                    Portfolio
                                 </button>
                                 <button
                                     onClick={() => setMainTab('trading')}
