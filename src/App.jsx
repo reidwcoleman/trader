@@ -7665,72 +7665,98 @@ const TradingSimulator = () => {
                                                 const isExpanded = expandedHolding === symbol;
 
                                                 return (
-                                                    <div key={symbol} className={`group/card relative transition-all duration-300 bg-black/60 backdrop-blur-xl border-2 rounded-xl overflow-hidden ${isPositive ? 'border-green-500/40 hover:border-gray-700' : 'border-red-500/40 hover:border-red-400'} ${isExpanded ? 'shadow-2xl' : ''}`} style={{boxShadow: isPositive ? '0 0 20px rgba(34, 197, 94, 0.1)' : '0 0 20px rgba(239, 68, 68, 0.1)'}}>
-                                                        <div onClick={() => setExpandedHolding(isExpanded ? null : symbol)} className="p-4 cursor-pointer hover:bg-white/5 transition-all">
-                                                            <div className="flex items-center justify-between">
-                                                                <div className="flex items-center gap-4 flex-1">
-                                                                    <div>
-                                                                        <div className="font-black text-white text-lg">{symbol}</div>
-                                                                        <div className="text-xs text-gray-400">{qty} shares</div>
-                                                                    </div>
-                                                                    <div className="hidden sm:block">
-                                                                        <div className="text-xs text-gray-400">Value</div>
-                                                                        <div className="font-bold text-white">${pnl.currentValue.toFixed(2)}</div>
+                                                    <div key={symbol} className="group/card">
+                                                        {/* Clean stock row */}
+                                                        <div
+                                                            onClick={() => setExpandedHolding(isExpanded ? null : symbol)}
+                                                            className="flex items-center justify-between py-4 border-b border-gray-800/50 cursor-pointer hover:bg-gray-900/50 transition-colors px-2"
+                                                        >
+                                                            <div className="flex items-center gap-3">
+                                                                <div>
+                                                                    <div className="font-semibold text-white">{symbol}</div>
+                                                                    <div className="text-sm text-gray-500">{qty} shares</div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="text-right">
+                                                                    <div className="font-semibold text-white">${pnl.currentValue.toFixed(2)}</div>
+                                                                    <div className={`text-sm ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                                        {isPositive ? '+' : ''}{pnl.unrealizedPnLPercent.toFixed(2)}%
                                                                     </div>
                                                                 </div>
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className="text-right">
-                                                                        <div className={`font-black text-lg ${isPositive ? 'text-green-300' : 'text-red-300'}`}>{isPositive ? '+' : ''}{pnl.unrealizedPnLPercent.toFixed(2)}%</div>
-                                                                        <div className={`text-xs font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>{isPositive ? '+' : ''}${pnl.unrealizedPnL.toFixed(2)}</div>
-                                                                    </div>
-                                                                    <div className={`text-xl text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}>▼</div>
-                                                                </div>
+                                                                <div className={`text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}>▼</div>
                                                             </div>
                                                         </div>
 
+                                                        {/* Expanded details */}
                                                         {isExpanded && (
-                                                            <div className="border-t border-cyan-500/20 bg-black/40 p-4 space-y-4">
+                                                            <div className="bg-gray-900/30 border-b border-gray-800/50 p-4 space-y-4">
+                                                                {/* Metrics */}
                                                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                                                    <div className="bg-cyan-500/10 border border-gray-800 rounded-lg p-3">
-                                                                        <div className="text-gray-300 text-xs font-semibold mb-1">Cost Basis</div>
-                                                                        <div className="text-white font-bold">${pnl.avgCost.toFixed(2)}</div>
+                                                                    <div>
+                                                                        <div className="text-xs text-gray-500 mb-1">Cost Basis</div>
+                                                                        <div className="text-white font-semibold">${pnl.avgCost.toFixed(2)}</div>
                                                                     </div>
-                                                                    <div className="bg-cyan-500/10 border border-gray-800 rounded-lg p-3">
-                                                                        <div className="text-gray-300 text-xs font-semibold mb-1">Current Price</div>
-                                                                        <div className="text-white font-bold">${stock.price.toFixed(2)}</div>
+                                                                    <div>
+                                                                        <div className="text-xs text-gray-500 mb-1">Current Price</div>
+                                                                        <div className="text-white font-semibold">${stock.price.toFixed(2)}</div>
                                                                     </div>
-                                                                    <div className="bg-cyan-500/10 border border-gray-800 rounded-lg p-3">
-                                                                        <div className="text-gray-300 text-xs font-semibold mb-1">Total Cost</div>
-                                                                        <div className="text-white font-bold">${pnl.totalCost.toFixed(2)}</div>
+                                                                    <div>
+                                                                        <div className="text-xs text-gray-500 mb-1">Total Cost</div>
+                                                                        <div className="text-white font-semibold">${pnl.totalCost.toFixed(2)}</div>
                                                                     </div>
-                                                                    <div className="bg-cyan-500/10 border border-gray-800 rounded-lg p-3">
-                                                                        <div className="text-gray-300 text-xs font-semibold mb-1">Total Value</div>
-                                                                        <div className="text-white font-bold">${pnl.currentValue.toFixed(2)}</div>
+                                                                    <div>
+                                                                        <div className="text-xs text-gray-500 mb-1">Total Gain/Loss</div>
+                                                                        <div className={`font-semibold ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                                            {isPositive ? '+' : ''}${pnl.unrealizedPnL.toFixed(2)}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
 
+                                                                {/* Action buttons */}
                                                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                                                    <button onClick={(e) => { e.stopPropagation(); setSelectedStock(symbol); setMainTab('trading'); setActiveTab('market'); }} className="bg-emerald-500 hover:bg-emerald-400 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-lg hover:shadow-green-500/50 transform ">📈 Buy More</button>
-                                                                    <button onClick={(e) => { e.stopPropagation(); setSelectedStock(symbol); setMainTab('trading'); setActiveTab('market'); }} className="bg-red-500/20 text-red-400 hover:from-red-400 hover:to-pink-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-lg hover:shadow-red-500/50 transform ">💰 Sell</button>
-                                                                    <button onClick={(e) => { e.stopPropagation(); setSelectedStock(symbol); setMainTab('ai-analysis'); }} className="bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-400 hover:to-violet-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-lg hover:shadow-purple-500/50 transform  flex items-center justify-center gap-1"><span>🧠</span><span className="hidden sm:inline">UltraThink</span></button>
-                                                                    <button onClick={(e) => { e.stopPropagation(); setMainTab('news'); }} className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-lg hover:shadow-blue-500/50 transform ">📰 News</button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); setSelectedStock(symbol); setMainTab('trading'); setActiveTab('market'); }}
+                                                                        className="bg-emerald-500 hover:bg-emerald-400 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
+                                                                    >
+                                                                        Buy More
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); setSelectedStock(symbol); setMainTab('trading'); setActiveTab('market'); }}
+                                                                        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
+                                                                    >
+                                                                        Sell
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); setSelectedStock(symbol); setMainTab('ai-analysis'); }}
+                                                                        className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-1"
+                                                                    >
+                                                                        <span>🧠</span><span className="hidden sm:inline">UltraThink</span>
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); setMainTab('news'); }}
+                                                                        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
+                                                                    >
+                                                                        News
+                                                                    </button>
                                                                 </div>
 
+                                                                {/* AI Recommendation */}
                                                                 {(() => {
                                                                     const currentChange = stock.change || 0;
                                                                     const positionReturn = pnl.unrealizedPnLPercent;
-                                                                    let aiAction = 'Hold', aiReason = '', aiColor = 'blue';
-                                                                    if (positionReturn > 15 && currentChange < -2) { aiAction = 'Consider Taking Profits'; aiReason = 'Strong gains with recent weakness'; aiColor = 'yellow'; }
-                                                                    else if (positionReturn < -10 && currentChange < -2) { aiAction = 'Consider Stop Loss'; aiReason = 'Significant loss with downtrend'; aiColor = 'red'; }
-                                                                    else if (positionReturn > 0 && currentChange > 2) { aiAction = 'Strong Hold'; aiReason = 'Profitable with momentum'; aiColor = 'green'; }
-                                                                    else if (positionReturn < -5 && currentChange > 2) { aiAction = 'Consider Adding'; aiReason = 'Recovery momentum detected'; aiColor = 'green'; }
-                                                                    
-                                                                    return (
-                                                                        <div className={`rounded-lg p-3 border ${aiColor === 'green' ? 'bg-green-900/20 border-green-500/30' : aiColor === 'red' ? 'bg-red-900/20 border-red-500/30' : aiColor === 'yellow' ? 'bg-yellow-900/20 border-yellow-500/30' : 'bg-blue-900/20 border-blue-500/30'}`}>
+                                                                    let aiAction = 'Hold', aiReason = '';
+                                                                    if (positionReturn > 15 && currentChange < -2) { aiAction = 'Consider Taking Profits'; aiReason = 'Strong gains with recent weakness'; }
+                                                                    else if (positionReturn < -10 && currentChange < -2) { aiAction = 'Consider Stop Loss'; aiReason = 'Significant loss with downtrend'; }
+                                                                    else if (positionReturn > 0 && currentChange > 2) { aiAction = 'Strong Hold'; aiReason = 'Profitable with momentum'; }
+                                                                    else if (positionReturn < -5 && currentChange > 2) { aiAction = 'Consider Adding'; aiReason = 'Recovery momentum detected'; }
+
+                                                                    return aiReason && (
+                                                                        <div className="bg-purple-600/10 rounded-lg p-3 border border-purple-600/30">
                                                                             <div className="flex items-start gap-2">
                                                                                 <span className="text-lg">🧠</span>
                                                                                 <div>
-                                                                                    <div className={`font-bold text-sm ${aiColor === 'green' ? 'text-green-300' : aiColor === 'red' ? 'text-red-300' : aiColor === 'yellow' ? 'text-yellow-300' : 'text-blue-300'}`}>{aiAction}</div>
+                                                                                    <div className="font-semibold text-sm text-purple-300">UltraThink: {aiAction}</div>
                                                                                     <div className="text-xs text-gray-400 mt-1">{aiReason}</div>
                                                                                 </div>
                                                                             </div>
