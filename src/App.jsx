@@ -6677,20 +6677,20 @@ const TradingSimulator = () => {
 
                         {/* Portfolio Value - Robinhood Style */}
                         <div className="text-center py-8 mb-6">
-                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">
+                            <div className="text-4xl md:text-5xl font-semibold text-white mb-2">
                                 ${portfolioValue.toLocaleString(undefined, {maximumFractionDigits: 0})}
                             </div>
-                            <div className={`text-xl md:text-2xl font-semibold mb-1 ${portfolioReturn >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                            <div className={`text-xl md:text-2xl font-medium mb-1 ${portfolioReturn >= 0 ? 'text-[#00C805]' : 'text-[#FF5252]'}`}>
                                 {portfolioReturn >= 0 ? '+' : ''}${(portfolioValue - 100000).toLocaleString(undefined, {maximumFractionDigits: 0})} ({portfolioReturn >= 0 ? '+' : ''}{portfolioReturn.toFixed(2)}%)
                             </div>
-                            <div className="text-sm text-gray-500">All Time</div>
+                            <div className="text-sm text-[#A0A0A0]">All Time</div>
                             {lastUpdate && (
                                 <div className="flex items-center justify-center gap-2 mt-3">
                                     <div className="flex h-2 w-2">
-                                        <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                        <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-[#00C805] opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00C805]"></span>
                                     </div>
-                                    <span className="text-xs text-gray-500">Live</span>
+                                    <span className="text-xs text-[#A0A0A0]">Live</span>
                                 </div>
                             )}
                         </div>
