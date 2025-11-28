@@ -6695,34 +6695,34 @@ const TradingSimulator = () => {
                             )}
                         </div>
 
-                        {/* Key Stats Row */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        {/* Key Stats Row - Robinhood Clean */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                             {/* Cash */}
-                            <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
-                                <div className="text-xs text-gray-500 mb-1">Cash</div>
-                                <div className="text-2xl font-bold text-white">${portfolio.cash.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
-                                <div className="text-xs text-gray-500 mt-1">
+                            <div className="bg-[#1C1C1C] rounded-xl p-4 border border-[#2C2C2C]">
+                                <div className="text-xs text-[#A0A0A0] mb-1">Cash</div>
+                                <div className="text-2xl font-semibold text-white">${portfolio.cash.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                                <div className="text-xs text-[#A0A0A0] mt-1">
                                     {(portfolio.cash / portfolioValue * 100).toFixed(1)}% of portfolio
                                 </div>
                             </div>
 
                             {/* Today's Change */}
-                            <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
-                                <div className="text-xs text-gray-500 mb-1">Today</div>
-                                <div className={`text-2xl font-bold ${dailyReturn >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                            <div className="bg-[#1C1C1C] rounded-xl p-4 border border-[#2C2C2C]">
+                                <div className="text-xs text-[#A0A0A0] mb-1">Today</div>
+                                <div className={`text-2xl font-semibold ${dailyReturn >= 0 ? 'text-[#00C805]' : 'text-[#FF5252]'}`}>
                                     {dailyReturn >= 0 ? '+' : ''}{dailyReturn.toFixed(2)}%
                                 </div>
-                                <div className={`text-xs ${dailyReturn >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                <div className={`text-xs ${dailyReturn >= 0 ? 'text-[#00C805]' : 'text-[#FF5252]'}`}>
                                     {dailyReturn >= 0 ? '+' : ''}${(portfolioValue - yesterdayValue).toLocaleString(undefined, {maximumFractionDigits: 0})}
                                 </div>
                             </div>
 
                             {/* Portfolio Health - Keep AI Feature */}
-                            <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+                            <div className="bg-[#1C1C1C] rounded-xl p-4 border border-[#2C2C2C]">
                                 <div className="flex items-center justify-between mb-2">
-                                    <div className="text-xs text-gray-500">UltraThink Health</div>
-                                    <div className="bg-purple-600/20 px-2 py-0.5 rounded-full border border-purple-600/40">
-                                        <span className="text-[8px] text-purple-400 font-bold">🧠 AI</span>
+                                    <div className="text-xs text-[#A0A0A0]">UltraThink Health</div>
+                                    <div className="bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/30">
+                                        <span className="text-[8px] text-purple-400 font-semibold">🧠 AI</span>
                                     </div>
                                 </div>
                                 {(() => {
@@ -6735,16 +6735,16 @@ const TradingSimulator = () => {
                                     if (positionsCount >= 10) healthScore += 20; else if (positionsCount >= 5) healthScore += 15; else if (positionsCount >= 3) healthScore += 10; else if (positionsCount === 0) healthScore -= 20;
                                     if (sellTrades > 0) { if (winRate >= 70) healthScore += 20; else if (winRate >= 50) healthScore += 10; else if (winRate < 30) healthScore -= 10; }
                                     healthScore = Math.max(0, Math.min(100, healthScore));
-                                    const healthColor = healthScore >= 70 ? 'emerald' : healthScore >= 40 ? 'yellow' : 'red';
+                                    const healthColor = healthScore >= 70 ? 'green' : healthScore >= 40 ? 'yellow' : 'red';
                                     const healthLabel = healthScore >= 70 ? 'Excellent' : healthScore >= 40 ? 'Good' : 'Needs Work';
                                     return (
                                         <div className="flex items-center gap-3">
-                                            <div className="text-3xl font-bold text-white">{healthScore}</div>
+                                            <div className="text-3xl font-semibold text-white">{healthScore}</div>
                                             <div className="flex-1">
-                                                <div className={`text-sm font-semibold ${healthColor === 'emerald' ? 'text-emerald-500' : healthColor === 'yellow' ? 'text-yellow-500' : 'text-red-500'}`}>
+                                                <div className={`text-sm font-semibold ${healthColor === 'green' ? 'text-[#00C805]' : healthColor === 'yellow' ? 'text-yellow-500' : 'text-[#FF5252]'}`}>
                                                     {healthLabel}
                                                 </div>
-                                                <div className="text-xs text-gray-500">{positionsCount} stocks • {sellTrades > 0 ? `${winRate.toFixed(0)}% win` : 'No trades'}</div>
+                                                <div className="text-xs text-[#A0A0A0]">{positionsCount} stocks • {sellTrades > 0 ? `${winRate.toFixed(0)}% win` : 'No trades'}</div>
                                             </div>
                                         </div>
                                     );
@@ -6752,49 +6752,49 @@ const TradingSimulator = () => {
                             </div>
                         </div>
 
-                        {/* Portfolio Sub-Tab Navigation */}
+                        {/* Portfolio Sub-Tab Navigation - Robinhood Style */}
                         {mainTab === 'portfolio' && (
-                            <div className="sticky top-16 z-30 mb-6 bg-black/95 backdrop-blur-2xl rounded-xl border border-gray-800 p-2 shadow-xl" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.15)'}}>
-                                <div className="flex items-center gap-2 overflow-x-auto">
+                            <div className="sticky top-16 z-30 mb-6 bg-black border-b border-[#2C2C2C]">
+                                <div className="flex items-center gap-1 overflow-x-auto px-4">
                                     <button
                                         onClick={() => setPortfolioSubTab('overview')}
-                                        className={`px-4 py-2 font-bold text-sm transition-all duration-300 rounded-lg whitespace-nowrap ${
+                                        className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                             portfolioSubTab === 'overview'
-                                                ? 'text-white bg-gradient-to-r from-cyan-500/40 to-blue-500/40 border-2 border-cyan-400/60 shadow-lg'
-                                                : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent'
+                                                ? 'text-white border-[#00C805]'
+                                                : 'text-[#A0A0A0] hover:text-white border-transparent'
                                         }`}
                                     >
-                                        📊 Overview
+                                        Overview
                                     </button>
                                     <button
                                         onClick={() => setPortfolioSubTab('holdings')}
-                                        className={`px-4 py-2 font-bold text-sm transition-all duration-300 rounded-lg whitespace-nowrap ${
+                                        className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                             portfolioSubTab === 'holdings'
-                                                ? 'text-white bg-gradient-to-r from-cyan-500/40 to-blue-500/40 border-2 border-cyan-400/60 shadow-lg'
-                                                : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent'
+                                                ? 'text-white border-[#00C805]'
+                                                : 'text-[#A0A0A0] hover:text-white border-transparent'
                                         }`}
                                     >
-                                        💼 Holdings
+                                        Holdings
                                     </button>
                                     <button
                                         onClick={() => setPortfolioSubTab('performance')}
-                                        className={`px-4 py-2 font-bold text-sm transition-all duration-300 rounded-lg whitespace-nowrap ${
+                                        className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                             portfolioSubTab === 'performance'
-                                                ? 'text-white bg-gradient-to-r from-cyan-500/40 to-blue-500/40 border-2 border-cyan-400/60 shadow-lg'
-                                                : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent'
+                                                ? 'text-white border-[#00C805]'
+                                                : 'text-[#A0A0A0] hover:text-white border-transparent'
                                         }`}
                                     >
-                                        📈 Performance
+                                        Performance
                                     </button>
                                     <button
                                         onClick={() => setPortfolioSubTab('insights')}
-                                        className={`px-4 py-2 font-bold text-sm transition-all duration-300 rounded-lg whitespace-nowrap ${
+                                        className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap ${
                                             portfolioSubTab === 'insights'
-                                                ? 'text-white bg-gradient-to-r from-cyan-500/40 to-blue-500/40 border-2 border-cyan-400/60 shadow-lg'
-                                                : 'text-gray-400 hover:text-white hover:bg-cyan-500/10 border-2 border-transparent'
+                                                ? 'text-white border-[#00C805]'
+                                                : 'text-[#A0A0A0] hover:text-white border-transparent'
                                         }`}
                                     >
-                                        🧠 Insights
+                                        Insights
                                     </button>
                                 </div>
                             </div>
@@ -9367,7 +9367,8 @@ const TradingSimulator = () => {
                         {/* News View */}
                         {mainTab === 'news' && (
                             <>
-                                <div className="group relative bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-2xl rounded-2xl p-6 border border-gray-800 mb-4 overflow-hidden transition-all duration-500 shadow-2xl" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
+                                {/* Clean News Section - Robinhood Style */}
+                                <div className="mb-4">
                                     {/* Animated shine effect */}
                                     <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent pointer-events-none"></div>
 
