@@ -7360,77 +7360,11 @@ const TradingSimulator = () => {
 
                                         <div className="space-y-3">
                                             {topBuys.map((stock, idx) => {
-                                                const isStrongBuy = stock.buyScore >= 70;
-                                                const isStrongBuy = stock.buyScore >= 70;
                                                 const recommendationColor =
-                                                    stock.recommendation === 'STRONG BUY' ? 'from-green-500 to-emerald-500' :
-                                                    stock.recommendation === 'BUY' ? 'from-green-600 to-green-700' :
-                                                    stock.recommendation === 'HOLD' ? 'from-yellow-600 to-yellow-700' :
-                                                    'from-gray-600 to-gray-700';
-
-                                                // Determine sector based on symbol
-                                                const techStocks = ['NVDA', 'AMD', 'INTC', 'MSFT', 'AAPL', 'GOOGL', 'META', 'TSM', 'AVGO', 'QCOM', 'MU', 'ARM', 'SMCI', 'KLAC', 'LRCX', 'ASML', 'AMAT', 'MRVL', 'ON', 'TXN', 'NXPI', 'PLTR', 'NOW', 'CRM', 'SNOW', 'DDOG', 'NET', 'WDAY', 'ZS'];
-                                                const financeStocks = ['JPM', 'BAC', 'GS', 'MS', 'C', 'V', 'MA', 'BRK.B', 'COIN', 'SQ', 'PYPL', 'HOOD'];
-                                                const healthStocks = ['UNH', 'JNJ', 'PFE', 'ABBV', 'LLY', 'TMO', 'MRNA', 'BNTX', 'REGN', 'VRTX', 'BIIB', 'GILD', 'AMGN', 'ISRG'];
-                                                const energyStocks = ['XOM', 'CVX', 'COP', 'SLB', 'OXY', 'ENPH', 'SEDG', 'RUN', 'PLUG', 'BE', 'FCEL'];
-                                                const consumerStocks = ['TSLA', 'NKE', 'DIS', 'SBUX', 'MCD', 'HD', 'WMT', 'COST', 'TGT', 'LOW', 'CHWY', 'BBY', 'AMZN'];
-
-                                                let sector = 'Other';
-                                                let sectorIcon = '📊';
-                                                let sectorColor = 'bg-gray-600';
-
-                                                if (techStocks.includes(stock.symbol)) {
-                                                    sector = 'Tech';
-                                                    sectorIcon = '💻';
-                                                    sectorColor = 'bg-blue-600';
-                                                } else if (financeStocks.includes(stock.symbol)) {
-                                                    sector = 'Finance';
-                                                    sectorIcon = '💰';
-                                                    sectorColor = 'bg-green-600';
-                                                } else if (healthStocks.includes(stock.symbol)) {
-                                                    sector = 'Health';
-                                                    sectorIcon = '⚕️';
-                                                    sectorColor = 'bg-red-600';
-                                                } else if (energyStocks.includes(stock.symbol)) {
-                                                    sector = 'Energy';
-                                                    sectorIcon = '⚡';
-                                                    sectorColor = 'bg-yellow-600';
-                                                } else if (consumerStocks.includes(stock.symbol)) {
-                                                    sector = 'Consumer';
-                                                    sectorIcon = '🛒';
-                                                    sectorColor = 'bg-purple-600';
-                                                }
-
-                                                // Determine risk level based on volatility and price
-                                                const volatility = (stock.high - stock.low) / stock.previousClose;
-                                                let riskLevel = 'Medium';
-                                                let riskIcon = '🟡';
-                                                let riskColor = 'bg-yellow-600';
-
-                                                if (volatility > 0.05 || stock.price > 200) {
-                                                    riskLevel = 'High';
-                                                    riskIcon = '🔴';
-                                                    riskColor = 'bg-red-600';
-                                                } else if (volatility < 0.02 && stock.price < 100) {
-                                                    riskLevel = 'Low';
-                                                    riskIcon = '🟢';
-                                                    riskColor = 'bg-green-600';
-                                                }
-
-                                                // Determine time horizon based on volatility and momentum
-                                                let timeHorizon = 'Swing';
-                                                let timeIcon = '🏋️';
-                                                let timeColor = 'bg-cyan-600';
-
-                                                if (volatility > 0.05 && Math.abs(stock.change) > 3) {
-                                                    timeHorizon = 'Day Trade';
-                                                    timeIcon = '🏃';
-                                                    timeColor = 'bg-orange-600';
-                                                } else if (volatility < 0.02 && stock.buyScore >= 75) {
-                                                    timeHorizon = 'Long-term';
-                                                    timeIcon = '🎯';
-                                                    timeColor = 'bg-indigo-600';
-                                                }
+                                                    stock.recommendation === 'STRONG BUY' ? 'text-emerald-400' :
+                                                    stock.recommendation === 'BUY' ? 'text-green-400' :
+                                                    stock.recommendation === 'HOLD' ? 'text-yellow-400' :
+                                                    'text-gray-400';
 
                                                 return (
                                                     <div
@@ -7439,91 +7373,47 @@ const TradingSimulator = () => {
                                                             addToWatchlist(stock.symbol);
                                                             setMainTab('trading');
                                                         }}
-                                                        className="group bg-gradient-to-br from-purple-900/40 to-indigo-900/40 rounded-xl p-5 border border-gray-800 hover:border-gray-700 transition-all duration-300  hover:shadow-2xl hover:shadow-purple-500/20 cursor-pointer"
+                                                        className="group bg-gray-900/50 hover:bg-gray-900/80 rounded-xl p-4 border border-gray-800/50 hover:border-purple-500/50 transition-all cursor-pointer"
                                                     >
-                                                        {/* Header with Rank and Recommendation */}
-                                                        <div className="flex items-start justify-between mb-4">
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="bg-purple-500/30 text-gray-400 text-sm font-black px-3 py-1 rounded-full">
-                                                                    #{idx + 1}
-                                                                </div>
-                                                                <div className={`bg-gradient-to-r ${recommendationColor} text-white text-xs font-black px-3 py-1 rounded-full shadow-lg`}>
-                                                                    {stock.recommendation}
+                                                        {/* Compact header */}
+                                                        <div className="flex items-center justify-between mb-3">
+                                                            <div className="flex items-center gap-3">
+                                                                <span className="text-gray-500 text-sm">#{idx + 1}</span>
+                                                                <div>
+                                                                    <h3 className="text-lg font-bold text-white">{stock.symbol}</h3>
+                                                                    <div className="text-xs text-gray-500 truncate max-w-[200px]">{stock.name}</div>
                                                                 </div>
                                                             </div>
                                                             <div className="text-right">
-                                                                <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-300">
-                                                                    {stock.buyScore}
-                                                                </div>
-                                                                <div className="text-[8px] text-gray-400">AI SCORE</div>
+                                                                <div className="text-2xl font-bold text-purple-400">{stock.buyScore}</div>
+                                                                <div className="text-xs text-gray-500">Score</div>
                                                             </div>
                                                         </div>
 
-                                                        {/* Stock Info */}
-                                                        <div className="mb-3">
-                                                            <h3 className="text-2xl font-black text-white group-hover:text-gray-300 transition-colors mb-1">
-                                                                {stock.symbol}
-                                                            </h3>
-                                                            <div className="text-xs text-gray-400 truncate">{stock.name}</div>
-                                                        </div>
-
-                                                        {/* NEW: Sector, Risk, Time Horizon Badges */}
-                                                        <div className="flex items-center gap-2 mb-4 flex-wrap">
-                                                            <div className={`${sectorColor} text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1`}>
-                                                                <span>{sectorIcon}</span>
-                                                                <span>{sector}</span>
-                                                            </div>
-                                                            <div className={`${riskColor} text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1`}>
-                                                                <span>{riskIcon}</span>
-                                                                <span>{riskLevel}</span>
-                                                            </div>
-                                                            <div className={`${timeColor} text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1`}>
-                                                                <span>{timeIcon}</span>
-                                                                <span>{timeHorizon}</span>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Price and Change */}
-                                                        <div className="flex items-center justify-between mb-4 pb-3 border-b border-purple-500/20">
+                                                        {/* Price and change */}
+                                                        <div className="flex items-center justify-between py-2 border-y border-gray-800/50">
                                                             <div>
-                                                                <div className="text-xs text-gray-400">Current Price</div>
-                                                                <div className="text-xl font-bold text-white">${stock.price.toFixed(2)}</div>
+                                                                <div className="text-xs text-gray-500">Price</div>
+                                                                <div className="text-lg font-semibold text-white">${stock.price.toFixed(2)}</div>
                                                             </div>
                                                             <div className="text-right">
-                                                                <div className="text-xs text-gray-400">Change</div>
-                                                                <div className={`text-xl font-bold ${stock.change >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                                                                <div className="text-xs text-gray-500">Change</div>
+                                                                <div className={`text-lg font-semibold ${stock.change >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                                                                     {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
                                                                 </div>
                                                             </div>
                                                         </div>
 
-                                                        {/* AI Signals */}
-                                                        <div className="mb-3">
-                                                            <div className="text-[10px] text-gray-300 font-bold mb-2">AI SIGNALS:</div>
-                                                            <div className="space-y-1">
-                                                                {stock.signals.slice(0, 3).map((signal, i) => (
-                                                                    <div key={i} className="flex items-center gap-2 text-xs">
-                                                                        <span className="text-green-400">✓</span>
-                                                                        <span className="text-gray-300">{signal}</span>
-                                                                    </div>
-                                                                ))}
+                                                        {/* Rating and top signal */}
+                                                        <div className="mt-3 flex items-center justify-between">
+                                                            <div className={`text-sm font-bold ${recommendationColor}`}>
+                                                                {stock.recommendation}
                                                             </div>
-                                                        </div>
-
-                                                        {/* AI Reasoning */}
-                                                        <div className="mt-3 pt-3 border-t border-purple-500/20 bg-black/20 rounded-lg p-3">
-                                                            <div className="text-xs">
-                                                                <span className="text-gray-300 font-bold">🧠 UltraThink:</span>
-                                                                {' '}
-                                                                <span className="text-gray-300">{stock.reasoning}</span>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Click to Trade */}
-                                                        <div className="mt-3 text-center">
-                                                            <div className="text-[10px] text-purple-400 font-semibold group-hover:text-gray-300 transition-colors">
-                                                                Click to trade →
-                                                            </div>
+                                                            {stock.signals[0] && (
+                                                                <div className="text-xs text-gray-400 truncate max-w-[200px]">
+                                                                    {stock.signals[0]}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 );
