@@ -7863,37 +7863,37 @@ const TradingSimulator = () => {
                         {mainTab === 'trading' && (
                             <>
                         {/* Chart Pattern Quick Tip */}
-                        <div className="bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-xl rounded-2xl p-4 border border-gray-800 shadow-xl mb-4" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.15)'}}>
+                        <div className="bg-[#1C1C1C] rounded-xl p-4 border border-[#2C2C2C] mb-4">
                             <div className="flex items-start gap-3">
                                 <div className="text-4xl flex-shrink-0">📊</div>
                                 <div className="flex-1">
                                     <div className="flex items-center justify-between mb-2">
-                                        <h3 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">Master Chart Patterns</h3>
+                                        <h3 className="text-xl font-semibold text-white">Master Chart Patterns</h3>
                                         <button
                                             onClick={() => setMainTab('learning')}
-                                            className="text-xs bg-cyan-500/20 hover:bg-cyan-500/30 text-gray-300 px-3 py-1.5 rounded-full font-bold transition-all"
+                                            className="text-xs bg-[#2C2C2C] hover:bg-[#3C3C3C] text-white px-3 py-1.5 rounded-full font-medium transition-colors"
                                         >
                                             Learn More →
                                         </button>
                                     </div>
-                                    <p className="text-cyan-100/80 mb-3 text-sm">
+                                    <p className="text-[#A0A0A0] mb-3 text-sm">
                                         Identify patterns to predict price movements! Learn 6 key patterns with interactive charts showing exact entry, target, and stop-loss points.
                                     </p>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                        <div className="bg-black/40 rounded-lg p-3 border border-gray-800">
+                                        <div className="bg-[#1C1C1C] rounded-lg p-3 border border-[#2C2C2C]">
                                             <div className="text-2xl mb-1">🚩</div>
-                                            <div className="text-sm font-bold text-green-300">Bull Flag</div>
-                                            <div className="text-xs text-green-200">+10.7% avg</div>
+                                            <div className="text-sm font-medium text-[#00C805]">Bull Flag</div>
+                                            <div className="text-xs text-[#00C805]">+10.7% avg</div>
                                         </div>
-                                        <div className="bg-black/40 rounded-lg p-3 border border-red-500/30">
+                                        <div className="bg-[#1C1C1C] rounded-lg p-3 border border-[#2C2C2C]">
                                             <div className="text-2xl mb-1">🎯</div>
-                                            <div className="text-sm font-bold text-red-300">Head & Shoulders</div>
-                                            <div className="text-xs text-red-200">-10.3% avg</div>
+                                            <div className="text-sm font-medium text-[#FF5252]">Head & Shoulders</div>
+                                            <div className="text-xs text-[#FF5252]">-10.3% avg</div>
                                         </div>
-                                        <div className="bg-black/40 rounded-lg p-3 border border-gray-800">
+                                        <div className="bg-[#1C1C1C] rounded-lg p-3 border border-[#2C2C2C]">
                                             <div className="text-2xl mb-1">💎</div>
-                                            <div className="text-sm font-bold text-green-300">Double Bottom</div>
-                                            <div className="text-xs text-green-200">+9.3% avg</div>
+                                            <div className="text-sm font-medium text-[#00C805]">Double Bottom</div>
+                                            <div className="text-xs text-[#00C805]">+9.3% avg</div>
                                         </div>
                                     </div>
                                 </div>
@@ -7902,10 +7902,10 @@ const TradingSimulator = () => {
 
                         {/* Leaderboard for Family Competitions */}
                         {(plan === 'family-public' || plan === 'family-private') && competition?.members && competition.members.length > 1 && (
-                            <div className="bg-gradient-to-br from-cyan-900/40 to-blue-950/40 backdrop-blur-xl rounded-2xl p-4 border border-gray-800 mb-4 shadow-xl" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.15)'}}>
-                                <h2 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300 mb-4 flex items-center gap-2">
+                            <div className="bg-[#1C1C1C] rounded-xl p-4 border border-[#2C2C2C] mb-4">
+                                <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                                     🏆 Leaderboard
-                                    <span className="text-sm font-normal text-gray-300 ml-2">
+                                    <span className="text-sm font-normal text-[#A0A0A0] ml-2">
                                         ({competition.members.length} players)
                                     </span>
                                 </h2>
@@ -7924,40 +7924,40 @@ const TradingSimulator = () => {
                                             return (
                                                 <div
                                                     key={member.id}
-                                                    className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
+                                                    className={`flex items-center justify-between p-4 rounded-xl border transition-colors ${
                                                         isCurrentUser
-                                                            ? 'bg-gradient-to-r from-cyan-900/50 to-blue-900/50 border-cyan-400 shadow-lg shadow-cyan-500/20'
+                                                            ? 'bg-[#1C1C1C] border-[#00C805]'
                                                             : index === 0
-                                                                ? 'bg-gradient-to-r from-yellow-900/30 to-amber-900/30 border-yellow-500'
-                                                                : 'bg-blue-900/30 border-purple-600/50'
+                                                                ? 'bg-[#1C1C1C] border-yellow-500'
+                                                                : 'bg-[#1C1C1C] border-[#2C2C2C]'
                                                     }`}
                                                 >
                                                     <div className="flex items-center gap-4">
-                                                        <div className={`text-3xl font-black ${
+                                                        <div className={`text-3xl font-semibold ${
                                                             index === 0 ? 'text-yellow-300' :
                                                             index === 1 ? 'text-gray-300' :
                                                             index === 2 ? 'text-orange-400' :
-                                                            'text-purple-400'
+                                                            'text-[#A0A0A0]'
                                                         }`}>
                                                             {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                                                         </div>
                                                         <div>
-                                                            <div className="font-black text-white text-lg flex items-center gap-2">
+                                                            <div className="font-semibold text-white text-lg flex items-center gap-2">
                                                                 {member.name}
                                                                 {isCurrentUser && (
-                                                                    <span className="text-xs bg-cyan-500 text-white px-2 py-1 rounded-full">YOU</span>
+                                                                    <span className="text-xs bg-[#00C805] text-white px-2 py-1 rounded-full">YOU</span>
                                                                 )}
                                                             </div>
-                                                            <div className="text-sm text-gray-300">
+                                                            <div className="text-sm text-[#A0A0A0]">
                                                                 Portfolio: ${member.portfolioValue.toLocaleString(undefined, {maximumFractionDigits: 0})}
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
-                                                        <div className={`text-2xl font-black ${isPositive ? 'text-green-300' : 'text-red-300'}`}>
+                                                        <div className={`text-2xl font-semibold ${isPositive ? 'text-[#00C805]' : 'text-[#FF5252]'}`}>
                                                             {isPositive ? '+' : ''}{returnPercent.toFixed(2)}%
                                                         </div>
-                                                        <div className={`text-sm font-semibold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                                                        <div className={`text-sm font-medium ${isPositive ? 'text-[#00C805]' : 'text-[#FF5252]'}`}>
                                                             {isPositive ? '+' : ''}${(member.portfolioValue - 100000).toLocaleString(undefined, {maximumFractionDigits: 0})}
                                                         </div>
                                                     </div>
@@ -7965,10 +7965,10 @@ const TradingSimulator = () => {
                                             );
                                         })}
                                 </div>
-                                <div className="mt-6 p-4 bg-purple-900/30 border border-purple-600/50 rounded-xl">
+                                <div className="mt-6 p-4 bg-[#1C1C1C] border border-[#2C2C2C] rounded-xl">
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-400 font-semibold">💰 Total Prize Pool:</span>
-                                        <span className="text-white font-black text-lg">${competition.totalPool?.toFixed(2) || '0.00'}</span>
+                                        <span className="text-[#A0A0A0] font-medium">💰 Total Prize Pool:</span>
+                                        <span className="text-white font-semibold text-lg">${competition.totalPool?.toFixed(2) || '0.00'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -7977,25 +7977,21 @@ const TradingSimulator = () => {
                         {/* Main Content */}
                         <div className="w-full">
                             {/* Market Status Banner */}
-                            <div className={`mb-4 rounded-2xl p-4 border-2 shadow-xl transition-all duration-300 backdrop-blur-xl ${
+                            <div className={`mb-4 rounded-xl p-4 border-l-4 transition-all ${
                                 marketOpen
-                                    ? 'bg-gradient-to-r from-green-900/50 to-emerald-900/50 border-green-500/50'
-                                    : 'bg-gradient-to-r from-red-900/50 to-rose-900/50 border-red-500/50'
-                            }`} style={{boxShadow: marketOpen ? '0 0 30px rgba(34, 197, 94, 0.2)' : '0 0 30px rgba(239, 68, 68, 0.2)'}}>
+                                    ? 'bg-[#1C1C1C] border-l-[#00C805] border border-[#2C2C2C]'
+                                    : 'bg-[#1C1C1C] border-l-[#FF5252] border border-[#2C2C2C]'
+                            }`}>
                                 <div className="flex items-center justify-between flex-wrap gap-3">
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
-                                            marketOpen
-                                                ? 'bg-green-500/30 border-2 border-green-400'
-                                                : 'bg-red-500/30 border-2 border-red-400'
-                                        }`}>
+                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl bg-[#2C2C2C]`}>
                                             {marketOpen ? '🟢' : '🔴'}
                                         </div>
                                         <div>
-                                            <h3 className={`text-xl font-black ${marketOpen ? 'text-green-300' : 'text-red-300'}`}>
+                                            <h3 className={`text-xl font-semibold ${marketOpen ? 'text-[#00C805]' : 'text-[#FF5252]'}`}>
                                                 {marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED'}
                                             </h3>
-                                            <p className={`text-sm font-semibold ${marketOpen ? 'text-green-200' : 'text-red-200'}`}>
+                                            <p className={`text-sm font-medium ${marketOpen ? 'text-[#00C805]' : 'text-[#FF5252]'}`}>
                                                 {marketOpen
                                                     ? `Closes in ${timeUntilChange}`
                                                     : currentHoliday
@@ -8006,10 +8002,10 @@ const TradingSimulator = () => {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-sm text-white/80 font-semibold">
+                                        <div className="text-sm text-white font-medium">
                                             {marketOpen ? 'Trading Enabled' : 'Trading Disabled'}
                                         </div>
-                                        <div className={`text-xs mt-1 font-bold ${marketOpen ? 'text-green-300' : 'text-red-300'}`}>
+                                        <div className={`text-xs mt-1 font-medium ${marketOpen ? 'text-[#00C805]' : 'text-[#FF5252]'}`}>
                                             {marketOpen
                                                 ? 'Mon-Fri, 9:30 AM - 4:00 PM ET'
                                                 : `Next Open: ${nextMarketOpenTime}`
@@ -8020,27 +8016,27 @@ const TradingSimulator = () => {
 
                                 {/* Market Closed Notice */}
                                 {!marketOpen && (
-                                    <div className="mt-4 pt-4 border-t border-red-500/30">
-                                        <div className="bg-red-950/40 rounded-xl p-4">
-                                            <h4 className="text-red-200 font-bold mb-2 flex items-center gap-2">
+                                    <div className="mt-4 pt-4 border-t border-[#2C2C2C]">
+                                        <div className="bg-[#1C1C1C] rounded-xl p-4">
+                                            <h4 className="text-[#FF5252] font-medium mb-2 flex items-center gap-2">
                                                 <span>🔒</span>
                                                 <span>Trading Unavailable</span>
                                             </h4>
-                                            <p className="text-red-200/80 text-sm mb-2">
+                                            <p className="text-[#A0A0A0] text-sm mb-2">
                                                 The US stock market is currently closed. You can still browse stocks, view news, and analyze opportunities.
                                             </p>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3 text-xs">
-                                                <div className="bg-red-900/30 rounded-lg p-2 border border-red-500/30">
-                                                    <div className="text-red-300 font-bold">📅 Trading Days</div>
-                                                    <div className="text-red-200/70">Monday - Friday</div>
+                                                <div className="bg-[#1C1C1C] rounded-lg p-2 border border-[#2C2C2C]">
+                                                    <div className="text-white font-medium">📅 Trading Days</div>
+                                                    <div className="text-[#A0A0A0]">Monday - Friday</div>
                                                 </div>
-                                                <div className="bg-red-900/30 rounded-lg p-2 border border-red-500/30">
-                                                    <div className="text-red-300 font-bold">⏰ Trading Hours</div>
-                                                    <div className="text-red-200/70">9:30 AM - 4:00 PM ET</div>
+                                                <div className="bg-[#1C1C1C] rounded-lg p-2 border border-[#2C2C2C]">
+                                                    <div className="text-white font-medium">⏰ Trading Hours</div>
+                                                    <div className="text-[#A0A0A0]">9:30 AM - 4:00 PM ET</div>
                                                 </div>
-                                                <div className="bg-red-900/30 rounded-lg p-2 border border-red-500/30">
-                                                    <div className="text-red-300 font-bold">🎯 Next Session</div>
-                                                    <div className="text-red-200/70">{timeUntilChange}</div>
+                                                <div className="bg-[#1C1C1C] rounded-lg p-2 border border-[#2C2C2C]">
+                                                    <div className="text-white font-medium">🎯 Next Session</div>
+                                                    <div className="text-[#A0A0A0]">{timeUntilChange}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -8216,9 +8212,7 @@ const TradingSimulator = () => {
                             })()}
 
                             {/* Market View */}
-                            <div className="group relative bg-black/80 backdrop-blur-2xl rounded-2xl p-6 border border-gray-800 hover:border-gray-700/60 transition-all duration-500 overflow-hidden" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
-                                {/* Animated shine effect */}
-                                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+                            <div className="relative bg-[#1C1C1C] rounded-xl p-6 border border-[#2C2C2C] transition-all overflow-hidden">
 
                                 {/* Clean Search Bar - Robinhood Style */}
                                 <div className="relative mb-6">
@@ -8250,7 +8244,7 @@ const TradingSimulator = () => {
                                                 setShowSearchResults(false);
                                             }
                                         }}
-                                        className="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-gray-700 focus:outline-none transition-colors"
+                                        className="w-full bg-[#1C1C1C] border border-[#2C2C2C] rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#00C805] focus:outline-none transition-colors"
                                     />
                                     {searching && (
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
@@ -8276,9 +8270,9 @@ const TradingSimulator = () => {
 
                                 {/* Clean Search Results */}
                                 {searchQuery && showSearchResults && (
-                                    <div className="mb-6 bg-gray-900/50 border border-gray-800 rounded-lg overflow-hidden">
+                                    <div className="mb-6 bg-[#1C1C1C] border border-[#2C2C2C] rounded-lg overflow-hidden">
                                         {searching ? (
-                                            <div className="p-6 text-center text-gray-500">Searching...</div>
+                                            <div className="p-6 text-center text-[#A0A0A0]">Searching...</div>
                                         ) : searchResults.length > 0 ? (
                                             <div className="max-h-60 overflow-y-auto">
                                                 {searchResults.map((result) => (
@@ -8302,17 +8296,17 @@ const TradingSimulator = () => {
                                                             setShowSearchResults(false);
                                                             setSearching(false);
                                                         }}
-                                                        className="p-4 border-b border-gray-800 last:border-b-0 hover:bg-gray-900/50 cursor-pointer transition-colors"
+                                                        className="p-4 border-b border-[#2C2C2C] last:border-b-0 hover:bg-[#2C2C2C] cursor-pointer transition-colors"
                                                     >
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex-1">
                                                                 <div className="flex items-center gap-2">
-                                                                    <div className="font-semibold text-white">{result.symbol}</div>
+                                                                    <div className="font-medium text-white">{result.symbol}</div>
                                                                     {result.owned && (
-                                                                        <span className="bg-emerald-600/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full">Owned</span>
+                                                                        <span className="bg-[#00C805]/20 text-[#00C805] text-xs px-2 py-0.5 rounded-full">Owned</span>
                                                                     )}
                                                                 </div>
-                                                                <div className="text-sm text-gray-500">{result.name}</div>
+                                                                <div className="text-sm text-[#A0A0A0]">{result.name}</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -8325,55 +8319,52 @@ const TradingSimulator = () => {
                                             </div>
                                         ) : (
                                             <div className="p-6 text-center">
-                                                <div className="text-gray-500 mb-2">No results found</div>
-                                                <div className="text-xs text-gray-600">Try: AAPL, GOOGL, MSFT, TSLA</div>
+                                                <div className="text-[#A0A0A0] mb-2">No results found</div>
+                                                <div className="text-xs text-[#A0A0A0]">Try: AAPL, GOOGL, MSFT, TSLA</div>
                                             </div>
                                         )}
                                     </div>
                                 )}
 
-                                <h3 className="text-lg font-bold text-white mb-4 mt-8">📊 Select a Stock to Trade</h3>
+                                <h3 className="text-lg font-medium text-white mb-4 mt-8">📊 Select a Stock to Trade</h3>
                                 {loading && stocks.length === 0 ? (
-                                    <div className="text-center py-12 bg-black/80 backdrop-blur-2xl border border-gray-800 rounded-xl">
-                                        <div className="text-gray-300 font-semibold">Loading stocks...</div>
+                                    <div className="text-center py-12 bg-[#1C1C1C] border border-[#2C2C2C] rounded-xl">
+                                        <div className="text-[#A0A0A0] font-medium">Loading stocks...</div>
                                     </div>
                                 ) : !selectedStock ? (
-                                    <div className="text-center py-12 bg-black/80 backdrop-blur-2xl rounded-xl border-2 border-dashed border-cyan-500/30">
+                                    <div className="text-center py-12 bg-[#1C1C1C] rounded-xl border border-dashed border-[#2C2C2C]">
                                         <div className="text-6xl mb-3 opacity-50">📊</div>
-                                        <div className="text-gray-300 font-semibold">No stock selected</div>
-                                        <div className="text-sm text-gray-400 mt-2 font-medium">Search and add stocks to your watchlist, then select one to trade</div>
+                                        <div className="text-white font-medium">No stock selected</div>
+                                        <div className="text-sm text-[#A0A0A0] mt-2 font-normal">Search and add stocks to your watchlist, then select one to trade</div>
                                     </div>
                                 ) : null}
 
                             {/* Trading Panel - Now in main left column */}
                             {selectedStock && (
-                                    <div className="group relative bg-black/80 backdrop-blur-2xl rounded-2xl p-6 border border-gray-800 hover:border-gray-700/60 mt-6 overflow-hidden transition-all duration-500" style={{boxShadow: '0 0 40px rgba(6, 182, 212, 0.2)'}}>
-                                        {/* Animated shine effect */}
-                                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent pointer-events-none"></div>
+                                    <div className="relative bg-[#1C1C1C] rounded-xl p-6 border border-[#2C2C2C] mt-6 overflow-hidden transition-all">
 
                                         {/* Stock Header with AI Indicator */}
-                                        <div className="relative mb-6 pb-6 border-b border-cyan-500/30">
+                                        <div className="relative mb-6 pb-6 border-b border-[#2C2C2C]">
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="flex items-center gap-3">
-                                                    <h2 className="text-4xl font-black text-white">{selectedStock}</h2>
+                                                    <h2 className="text-4xl font-semibold text-white">{selectedStock}</h2>
                                                     {/* AI Quick Signal */}
-                                                    <div className="relative flex items-center gap-2 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-gray-800 rounded-full px-3 py-1 overflow-hidden">
-                                                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 animate-pulse"></div>
-                                                        <span className="relative text-lg animate-pulse">🧠</span>
-                                                        <span className="relative text-gray-300 text-xs font-black">AI Active</span>
+                                                    <div className="flex items-center gap-2 bg-[#1C1C1C] border border-[#2C2C2C] rounded-full px-3 py-1">
+                                                        <span className="text-lg">🧠</span>
+                                                        <span className="text-[#A0A0A0] text-xs font-medium">AI Active</span>
                                                     </div>
                                                 </div>
-                                                <div className={`px-4 py-2 rounded-lg font-bold text-sm border-2 ${
+                                                <div className={`px-4 py-2 rounded-lg font-medium text-sm ${
                                                     (stocks.find(s => s.symbol === selectedStock)?.change || 0) >= 0
-                                                        ? 'bg-green-500/20 text-green-300 border-green-500/50'
-                                                        : 'bg-red-500/20 text-red-300 border-red-500/50'
-                                                }`} style={{boxShadow: (stocks.find(s => s.symbol === selectedStock)?.change || 0) >= 0 ? '0 0 15px rgba(34, 197, 94, 0.2)' : '0 0 15px rgba(239, 68, 68, 0.2)'}}>
+                                                        ? 'bg-[#00C805]/20 text-[#00C805]'
+                                                        : 'bg-[#FF5252]/20 text-[#FF5252]'
+                                                }`}>
                                                     {(stocks.find(s => s.symbol === selectedStock)?.change || 0) >= 0 ? '↗' : '↘'}
                                                     {(stocks.find(s => s.symbol === selectedStock)?.change || 0) >= 0 ? '+' : ''}
                                                     {(stocks.find(s => s.symbol === selectedStock)?.change || 0).toFixed(2)}%
                                                 </div>
                                             </div>
-                                            <p className="text-gray-300 text-lg mb-3 font-semibold">{stocks.find(s => s.symbol === selectedStock)?.name || selectedStock}</p>
+                                            <p className="text-[#A0A0A0] text-lg mb-3 font-normal">{stocks.find(s => s.symbol === selectedStock)?.name || selectedStock}</p>
 
                                             {/* Quick AI Signal - UltraThink Enhanced */}
                                             {(() => {
@@ -8455,21 +8446,20 @@ const TradingSimulator = () => {
                                                 }
 
                                                 return (
-                                                    <div className={`relative bg-gradient-to-r ${
-                                                        signalColor === 'green' ? 'from-green-500/20 to-emerald-500/20 border-green-500/50' :
-                                                        signalColor === 'red' ? 'from-red-500/20 to-rose-500/20 border-red-500/50' :
-                                                        'from-yellow-500/20 to-amber-500/20 border-yellow-500/50'
-                                                    } border-2 rounded-lg p-3 flex items-center justify-between overflow-hidden`} style={{boxShadow: signalColor === 'green' ? '0 0 20px rgba(34, 197, 94, 0.2)' : signalColor === 'red' ? '0 0 20px rgba(239, 68, 68, 0.2)' : '0 0 20px rgba(234, 179, 8, 0.2)'}}>
-                                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-50"></div>
-                                                        <div className="relative flex items-center gap-2">
+                                                    <div className={`bg-[#1C1C1C] border-l-4 ${
+                                                        signalColor === 'green' ? 'border-l-[#00C805]' :
+                                                        signalColor === 'red' ? 'border-l-[#FF5252]' :
+                                                        'border-l-yellow-500'
+                                                    } border border-[#2C2C2C] rounded-lg p-3 flex items-center justify-between`}>
+                                                        <div className="flex items-center gap-2">
                                                             <span className="text-2xl">{signalColor === 'green' ? '📈' : signalColor === 'red' ? '📉' : '⚖️'}</span>
                                                             <div>
-                                                                <div className={`text-sm font-black ${
-                                                                    signalColor === 'green' ? 'text-green-300' :
-                                                                    signalColor === 'red' ? 'text-red-300' :
-                                                                    'text-yellow-300'
+                                                                <div className={`text-sm font-medium ${
+                                                                    signalColor === 'green' ? 'text-[#00C805]' :
+                                                                    signalColor === 'red' ? 'text-[#FF5252]' :
+                                                                    'text-yellow-500'
                                                                 }`}>AI Signal: {momentum}</div>
-                                                                <div className="text-xs text-gray-300 font-semibold">{actionText}</div>
+                                                                <div className="text-xs text-[#A0A0A0] font-normal">{actionText}</div>
                                                             </div>
                                                         </div>
                                                         <button
@@ -8477,7 +8467,7 @@ const TradingSimulator = () => {
                                                                 setAiAnalysisTab('analysis');
                                                                 setMainTab('ai-analysis');
                                                             }}
-                                                            className="relative text-xs font-bold text-cyan-400 hover:text-gray-300 underline transition-colors"
+                                                            className="text-xs font-medium text-white hover:text-[#A0A0A0] underline transition-colors"
                                                         >
                                                             Full Analysis →
                                                         </button>
@@ -8931,50 +8921,49 @@ const TradingSimulator = () => {
 
                                         {/* Next Week Predicted Price */}
                                         {stockPredictions[selectedStock] && (
-                                            <div className="relative mb-6 text-center bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-xl p-4 border border-gray-800 overflow-hidden">
-                                                <div className="relative text-xs text-purple-400 font-black mb-1 uppercase tracking-wider">🔮 Next Week Prediction</div>
-                                                <div className={`relative text-3xl font-black mb-1 ${stockPredictions[selectedStock].expectedChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                            <div className="mb-6 text-center bg-[#1C1C1C] rounded-xl p-4 border border-[#2C2C2C]">
+                                                <div className="text-xs text-[#A0A0A0] font-medium mb-1 uppercase tracking-wider">🔮 Next Week Prediction</div>
+                                                <div className={`text-3xl font-semibold mb-1 ${stockPredictions[selectedStock].expectedChange >= 0 ? 'text-[#00C805]' : 'text-[#FF5252]'}`}>
                                                     ${stockPredictions[selectedStock].predictedPrice.toFixed(2)}
                                                 </div>
-                                                <div className={`relative text-sm font-semibold ${stockPredictions[selectedStock].expectedChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                <div className={`text-sm font-medium ${stockPredictions[selectedStock].expectedChange >= 0 ? 'text-[#00C805]' : 'text-[#FF5252]'}`}>
                                                     {stockPredictions[selectedStock].expectedChange >= 0 ? '+' : ''}{stockPredictions[selectedStock].expectedChange.toFixed(2)}%
                                                 </div>
                                             </div>
                                         )}
 
                                         {/* Price Chart */}
-                                        <div className="relative mb-6 bg-black/60 backdrop-blur-xl rounded-xl p-4 border border-gray-800 overflow-hidden" style={{boxShadow: '0 0 25px rgba(6, 182, 212, 0.15)'}}>
-                                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-blue-500/5"></div>
-                                            <div className="relative flex items-center justify-between mb-3">
+                                        <div className="mb-6 bg-[#1C1C1C] rounded-xl p-4 border border-[#2C2C2C]">
+                                            <div className="flex items-center justify-between mb-3">
                                                 <div className="flex items-center gap-2">
-                                                    <h3 className="text-sm font-black text-white">📈 Price Chart</h3>
+                                                    <h3 className="text-sm font-medium text-white">📈 Price Chart</h3>
                                                     {isRealChartData ? (
                                                         chartPeriod === '1D' ? (
-                                                            <div className="flex items-center gap-1 bg-purple-500/20 border border-gray-800 rounded-full px-2 py-1" style={{boxShadow: '0 0 10px rgba(168, 85, 247, 0.2)'}}>
+                                                            <div className="flex items-center gap-1 bg-[#1C1C1C] border border-[#2C2C2C] rounded-full px-2 py-1">
                                                                 <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse"></span>
-                                                                <span className="text-gray-300 text-[10px] font-black uppercase tracking-wide">Polygon.io (15m delay)</span>
+                                                                <span className="text-[#A0A0A0] text-[10px] font-medium uppercase tracking-wide">Polygon.io (15m delay)</span>
                                                             </div>
                                                         ) : (
-                                                            <div className="flex items-center gap-1 bg-green-500/20 border border-gray-800 rounded-full px-2 py-1" style={{boxShadow: '0 0 10px rgba(34, 197, 94, 0.2)'}}>
-                                                                <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                                                                <span className="text-green-300 text-[10px] font-black uppercase tracking-wide">Alpha Vantage Live</span>
+                                                            <div className="flex items-center gap-1 bg-[#1C1C1C] border border-[#2C2C2C] rounded-full px-2 py-1">
+                                                                <span className="w-1.5 h-1.5 bg-[#00C805] rounded-full animate-pulse"></span>
+                                                                <span className="text-[#00C805] text-[10px] font-medium uppercase tracking-wide">Alpha Vantage Live</span>
                                                             </div>
                                                         )
                                                     ) : (
-                                                        <div className="flex items-center gap-1 bg-yellow-500/20 border-2 border-yellow-500/50 rounded-full px-2 py-1" style={{boxShadow: '0 0 10px rgba(234, 179, 8, 0.2)'}}>
-                                                            <span className="text-yellow-300 text-[10px] font-black uppercase tracking-wide">Simulated</span>
+                                                        <div className="flex items-center gap-1 bg-yellow-500/20 border border-yellow-500 rounded-full px-2 py-1">
+                                                            <span className="text-yellow-500 text-[10px] font-medium uppercase tracking-wide">Simulated</span>
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div className="flex flex-wrap gap-1 bg-black/60 backdrop-blur-sm rounded-lg p-1 border border-cyan-500/20">
+                                                <div className="flex flex-wrap gap-1 bg-[#1C1C1C] rounded-lg p-1 border border-[#2C2C2C]">
                                                     {['1D', '1W', '1M', '3M', '6M', 'YTD', '1Y', '5Y', 'ALL'].map(period => (
                                                         <button
                                                             key={period}
                                                             onClick={() => setChartPeriod(period)}
-                                                            className={`px-2 py-1 rounded font-black text-xs transition-all ${
+                                                            className={`px-2 py-1 rounded font-medium text-xs transition-colors ${
                                                                 chartPeriod === period
-                                                                    ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg'
-                                                                    : 'text-gray-400 hover:text-gray-300 hover:bg-cyan-500/10'
+                                                                    ? 'bg-[#00C805] text-white'
+                                                                    : 'text-[#A0A0A0] hover:text-white'
                                                             }`}
                                                         >
                                                             {period}
@@ -8982,15 +8971,15 @@ const TradingSimulator = () => {
                                                     ))}
                                                 </div>
                                                 {chartPeriod === '1D' && (
-                                                    <div className="flex gap-1 bg-black/60 backdrop-blur-sm rounded-lg p-1 border border-purple-500/20 mt-2">
+                                                    <div className="flex gap-1 bg-[#1C1C1C] rounded-lg p-1 border border-[#2C2C2C] mt-2">
                                                         {[1, 5].map(interval => (
                                                             <button
                                                                 key={interval}
                                                                 onClick={() => setIntradayInterval(interval)}
-                                                                className={`px-2 py-1 text-xs font-bold rounded ${
+                                                                className={`px-2 py-1 text-xs font-medium rounded ${
                                                                     intradayInterval === interval
-                                                                        ? 'bg-purple-500 text-white'
-                                                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                                                        ? 'bg-[#2C2C2C] text-white'
+                                                                        : 'text-[#A0A0A0] hover:bg-[#2C2C2C]'
                                                                 }`}
                                                             >
                                                                 {interval}min
@@ -9003,15 +8992,15 @@ const TradingSimulator = () => {
                                                 {chartLoading && (
                                                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10 rounded-lg">
                                                         <div className="flex flex-col items-center gap-2">
-                                                            <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                                                            <span className="text-emerald-400 text-xs font-bold">Loading chart...</span>
+                                                            <div className="w-8 h-8 border-2 border-[#00C805] border-t-transparent rounded-full animate-spin"></div>
+                                                            <span className="text-[#00C805] text-xs font-medium">Loading chart...</span>
                                                         </div>
                                                     </div>
                                                 )}
                                                 <canvas ref={chartRef}></canvas>
                                             </div>
                                             {!isRealChartData && (
-                                                <div className="relative mt-3 text-xs text-yellow-400 italic text-center font-semibold">
+                                                <div className="mt-3 text-xs text-yellow-500 italic text-center font-normal">
                                                     ⚠️ Using simulated historical data - Alpha Vantage API limit reached
                                                 </div>
                                             )}
@@ -9019,30 +9008,30 @@ const TradingSimulator = () => {
 
                                         {/* Trade Type Selector */}
                                         <div className="mb-6">
-                                            <label className="block text-gray-300 font-bold mb-3 text-sm uppercase tracking-wide">Trade Type</label>
+                                            <label className="block text-white font-medium mb-3 text-sm">Trade Type</label>
                                             <div className="grid grid-cols-2 gap-3">
                                                 <button
                                                     onClick={() => setTradeType('long')}
-                                                    className={`py-3 rounded-xl font-bold transition-all duration-300 ${
+                                                    className={`py-3 rounded-xl font-medium transition-colors ${
                                                         tradeType === 'long'
-                                                            ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg'
-                                                            : 'bg-blue-700/50 text-blue-300 hover:bg-blue-700'
+                                                            ? 'bg-[#00C805] text-white'
+                                                            : 'bg-[#2C2C2C] text-[#A0A0A0] hover:bg-[#3C3C3C]'
                                                     }`}
                                                 >
                                                     📈 Long (Buy)
                                                 </button>
                                                 <button
                                                     onClick={() => setTradeType('short')}
-                                                    className={`py-3 rounded-xl font-bold transition-all duration-300 ${
+                                                    className={`py-3 rounded-xl font-medium transition-colors ${
                                                         tradeType === 'short'
-                                                            ? 'bg-red-500/20 text-red-400 text-white shadow-lg'
-                                                            : 'bg-blue-700/50 text-blue-300 hover:bg-blue-700'
+                                                            ? 'bg-[#FF5252] text-white'
+                                                            : 'bg-[#2C2C2C] text-[#A0A0A0] hover:bg-[#3C3C3C]'
                                                     }`}
                                                 >
                                                     📉 Short (Sell)
                                                 </button>
                                             </div>
-                                            <div className="mt-2 text-xs text-blue-300 text-center">
+                                            <div className="mt-2 text-xs text-[#A0A0A0] text-center">
                                                 {tradeType === 'long' ? '💡 Buy stock expecting price to rise' : '💡 Bet against stock expecting price to fall'}
                                             </div>
                                         </div>
@@ -9083,15 +9072,15 @@ const TradingSimulator = () => {
 
                                             {/* Error message */}
                                             {quantityError && (
-                                                <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-3 text-red-300 text-sm text-center">
+                                                <div className="bg-[#1C1C1C] border border-[#FF5252] rounded-lg p-3 text-[#FF5252] text-sm text-center">
                                                     ⚠️ {quantityError}
                                                 </div>
                                             )}
 
                                             {/* Clean total */}
-                                            <div className="text-center py-4 border-t border-gray-800">
-                                                <div className="text-gray-500 text-sm">Estimated Cost</div>
-                                                <div className="text-2xl font-bold text-white">
+                                            <div className="text-center py-4 border-t border-[#2C2C2C]">
+                                                <div className="text-[#A0A0A0] text-sm">Estimated Cost</div>
+                                                <div className="text-2xl font-semibold text-white">
                                                     ${((stocks.find(s => s.symbol === selectedStock)?.price || 0) * quantity).toFixed(2)}
                                                 </div>
                                             </div>
@@ -9106,10 +9095,10 @@ const TradingSimulator = () => {
                                                     }
                                                 }}
                                                 disabled={!marketOpen}
-                                                className={`w-full py-4 rounded-full font-semibold text-lg transition-colors ${
+                                                className={`w-full py-4 rounded-full font-medium text-lg transition-colors ${
                                                     marketOpen
-                                                        ? 'bg-emerald-500 hover:bg-emerald-400 text-white cursor-pointer'
-                                                        : 'bg-gray-700 text-gray-400 cursor-not-allowed opacity-60'
+                                                        ? 'bg-[#00C805] hover:bg-[#00B804] text-white cursor-pointer'
+                                                        : 'bg-[#2C2C2C] text-[#A0A0A0] cursor-not-allowed opacity-60'
                                                 }`}
                                             >
                                                 {!marketOpen && '🔒 '}
@@ -9129,10 +9118,10 @@ const TradingSimulator = () => {
                                                         }
                                                     }}
                                                     disabled={!marketOpen}
-                                                    className={`w-full py-4 rounded-full font-semibold text-lg transition-colors ${
+                                                    className={`w-full py-4 rounded-full font-medium text-lg transition-colors ${
                                                         marketOpen
-                                                            ? 'bg-gray-800 hover:bg-gray-700 text-white cursor-pointer'
-                                                            : 'bg-gray-700 text-gray-400 cursor-not-allowed opacity-60'
+                                                            ? 'bg-[#1C1C1C] hover:bg-[#2C2C2C] border border-[#2C2C2C] text-white cursor-pointer'
+                                                            : 'bg-[#2C2C2C] text-[#A0A0A0] cursor-not-allowed opacity-60'
                                                     }`}
                                                 >
                                                     {!marketOpen && '🔒 '}
