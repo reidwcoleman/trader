@@ -9288,24 +9288,24 @@ const TradingSimulator = () => {
                         {/* Watchlist View */}
                         {mainTab === 'watchlist' && (
                             <>
-                                <div className="bg-gradient-to-br from-cyan-900/50 via-blue-900/50 to-cyan-900/50 backdrop-blur-xl rounded-2xl p-4 border border-gray-800 mb-4 shadow-xl" style={{boxShadow: '0 0 30px rgba(6, 182, 212, 0.15)'}}>
-                                    <h2 className="text-xl font-black text-white mb-4 flex items-center gap-2">
+                                <div className="bg-[#1C1C1C] rounded-xl p-4 border border-[#2C2C2C] mb-4">
+                                    <h2 className="text-xl font-medium text-white mb-4 flex items-center gap-2">
                                         ⭐ My Watchlist
-                                        <span className="text-sm font-normal text-gray-300 ml-2">
+                                        <span className="text-sm font-normal text-[#A0A0A0] ml-2">
                                             ({watchlist.length} stocks)
                                         </span>
                                     </h2>
 
                                     {loading && stocks.length === 0 ? (
                                         <div className="text-center py-8">
-                                            <div className="text-gray-200">Loading stocks...</div>
+                                            <div className="text-[#A0A0A0]">Loading stocks...</div>
                                         </div>
                                     ) : watchlist.length === 0 ? (
-                                        <div className="text-center py-12 bg-cyan-900/20 rounded-xl border-2 border-dashed border-cyan-500/40 animate-fade-in">
-                                            <div className="text-6xl mb-3 opacity-50 animate-bounce">⭐</div>
-                                            <h3 className="text-xl font-bold text-white mb-2">No Stocks in Watchlist</h3>
-                                            <p className="text-gray-200 text-sm mb-4">Add stocks to your watchlist to track them here</p>
-                                            <div className="inline-flex items-center gap-2 bg-cyan-500/20 border border-gray-800 rounded-lg px-4 py-2 text-gray-300 text-sm font-semibold  transition-transform">
+                                        <div className="text-center py-12 bg-[#1C1C1C] rounded-xl border border-dashed border-[#2C2C2C]">
+                                            <div className="text-6xl mb-3 opacity-50">⭐</div>
+                                            <h3 className="text-xl font-medium text-white mb-2">No Stocks in Watchlist</h3>
+                                            <p className="text-[#A0A0A0] text-sm mb-4">Add stocks to your watchlist to track them here</p>
+                                            <div className="inline-flex items-center gap-2 bg-[#2C2C2C] rounded-lg px-4 py-2 text-[#A0A0A0] text-sm font-normal">
                                                 <span>💡</span>
                                                 <span>Go to Trading tab to search and add stocks</span>
                                             </div>
@@ -9320,28 +9320,27 @@ const TradingSimulator = () => {
                                                         setTradeAnalysisData(null); // Clear trade analysis when switching stocks
                                                         setMainTab('trading');
                                                     }}
-                                                    className={`p-4 rounded-xl cursor-pointer transition-all bg-gradient-to-br from-cyan-900/40 to-blue-950/40 backdrop-blur-xl border border-gray-800 hover:border-gray-700 hover:-translate-y-1 shadow-lg hover:shadow-xl will-change-transform gpu-accelerated animate-fade-in stagger-${Math.min(index + 1, 6)}`}
-                                                    style={{boxShadow: '0 0 20px rgba(6, 182, 212, 0.1)'}}
+                                                    className={`p-4 rounded-xl cursor-pointer transition-colors bg-[#1C1C1C] border border-[#2C2C2C] hover:bg-[#2C2C2C] animate-fade-in stagger-${Math.min(index + 1, 6)}`}
                                                 >
                                                     <div className="flex justify-between items-start mb-3">
                                                         <div>
-                                                            <div className="font-bold text-xl text-white">{stock.symbol}</div>
-                                                            <div className="text-xs text-gray-200 mt-0.5">{stock.name}</div>
+                                                            <div className="font-medium text-xl text-white">{stock.symbol}</div>
+                                                            <div className="text-xs text-[#A0A0A0] mt-0.5">{stock.name}</div>
                                                         </div>
-                                                        <div className={`px-3 py-1 rounded-full font-bold text-sm transition-all ${
+                                                        <div className={`px-3 py-1 rounded-full font-medium text-sm ${
                                                             stock.change >= 0
-                                                                ? 'bg-green-500/20 text-green-300 border border-green-500 animate-pulse-glow-green'
-                                                                : 'bg-red-500/20 text-red-300 border border-red-500 animate-pulse-glow-red'
+                                                                ? 'bg-[#00C805]/20 text-[#00C805]'
+                                                                : 'bg-[#FF5252]/20 text-[#FF5252]'
                                                         }`}>
                                                             {stock.change >= 0 ? '↗' : '↘'} {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
                                                         </div>
                                                     </div>
-                                                    <div className="text-center pt-3 border-t border-cyan-600/30">
-                                                        <div className="text-xs text-gray-300 mb-1">Current Price</div>
-                                                        <div className="font-bold text-2xl text-white">${stock.price.toFixed(2)}</div>
+                                                    <div className="text-center pt-3 border-t border-[#2C2C2C]">
+                                                        <div className="text-xs text-[#A0A0A0] mb-1">Current Price</div>
+                                                        <div className="font-semibold text-2xl text-white">${stock.price.toFixed(2)}</div>
                                                     </div>
                                                     <div className="mt-3 text-center">
-                                                        <button className="w-full bg-gray-700 hover:bg-gray-600 hover:from-cyan-400 hover:to-blue-500 text-white py-2 rounded-lg font-bold text-xs transition-all shadow-lg hover:shadow-xl ">
+                                                        <button className="w-full bg-[#2C2C2C] hover:bg-[#3C3C3C] text-white py-2 rounded-lg font-medium text-xs transition-colors">
                                                             📊 Trade This Stock
                                                         </button>
                                                     </div>
@@ -10390,20 +10389,20 @@ const TradingSimulator = () => {
                                 {loadingMovers ? (
                                     <div className="text-center py-12">
                                         <div className="text-4xl mb-4">📊</div>
-                                        <div className="text-lg text-white font-semibold mb-2">Loading Market Movers...</div>
-                                        <div className="text-sm text-gray-500">Scanning {moversProgress.current}/{moversProgress.total} stocks</div>
+                                        <div className="text-lg text-white font-medium mb-2">Loading Market Movers...</div>
+                                        <div className="text-sm text-[#A0A0A0]">Scanning {moversProgress.current}/{moversProgress.total} stocks</div>
                                     </div>
                                 ) : (
                                         <>
                                             {/* Top Gainers - Robinhood Style */}
                                             <div className="mb-8">
                                                 <div className="flex items-center justify-between mb-4">
-                                                    <h2 className="text-lg font-semibold text-white">Top Movers</h2>
-                                                    <span className="text-sm text-gray-500">Today</span>
+                                                    <h2 className="text-lg font-medium text-white">Top Movers</h2>
+                                                    <span className="text-sm text-[#A0A0A0]">Today</span>
                                                 </div>
 
                                                 {topGainers.length === 0 ? (
-                                                    <div className="text-center py-8 text-gray-500">No gainers found</div>
+                                                    <div className="text-center py-8 text-[#A0A0A0]">No gainers found</div>
                                                 ) : (
                                                     <div className="space-y-1 mb-8">
                                                         {topGainers.map((stock, i) => (
@@ -10413,18 +10412,18 @@ const TradingSimulator = () => {
                                                                     addToWatchlist(stock.symbol);
                                                                     setMainTab('trading');
                                                                 }}
-                                                                className="flex items-center justify-between py-3 hover:bg-gray-900/50 rounded-lg px-2 cursor-pointer transition-colors"
+                                                                className="flex items-center justify-between py-3 hover:bg-[#1C1C1C] rounded-lg px-2 cursor-pointer transition-colors"
                                                             >
                                                                 <div className="flex items-center gap-3">
-                                                                    <span className="text-gray-500 w-4 text-sm">{i + 1}</span>
+                                                                    <span className="text-[#A0A0A0] w-4 text-sm">{i + 1}</span>
                                                                     <div>
-                                                                        <div className="font-semibold text-white">{stock.symbol}</div>
-                                                                        <div className="text-sm text-gray-500 truncate max-w-[120px]">{stock.name}</div>
+                                                                        <div className="font-medium text-white">{stock.symbol}</div>
+                                                                        <div className="text-sm text-[#A0A0A0] truncate max-w-[120px]">{stock.name}</div>
                                                                     </div>
                                                                 </div>
                                                                 <div className="text-right">
-                                                                    <div className="font-semibold text-white">${stock.price.toFixed(2)}</div>
-                                                                    <div className="text-emerald-500">
+                                                                    <div className="font-medium text-white">${stock.price.toFixed(2)}</div>
+                                                                    <div className="text-[#00C805]">
                                                                         +{stock.change.toFixed(2)}%
                                                                     </div>
                                                                 </div>
@@ -10435,12 +10434,12 @@ const TradingSimulator = () => {
 
                                                 {/* Top Losers */}
                                                 <div className="flex items-center justify-between mb-4 mt-8">
-                                                    <h2 className="text-lg font-semibold text-white">Top Losers</h2>
-                                                    <span className="text-sm text-gray-500">Today</span>
+                                                    <h2 className="text-lg font-medium text-white">Top Losers</h2>
+                                                    <span className="text-sm text-[#A0A0A0]">Today</span>
                                                 </div>
 
                                                 {topLosers.length === 0 ? (
-                                                    <div className="text-center py-8 text-gray-500">No losers found</div>
+                                                    <div className="text-center py-8 text-[#A0A0A0]">No losers found</div>
                                                 ) : (
                                                     <div className="space-y-1">
                                                         {topLosers.map((stock, i) => (
@@ -10450,18 +10449,18 @@ const TradingSimulator = () => {
                                                                     addToWatchlist(stock.symbol);
                                                                     setMainTab('trading');
                                                                 }}
-                                                                className="flex items-center justify-between py-3 hover:bg-gray-900/50 rounded-lg px-2 cursor-pointer transition-colors"
+                                                                className="flex items-center justify-between py-3 hover:bg-[#1C1C1C] rounded-lg px-2 cursor-pointer transition-colors"
                                                             >
                                                                 <div className="flex items-center gap-3">
-                                                                    <span className="text-gray-500 w-4 text-sm">{i + 1}</span>
+                                                                    <span className="text-[#A0A0A0] w-4 text-sm">{i + 1}</span>
                                                                     <div>
-                                                                        <div className="font-semibold text-white">{stock.symbol}</div>
-                                                                        <div className="text-sm text-gray-500 truncate max-w-[120px]">{stock.name}</div>
+                                                                        <div className="font-medium text-white">{stock.symbol}</div>
+                                                                        <div className="text-sm text-[#A0A0A0] truncate max-w-[120px]">{stock.name}</div>
                                                                     </div>
                                                                 </div>
                                                                 <div className="text-right">
-                                                                    <div className="font-semibold text-white">${stock.price.toFixed(2)}</div>
-                                                                    <div className="text-red-500">
+                                                                    <div className="font-medium text-white">${stock.price.toFixed(2)}</div>
+                                                                    <div className="text-[#FF5252]">
                                                                         {stock.change.toFixed(2)}%
                                                                     </div>
                                                                 </div>
@@ -10476,7 +10475,7 @@ const TradingSimulator = () => {
                                                 <button
                                                     onClick={fetchMarketMovers}
                                                     disabled={loadingMovers}
-                                                    className="bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                                                    className="bg-[#00C805] hover:bg-[#00B804] disabled:bg-[#2C2C2C] text-white px-8 py-4 rounded-xl font-medium text-lg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                                                 >
                                                     {loadingMovers ? 'Refreshing...' : 'Refresh Market Data'}
                                                 </button>
