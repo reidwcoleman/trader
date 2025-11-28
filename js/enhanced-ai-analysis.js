@@ -2326,7 +2326,8 @@ if (typeof window !== 'undefined') {
         fetchHistoricalData
     };
 
-    console.log('✨ UltraThink AI Analysis v3.1 Loaded - Market Hours Aware!');
-    console.log('📊 Features: 18 Indicators | Price Prediction | Market Rating | Pattern Recognition');
+    console.log('✨ UltraThink AI Analysis v3.1 Loaded - Enhanced Buy/Sell Recommendations!');
+    console.log('📊 Features: 18 Indicators | 8-Level Rating System | Price Targets | Stop Loss | Risk/Reward');
+    console.log('🎯 NEW: Clear BUY/SELL Actions | Position Sizing | Probability Analysis | Trading Plans');
     console.log('🕐 Live Updates: Every 5 min during market hours | Last close data when closed');
 }
