@@ -6097,12 +6097,6 @@ const TradingSimulator = () => {
                                                         // Immediately transition to app
                                                         setView('app');
                                                         setLoading(false);
-
-                                                        // Set flag to show market rating modal once it loads
-                                                        setShouldShowMarketRatingOnLoad(true);
-
-                                                        // Fetch market rating immediately on login
-                                                        fetchMarketRating();
                                                     } catch (error) {
                                                         clearInterval(countdownInterval);
                                                         setLoginCountdown(null);
@@ -6237,125 +6231,6 @@ const TradingSimulator = () => {
 
             return (
                 <>
-                    {/* Market Rating Auto-Popup Modal */}
-                    {showMarketRatingModal && marketRating && (
-                        <div
-                            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fadeIn"
-                            onClick={() => setShowMarketRatingModal(false)}
-                        >
-                            <div
-                                className="bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-3xl max-w-2xl w-full border-4 shadow-2xl overflow-hidden animate-slideUp"
-                                style={{
-                                    borderColor: marketRating.rating >= 65 ? '#10b981' : marketRating.rating >= 45 ? '#f59e0b' : '#ef4444',
-                                    boxShadow: `0 0 60px ${marketRating.rating >= 65 ? 'rgba(16, 185, 129, 0.4)' : marketRating.rating >= 45 ? 'rgba(245, 158, 11, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                {/* Header */}
-                                <div className={`p-6 bg-gradient-to-r ${marketRating.rating >= 65 ? 'from-green-500/20 to-emerald-500/20' : marketRating.rating >= 45 ? 'from-yellow-500/20 to-orange-500/20' : 'from-red-500/20 to-rose-500/20'} border-b border-gray-700`}>
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className="text-6xl">{marketRating.emoji}</div>
-                                            <div>
-                                                <h2 className="text-3xl font-black text-white mb-1">Market Intelligence Report</h2>
-                                                <p className="text-gray-400">UltraThink v3.1 - Market Hours Aware</p>
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => setShowMarketRatingModal(false)}
-                                            className="text-gray-400 hover:text-white text-3xl transition-colors"
-                                        >
-                                            ×
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Content */}
-                                <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-                                    {/* Market Status */}
-                                    <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <span className="text-gray-400 font-semibold">Market Status</span>
-                                            <span className="text-lg font-bold text-white">{marketRating.marketStatus}</span>
-                                        </div>
-                                        <div className="text-sm text-gray-400">{marketRating.dataAsOf}</div>
-                                        {marketRating.nextMarketOpen && (
-                                            <div className="text-sm text-cyan-400 mt-1">Next Open: {marketRating.nextMarketOpen}</div>
-                                        )}
-                                        <div className="text-xs text-gray-500 mt-1">{marketRating.updateFrequency}</div>
-                                    </div>
-
-                                    {/* Rating Score */}
-                                    <div className="text-center">
-                                        <div className={`text-7xl font-black mb-2 ${marketRating.rating >= 65 ? 'text-green-400' : marketRating.rating >= 45 ? 'text-yellow-400' : 'text-red-400'}`}>
-                                            {marketRating.rating}/100
-                                        </div>
-                                        <div className={`text-2xl font-bold mb-2 px-6 py-2 rounded-full inline-block ${marketRating.rating >= 65 ? 'bg-green-500/20 text-green-300 border border-gray-800' : marketRating.rating >= 45 ? 'bg-yellow-500/20 text-yellow-300 border-2 border-yellow-500/40' : 'bg-red-500/20 text-red-300 border-2 border-red-500/40'}`}>
-                                            {marketRating.sentiment}
-                                        </div>
-                                        <div className={`text-xl font-black ${marketRating.rating >= 65 ? 'text-green-400' : marketRating.rating >= 45 ? 'text-yellow-400' : 'text-red-400'}`}>
-                                            {marketRating.recommendation}
-                                        </div>
-                                    </div>
-
-                                    {/* Advice */}
-                                    <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-gray-800 rounded-xl p-4">
-                                        <p className="text-white leading-relaxed">{marketRating.advice}</p>
-                                    </div>
-
-                                    {/* Confidence */}
-                                    <div className="flex items-center justify-between bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-                                        <span className="text-gray-400 font-semibold">Confidence Level</span>
-                                        <span className="text-lg font-bold text-cyan-400">{marketRating.confidenceLevel} ({marketRating.confidence}%)</span>
-                                    </div>
-
-                                    {/* Signals */}
-                                    {marketRating.signals && marketRating.signals.length > 0 && (
-                                        <div className="bg-green-500/10 border border-gray-800 rounded-xl p-4">
-                                            <h3 className="text-green-400 font-bold mb-3 flex items-center gap-2">
-                                                <span>📈</span> Bullish Signals
-                                            </h3>
-                                            <ul className="space-y-2">
-                                                {marketRating.signals.map((signal, idx) => (
-                                                    <li key={idx} className="text-sm text-gray-300">{signal}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-
-                                    {/* Warnings */}
-                                    {marketRating.warnings && marketRating.warnings.length > 0 && (
-                                        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
-                                            <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2">
-                                                <span>⚠️</span> Bearish Warnings
-                                            </h3>
-                                            <ul className="space-y-2">
-                                                {marketRating.warnings.map((warning, idx) => (
-                                                    <li key={idx} className="text-sm text-gray-300">{warning}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-
-                                    {/* Footer */}
-                                    <div className="text-center text-xs text-gray-500">
-                                        {marketRating.factorsAnalyzed} factors analyzed • {marketRating.dataPoints} data points • {marketRating.ultraThinkVersion}
-                                    </div>
-                                </div>
-
-                                {/* Close Button */}
-                                <div className="p-4 bg-gray-800/50 border-t border-gray-700">
-                                    <button
-                                        onClick={() => setShowMarketRatingModal(false)}
-                                        className="w-full bg-gray-700 hover:bg-gray-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl"
-                                    >
-                                        Got It! Let's Trade
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
                     {/* Toast Notification Container */}
                     <div className="toast-container">
                         {toasts.map(toast => {
@@ -6823,96 +6698,6 @@ const TradingSimulator = () => {
                                 )}
                             </div>
                         </div>
-
-                        {/* ═══════════════════════════════════════════════════════════════ */}
-                        {/* ULTRATHINK V2.5 - MARKET RATING BANNER */}
-                        {/* ═══════════════════════════════════════════════════════════════ */}
-                        {marketRating && showMarketBanner && (
-                            <div className="relative bg-gradient-to-r from-black/95 via-gray-900/95 to-black/95 backdrop-blur-xl rounded-2xl p-4 mb-6 border border-gray-800 hover:border-gray-700 transition-all duration-500 overflow-hidden group" style={{boxShadow: `0 0 40px ${marketRating.rating >= 65 ? 'rgba(34, 197, 94, 0.3)' : marketRating.rating >= 45 ? 'rgba(234, 179, 8, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`}}>
-                                {/* Animated background */}
-                                <div className={`absolute inset-0 opacity-10 bg-gradient-to-r ${marketRating.rating >= 65 ? 'from-green-500 to-emerald-500' : marketRating.rating >= 45 ? 'from-yellow-500 to-orange-500' : 'from-red-500 to-rose-500'} animate-pulse`}></div>
-
-                                {/* Close button */}
-                                <button
-                                    onClick={() => setShowMarketBanner(false)}
-                                    className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors duration-200 z-10"
-                                    title="Dismiss"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-
-                                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-4">
-                                    {/* Left: Icon & Title */}
-                                    <div className="flex items-center gap-3">
-                                        <div className={`text-4xl md:text-5xl transition-transform duration-300 group-hover:scale-110`}>
-                                            {marketRating.emoji}
-                                        </div>
-                                        <div>
-                                            <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">
-                                                TODAY'S MARKET RATING
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className={`text-2xl md:text-3xl font-black ${marketRating.rating >= 65 ? 'text-green-400' : marketRating.rating >= 45 ? 'text-yellow-400' : 'text-red-400'}`}>
-                                                    {marketRating.rating}/100
-                                                </span>
-                                                <span className={`text-sm md:text-base font-bold px-3 py-1 rounded-full ${marketRating.rating >= 65 ? 'bg-green-500/20 text-green-300 border border-green-500/40' : marketRating.rating >= 45 ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40' : 'bg-red-500/20 text-red-300 border border-red-500/40'}`}>
-                                                    {marketRating.sentiment}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Middle: Recommendation */}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-start gap-2 mb-2">
-                                            <span className={`text-lg font-black ${marketRating.rating >= 65 ? 'text-green-400' : marketRating.rating >= 45 ? 'text-yellow-400' : 'text-red-400'}`}>
-                                                {marketRating.recommendation}
-                                            </span>
-                                        </div>
-                                        <p className="text-sm text-gray-300 leading-relaxed">
-                                            {marketRating.advice}
-                                        </p>
-                                    </div>
-
-                                    {/* Right: Key Factors (collapsed on mobile) */}
-                                    <div className="hidden lg:block flex-shrink-0 w-64">
-                                        <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2">
-                                            Market Factors:
-                                        </div>
-                                        <div className="space-y-1 max-h-20 overflow-y-auto custom-scrollbar">
-                                            {marketRating.factors && marketRating.factors.slice(0, 3).map((factor, idx) => (
-                                                <div key={idx} className="text-xs text-gray-300 flex items-start gap-1">
-                                                    <span className="text-cyan-400 flex-shrink-0">•</span>
-                                                    <span className="line-clamp-1">{factor}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Mobile: Expand button */}
-                                    <button className="lg:hidden text-xs text-cyan-400 hover:text-gray-300 font-bold uppercase tracking-wider">
-                                        View Details →
-                                    </button>
-                                </div>
-
-                                {/* Bottom: Full factors (mobile expanded view) */}
-                                <details className="lg:hidden mt-3 pt-3 border-t border-gray-700/50">
-                                    <summary className="cursor-pointer text-xs text-cyan-400 hover:text-gray-300 font-bold uppercase tracking-wider">
-                                        View All Market Factors
-                                    </summary>
-                                    <div className="mt-2 space-y-1">
-                                        {marketRating.factors && marketRating.factors.map((factor, idx) => (
-                                            <div key={idx} className="text-xs text-gray-300 flex items-start gap-2 pl-2">
-                                                <span className="text-cyan-400 flex-shrink-0">•</span>
-                                                <span>{factor}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </details>
-                            </div>
-                        )}
 
                         {/* Stats - Premium Compact 3-Card Layout */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
@@ -9354,6 +9139,19 @@ const TradingSimulator = () => {
                                             </div>
                                             <div className="relative text-sm text-gray-400 font-semibold">Per Share</div>
                                         </div>
+
+                                        {/* Next Week Predicted Price */}
+                                        {stockPredictions[selectedStock] && (
+                                            <div className="relative mb-6 text-center bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-xl p-4 border border-gray-800 overflow-hidden">
+                                                <div className="relative text-xs text-purple-400 font-black mb-1 uppercase tracking-wider">🔮 Next Week Prediction</div>
+                                                <div className={`relative text-3xl font-black mb-1 ${stockPredictions[selectedStock].expectedChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                    ${stockPredictions[selectedStock].predictedPrice.toFixed(2)}
+                                                </div>
+                                                <div className={`relative text-sm font-semibold ${stockPredictions[selectedStock].expectedChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                    {stockPredictions[selectedStock].expectedChange >= 0 ? '+' : ''}{stockPredictions[selectedStock].expectedChange.toFixed(2)}%
+                                                </div>
+                                            </div>
+                                        )}
 
                                         {/* Price Chart */}
                                         <div className="relative mb-6 bg-black/60 backdrop-blur-xl rounded-xl p-4 border border-gray-800 overflow-hidden" style={{boxShadow: '0 0 25px rgba(6, 182, 212, 0.15)'}}>
