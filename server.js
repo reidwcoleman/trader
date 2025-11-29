@@ -847,94 +847,101 @@ app.get('/api/stocks/quote', async (req, res) => {
 app.post('/api/trades', async (req, res) => {
     try {
         const { userId, symbol, shares, action, orderType, limitPrice, currentPrice } = req.body;
-        
+
         if (!userId || !symbol || !shares || !action) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
-        
+
         const accounts = readAccounts();
-        const accountIndex = accounts.findIndex(acc => acc.id === userId);
-        
+        // Find account by email (userId is actually the email)
+        const accountIndex = accounts.findIndex(acc => acc.email === userId);
+
         if (accountIndex === -1) {
             return res.status(404).json({ error: 'Account not found' });
         }
-        
+
         const account = accounts[accountIndex];
         const tradePrice = limitPrice || currentPrice || 100;
         const totalCost = shares * tradePrice;
         const commission = totalCost * 0.001; // 0.1% commission
-        
-        // Initialize account properties if they don't exist
-        if (!account.cash) account.cash = 100000;
-        if (!account.holdings) account.holdings = [];
-        if (!account.activity) account.activity = [];
-        
+
+        // Initialize portfolio properties if they don't exist
+        if (!account.portfolio) {
+            account.portfolio = {
+                cash: 100000,
+                positions: {},
+                history: [],
+                lastBuyTime: {},
+                watchlist: []
+            };
+        }
+        if (!account.portfolio.cash) account.portfolio.cash = 100000;
+        if (!account.portfolio.positions) account.portfolio.positions = {};
+        if (!account.portfolio.history) account.portfolio.history = [];
+
         if (action === 'buy') {
             // Check if user has enough cash
-            if (account.cash < totalCost + commission) {
+            if (account.portfolio.cash < totalCost + commission) {
                 return res.status(400).json({ error: 'Insufficient buying power' });
             }
-            
+
             // Deduct cash
-            account.cash -= (totalCost + commission);
-            
-            // Add to holdings
-            const existingHolding = account.holdings.find(h => h.symbol === symbol);
-            if (existingHolding) {
-                // Update average cost
-                const totalShares = existingHolding.shares + shares;
-                const totalValue = (existingHolding.shares * existingHolding.avgCost) + totalCost;
-                existingHolding.avgCost = totalValue / totalShares;
-                existingHolding.shares = totalShares;
+            account.portfolio.cash -= (totalCost + commission);
+
+            // Add to positions (positions is an object, not array)
+            if (account.portfolio.positions[symbol]) {
+                // Update existing position - calculate new average cost
+                const existingShares = account.portfolio.positions[symbol];
+                account.portfolio.positions[symbol] = existingShares + shares;
             } else {
-                account.holdings.push({
-                    symbol,
-                    shares,
-                    avgCost: tradePrice,
-                    purchaseDate: Date.now()
-                });
+                account.portfolio.positions[symbol] = shares;
             }
         } else if (action === 'sell') {
-            // Find holding
-            const holdingIndex = account.holdings.findIndex(h => h.symbol === symbol);
-            if (holdingIndex === -1 || account.holdings[holdingIndex].shares < shares) {
+            // Check if user has enough shares
+            if (!account.portfolio.positions[symbol] || account.portfolio.positions[symbol] < shares) {
                 return res.status(400).json({ error: 'Insufficient shares to sell' });
             }
-            
+
             // Add cash (minus commission)
-            account.cash += (totalCost - commission);
-            
-            // Reduce holdings
-            const holding = account.holdings[holdingIndex];
-            holding.shares -= shares;
-            
-            // Remove holding if no shares left
-            if (holding.shares === 0) {
-                account.holdings.splice(holdingIndex, 1);
+            account.portfolio.cash += (totalCost - commission);
+
+            // Reduce positions
+            account.portfolio.positions[symbol] -= shares;
+
+            // Remove position if no shares left
+            if (account.portfolio.positions[symbol] === 0) {
+                delete account.portfolio.positions[symbol];
             }
         }
-        
-        // Add to activity log
-        account.activity.unshift({
-            id: Date.now(),
+
+        // Add to history
+        account.portfolio.history.unshift({
             type: action,
             symbol,
-            shares,
+            quantity: shares,
             price: tradePrice,
-            amount: totalCost,
-            commission,
-            timestamp: Date.now(),
-            status: orderType === 'market' ? 'filled' : 'pending'
+            total: totalCost,
+            fee: commission,
+            timestamp: new Date().toISOString()
         });
-        
-        // Keep only last 50 activities
-        if (account.activity.length > 50) {
-            account.activity = account.activity.slice(0, 50);
+
+        // Keep only last 50 history items
+        if (account.portfolio.history.length > 50) {
+            account.portfolio.history = account.portfolio.history.slice(0, 50);
         }
-        
+
+        // Update lastBuyTime if buying
+        if (action === 'buy') {
+            if (!account.portfolio.lastBuyTime) account.portfolio.lastBuyTime = {};
+            account.portfolio.lastBuyTime[symbol] = new Date().toISOString();
+        }
+
+        // Update timestamp
+        account.updatedAt = new Date().toISOString();
+
         // Save accounts
         writeAccounts(accounts);
-        
+
         res.json({
             success: true,
             trade: {
@@ -944,10 +951,11 @@ app.post('/api/trades', async (req, res) => {
                 price: tradePrice,
                 total: totalCost,
                 commission,
-                newCash: account.cash
-            }
+                newCash: account.portfolio.cash
+            },
+            portfolio: account.portfolio
         });
-        
+
     } catch (error) {
         console.error('Trade error:', error);
         res.status(500).json({ error: 'Failed to execute trade' });
