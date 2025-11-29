@@ -378,12 +378,26 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    // Store user data in localStorage
+                    const userData = {
+                        username: data.account.userName,
+                        email: data.account.email,
+                        accountCode: data.account.accountCode,
+                        learningProgress: { level: 1, xp: 0, streak: 0 }
+                    };
+                    localStorage.setItem('user', JSON.stringify(userData));
+
+                    // Store portfolio data
+                    if (data.account.portfolio) {
+                        localStorage.setItem('portfolio', JSON.stringify(data.account.portfolio));
+                    }
+
                     showAlert('Sign in successful! Redirecting...', 'success');
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
                     }, 1000);
                 } else {
-                    showAlert(data.message || 'Sign in failed', 'error');
+                    showAlert(data.message || data.error || 'Sign in failed', 'error');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Sign In';
                 }
