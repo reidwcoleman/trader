@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markets | FinClash</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+    
+    <!-- External Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Internal Styles -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/ui-components.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    
+    <style>
+        /* Markets Page Specific Styles */
+        .markets-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .indices-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .index-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .index-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(0, 230, 118, 0.2);
+        }
+        
+        .index-name {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .index-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        
+        .index-change {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .movers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .mover-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .mover-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateX(4px);
+        }
+        
+        .mover-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin: 0 0 4px 0;
+        }
+        
+        .mover-info p {
+            font-size: 13px;
+            color: #888;
+            margin: 0;
+        }
+        
+        .mover-price {
+            text-align: right;
+        }
+        
+        .mover-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+        
+        .mover-change {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .sector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .sector-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .sector-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(0, 230, 118, 0.2);
+        }
+        
+        .sector-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .sector-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .sector-change {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .sector-stocks {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .sector-stock {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .sector-stock-symbol {
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        .sector-stock-change {
+            font-weight: 600;
+        }
+        
+        .news-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .news-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(0, 230, 118, 0.2);
+        }
+        
+        .news-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .news-summary {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .news-meta {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        @media (max-width: 1024px) {
+            .markets-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .indices-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sector-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .indices-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .index-card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="dashboard.html" class="logo">FinClash</a>
+                    <nav class="nav-tabs">
+                        <button class="nav-tab" onclick="switchTab('portfolio')">Portfolio</button>
+                        <button class="nav-tab active" onclick="switchTab('markets')">Markets</button>
+                        <button class="nav-tab" onclick="switchTab('research')">Research</button>
+                        <button class="nav-tab" onclick="switchTab('learn')">Learn</button>
+                    </nav>
+                </div>
+                <div class="header-right">
+                    <div class="market-status" id="marketStatus">
+                        <div class="status-indicator"></div>
+                        <span class="status-text">Market Open</span>
+                    </div>
+                    <div class="buying-power">
+                        <div class="buying-power-label">Buying Power</div>
+                        <div class="buying-power-value" id="buyingPower">$0.00</div>
+                    </div>
+                    <div class="user-menu" onclick="toggleUserMenu()" id="userMenu">U</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Market Indices -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Market</h2>
+                </div>
+                
+                <div class="indices-grid">
+                    <div class="index-card" onclick="viewIndex('SPY')">
+                        <div class="index-name">S&P 500</div>
+                        <div class="index-value" id="sp500-value">4,150.00</div>
+                        <div class="index-change positive" id="sp500-change">+18.50 (+0.45%)</div>
+                    </div>
+                    <div class="index-card" onclick="viewIndex('DIA')">
+                        <div class="index-name">Dow Jones</div>
+                        <div class="index-value" id="dow-value">34,200.00</div>
+                        <div class="index-change negative" id="dow-change">-85.20 (-0.25%)</div>
+                    </div>
+                    <div class="index-card" onclick="viewIndex('QQQ')">
+                        <div class="index-name">Nasdaq</div>
+                        <div class="index-value" id="nasdaq-value">12,800.00</div>
+                        <div class="index-change positive" id="nasdaq-change">+45.30 (+0.35%)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="markets-grid">
+                <!-- Market Movers -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Top Movers</h2>
+                        <button class="panel-action" onclick="viewAllMovers()">More</button>
+                    </div>
+                    
+                    <div class="movers-list" id="topMovers">
+                        <div class="mover-item" onclick="viewStock('NVDA')">
+                            <div class="mover-info">
+                                <h4>NVDA</h4>
+                                <p>NVIDIA Corp</p>
+                            </div>
+                            <div class="mover-price">
+                                <div class="mover-value">$485.20</div>
+                                <div class="mover-change positive">+8.4%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mover-item" onclick="viewStock('TSLA')">
+                            <div class="mover-info">
+                                <h4>TSLA</h4>
+                                <p>Tesla Inc</p>
+                            </div>
+                            <div class="mover-price">
+                                <div class="mover-value">$242.80</div>
+                                <div class="mover-change positive">+6.2%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mover-item" onclick="viewStock('META')">
+                            <div class="mover-info">
+                                <h4>META</h4>
+                                <p>Meta Platforms</p>
+                            </div>
+                            <div class="mover-price">
+                                <div class="mover-value">$325.50</div>
+                                <div class="mover-change positive">+4.7%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mover-item" onclick="viewStock('AMZN')">
+                            <div class="mover-info">
+                                <h4>AMZN</h4>
+                                <p>Amazon.com Inc</p>
+                            </div>
+                            <div class="mover-price">
+                                <div class="mover-value">$145.20</div>
+                                <div class="mover-change negative">-2.3%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mover-item" onclick="viewStock('GOOGL')">
+                            <div class="mover-info">
+                                <h4>GOOGL</h4>
+                                <p>Alphabet Inc</p>
+                            </div>
+                            <div class="mover-price">
+                                <div class="mover-value">$138.70</div>
+                                <div class="mover-change negative">-1.8%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Market News -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Market News</h2>
+                        <button class="panel-action" onclick="viewAllNews()">More</button>
+                    </div>
+                    
+                    <div id="marketNews">
+                        <div class="news-item" onclick="openNews('#')">
+                            <div class="news-title">Fed Signals Potential Rate Pause</div>
+                            <div class="news-summary">Federal Reserve officials suggest monetary policy may remain unchanged at next meeting</div>
+                            <div class="news-meta">
+                                <span>Reuters</span>
+                                <span>2 hours ago</span>
+                            </div>
+                        </div>
+                        
+                        <div class="news-item" onclick="openNews('#')">
+                            <div class="news-title">Tech Earnings Drive Market Rally</div>
+                            <div class="news-summary">Strong quarterly results from major technology companies boost investor confidence</div>
+                            <div class="news-meta">
+                                <span>Bloomberg</span>
+                                <span>4 hours ago</span>
+                            </div>
+                        </div>
+                        
+                        <div class="news-item" onclick="openNews('#')">
+                            <div class="news-title">Oil Prices Rise on Supply Concerns</div>
+                            <div class="news-summary">Crude oil futures gain amid geopolitical tensions and production cuts</div>
+                            <div class="news-meta">
+                                <span>MarketWatch</span>
+                                <span>6 hours ago</span>
+                            </div>
+                        </div>
+                        
+                        <div class="news-item" onclick="openNews('#')">
+                            <div class="news-title">Dollar Strengthens Against Euro</div>
+                            <div class="news-summary">US currency gains ground as economic data shows resilience</div>
+                            <div class="news-meta">
+                                <span>Financial Times</span>
+                                <span>8 hours ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sector Performance -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Sectors</h2>
+                    <button class="panel-action" onclick="viewAllSectors()">More</button>
+                </div>
+                
+                <div class="sector-grid">
+                    <div class="sector-card" onclick="viewSector('technology')">
+                        <div class="sector-header">
+                            <div class="sector-name">Technology</div>
+                            <div class="sector-change positive">+2.1%</div>
+                        </div>
+                        <div class="sector-stocks">
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">AAPL</span>
+                                <span class="sector-stock-change positive">+1.8%</span>
+                            </div>
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">MSFT</span>
+                                <span class="sector-stock-change positive">+2.3%</span>
+                            </div>
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">NVDA</span>
+                                <span class="sector-stock-change positive">+8.4%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sector-card" onclick="viewSector('healthcare')">
+                        <div class="sector-header">
+                            <div class="sector-name">Healthcare</div>
+                            <div class="sector-change positive">+0.8%</div>
+                        </div>
+                        <div class="sector-stocks">
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">JNJ</span>
+                                <span class="sector-stock-change positive">+0.5%</span>
+                            </div>
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">UNH</span>
+                                <span class="sector-stock-change positive">+1.2%</span>
+                            </div>
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">PFE</span>
+                                <span class="sector-stock-change negative">-0.3%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sector-card" onclick="viewSector('financial')">
+                        <div class="sector-header">
+                            <div class="sector-name">Financial</div>
+                            <div class="sector-change negative">-0.4%</div>
+                        </div>
+                        <div class="sector-stocks">
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">JPM</span>
+                                <span class="sector-stock-change negative">-0.8%</span>
+                            </div>
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">BAC</span>
+                                <span class="sector-stock-change negative">-0.2%</span>
+                            </div>
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">WFC</span>
+                                <span class="sector-stock-change positive">+0.1%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sector-card" onclick="viewSector('energy')">
+                        <div class="sector-header">
+                            <div class="sector-name">Energy</div>
+                            <div class="sector-change positive">+1.5%</div>
+                        </div>
+                        <div class="sector-stocks">
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">XOM</span>
+                                <span class="sector-stock-change positive">+2.1%</span>
+                            </div>
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">CVX</span>
+                                <span class="sector-stock-change positive">+1.3%</span>
+                            </div>
+                            <div class="sector-stock">
+                                <span class="sector-stock-symbol">COP</span>
+                                <span class="sector-stock-change positive">+0.9%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/config.js"></script>
+    <script src="/js/markets.js"></script>
+</body>
+</html>

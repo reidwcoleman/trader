@@ -110,6 +110,43 @@
             color: #00e676;
         }
         
+        .market-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00e676;
+            box-shadow: 0 0 8px rgba(0, 230, 118, 0.5);
+            animation: pulse-status 2s infinite;
+        }
+        
+        .status-indicator.closed {
+            background: #666;
+            box-shadow: none;
+            animation: none;
+        }
+        
+        .status-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        @keyframes pulse-status {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
         .user-menu {
             width: 40px;
             height: 40px;
@@ -433,6 +470,53 @@
             color: #888;
         }
         
+        /* Empty States */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+            margin: 0 0 8px 0;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            color: #888;
+            margin: 0 0 24px 0;
+            line-height: 1.5;
+        }
+        
+        .empty-action {
+            background: linear-gradient(135deg, #00e676, #00b248);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .empty-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 230, 118, 0.3);
+        }
+        
         .spinner {
             width: 24px;
             height: 24px;
@@ -448,6 +532,69 @@
         }
         
         /* Mobile Responsive */
+        /* Subtle Animations */
+        .stat-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        .stat-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        
+        .stat-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        
+        .watchlist-item {
+            animation: slideInRight 0.4s ease forwards;
+            opacity: 0;
+        }
+        
+        .watchlist-item:nth-child(1) { animation-delay: 0.1s; }
+        .watchlist-item:nth-child(2) { animation-delay: 0.2s; }
+        .watchlist-item:nth-child(3) { animation-delay: 0.3s; }
+        .watchlist-item:nth-child(4) { animation-delay: 0.4s; }
+        .watchlist-item:nth-child(5) { animation-delay: 0.5s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Enhanced mobile touch targets */
+        @media (hover: none) {
+            .nav-tab, .panel-action, .btn-buy, .btn-sell {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .watchlist-item {
+                padding: 20px 16px;
+            }
+            
+            .form-input {
+                padding: 16px 20px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+        
         @media (max-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -467,6 +614,11 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
             }
+            
+            .market-status {
+                order: -1;
+                margin-right: auto;
+            }
         }
         
         @media (max-width: 640px) {
@@ -484,6 +636,17 @@
             
             .chart-container {
                 height: 300px;
+            }
+            
+            .trade-buttons {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .trade-buttons .btn-buy,
+            .trade-buttons .btn-sell {
+                padding: 18px;
+                font-size: 16px;
             }
         }
     </style>
@@ -503,6 +666,10 @@
                     </nav>
                 </div>
                 <div class="header-right">
+                    <div class="market-status" id="marketStatus">
+                        <div class="status-indicator"></div>
+                        <span class="status-text">Market Open</span>
+                    </div>
                     <div class="buying-power">
                         <div class="buying-power-label">Buying Power</div>
                         <div class="buying-power-value" id="buyingPower">$0.00</div>
@@ -522,17 +689,17 @@
                 <div class="panel">
                     <div class="panel-header">
                         <h2 class="panel-title">Portfolio</h2>
-                        <button class="panel-action" onclick="viewFullPortfolio()">View All</button>
+                        <button class="panel-action" onclick="viewFullPortfolio()">Details</button>
                     </div>
                     
                     <div class="portfolio-stats">
                         <div class="stat-card">
-                            <div class="stat-label">Total Value</div>
+                            <div class="stat-label">Portfolio</div>
                             <div class="stat-value" id="totalValue">$0.00</div>
                             <div class="stat-change" id="totalChange">$0.00 (0.00%)</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">Today's Return</div>
+                            <div class="stat-label">Today</div>
                             <div class="stat-value" id="todayReturn">$0.00</div>
                             <div class="stat-change" id="todayPercent">(0.00%)</div>
                         </div>
@@ -551,8 +718,8 @@
                 <!-- Holdings -->
                 <div class="panel">
                     <div class="panel-header">
-                        <h2 class="panel-title">Your Holdings</h2>
-                        <button class="panel-action" onclick="manageHoldings()">Manage</button>
+                        <h2 class="panel-title">Holdings</h2>
+                        <button class="panel-action" onclick="manageHoldings()">View All</button>
                     </div>
                     
                     <div id="holdings-list">
@@ -568,7 +735,7 @@
                 <!-- Quick Trade -->
                 <div class="panel">
                     <div class="panel-header">
-                        <h2 class="panel-title">Quick Trade</h2>
+                        <h2 class="panel-title">Trade</h2>
                     </div>
                     
                     <form class="quick-trade-form" onsubmit="handleQuickTrade(event)">
@@ -619,8 +786,8 @@
                 <!-- Recent Activity -->
                 <div class="panel">
                     <div class="panel-header">
-                        <h2 class="panel-title">Recent Activity</h2>
-                        <button class="panel-action" onclick="viewAllActivity()">View All</button>
+                        <h2 class="panel-title">Activity</h2>
+                        <button class="panel-action" onclick="viewAllActivity()">More</button>
                     </div>
                     
                     <div id="recent-activity">

@@ -44,6 +44,34 @@ function updateUserInfo() {
     if (currentUser) {
         const userMenu = document.getElementById('userMenu');
         userMenu.textContent = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
+        
+        // Update market status
+        updateMarketStatus();
+    }
+}
+
+// Update market status
+function updateMarketStatus() {
+    const now = new Date();
+    const hours = now.getHours();
+    const day = now.getDay();
+    
+    // Market is open Monday-Friday 9:30 AM - 4:00 PM ET
+    // This is simplified - real implementation would handle holidays and exact timezone
+    const isWeekday = day >= 1 && day <= 5;
+    const isMarketHours = hours >= 9 && hours < 16;
+    const isOpen = isWeekday && isMarketHours;
+    
+    const statusElement = document.getElementById('marketStatus');
+    const indicator = statusElement.querySelector('.status-indicator');
+    const text = statusElement.querySelector('.status-text');
+    
+    if (isOpen) {
+        indicator.classList.remove('closed');
+        text.textContent = 'Market Open';
+    } else {
+        indicator.classList.add('closed');
+        text.textContent = 'Market Closed';
     }
 }
 
@@ -119,9 +147,13 @@ function updateHoldingsDisplay() {
     
     if (!portfolioData.holdings || portfolioData.holdings.length === 0) {
         holdingsList.innerHTML = `
-            <div style="text-align: center; color: #888; padding: 40px;">
-                <p>No holdings yet</p>
-                <p style="font-size: 14px;">Start trading to build your portfolio</p>
+            <div class="empty-state">
+                <div class="empty-icon">📈</div>
+                <h3>No holdings yet</h3>
+                <p>Start trading to build your portfolio</p>
+                <button class="btn-primary empty-action" onclick="document.getElementById('tradeSymbol').focus()">
+                    Start Trading
+                </button>
             </div>
         `;
         return;
@@ -308,9 +340,10 @@ function updateActivityDisplay() {
     
     if (activityData.length === 0) {
         activityContainer.innerHTML = `
-            <div style="text-align: center; color: #888; padding: 40px;">
-                <p>No recent activity</p>
-                <p style="font-size: 14px;">Your trades will appear here</p>
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <h3>No activity yet</h3>
+                <p>Your trades will appear here</p>
             </div>
         `;
         return;
