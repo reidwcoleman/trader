@@ -736,9 +736,365 @@ app.post('/api/scrape-article', async (req, res) => {
     }
 });
 
+// Portfolio API endpoints
+app.get('/api/portfolio/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const accounts = readAccounts();
+        const account = accounts.find(acc => acc.id === userId);
+        
+        if (!account) {
+            return res.status(404).json({ error: 'Account not found' });
+        }
+        
+        // Calculate portfolio value
+        const cash = account.cash || 100000;
+        const holdings = account.holdings || [];
+        
+        // Simulate real-time prices for holdings
+        let holdingsValue = 0;
+        const updatedHoldings = holdings.map(holding => {
+            // Simulate price movement (±2%)
+            const currentPrice = holding.avgCost * (1 + (Math.random() - 0.5) * 0.04);
+            const value = holding.shares * currentPrice;
+            holdingsValue += value;
+            
+            return {
+                ...holding,
+                currentPrice,
+                totalValue: value,
+                gainLoss: value - (holding.shares * holding.avgCost),
+                gainLossPercent: ((currentPrice - holding.avgCost) / holding.avgCost) * 100
+            };
+        });
+        
+        const totalValue = cash + holdingsValue;
+        const todayReturn = holdingsValue * (Math.random() - 0.5) * 0.02; // ±2% daily return
+        const totalReturn = totalValue - 100000; // Assuming $100k start
+        
+        res.json({
+            totalValue,
+            cash,
+            holdings: updatedHoldings,
+            todayReturn,
+            totalReturn,
+            todayReturnPercent: (todayReturn / totalValue) * 100,
+            totalReturnPercent: (totalReturn / 100000) * 100
+        });
+    } catch (error) {
+        console.error('Portfolio error:', error);
+        res.status(500).json({ error: 'Failed to load portfolio' });
+    }
+});
+
+// Stock quotes API
+app.get('/api/stocks/quotes', async (req, res) => {
+    try {
+        const symbols = req.query.symbols?.split(',') || [];
+        const quotes = {};
+        
+        // Generate mock quotes for requested symbols
+        symbols.forEach(symbol => {
+            const basePrice = Math.random() * 200 + 50;
+            const change = (Math.random() - 0.5) * 10;
+            
+            quotes[symbol] = {
+                price: basePrice,
+                change,
+                changePercent: (change / basePrice) * 100,
+                volume: Math.floor(Math.random() * 50000000) + 1000000
+            };
+        });
+        
+        res.json(quotes);
+    } catch (error) {
+        console.error('Quotes error:', error);
+        res.status(500).json({ error: 'Failed to fetch quotes' });
+    }
+});
+
+// Individual stock quote
+app.get('/api/stocks/quote', async (req, res) => {
+    try {
+        const symbol = req.query.symbol;
+        if (!symbol) {
+            return res.status(400).json({ error: 'Symbol required' });
+        }
+        
+        const basePrice = Math.random() * 200 + 50;
+        const change = (Math.random() - 0.5) * 10;
+        
+        res.json({
+            symbol: symbol.toUpperCase(),
+            name: `${symbol.toUpperCase()} Corporation`,
+            price: basePrice,
+            change,
+            changePercent: (change / basePrice) * 100,
+            marketCap: `${(Math.random() * 3 + 0.5).toFixed(1)}T`,
+            peRatio: (Math.random() * 40 + 10).toFixed(1),
+            weekHigh: basePrice * 1.3,
+            weekLow: basePrice * 0.7,
+            volume: `${(Math.random() * 80 + 20).toFixed(1)}M`,
+            avgVolume: `${(Math.random() * 60 + 30).toFixed(1)}M`
+        });
+    } catch (error) {
+        console.error('Quote error:', error);
+        res.status(500).json({ error: 'Failed to fetch quote' });
+    }
+});
+
+// Trading API
+app.post('/api/trades', async (req, res) => {
+    try {
+        const { userId, symbol, shares, action, orderType, limitPrice, currentPrice } = req.body;
+        
+        if (!userId || !symbol || !shares || !action) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+        
+        const accounts = readAccounts();
+        const accountIndex = accounts.findIndex(acc => acc.id === userId);
+        
+        if (accountIndex === -1) {
+            return res.status(404).json({ error: 'Account not found' });
+        }
+        
+        const account = accounts[accountIndex];
+        const tradePrice = limitPrice || currentPrice || 100;
+        const totalCost = shares * tradePrice;
+        const commission = totalCost * 0.001; // 0.1% commission
+        
+        // Initialize account properties if they don't exist
+        if (!account.cash) account.cash = 100000;
+        if (!account.holdings) account.holdings = [];
+        if (!account.activity) account.activity = [];
+        
+        if (action === 'buy') {
+            // Check if user has enough cash
+            if (account.cash < totalCost + commission) {
+                return res.status(400).json({ error: 'Insufficient buying power' });
+            }
+            
+            // Deduct cash
+            account.cash -= (totalCost + commission);
+            
+            // Add to holdings
+            const existingHolding = account.holdings.find(h => h.symbol === symbol);
+            if (existingHolding) {
+                // Update average cost
+                const totalShares = existingHolding.shares + shares;
+                const totalValue = (existingHolding.shares * existingHolding.avgCost) + totalCost;
+                existingHolding.avgCost = totalValue / totalShares;
+                existingHolding.shares = totalShares;
+            } else {
+                account.holdings.push({
+                    symbol,
+                    shares,
+                    avgCost: tradePrice,
+                    purchaseDate: Date.now()
+                });
+            }
+        } else if (action === 'sell') {
+            // Find holding
+            const holdingIndex = account.holdings.findIndex(h => h.symbol === symbol);
+            if (holdingIndex === -1 || account.holdings[holdingIndex].shares < shares) {
+                return res.status(400).json({ error: 'Insufficient shares to sell' });
+            }
+            
+            // Add cash (minus commission)
+            account.cash += (totalCost - commission);
+            
+            // Reduce holdings
+            const holding = account.holdings[holdingIndex];
+            holding.shares -= shares;
+            
+            // Remove holding if no shares left
+            if (holding.shares === 0) {
+                account.holdings.splice(holdingIndex, 1);
+            }
+        }
+        
+        // Add to activity log
+        account.activity.unshift({
+            id: Date.now(),
+            type: action,
+            symbol,
+            shares,
+            price: tradePrice,
+            amount: totalCost,
+            commission,
+            timestamp: Date.now(),
+            status: orderType === 'market' ? 'filled' : 'pending'
+        });
+        
+        // Keep only last 50 activities
+        if (account.activity.length > 50) {
+            account.activity = account.activity.slice(0, 50);
+        }
+        
+        // Save accounts
+        writeAccounts(accounts);
+        
+        res.json({
+            success: true,
+            trade: {
+                symbol,
+                shares,
+                action,
+                price: tradePrice,
+                total: totalCost,
+                commission,
+                newCash: account.cash
+            }
+        });
+        
+    } catch (error) {
+        console.error('Trade error:', error);
+        res.status(500).json({ error: 'Failed to execute trade' });
+    }
+});
+
+// Watchlist API
+app.get('/api/watchlist/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const accounts = readAccounts();
+        const account = accounts.find(acc => acc.id === userId);
+        
+        if (!account) {
+            return res.status(404).json({ error: 'Account not found' });
+        }
+        
+        // Default watchlist if none exists
+        const defaultWatchlist = [
+            { symbol: 'AAPL', name: 'Apple Inc.' },
+            { symbol: 'NVDA', name: 'NVIDIA Corporation' },
+            { symbol: 'MSFT', name: 'Microsoft Corporation' },
+            { symbol: 'GOOGL', name: 'Alphabet Inc.' },
+            { symbol: 'TSLA', name: 'Tesla, Inc.' }
+        ];
+        
+        res.json(account.watchlist || defaultWatchlist);
+    } catch (error) {
+        console.error('Watchlist error:', error);
+        res.status(500).json({ error: 'Failed to load watchlist' });
+    }
+});
+
+// Activity API
+app.get('/api/activity/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const accounts = readAccounts();
+        const account = accounts.find(acc => acc.id === userId);
+        
+        if (!account) {
+            return res.status(404).json({ error: 'Account not found' });
+        }
+        
+        res.json(account.activity || []);
+    } catch (error) {
+        console.error('Activity error:', error);
+        res.status(500).json({ error: 'Failed to load activity' });
+    }
+});
+
+// Stock chart API
+app.get('/api/stocks/chart', async (req, res) => {
+    try {
+        const { symbol, period } = req.query;
+        
+        if (!symbol) {
+            return res.status(400).json({ error: 'Symbol required' });
+        }
+        
+        // Generate mock chart data
+        const periodDays = {
+            '1D': 1,
+            '5D': 5,
+            '1M': 30,
+            '3M': 90,
+            '6M': 180,
+            '1Y': 365,
+            '5Y': 1825
+        };
+        
+        const days = periodDays[period] || 30;
+        const data = [];
+        const labels = [];
+        let basePrice = Math.random() * 200 + 50;
+        
+        for (let i = days; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            labels.push(date.toISOString().split('T')[0]);
+            
+            basePrice += (Math.random() - 0.5) * (basePrice * 0.02);
+            data.push(parseFloat(basePrice.toFixed(2)));
+        }
+        
+        res.json({ labels, data });
+    } catch (error) {
+        console.error('Chart error:', error);
+        res.status(500).json({ error: 'Failed to generate chart' });
+    }
+});
+
+// Stock news API
+app.get('/api/news/stock', async (req, res) => {
+    try {
+        const symbol = req.query.symbol;
+        
+        // Generate mock news for the stock
+        const mockNews = [
+            {
+                title: `${symbol} Reports Strong Quarterly Earnings`,
+                summary: `${symbol} exceeded analyst expectations with strong revenue growth and improved margins in the latest quarter.`,
+                source: 'Financial Times',
+                time: '2 hours ago',
+                url: '#'
+            },
+            {
+                title: `Analysts Upgrade ${symbol} Price Target`,
+                summary: 'Multiple investment firms have raised their price targets following positive market developments.',
+                source: 'Bloomberg',
+                time: '4 hours ago',
+                url: '#'
+            },
+            {
+                title: `${symbol} Announces Strategic Partnership`,
+                summary: 'The company has entered into a strategic partnership expected to drive future growth.',
+                source: 'Reuters',
+                time: '6 hours ago',
+                url: '#'
+            },
+            {
+                title: `Market Volatility Affects ${symbol} Trading`,
+                summary: 'Recent market conditions have led to increased trading volume and price fluctuations.',
+                source: 'MarketWatch',
+                time: '8 hours ago',
+                url: '#'
+            },
+            {
+                title: `${symbol} CEO Discusses Long-term Vision`,
+                summary: 'Company leadership outlined strategic initiatives for the next fiscal year.',
+                source: 'CNBC',
+                time: '1 day ago',
+                url: '#'
+            }
+        ];
+        
+        res.json(mockNews);
+    } catch (error) {
+        console.error('News error:', error);
+        res.status(500).json({ error: 'Failed to load news' });
+    }
+});
+
 server.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`📧 Email service configured: ${process.env.EMAIL_USER || 'Not configured'}`);
     console.log(`💬 Chat server ready`);
     console.log(`📰 Article scraper ready`);
+    console.log(`💹 Trading API ready`);
 });
