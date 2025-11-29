@@ -248,7 +248,7 @@ app.post('/api/send-password-reset', async (req, res) => {
 // Create account endpoint
 app.post('/api/accounts/create', async (req, res) => {
     try {
-        const { email, userName, password, accountCode } = req.body;
+        let { email, userName, password, accountCode } = req.body;
 
         if (!email || !isValidEmail(email)) {
             return res.status(400).json({ error: 'Valid email is required' });
@@ -262,16 +262,18 @@ app.post('/api/accounts/create', async (req, res) => {
             return res.status(400).json({ error: 'Password is required' });
         }
 
-        if (!accountCode) {
-            return res.status(400).json({ error: 'Account code is required' });
-        }
-
         const accounts = readAccounts();
 
         // Check if email already exists
         const existingAccount = accounts.find(acc => acc.email.toLowerCase() === email.toLowerCase());
         if (existingAccount) {
             return res.status(400).json({ error: 'An account with this email already exists' });
+        }
+
+        // Generate accountCode if not provided
+        if (!accountCode) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            accountCode = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
         }
 
         // Hash the password
@@ -741,37 +743,45 @@ app.get('/api/portfolio/:userId', async (req, res) => {
     try {
         const userId = req.params.userId;
         const accounts = readAccounts();
-        const account = accounts.find(acc => acc.id === userId);
-        
+        // Find account by email
+        const account = accounts.find(acc => acc.email === userId);
+
         if (!account) {
             return res.status(404).json({ error: 'Account not found' });
         }
-        
-        // Calculate portfolio value
-        const cash = account.cash || 100000;
-        const holdings = account.holdings || [];
-        
-        // Simulate real-time prices for holdings
+
+        // Get portfolio data
+        const portfolio = account.portfolio || { cash: 100000, positions: {}, history: [] };
+        const cash = portfolio.cash || 100000;
+        const positions = portfolio.positions || {};
+
+        // Convert positions object to holdings array with simulated prices
         let holdingsValue = 0;
-        const updatedHoldings = holdings.map(holding => {
+        const updatedHoldings = Object.entries(positions).map(([symbol, shares]) => {
+            // Get price from history if available, otherwise simulate
+            const lastTrade = portfolio.history?.find(h => h.symbol === symbol);
+            const avgCost = lastTrade?.price || 100;
+
             // Simulate price movement (±2%)
-            const currentPrice = holding.avgCost * (1 + (Math.random() - 0.5) * 0.04);
-            const value = holding.shares * currentPrice;
+            const currentPrice = avgCost * (1 + (Math.random() - 0.5) * 0.04);
+            const value = shares * currentPrice;
             holdingsValue += value;
-            
+
             return {
-                ...holding,
+                symbol,
+                shares,
+                avgCost,
                 currentPrice,
                 totalValue: value,
-                gainLoss: value - (holding.shares * holding.avgCost),
-                gainLossPercent: ((currentPrice - holding.avgCost) / holding.avgCost) * 100
+                gainLoss: value - (shares * avgCost),
+                gainLossPercent: ((currentPrice - avgCost) / avgCost) * 100
             };
         });
-        
+
         const totalValue = cash + holdingsValue;
         const todayReturn = holdingsValue * (Math.random() - 0.5) * 0.02; // ±2% daily return
         const totalReturn = totalValue - 100000; // Assuming $100k start
-        
+
         res.json({
             totalValue,
             cash,
@@ -967,12 +977,13 @@ app.get('/api/watchlist/:userId', async (req, res) => {
     try {
         const userId = req.params.userId;
         const accounts = readAccounts();
-        const account = accounts.find(acc => acc.id === userId);
-        
+        // Find account by email
+        const account = accounts.find(acc => acc.email === userId);
+
         if (!account) {
             return res.status(404).json({ error: 'Account not found' });
         }
-        
+
         // Default watchlist if none exists
         const defaultWatchlist = [
             { symbol: 'AAPL', name: 'Apple Inc.' },
@@ -981,8 +992,9 @@ app.get('/api/watchlist/:userId', async (req, res) => {
             { symbol: 'GOOGL', name: 'Alphabet Inc.' },
             { symbol: 'TSLA', name: 'Tesla, Inc.' }
         ];
-        
-        res.json(account.watchlist || defaultWatchlist);
+
+        const watchlist = account.portfolio?.watchlist || defaultWatchlist;
+        res.json(watchlist);
     } catch (error) {
         console.error('Watchlist error:', error);
         res.status(500).json({ error: 'Failed to load watchlist' });
@@ -994,13 +1006,15 @@ app.get('/api/activity/:userId', async (req, res) => {
     try {
         const userId = req.params.userId;
         const accounts = readAccounts();
-        const account = accounts.find(acc => acc.id === userId);
-        
+        // Find account by email
+        const account = accounts.find(acc => acc.email === userId);
+
         if (!account) {
             return res.status(404).json({ error: 'Account not found' });
         }
-        
-        res.json(account.activity || []);
+
+        const history = account.portfolio?.history || [];
+        res.json(history);
     } catch (error) {
         console.error('Activity error:', error);
         res.status(500).json({ error: 'Failed to load activity' });

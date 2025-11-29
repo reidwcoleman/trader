@@ -208,9 +208,20 @@ class TradingApp {
     /**
      * Handle order execution
      */
-    async handleOrderExecuted(order) {
-        // Update portfolio
-        await this.updatePortfolio(order);
+    async handleOrderExecuted(order, backendResponse) {
+        // Update portfolio from backend response if available
+        if (backendResponse?.portfolio) {
+            this.portfolio = {
+                ...this.portfolio,
+                cash: backendResponse.portfolio.cash,
+                positions: backendResponse.portfolio.positions,
+                history: backendResponse.portfolio.history
+            };
+            this.savePortfolio();
+        } else {
+            // Fallback to local calculation if no backend response
+            await this.updatePortfolio(order);
+        }
 
         // Refresh portfolio hub if open
         if (this.currentHub === 'portfolio' && this.hubs.portfolio) {
@@ -255,6 +266,7 @@ class TradingApp {
     getTradingEngine() {
         if (!this._tradingEngine) {
             this._tradingEngine = new TradingEngine({
+                userId: this.user?.email || null,
                 onOrderExecuted: (order) => this.handleOrderExecuted(order),
                 validateFunds: (amount) => this.validateFunds(amount)
             });

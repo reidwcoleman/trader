@@ -446,12 +446,30 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    // Store user data in localStorage for immediate access
+                    const userData = {
+                        username: data.account.userName,
+                        email: data.account.email,
+                        accountCode: data.account.accountCode,
+                        learningProgress: { level: 1, xp: 0, streak: 0 }
+                    };
+                    localStorage.setItem('user', JSON.stringify(userData));
+
+                    // Initialize default portfolio
+                    const portfolio = {
+                        cash: 100000,
+                        positions: {},
+                        history: [],
+                        watchlist: []
+                    };
+                    localStorage.setItem('portfolio', JSON.stringify(portfolio));
+
                     showAlert('Account created successfully! Redirecting...', 'success');
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = 'dashboard.html';
                     }, 1000);
                 } else {
-                    showAlert(data.message || 'Registration failed', 'error');
+                    showAlert(data.message || data.error || 'Registration failed', 'error');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Create Account';
                 }

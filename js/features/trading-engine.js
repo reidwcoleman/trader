@@ -31,10 +31,14 @@ class TradingEngine {
             const trade = {
                 userId: this.userId,
                 symbol,
+                shares: quantity,  // Backend expects 'shares'
+                action: side,      // Backend expects 'action'
+                currentPrice: price,  // Backend expects 'currentPrice'
+                orderType: 'market',
+                // Client-side tracking
                 quantity,
                 price,
                 side,
-                orderType: 'market',
                 totalCost: side === 'buy' ? totalCost : -totalCost,
                 commission: Math.abs(totalCost * this.commission),
                 timestamp: Date.now(),
@@ -44,7 +48,8 @@ class TradingEngine {
             const response = await this.sendTradeToBackend(trade);
 
             if (this.callbacks.onTradeExecuted) {
-                this.callbacks.onTradeExecuted(trade);
+                // Pass both the trade and the backend response
+                this.callbacks.onTradeExecuted(trade, response);
             }
 
             UIToast.show({
